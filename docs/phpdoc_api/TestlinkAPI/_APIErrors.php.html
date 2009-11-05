@@ -1,0 +1,2650 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Docs for page APIErrors.php</title>
+	<link rel="stylesheet" type="text/css" href="../media/style.css">
+	<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+</head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" height="48" width="100%">
+  <tr>
+	<td class="header-top-left"><img src="../media/logo.png" border="0" alt="phpDocumentor " /></td>
+    <td class="header-top-right">TestlinkAPI<br /><div class="header-top-right-subpackage"></div></td>
+  </tr>
+  <tr><td colspan="2" class="header-line"><img src="../media/empty.png" width="1" height="1" border="0" alt=""  /></td></tr>
+  <tr>
+    <td colspan="2" class="header-menu">
+      
+                        
+                      		[ <a href="../classtrees_TestlinkAPI.html" class="menu">class tree: TestlinkAPI</a> ]
+		[ <a href="../elementindex_TestlinkAPI.html" class="menu">index: TestlinkAPI</a> ]
+            [ <a href="../elementindex.html" class="menu">all elements</a> ]
+    </td>
+  </tr>
+  <tr><td colspan="2" class="header-line"><img src="../media/empty.png" width="1" height="1" border="0" alt=""  /></td></tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="195" class="menu">
+		<div class="package-title">TestlinkAPI</div>
+      <b>Packages:</b><br />
+  <div class="package">
+              <a href="../li_TestlinkAPI.html">TestlinkAPI</a><br />
+      	</div>
+      <br />
+                        <b>Files:</b><br />
+        <div class="package">
+				<span style="padding-left: 1em;"><a href="../TestlinkAPI/_api.const.inc.php.html">api.const.inc.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_APIErrors.php.html">APIErrors.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_APIKey.php.html">APIKey.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientAddTestCaseToTestPlan.php.html">clientAddTestCaseToTestPlan.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientAssignRequirements.php.html">clientAssignRequirements.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientCreateTestCase.php.html">clientCreateTestCase.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientCreateTestProject.php.html">clientCreateTestProject.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientCreateTestSuite.php.html">clientCreateTestSuite.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetBuilds.php.html">clientGetBuilds.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetLastExecutionResult.php.html">clientGetLastExecutionResult.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetTestCaseAttachments.php.html">clientGetTestCaseAttachments.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetTestCaseCustomFieldDesignValue.php.html">clientGetTestCaseCustomFieldDesignValue.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetTestCasesForTestPlan.php.html">clientGetTestCasesForTestPlan.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetTestCasesForTestSuite.php.html">clientGetTestCasesForTestSuite.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientGetTestCasesIDByName.php.html">clientGetTestCasesIDByName.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientReportTCResult.php.html">clientReportTCResult.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientSample.php.html">clientSample.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_sample_clients---php---clientSample2.php.html">clientSample2.php</a></span><br />
+			<span style="padding-left: 1em;"><a href="../TestlinkAPI/_xmlrpc.php.html">xmlrpc.php</a></span><br />
+	  </div>
+            <br />
+                  <b>Classes:</b><br />
+        <div class="package">
+		    		<a href="../TestlinkAPI/APIKey.html">APIKey</a>    	 <br />
+	    		<a href="../TestlinkAPI/TestlinkXMLRPCServer.html">TestlinkXMLRPCServer</a>    	 <br />
+	  </div>
+                </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+
+<h1>Procedural File: APIErrors.php</h1>
+Source Location: /APIErrors.php<br /><br />
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Page Details</div>
+	<div class="nav-bar">
+					<span class="disabled">Page Details</span> |
+									<a href="#sec-includes">Includes</a>
+			|							<a href="#sec-constants">Constants</a>
+										</div>
+	<div class="info-box-body">
+		<p align="center" class="short-description"><strong>Error codes for the TestlinkXMLRPCServer
+</strong></p>
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tr><td><strong>Author:</strong>&nbsp;&nbsp;</td><td>Asiel Brumfield &lt;<a href="mailto:asielb@users.sourceforge.net">asielb@users.sourceforge.net</a>&gt;</td></tr>
+			<tr><td><strong>Link:</strong>&nbsp;&nbsp;</td><td><a href="http://testlink.org/api/">http://testlink.org/api/
+
+ rev: 20090304 - BUGID 2191 - franciscom
+
+      20080518 - franciscom - TestLink Development team - www.teamst.org
+      suppress log for missing localization strings.</a></td></tr>
+	</table>
+
+			</div>
+</div>
+
+
+	<a name="sec-includes"></a>
+	<div class="info-box">
+		<div class="info-box-title">Includes</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Page Details</a> |
+						<span class="disabled">Includes</span>
+			|							<a href="#sec-constants">Constants</a>
+															</div>
+		<div class="info-box-body">
+			<a name="_dirname(__FILE__)_/__/functions/lang_api_php"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">dirname(__FILE__).'/../functions/lang_api.php'</span>)
+			<span class="smalllinenumber">[line 24]</span>
+		</span>
+	</div>
+
+		
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+		<br />
+</div>
+<a name="_dirname(__FILE__)_/__/__/config_inc_php"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">dirname(__FILE__)."/../../config.inc.php"</span>)
+			<span class="smalllinenumber">[line 23]</span>
+		</span>
+	</div>
+
+	<p align="center" class="short-description"><strong>general config file gives us lang_get access
+</strong></p>
+	
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+		<br />
+</div>
+		</div>
+	</div><br />
+
+	<a name="sec-constants"></a>
+	<div class="info-box">
+		<div class="info-box-title">Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Page Details</a> |
+										<a href="#sec-includes">Includes</a>
+				|						<span class="disabled">Constants</span>
+											</div>
+		<div class="info-box-body">
+			<a name="defineBAD_BUILD_FOR_TPLAN"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BAD_BUILD_FOR_TPLAN</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 116]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BAD_BUILD_FOR_TPLAN = 3032</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineBAD_BUILD_FOR_TPLAN_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BAD_BUILD_FOR_TPLAN_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 117]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BAD_BUILD_FOR_TPLAN_STR = lang_get('API_BAD_BUILD_FOR_TPLAN',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineBUILDID_NOGUESS"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BUILDID_NOGUESS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 127]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BUILDID_NOGUESS = 4020</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineBUILDID_NOGUESS_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BUILDID_NOGUESS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 128]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BUILDID_NOGUESS_STR = lang_get('API_BUILDID_NOGUESS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineBUILDID_NOT_INTEGER"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BUILDID_NOT_INTEGER</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 125]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BUILDID_NOT_INTEGER = 4010</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineBUILDID_NOT_INTEGER_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">BUILDID_NOT_INTEGER_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 126]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>BUILDID_NOT_INTEGER_STR = lang_get('API_BUILDID_NOT_INTEGER',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineCUSTOMFIELD_NOT_APP_FOR_NODE_TYPE"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">CUSTOMFIELD_NOT_APP_FOR_NODE_TYPE</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 208]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>CUSTOMFIELD_NOT_APP_FOR_NODE_TYPE = 9001</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineCUSTOMFIELD_NOT_APP_FOR_NODE_TYPE_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">CUSTOMFIELD_NOT_APP_FOR_NODE_TYPE_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 209]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>CUSTOMFIELD_NOT_APP_FOR_NODE_TYPE_STR = lang_get('API_CUSTOMFIELD_NOT_APP_FOR_NODE_TYPE',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineGENERAL_ERROR_CODE"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">GENERAL_ERROR_CODE</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 34]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>GENERAL_ERROR_CODE = -1</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>a catch all generic error
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineGENERAL_SUCCESS_CODE"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">GENERAL_SUCCESS_CODE</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 36]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>GENERAL_SUCCESS_CODE = 1</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineGENERAL_SUCCESS_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">GENERAL_SUCCESS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 43]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>GENERAL_SUCCESS_STR = lang_get('API_GENERAL_SUCCESS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINSUFFICIENT_RIGHTS"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INSUFFICIENT_RIGHTS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 97]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INSUFFICIENT_RIGHTS = 2010</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINSUFFICIENT_RIGHTS_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INSUFFICIENT_RIGHTS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 98]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INSUFFICIENT_RIGHTS_STR = lang_get('API_INSUFFICIENT_RIGHTS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_AUTH"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_AUTH</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 95]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_AUTH = 2000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>2000 level - authentication errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_AUTH_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_AUTH_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 96]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_AUTH_STR = lang_get('API_INVALID_AUTH',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_BUILDID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_BUILDID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 123]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_BUILDID = 4000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>4000 level - Build errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_BUILDID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_BUILDID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 124]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_BUILDID_STR = lang_get('API_INVALID_BUILDID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_STATUS"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_STATUS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 155]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_STATUS = 6000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>6000 level - Status errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_STATUS_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_STATUS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 156]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_STATUS_STR = lang_get('API_INVALID_STATUS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TCASEID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TCASEID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 134]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TCASEID = 5000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>5000 level - Test Case errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TCASEID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TCASEID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 135]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TCASEID_STR = lang_get('API_INVALID_TCASEID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTCASE_EXTERNAL_ID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTCASE_EXTERNAL_ID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 142]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTCASE_EXTERNAL_ID = 5040</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTCASE_EXTERNAL_ID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTCASE_EXTERNAL_ID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 143]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTCASE_EXTERNAL_ID_STR = lang_get('API_INVALID_TESTCASE_EXTERNAL_ID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTCASE_VERSION_NUMBER"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTCASE_VERSION_NUMBER</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 144]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTCASE_VERSION_NUMBER = 5050</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTCASE_VERSION_NUMBER_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTCASE_VERSION_NUMBER_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 145]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTCASE_VERSION_NUMBER_STR = lang_get('API_INVALID_TESTCASE_VERSION_NUMBER',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTPROJECTID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTPROJECTID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 161]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTPROJECTID = 7000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>7000 level - Test Project errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTPROJECTID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTPROJECTID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 162]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTPROJECTID_STR = lang_get('API_INVALID_TESTPROJECTID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTSUITEID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTSUITEID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 190]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTSUITEID = 8000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>8000 level - Test Suite errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TESTSUITEID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TESTSUITEID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 191]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TESTSUITEID_STR = lang_get('API_INVALID_TESTSUITEID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TPLANID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TPLANID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 104]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TPLANID = 3000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>3000 level - Test Plan errors
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineINVALID_TPLANID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">INVALID_TPLANID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 105]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>INVALID_TPLANID_STR = lang_get('API_INVALID_TPLANID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineMISSING_REQUIRED_PARAMETER"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">MISSING_REQUIRED_PARAMETER</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 81]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>MISSING_REQUIRED_PARAMETER = 200</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineMISSING_REQUIRED_PARAMETER_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">MISSING_REQUIRED_PARAMETER_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 82]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>MISSING_REQUIRED_PARAMETER_STR = lang_get('API_MISSING_REQUIRED_PARAMETER',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNOT_YET_IMPLEMENTED"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NOT_YET_IMPLEMENTED</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 45]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NOT_YET_IMPLEMENTED = 50</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNOT_YET_IMPLEMENTED_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NOT_YET_IMPLEMENTED_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 46]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NOT_YET_IMPLEMENTED_STR = lang_get('API_NOT_YET_IMPLEMENTED',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_BUILDID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_BUILDID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 63]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_BUILDID = 130</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_BUILDID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_BUILDID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 64]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_BUILDID_STR = lang_get('API_NO_BUILDID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_BUILD_FOR_TPLANID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_BUILD_FOR_TPLANID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 108]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_BUILD_FOR_TPLANID = 3020</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_BUILD_FOR_TPLANID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_BUILD_FOR_TPLANID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 109]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_BUILD_FOR_TPLANID_STR = lang_get('API_NO_BUILD_FOR_TPLANID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_CUSTOMFIELD_BY_THIS_NAME"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_CUSTOMFIELD_BY_THIS_NAME</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 205]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_CUSTOMFIELD_BY_THIS_NAME = 9000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>9000 level - Custom Fields
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_CUSTOMFIELD_BY_THIS_NAME_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_CUSTOMFIELD_BY_THIS_NAME_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 206]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_CUSTOMFIELD_BY_THIS_NAME_STR = lang_get('API_NO_CUSTOMFIELD_BY_THIS_NAME',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_DEV_KEY"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_DEV_KEY</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 50]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_DEV_KEY = 100</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Error codes below 1000 are system level
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_DEV_KEY_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_DEV_KEY_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 51]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_DEV_KEY_STR = lang_get('API_NO_DEV_KEY',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_STATUS"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_STATUS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 69]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_STATUS = 150</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_STATUS_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_STATUS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 70]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_STATUS_STR = lang_get('API_NO_STATUS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TCASEEXTERNALID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TCASEEXTERNALID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 56]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TCASEEXTERNALID = 110</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TCASEEXTERNALID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TCASEEXTERNALID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 57]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TCASEEXTERNALID_STR = lang_get('API_NO_TCASEEXTERNALID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TCASEID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TCASEID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 53]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TCASEID = 110</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TCASEID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TCASEID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 54]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TCASEID_STR = lang_get('API_NO_TCASEID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTCASENAME"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTCASENAME</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 75]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTCASENAME = 170</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTCASENAME_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTCASENAME_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 76]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTCASENAME_STR = lang_get('API_NO_TESTCASENAME',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTCASE_BY_THIS_NAME"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTCASE_BY_THIS_NAME</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 140]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTCASE_BY_THIS_NAME = 5030</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTCASE_BY_THIS_NAME_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTCASE_BY_THIS_NAME_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 141]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTCASE_BY_THIS_NAME_STR = lang_get('API_NO_TESTCASE_BY_THIS_NAME',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTPROJECTID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTPROJECTID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 72]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTPROJECTID = 160</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTPROJECTID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTPROJECTID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 73]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTPROJECTID_STR = lang_get('API_NO_TESTPROJECTID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTSUITEID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTSUITEID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 78]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTSUITEID = 180</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTSUITEID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTSUITEID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 79]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTSUITEID_STR = lang_get('API_NO_TESTSUITEID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTSUITENAME"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTSUITENAME</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 87]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTSUITENAME = 220</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TESTSUITENAME_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TESTSUITENAME_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 88]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TESTSUITENAME_STR = lang_get('API_NO_TESTSUITENAME',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TEST_MODE"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TEST_MODE</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 66]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TEST_MODE = 140</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TEST_MODE_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TEST_MODE_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 67]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TEST_MODE_STR = lang_get('API_NO_TEST_MODE',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TPLANID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TPLANID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 60]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TPLANID = 120</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_TPLANID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_TPLANID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 61]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_TPLANID_STR = lang_get('API_NO_TPLANID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_USER_BY_THIS_LOGIN"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_USER_BY_THIS_LOGIN</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 215]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_USER_BY_THIS_LOGIN = 10000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>10000 level - User
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineNO_USER_BY_THIS_LOGIN_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">NO_USER_BY_THIS_LOGIN_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 216]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>NO_USER_BY_THIS_LOGIN_STR = lang_get('API_NO_USER_BY_THIS_LOGIN',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="definePARAMETER_NOT_INT"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">PARAMETER_NOT_INT</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 84]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>PARAMETER_NOT_INT = 210</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="definePARAMETER_NOT_INT_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">PARAMETER_NOT_INT_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 85]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>PARAMETER_NOT_INT_STR = lang_get('API_PARAMETER_NOT_INT',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_IS_EMPTY"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_IS_EMPTY</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 225]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_IS_EMPTY = 11001</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_IS_EMPTY_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_IS_EMPTY_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 226]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_IS_EMPTY_STR = lang_get('API_REQSPEC_IS_EMPTY',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 222]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_KO = 11000</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>11000 level - Requirements
+</strong></p>
+<span class="description"><p>Constants</p></span>    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 223]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_KO_STR = lang_get('API_REQSPEC_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_TPROJECT_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_TPROJECT_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 183]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_TPROJECT_KO = 7010</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQSPEC_TPROJECT_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQSPEC_TPROJECT_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 184]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQSPEC_TPROJECT_KO_STR = lang_get('API_REQSPEC_TPROJECT_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQ_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQ_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 231]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQ_KO = 11003</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQ_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQ_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 232]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQ_KO_STR = lang_get('API_REQ_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQ_REQSPEC_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQ_REQSPEC_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 228]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQ_REQSPEC_KO = 11002</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineREQ_REQSPEC_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">REQ_REQSPEC_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 229]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>REQ_REQSPEC_KO_STR = lang_get('API_REQ_REQSPEC_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASEID_NOT_INTEGER"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASEID_NOT_INTEGER</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 136]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASEID_NOT_INTEGER = 5010</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASEID_NOT_INTEGER_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASEID_NOT_INTEGER_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 137]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASEID_NOT_INTEGER_STR = lang_get('API_TCASEID_NOT_INTEGER',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASEID_NOT_IN_TPLANID"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASEID_NOT_IN_TPLANID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 110]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASEID_NOT_IN_TPLANID = 3030</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASEID_NOT_IN_TPLANID_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASEID_NOT_IN_TPLANID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 111]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASEID_NOT_IN_TPLANID_STR = lang_get('API_TCASEID_NOT_IN_TPLANID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASE_TPROJECT_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASE_TPROJECT_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 173]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASE_TPROJECT_KO = 7007</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASE_TPROJECT_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASE_TPROJECT_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 174]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASE_TPROJECT_KO_STR = lang_get('API_TCASE_TPROJECT_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASE_VERSION_NUMBER_KO"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASE_VERSION_NUMBER_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 146]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASE_VERSION_NUMBER_KO = 5051</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTCASE_VERSION_NUMBER_KO_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TCASE_VERSION_NUMBER_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 147]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TCASE_VERSION_NUMBER_KO_STR = lang_get('API_TCASE_VERSION_NUMBER_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTCASENAME_NOT_STRING"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTCASENAME_NOT_STRING</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 138]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTCASENAME_NOT_STRING = 5020</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTCASENAME_NOT_STRING_STR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTCASENAME_NOT_STRING_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 139]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTCASENAME_NOT_STRING_STR = lang_get('API_TESTCASENAME_NOT_STRING',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTPROJECTNAME_EXISTS"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTPROJECTNAME_EXISTS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 165]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTPROJECTNAME_EXISTS = 7002</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTPROJECTNAME_SINTAX_ERROR"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTPROJECTNAME_SINTAX_ERROR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 164]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTPROJECTNAME_SINTAX_ERROR = 7001</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTPROJECT_TESTCASEPREFIX_EXISTS"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTPROJECT_TESTCASEPREFIX_EXISTS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 166]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTPROJECT_TESTCASEPREFIX_EXISTS = 7003</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTPROJECT_TESTCASEPREFIX_IS_EMPTY"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTPROJECT_TESTCASEPREFIX_IS_EMPTY</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 167]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTPROJECT_TESTCASEPREFIX_IS_EMPTY = 7004</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTPROJECT_TESTCASEPREFIX_IS_TOO_LONG"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTPROJECT_TESTCASEPREFIX_IS_TOO_LONG</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 168]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTPROJECT_TESTCASEPREFIX_IS_TOO_LONG = 7005</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTSUITENAME_NOT_STRING"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTSUITENAME_NOT_STRING</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 197]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTSUITENAME_NOT_STRING = 8002</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTSUITENAME_NOT_STRING_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTSUITENAME_NOT_STRING_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 198]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTSUITENAME_NOT_STRING_STR = lang_get('API_TESTSUITENAME_NOT_STRING',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTSUITE_DONOTBELONGTO_TESTPROJECT"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTSUITE_DONOTBELONGTO_TESTPROJECT</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 193]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTSUITE_DONOTBELONGTO_TESTPROJECT = 8001</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTESTSUITE_DONOTBELONGTO_TESTPROJECT_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TESTSUITE_DONOTBELONGTO_TESTPROJECT_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 194]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TESTSUITE_DONOTBELONGTO_TESTPROJECT_STR = lang_get('API_TESTSUITE_DONOTBELONGTO_TESTPROJECT',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLANID_NOT_INTEGER"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLANID_NOT_INTEGER</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 106]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLANID_NOT_INTEGER = 3010</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLANID_NOT_INTEGER_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLANID_NOT_INTEGER_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 107]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLANID_NOT_INTEGER_STR = lang_get('API_TPLANID_NOT_INTEGER',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLAN_HAS_NO_BUILDS"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLAN_HAS_NO_BUILDS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 113]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLAN_HAS_NO_BUILDS = 3031</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLAN_HAS_NO_BUILDS_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLAN_HAS_NO_BUILDS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 114]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLAN_HAS_NO_BUILDS_STR = lang_get('API_TPLAN_HAS_NO_BUILDS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLAN_TPROJECT_KO"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLAN_TPROJECT_KO</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 170]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLAN_TPROJECT_KO = 7006</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPLAN_TPROJECT_KO_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPLAN_TPROJECT_KO_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 171]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPLAN_TPROJECT_KO_STR = lang_get('API_TPLAN_TPROJECT_KO',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPROJECT_IS_EMPTY"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPROJECT_IS_EMPTY</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 176]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPROJECT_IS_EMPTY = 7008</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPROJECT_IS_EMPTY_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPROJECT_IS_EMPTY_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 177]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPROJECT_IS_EMPTY_STR = lang_get('API_TPROJECT_IS_EMPTY',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPROJECT_PREFIX_ALREADY_EXISTS"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPROJECT_PREFIX_ALREADY_EXISTS</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 179]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPROJECT_PREFIX_ALREADY_EXISTS = 7009</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineTPROJECT_PREFIX_ALREADY_EXISTS_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">TPROJECT_PREFIX_ALREADY_EXISTS_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 180]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>TPROJECT_PREFIX_ALREADY_EXISTS_STR = lang_get('API_TPROJECT_PREFIX_ALREADY_EXISTS',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineVERSION_NOT_VALID"><!-- --></a>
+<div class="evenrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">VERSION_NOT_VALID</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 149]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>VERSION_NOT_VALID = 5052</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+<a name="defineVERSION_NOT_VALID_STR"><!-- --></a>
+<div class="oddrow">
+
+	<div>
+		<span class="const-title">
+			<span class="const-name">VERSION_NOT_VALID_STR</span>&nbsp;&nbsp;<span class="smalllinenumber">[line 150]</span>
+		</span>
+	</div>
+<br />
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code-border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>VERSION_NOT_VALID_STR = lang_get('API_VERSION_NOT_VALID',null,1)</code>
+    </td></tr></table>
+    </td></tr></table>
+
+    <p align="center" class="short-description"><strong>Constants
+</strong></p>
+    
+	<br />
+
+		<div class="top">[ <a href="#top">Top</a> ]</div>
+	<br />
+</div>
+		</div>
+	</div><br />
+
+
+
+        <div class="credit">
+		    <hr class="separator" />
+		    Documentation generated on Fri, 03 Apr 2009 14:13:34 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.1</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
