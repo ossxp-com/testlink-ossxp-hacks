@@ -1485,7 +1485,7 @@ $TLS_warning_empty_pwd = "口令不允许为空！";
 $TLS_your_password_is_external = "您的密码是在外部系统中管理的。<br>".
                                  "您无法通过 TestLink 来修改密码。";
 $TLS_user_api_key = "Personal API access key";
-$TLS_audit_login_history = "Login history";
+$TLS_audit_login_history = "登录历史";
 $TLS_audit_last_succesful_logins = "Last successful logins";
 $TLS_audit_last_failed_logins = "Last failed logins";
 $TLS_result_password_changed = "Your password was changed succesfully";
