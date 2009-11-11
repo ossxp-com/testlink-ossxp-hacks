@@ -15,6 +15,9 @@ dir: clean
 	(cd $(SOURCEDIR); [ -d debian ] || ln -s $$(dirname $(CURDIR))/debian debian; git status || true)
 	sudo setfacl -Rb $(SOURCEDIR) $$(dirname $$(pwd -P))/debian
 
+debian/patches:
+	(cd $(SOURCEDIR); make -f debian/rules debian/patches)
+
 build:
 	(cd $(SOURCEDIR); make -f debian/rules debian/control || true)
 	(cd $(SOURCEDIR); dpkg-buildpackage -b -rfakeroot || true)
