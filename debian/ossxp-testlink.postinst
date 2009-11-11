@@ -14,3 +14,12 @@ case "$1" in
         exit 1
     ;;
 esac
+
+# if package is newly installed, link install to web/install
+if [ -z "$2" ]; then
+    [ -e /opt/testlink/web/install ] || ln -s /opt/testlink/install /opt/testlink/web/
+fi
+
+#DEBHELPER#
+
+exit 0

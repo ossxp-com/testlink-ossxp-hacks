@@ -10,6 +10,11 @@ $(patsubst %,binary-fixup/%,$(DEB_ALL_PACKAGES)) ::
 	pkg=$(subst binary-fixup/,,$@); \
 		find debian/$$pkg/ \( -name .svn -o -name "*~" \) -exec rm -rf {} + 
 
-#binary-fixup/ossxp-linux-base::
+binary-fixup/ossxp-testlink::
+	-rm -f debian/ossxp-testlink/opt/testlink/web/config_db.inc.php
+	-rm -f debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
+	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/web
+	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/logs
 
 # vim: noet
