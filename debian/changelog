@@ -1,3 +1,11 @@
+ossxp-testlink (1.8.4-2) unstable; urgency=low
+
+  * Testlink virtual host for apache automatically enabled on firest
+    install.
+  * Backup /opt/testlink/upload directory.
+
+ -- Lei Weiwei <leiww@bj.ossxp.com>  Wed, 11 Nov 2009 16:07:16 +0800
+
 ossxp-testlink (1.8.4-1) unstable; urgency=low
 
   * Package initialized.
