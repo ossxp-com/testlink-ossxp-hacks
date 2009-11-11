@@ -1,2 +1,4 @@
 /opt/testlink
-/opt/testlink/logs
+/opt/testlink/log
+/opt/testlink/upload
+/opt/testlink/web/gui/templates_c

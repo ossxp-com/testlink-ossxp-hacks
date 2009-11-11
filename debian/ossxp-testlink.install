@@ -1,3 +1,4 @@
+debian/conf/apache2  /etc/
 debian/package_info/*.conf  opt/ossxp/lib/packages/
 *.php           /opt/testlink/web
 cfg             /opt/testlink/web
@@ -6,10 +7,7 @@ gui             /opt/testlink/web
 lib             /opt/testlink/web
 locale          /opt/testlink/web
 third_party     /opt/testlink/web
-
-upload_area     /opt/testlink/web
 install         /opt/testlink/
-
 CHANGELOG       /opt/testlink/doc
 SCHEMA_CHANGES  /opt/testlink/doc
 readme          /opt/testlink/doc

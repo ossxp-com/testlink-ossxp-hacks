@@ -14,7 +14,10 @@ binary-fixup/ossxp-testlink::
 	-rm -f debian/ossxp-testlink/opt/testlink/web/config_db.inc.php
 	-rm -f debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
 	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c
-	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/web
-	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/logs
+	mkdir   debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/log
+	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/upload
+	chown www-data.www-data debian/ossxp-testlink/opt/testlink/web
 
 # vim: noet

@@ -17,7 +17,7 @@ esac
 
 # if package is newly installed, link install to web/install
 if [ -z "$2" ]; then
-    [ -e /opt/testlink/web/install ] || ln -s /opt/testlink/install /opt/testlink/web/
+    [ -e /opt/testlink/web/install ] || cp -a /opt/testlink/install /opt/testlink/web/
 fi
 
 #DEBHELPER#
