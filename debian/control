@@ -1,0 +1,19 @@
+Source: ossxp-testlink
+Section: ossxp
+Priority: optional
+Maintainer: Jiang Xin <worldhello.net@gmail.com>
+Build-Depends: debhelper (>= 5.0), cdbs (>= 0.4.43)
+Standards-Version: 1.0.0
+
+Package: ossxp-testlink
+Architecture: all
+Section: ossxp
+Priority: optional
+Depends: ossxp-apache2, ossxp-php5, php5-mysql, php5-gd, php5-imap, php5-ldap, php5-mhash, imagemagick (>= 5.4.4.5-1) | graphicsmagick-im-compat, fping, libcrypt-smbhash-perl, php5-recode, php-mail, php-mail-mime, php-net-smtp
+Suggests: 
+Description: TestLink is a open source Test Management and execution system
+ TestLink enables easily to create and manage Test cases as well as organize
+ them into Test plans. These Test plans allow team members to execute Test
+ cases and track test results dynamically, generate reports, trace software
+ requirements, prioritize and assign tasks.
+

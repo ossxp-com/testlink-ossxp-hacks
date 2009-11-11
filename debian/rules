@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+#include /usr/share/cdbs/1/class/langcore.mk
+#include /usr/share/cdbs/1/class/makefile-vars.mk
+include /usr/share/cdbs/1/rules/patchsys-quilt.mk
+
+# binary-fixup
+$(patsubst %,binary-fixup/%,$(DEB_ALL_PACKAGES)) ::
+	pkg=$(subst binary-fixup/,,$@); \
+		find debian/$$pkg/ \( -name .svn -o -name "*~" \) -exec rm -rf {} + 
+
+#binary-fixup/ossxp-linux-base::
+
+# vim: noet
