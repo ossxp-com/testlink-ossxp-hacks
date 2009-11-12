@@ -13,10 +13,10 @@
  */
 // Set the bug tracking system Interface to redMine 0.6.3
 
-/** The DB host to use when connecting to the mantis db */
+/** The DB host to use when connecting to the redmine db */
 define('BUG_TRACK_DB_HOST', '[CONFIGURE_BUG_TRACK_DB_HOST]');
 
-/** The name of the database that contains the mantis tables */
+/** The name of the database that contains the redmine tables */
 define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
 
 /** The DB type being used by redMine

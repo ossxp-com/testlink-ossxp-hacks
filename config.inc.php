@@ -218,6 +218,7 @@ $g_removeEventsOlderThan = 30;
  * 'TRACKPLUS' : edit configuration in TL_ABS_PATH/cfg/trackplus.cfg.php
  * 'EVENTUM'   : edit configuration in TL_ABS_PATH/cfg/eventum.cfg.php
  * 'SEAPINE'   : edit configuration in TL_ABS_PATH/cfg/seapine.cfg.php
+ * 'REDMINE'   : edit configuration in TL_ABS_PATH/cfg/redmine.cfg.php
  * 'GFORGE'    : edit configuration in TL_ABS_PATH/cfg/gforge.cfg.php
  * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
  * ]
