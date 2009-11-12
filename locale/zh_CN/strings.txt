@@ -66,7 +66,7 @@ $TLS_req_spec = "需求规约";
 $TLS_req_spec_short = "Req. Spec.";
 $TLS_srs = "SRS";
 $TLS_Role = "角色";
-$TLS_sort_table_by_column = "Click to change sort order";
+$TLS_sort_table_by_column = "反向排序";
 $TLS_scope = "范围";
 $TLS_status = "状态";
 $TLS_test_case = "测试用例";
@@ -76,7 +76,7 @@ $TLS_tester = "Tester";
 $TLS_test_plan = "测试计划";
 $TLS_testplan = $TLS_test_plan;
 $TLS_testproject = "测试产品";
-$TLS_test_report = "Test Report";
+$TLS_test_report = "详细测试报告";
 $TLS_test_suite = "测试集";
 $TLS_testsuite_created = "测试集创建成功";
 $TLS_title = "标题";
@@ -101,7 +101,7 @@ $TLS_unassigned = "未指派";
 // Buttons (used wide)
 $TLS_btn_apply 	= "Apply";
 $TLS_btn_add = "增加";
-$TLS_btn_add_to_testplans = "Add to Test Plans";
+$TLS_btn_add_to_testplans = "关联到测试计划";
 $TLS_btn_assign = "指派";
 $TLS_btn_cancel = "取消";
 $TLS_btn_check = "全选";
@@ -282,7 +282,7 @@ $TLS_login_msg_session_exists1 = "浏览器中已经有一个合法的登陆用�
 $TLS_login_msg_session_exists2 = " 首先，你是否想重新建立会话。";
 $TLS_logout_link = "退出";
 $TLS_passwd_lost = "你的口令已经发送到你注册用户信息时指定的电子邮件地址中。请查看你的邮箱。如果还有其它问题，请与TestLink管理员联系。";
-$TLS_password_reseted = "New password has been sent via mail";
+$TLS_password_reseted = "新密码已发送到你的邮箱";
 $TLS_please_login = "请登陆 ...";
 $TLS_session_expired = "你的会话已经超时！请重新登陆。";
 $TLS_your_first_login = "欢迎使用 TestLink！你具有客户访问权限。请登陆 ...";
@@ -996,12 +996,12 @@ $TLS_keywords = "关键字";
 $TLS_access_doc = "documentation";
 $TLS_home = "主页";
 $TLS_link_logout = "注销";
-$TLS_navbar_user_management = "Users";
+$TLS_navbar_user_management = "用户管理";
 $TLS_product = "产品";
 $TLS_product_role = "测试产品角色 ";
 $TLS_search_testcase = "查找";
 $TLS_title_edit_personal_data = "个人帐号";
-$TLS_title_events = "Events";
+$TLS_title_events = "查看网站后台";
 $TLS_title_execute = "执行";
 $TLS_title_results = "结果";
 $TLS_title_specification = "测试规范";
@@ -1295,8 +1295,8 @@ $TLS_info_test_results = "这里只列出最后一次的测试结果。如果最
 $TLS_th_bugs = "问题";
 $TLS_th_date = "日期";
 $TLS_th_run_by = "执行人";
-$TLS_th_bugs_not_linked = "Test Cases with missing/linked Bugs";
-$TLS_th_assigned_to = "Assigned To";
+$TLS_th_bugs_not_linked = "关联/未关联bug的测试用例";
+$TLS_th_assigned_to = "指派给";
 
 
 // ----- gui/templates/resultsGeneral.tpl -----
@@ -1600,19 +1600,19 @@ $TLS_href_req_assign = "指派需求";
 $TLS_href_req_spec = "需求规约";
 $TLS_href_roles_management = "角色管理";
 $TLS_href_search_tc = "搜索测试用例";
-$TLS_href_tproject_management = "Test Project Management";
+$TLS_href_tproject_management = "测试项目管理";
 $TLS_href_user_management = "用户管理";
 $TLS_href_admin_modules = "System Configuration";
 $TLS_title_requirements = "需求";
 $TLS_title_test_spec = "测试规范";
 $TLS_title_product_mgmt = "产品管理";
 $TLS_href_plan_define_priority = "定义优先级规则";
-$TLS_href_my_testcase_assignments="Test Cases assigned to me";
+$TLS_href_my_testcase_assignments="指派给我的测试用例";
 
 
 // ----- gui/templates/mainPage_right.tpl -----
 $TLS_filter_tp_by_product = "按产品筛选测试计划";
-$TLS_href_add_remove_test_cases = "Add / Remove Test Cases";
+$TLS_href_add_remove_test_cases = "添加/删除测试用例";
 $TLS_href_build_new = "构建管理";
 $TLS_href_execute_test = "执行测试";
 $TLS_href_metrics_dashboard = "度量仪表盘";
@@ -2022,13 +2022,13 @@ $TLS_link_report_failed = "失败的测试用例";
 $TLS_link_report_general_tp_metrics = "总体测试计划度量";
 $TLS_link_report_metrics_active_build = "活动构建的度量";
 $TLS_link_report_metrics_more_builds = "查询度量";
-$TLS_link_report_not_run = "Not run Test Cases";
+$TLS_link_report_not_run = "尚未执行的测试用例";
 $TLS_link_report_overall_build = "全部构建的状态";
 $TLS_link_report_reqs_coverage = "基于需求的报告";
-$TLS_link_report_tcases_without_tester = "Test Cases without Tester Assignment";
-$TLS_link_report_test = "测试报告";
+$TLS_link_report_tcases_without_tester = "还未分配的测试用例";
+$TLS_link_report_test = "简要测试报告";
 $TLS_link_report_total_bugs = "每个测试用例的全部问题";
-$TLS_link_report_uncovered_testcases = "Test Cases without Requirements Assignment";
+$TLS_link_report_uncovered_testcases = "尚未关联到需求的测试用例";
 $TLS_link_report_tcases_with_cf = "Test Cases with Custom Fields info";
 $TLS_caption_testCasesWithCF = $TLS_link_report_tcases_with_cf;
 $TLS_link_report_free_testcases_on_testproject = "Test Cases not assigned to Any Test Plan";
@@ -2160,12 +2160,12 @@ $TLS_no_tplans_to_fix = "You currently have no Test Plans that are not associate
 
 
 // ----- lib/project/project_req_spec_mgmt.tpl -----
-$TLS_btn_new_req_spec = "New Requirement Specification";
+$TLS_btn_new_req_spec = "新建测试规格";
 $TLS_btn_reorder_req_spec = "Reorder Requirement Specifications";
 
 
 // ----- reqSpecEdit.php -----
-$TLS_delete_req_spec = "Delete Requirement Specification";
+$TLS_delete_req_spec = "删除测试规格";
 $TLS_req_spec_created = "Requirement Specification: %s was successfully created";
 $TLS_req_spec_deleted = "Requirement Specification: %s was successfully deleted";
 $TLS_title_req_spec = "Requirement Specifications";

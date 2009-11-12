@@ -2,3 +2,4 @@ config_db.inc.php
 custom_config.inc.php
 logs
 gui/templates_c/*.php
+upload_area/executions

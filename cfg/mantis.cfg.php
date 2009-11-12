@@ -13,19 +13,19 @@
 //also tested with MANTIS 1.0.0.a3
 
 /** The DB host to use when connecting to the mantis db */
-define('BUG_TRACK_DB_HOST', '[CONFIGURE_BUG_TRACK_DB_HOST]');
+define('BUG_TRACK_DB_HOST', 'localhost');
 
 /** The name of the database that contains the mantis tables */
-define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
+define('BUG_TRACK_DB_NAME', 'mantis');
 
 /** The DB type being used by mantis 
 values: mysql,mssql,postgres
 */
-define('BUG_TRACK_DB_TYPE', '[CONFIGURE_BUG_TRACK_DB_TYPE]');
+define('BUG_TRACK_DB_TYPE', 'mysql');
 
 /** The DB password to use for connecting to the mantis db */
-define('BUG_TRACK_DB_USER', '[CONFIGURE_BUG_TRACK_DB_USER]');
-define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
+define('BUG_TRACK_DB_USER', 'root');
+define('BUG_TRACK_DB_PASS', 'root');
 
 
 /* link of the web server for mantis*/

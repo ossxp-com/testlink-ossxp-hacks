@@ -222,7 +222,7 @@ $g_removeEventsOlderThan = 30;
  * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
  * ]
  */
-$g_interface_bugs = 'NO';
+$g_interface_bugs = 'MANTIS';
 
 
 
