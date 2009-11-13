@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.4-3) unstable; urgency=low
+
+  * Add new authorize method: COSIGN.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Fri, 13 Nov 2009 16:07:01 +0800
+
 ossxp-testlink (1.8.4-2) unstable; urgency=low
 
   * Testlink virtual host for apache automatically enabled on firest

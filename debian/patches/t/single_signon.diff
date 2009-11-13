@@ -1,0 +1,318 @@
+From: Jiang Xin <worldhello.net@gmail.com>
+Subject: [PATCH] t/single_signon
+
+TestLink 单点登录支持
+
+Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
+
+---
+ config.inc.php                |   10 +++++++-
+ index.php                     |   12 +++++++++-
+ lib/functions/doAuthorize.php |   31 ++++++++++++++++++++++++---
+ lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++++++++
+ lib/functions/user.class.php  |   24 ++++++++++++++++++++-
+ login.php                     |   23 +++++++++++++++++--
+ logout.php                    |   17 ++++++++++++++-
+ 7 files changed, 150 insertions(+), 13 deletions(-)
+
+diff --git a/config.inc.php b/config.inc.php
+index 406798a..943862b 100644
+--- a/config.inc.php
++++ b/config.inc.php
+@@ -260,17 +260,23 @@ $g_smtp_password    = '';  # password
+ /** 
+  * Login authentication method:
+  * 		'MD5' => use password stored on db
+- *    'LDAP' => use password from LDAP Server
++ * 		'LDAP' => use password from LDAP Server
++ * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
+  */ 
+ $tlCfg->authentication['method'] = 'MD5';
++$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
+ 
+ /** LDAP authentication credentials */
+ $tlCfg->authentication['ldap_server']		= 'localhost';
+ $tlCfg->authentication['ldap_port']			= '389';
+ $tlCfg->authentication['ldap_version']		= '3'; // could be '2' in some cases
+ $tlCfg->authentication['ldap_root_dn']		= 'dc=mycompany,dc=com';
+-$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(organizationname=*Traffic)'
++$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(authorizedService=testlink)'
+ $tlCfg->authentication['ldap_uid_field']	= 'uid'; // Use 'sAMAccountName' for Active Directory
++$tlCfg->authentication['ldap_firstname_field']	= 'givenName';
++$tlCfg->authentication['ldap_lastname_field']	= 'sn';
++$tlCfg->authentication['ldap_fullname_field']	= 'cn';
++$tlCfg->authentication['ldap_email_field']	    = 'mail';
+ $tlCfg->authentication['ldap_bind_dn']		= ''; // Left empty for anonymous LDAP binding 
+ $tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
+ 
+diff --git a/index.php b/index.php
+index e1526b3..46d57b7 100644
+--- a/index.php
++++ b/index.php
+@@ -25,7 +25,15 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
+ //verify the session during a work
+ if (!isset($_SESSION['currentUser']))
+ {
+-	redirect(TL_BASE_HREF ."login.php?note=expired");
++	if (strtolower($tlCfg->authentication['method']) == 'cosign')
++	{
++		// If redirect to ?note=expired, account a deadly loop in some instance.
++		redirect(TL_BASE_HREF ."login.php");
++	}
++	else
++	{
++		redirect(TL_BASE_HREF ."login.php?note=expired");
++	}
+ 	exit;
+ }
+ $smarty = new TLSmarty();
+@@ -33,4 +41,4 @@ $smarty->assign('title', lang_get('main_page_title'));
+ $smarty->assign('titleframe', 'lib/general/navBar.php');
+ $smarty->assign('mainframe', $reqURI);
+ $smarty->display('main.tpl');
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
+index 5f4e32e..5c60aec 100644
+--- a/lib/functions/doAuthorize.php
++++ b/lib/functions/doAuthorize.php
+@@ -19,20 +19,43 @@
+  * *********************************************************************************** */
+ require_once("users.inc.php");
+ require_once("roles.inc.php");
++require_once('config.inc.php');
++require_once('common.php');
+ 
+ /** authorization function verifies login & password and set user session data */
+-function doAuthorize(&$db,$login,$pwd,&$msg)
++function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
+ {
+     $result = tl::ERROR;
+ 	$_SESSION['locale'] = TL_DEFAULT_LOCALE; 
+-	if (!is_null($pwd) && !is_null($login))
++
++	if (!is_null($pwd) && !is_null($login) || $sso && !is_null($login))
+ 	{
+ 		$user = new tlUser();
+ 		$user->login = $login;
+ 		$login_exists = ($user->readFromDB($db,tlUser::USER_O_SEARCH_BYLOGIN) >= tl::OK); 
++		if ($sso && !is_null($login))
++		{
++			$user->updateFromLDAP(true);
++			if (!$login_exists || $user->ldap_update)
++			{
++				$user->bActive = 1;
++				$login_exists = 1;
++				$user->writeToDB($db);
++				$user->ldap_update = false;
++			}
++		}
+ 		if ($login_exists)
+-	    {
+-			$password_check = auth_does_password_match($user,$pwd);
++		{
++			if ($sso)
++			{
++				$password_check = new stdClass();
++				$password_check->status_ok = true;
++				$password_check->msg = 'ok';
++			}
++			else
++			{
++				$password_check = auth_does_password_match($user,$pwd);
++			}
+ 			if ($password_check->status_ok && $user->bActive)
+ 			{
+ 				// 20051007 MHT Solved  0000024 Session confusion 
+diff --git a/lib/functions/ldap_api.php b/lib/functions/ldap_api.php
+index 6145c2e..1a04588 100644
+--- a/lib/functions/ldap_api.php
++++ b/lib/functions/ldap_api.php
+@@ -134,4 +134,50 @@
+     	return $t_authenticated;
+ 	}
+ 
++// ----------------------------------------------------------------------------
++	// Read user attributes from the LDAP directory
++	function ldap_fetch_account( $login_name ) 
++	{
++		$account = array();
++
++		$authCfg 			= config_get('authentication');
++		$t_ldap_organization = $authCfg['ldap_organization'];
++		$t_ldap_root_dn		= $authCfg['ldap_root_dn'];
++		$t_ldap_uid_field	= strtolower( $authCfg['ldap_uid_field'] );	// 'uid' by default
++		$t_ldap_firstname_field = strtolower( $authCfg['ldap_firstname_field'] );	// 'givenName' by default
++		$t_ldap_lastname_field  = strtolower( $authCfg['ldap_lastname_field'] );	// 'sn' by default
++		$t_ldap_fullname_field  = strtolower( $authCfg['ldap_fullname_field'] );	// 'cn' by default
++		$t_ldap_email_field     = strtolower( $authCfg['ldap_email_field'] );	// 'mail' by default
++
++		$t_username      	= $login_name;
++		$t_search_filter 	= "(&$t_ldap_organization($t_ldap_uid_field=$t_username))";
++		$t_search_attrs  	= array( 'dn',
++									$t_ldap_firstname_field,
++									$t_ldap_lastname_field,
++									$t_ldap_fullname_field,
++									$t_ldap_email_field );
++		$t_connect          = ldap_connect_bind();
++
++		if( !is_null($t_connect->handler) )
++		{
++			$t_ds = $t_connect->handler;
++
++			# Search for the user id
++			$t_sr = ldap_search( $t_ds, $t_ldap_root_dn, $t_search_filter, $t_search_attrs );
++			$t_info = ldap_get_entries( $t_ds, $t_sr );
++
++			if ( $t_info ) {
++				# Try to authenticate to each until we get a match
++				$account['firstName'] = in_array($t_ldap_firstname_field, $t_info[0]) ? $t_info[0][$t_ldap_firstname_field][0] : '';
++				$account['lastName'] = in_array($t_ldap_lastname_field, $t_info[0]) ? $t_info[0][$t_ldap_lastname_field][0] : '';
++				$account['emailAddress'] = in_array($t_ldap_email_field, $t_info[0]) ? $t_info[0][$t_ldap_email_field][0] : '';
++			}
++
++			ldap_free_result( $t_sr );
++			ldap_unbind( $t_ds );
++		}
++
++		return $account;
++	}
++
+ ?>
+diff --git a/lib/functions/user.class.php b/lib/functions/user.class.php
+index 84bd6b0..7084b70 100644
+--- a/lib/functions/user.class.php
++++ b/lib/functions/user.class.php
+@@ -11,6 +11,9 @@
+  * rev: 20090101 - franciscom - changes to deleteFromDB() due to Foreing Key constraints
+  *      20081213 - franciscom - removed global coupling to access config parameters
+  */
++
++require_once("ldap_api.php");
++
+ class tlUser extends tlDBObject
+ {
+ 	private $object_table = "users";
+@@ -27,6 +30,7 @@ class tlUser extends tlDBObject
+ 	public $tplanRoles;
+ 	public $login;
+ 	public $userApiKey;
++	public $ldap_update;
+ 	protected $password;
+ 	
+ 	//configuration options
+@@ -69,6 +73,7 @@ class tlUser extends tlDBObject
+ 		$this->bActive = 1;
+ 		$this->tprojectRoles = null;
+ 		$this->tplanRoles = null;
++		$this->ldap_update = false;
+ 	}
+ 	
+ 	protected function _clean($options = self::TLOBJ_O_SEARCH_BY_ID)
+@@ -107,6 +112,23 @@ class tlUser extends tlDBObject
+ 	{
+ 	}
+ 	//BEGIN interface iDBSerialization
++	public function updateFromLDAP($change=true)
++	{
++		$account = ldap_fetch_account( $this->login );
++		foreach(array("firstName", "lastName", "emailAddress") as $attr)
++		{
++			if ( $this->$attr != $account[$attr] )
++			{
++				$this->ldap_update = true;
++				if ($change)
++					$this->$attr = $account[$attr];
++				else
++					break;
++			}
++		}
++		return $account;
++	}
++
+ 	public function readFromDB(&$db,$options = self::TLOBJ_O_SEARCH_BY_ID)
+ 	{
+ 		$this->_clean($options);
+@@ -518,4 +540,4 @@ class tlUser extends tlDBObject
+ 		return tlDBObject::createObjectsFromDBbySQL($db,$query,'id',__CLASS__,true,$detailLevel);
+ 	}
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/login.php b/login.php
+index c80aef7..cf20164 100644
+--- a/login.php
++++ b/login.php
+@@ -35,13 +35,23 @@ if (!$op['status'])
+ $args = init_args();
+ $gui = init_gui($db,$args);
+ 
+-if(!is_null($args->login))
++$cosign_loggedin = 0;
++if (strtolower($tlCfg->authentication['method']) == 'cosign')
++{
++	if (@$_SERVER["REMOTE_USER"] || @$_SERVER["REDIRECT_REMOTE_USER"])
++	{
++		$args->login = @$_SERVER["REMOTE_USER"] ? @$_SERVER["REMOTE_USER"] : @$_SERVER["REDIRECT_REMOTE_USER"];
++		$cosign_loggedin = 1;
++	}
++}
++
++if(!is_null($args->login) || $cosign_loggedin)
+ {
+ 	doSessionStart();
+ 	unset($_SESSION['basehref']);
+ 	setPaths();
+-	
+-	if(doAuthorize($db,$args->login,$args->pwd,$msg) < tl::OK)
++
++	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
+ 	{
+ 		if (!$msg)
+ 		{
+@@ -61,6 +71,13 @@ if(!is_null($args->login))
+ 	}
+ }
+ 
++/** no needs to do this, because TL does not have anonymous login.
++if ($tlCfg->authentication['method'] == 'COSIGN')
++{
++	// Redirect to cosign login page.
++}
++*/
++
+ $logPeriodToDelete = config_get('removeEventsOlderThan');
+ $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
+ 
+diff --git a/logout.php b/logout.php
+index 5e4d739..ed55309 100644
+--- a/logout.php
++++ b/logout.php
+@@ -21,6 +21,21 @@ if ($userID)
+ session_unset();
+ session_destroy();
+ 
++if (strtolower($tlCfg->authentication['method']) == "cosign")
++{
++	$authCfg = config_get('authentication');
++	$logout_url = $authCfg['logout_url'];
++
++	if (@$_SERVER['COSIGN_SERVICE'] || @$_SERVER['REDIRECT_COSIGN_SERVICE'])
++	{
++		$cookie_name = @$_SERVER["COSIGN_SERVICE"] ? @$_SERVER["COSIGN_SERVICE"] : @$_SERVER["REDIRECT_COSIGN_SERVICE"];
++		setcookie( $cookie_name, "null", time()-1, '/', "", 0 );
++		setcookie( $cookie_name, "null", time()-1 );
++	}
++	redirect($logout_url);
++	exit();
++}
++
+ redirect("login.php");
+ exit();
+-?>
+\ No newline at end of file
++?>
+-- 
+tg: (ea9460b..) t/single_signon (depends on: t/zh_cn_l10n)
