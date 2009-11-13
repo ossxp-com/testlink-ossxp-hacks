@@ -8,18 +8,18 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  config.inc.php                |   10 +++++++-
  index.php                     |   12 +++++++++-
- lib/functions/doAuthorize.php |   31 ++++++++++++++++++++++++---
+ lib/functions/doAuthorize.php |   39 ++++++++++++++++++++++++++++------
  lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++++++++
  lib/functions/user.class.php  |   24 ++++++++++++++++++++-
  login.php                     |   23 +++++++++++++++++--
  logout.php                    |   17 ++++++++++++++-
- 7 files changed, 150 insertions(+), 13 deletions(-)
+ 7 files changed, 155 insertions(+), 16 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 406798a..943862b 100644
+index 19e46e0..1d2ee5b 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -260,17 +260,23 @@ $g_smtp_password    = '';  # password
+@@ -261,17 +261,23 @@ $g_smtp_password    = '';  # password
  /** 
   * Login authentication method:
   * 		'MD5' => use password stored on db
@@ -74,10 +74,18 @@ index e1526b3..46d57b7 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index 5f4e32e..5c60aec 100644
+index 5f4e32e..af2d625 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
-@@ -19,20 +19,43 @@
+@@ -1,6 +1,4 @@
+-<?php
+-/**
+- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
++<?php /** * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+  * This script is distributed under the GNU General Public License 2 or later. 
+  * 
+  * @filesource $RCSfile: doAuthorize.php,v $
+@@ -19,20 +17,47 @@
   * *********************************************************************************** */
  require_once("users.inc.php");
  require_once("roles.inc.php");
@@ -102,8 +110,12 @@ index 5f4e32e..5c60aec 100644
 +			$user->updateFromLDAP(true);
 +			if (!$login_exists || $user->ldap_update)
 +			{
-+				$user->bActive = 1;
-+				$login_exists = 1;
++				if (!$login_exists)
++				{
++					$user->globalRoleID = TL_ROLES_GUEST;
++					$user->bActive = 1;
++					$login_exists = 1;
++				}
 +				$user->writeToDB($db);
 +				$user->ldap_update = false;
 +			}
@@ -315,4 +327,4 @@ index 5e4d739..ed55309 100644
 \ No newline at end of file
 +?>
 -- 
-tg: (ea9460b..) t/single_signon (depends on: t/zh_cn_l10n)
+tg: (dc52d9d..) t/single_signon (depends on: t/zh_cn_l10n t/bugtrac_integration)

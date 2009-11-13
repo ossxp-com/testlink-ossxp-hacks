@@ -1,6 +1,7 @@
-ossxp-testlink (1.8.4-3) unstable; urgency=low
+ossxp-testlink (1.8.4-4) unstable; urgency=low
 
   * Add new authorize method: COSIGN.
+  * Not initial new user's roleid, cause bad sql insert clause.
 
  -- Jiang Xin <jiangxin@bj.ossxp.com>  Fri, 13 Nov 2009 16:07:01 +0800
 
