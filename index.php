@@ -25,7 +25,15 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
 //verify the session during a work
 if (!isset($_SESSION['currentUser']))
 {
-	redirect(TL_BASE_HREF ."login.php?note=expired");
+	if (strtolower($tlCfg->authentication['method']) == 'cosign')
+	{
+		// If redirect to ?note=expired, account a deadly loop in some instance.
+		redirect(TL_BASE_HREF ."login.php");
+	}
+	else
+	{
+		redirect(TL_BASE_HREF ."login.php?note=expired");
+	}
 	exit;
 }
 $smarty = new TLSmarty();

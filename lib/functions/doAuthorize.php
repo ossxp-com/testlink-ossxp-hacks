@@ -19,20 +19,43 @@
  * *********************************************************************************** */
 require_once("users.inc.php");
 require_once("roles.inc.php");
+require_once('config.inc.php');
+require_once('common.php');
 
 /** authorization function verifies login & password and set user session data */
-function doAuthorize(&$db,$login,$pwd,&$msg)
+function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
 {
     $result = tl::ERROR;
 	$_SESSION['locale'] = TL_DEFAULT_LOCALE; 
-	if (!is_null($pwd) && !is_null($login))
+
+	if (!is_null($pwd) && !is_null($login) || $sso && !is_null($login))
 	{
 		$user = new tlUser();
 		$user->login = $login;
 		$login_exists = ($user->readFromDB($db,tlUser::USER_O_SEARCH_BYLOGIN) >= tl::OK); 
+		if ($sso && !is_null($login))
+		{
+			$user->updateFromLDAP(true);
+			if (!$login_exists || $user->ldap_update)
+			{
+				$user->bActive = 1;
+				$login_exists = 1;
+				$user->writeToDB($db);
+				$user->ldap_update = false;
+			}
+		}
 		if ($login_exists)
-	    {
-			$password_check = auth_does_password_match($user,$pwd);
+		{
+			if ($sso)
+			{
+				$password_check = new stdClass();
+				$password_check->status_ok = true;
+				$password_check->msg = 'ok';
+			}
+			else
+			{
+				$password_check = auth_does_password_match($user,$pwd);
+			}
 			if ($password_check->status_ok && $user->bActive)
 			{
 				// 20051007 MHT Solved  0000024 Session confusion 

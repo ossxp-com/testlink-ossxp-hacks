@@ -35,13 +35,23 @@ if (!$op['status'])
 $args = init_args();
 $gui = init_gui($db,$args);
 
-if(!is_null($args->login))
+$cosign_loggedin = 0;
+if (strtolower($tlCfg->authentication['method']) == 'cosign')
+{
+	if (@$_SERVER["REMOTE_USER"] || @$_SERVER["REDIRECT_REMOTE_USER"])
+	{
+		$args->login = @$_SERVER["REMOTE_USER"] ? @$_SERVER["REMOTE_USER"] : @$_SERVER["REDIRECT_REMOTE_USER"];
+		$cosign_loggedin = 1;
+	}
+}
+
+if(!is_null($args->login) || $cosign_loggedin)
 {
 	doSessionStart();
 	unset($_SESSION['basehref']);
 	setPaths();
-	
-	if(doAuthorize($db,$args->login,$args->pwd,$msg) < tl::OK)
+
+	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
 	{
 		if (!$msg)
 		{
@@ -60,6 +70,13 @@ if(!is_null($args->login))
 		exit();
 	}
 }
+
+/** no needs to do this, because TL does not have anonymous login.
+if ($tlCfg->authentication['method'] == 'COSIGN')
+{
+	// Redirect to cosign login page.
+}
+*/
 
 $logPeriodToDelete = config_get('removeEventsOlderThan');
 $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));

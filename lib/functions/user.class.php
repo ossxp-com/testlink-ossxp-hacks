@@ -11,6 +11,9 @@
  * rev: 20090101 - franciscom - changes to deleteFromDB() due to Foreing Key constraints
  *      20081213 - franciscom - removed global coupling to access config parameters
  */
+
+require_once("ldap_api.php");
+
 class tlUser extends tlDBObject
 {
 	private $object_table = "users";
@@ -27,6 +30,7 @@ class tlUser extends tlDBObject
 	public $tplanRoles;
 	public $login;
 	public $userApiKey;
+	public $ldap_update;
 	protected $password;
 	
 	//configuration options
@@ -69,6 +73,7 @@ class tlUser extends tlDBObject
 		$this->bActive = 1;
 		$this->tprojectRoles = null;
 		$this->tplanRoles = null;
+		$this->ldap_update = false;
 	}
 	
 	protected function _clean($options = self::TLOBJ_O_SEARCH_BY_ID)
@@ -107,6 +112,23 @@ class tlUser extends tlDBObject
 	{
 	}
 	//BEGIN interface iDBSerialization
+	public function updateFromLDAP($change=true)
+	{
+		$account = ldap_fetch_account( $this->login );
+		foreach(array("firstName", "lastName", "emailAddress") as $attr)
+		{
+			if ( $this->$attr != $account[$attr] )
+			{
+				$this->ldap_update = true;
+				if ($change)
+					$this->$attr = $account[$attr];
+				else
+					break;
+			}
+		}
+		return $account;
+	}
+
 	public function readFromDB(&$db,$options = self::TLOBJ_O_SEARCH_BY_ID)
 	{
 		$this->_clean($options);
