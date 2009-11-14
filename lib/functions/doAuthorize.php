@@ -40,7 +40,8 @@ function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
 			{
 				if (!$login_exists)
 				{
-					$user->globalRoleID = $GLOBALS["tlCfg"]->default_roleid ? $GLOBALS["tlCfg"]->default_roleid : TL_ROLES_GUEST;
+					$user->globalRoleID = config_get('default_roleid');
+					$user->locale = config_get('default_language');
 					$user->bActive = 1;
 					$login_exists = 1;
 				}
