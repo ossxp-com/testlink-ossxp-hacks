@@ -11,10 +11,18 @@ $(patsubst %,binary-fixup/%,$(DEB_ALL_PACKAGES)) ::
 		find debian/$$pkg/ \( -name .svn -o -name "*~" \) -exec rm -rf {} + 
 
 binary-fixup/ossxp-testlink::
+	# Remove runtime files used for development, or runtime files in development.
+	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c
 	-rm -f debian/ossxp-testlink/opt/testlink/web/config_db.inc.php
 	-rm -f debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
-	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+
+	# Copy from template file
+	cp custom_config.inc.php.example debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
+
+	# Create runtime directory.
 	mkdir   debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+
+	# Set permissions
 	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/web/gui/templates_c
 	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/log
 	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/upload

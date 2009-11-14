@@ -6,12 +6,12 @@ Subject: [PATCH] t/bugtrac_integration
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- cfg/redmine.cfg.php |    6 +++---
- config.inc.php      |    3 ++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ cfg/redmine.cfg.php |    4 ++--
+ config.inc.php      |    1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
-index a87ea2f..4c3e4e4 100644
+index a87ea2f..c636781 100644
 --- a/cfg/redmine.cfg.php
 +++ b/cfg/redmine.cfg.php
 @@ -13,10 +13,10 @@
@@ -27,15 +27,8 @@ index a87ea2f..4c3e4e4 100644
  define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
  
  /** The DB type being used by redMine
-@@ -56,4 +56,4 @@ define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
- /** link to the bugtracking system, for entering new bugs */
- define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
- // define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
--?>
-\ No newline at end of file
-+?>
 diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..24c3ec2 100644
+index 4117b9f..df2914c 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -218,6 +218,7 @@ $g_removeEventsOlderThan = 30;
@@ -46,12 +39,5 @@ index 4117b9f..24c3ec2 100644
   * 'GFORGE'    : edit configuration in TL_ABS_PATH/cfg/gforge.cfg.php
   * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
   * ]
-@@ -943,4 +944,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
- $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
- $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
- // ----- END OF FILE --------------------------------------------------------------------
--?>
-\ No newline at end of file
-+?>
 -- 
 tg: (f0706d5..) t/bugtrac_integration (depends on: master)

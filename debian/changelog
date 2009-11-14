@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.4-5) unstable; urgency=low
+
+  * Install custom_config.inc.php as conffiles.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sat, 14 Nov 2009 09:49:04 +0800
+
 ossxp-testlink (1.8.4-4) unstable; urgency=low
 
   * Add new authorize method: COSIGN.
@@ -18,4 +24,3 @@ ossxp-testlink (1.8.4-1) unstable; urgency=low
   * Package initialized.
 
  -- Jiang Xin <jiangxin@bj.ossxp.com>  Wed, 11 Nov 2009 11:38:21 +0800
-
