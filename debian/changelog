@@ -1,6 +1,7 @@
-ossxp-testlink (1.8.4-5) unstable; urgency=low
+ossxp-testlink (1.8.4-6) unstable; urgency=low
 
   * Install custom_config.inc.php as conffiles.
+  * Set locale for admin or new users to zh_CN.
 
  -- Jiang Xin <jiangxin@bj.ossxp.com>  Sat, 14 Nov 2009 09:49:04 +0800
 

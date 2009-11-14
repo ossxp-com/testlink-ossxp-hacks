@@ -6,9 +6,24 @@ Custom config files.
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- custom_config.inc.php.example |   93 ++++++++++++++++++++++++++++++++---------
- 1 files changed, 73 insertions(+), 20 deletions(-)
+ config.inc.php                                     |    2 +-
+ custom_config.inc.php.example                      |   93 +++++++++++++++----
+ install/sql/mysql/testlink_create_default_data.sql |    2 +-
+ 3 files changed, 75 insertions(+), 22 deletions(-)
 
+diff --git a/config.inc.php b/config.inc.php
+index 4117b9f..d7bf17b 100644
+--- a/config.inc.php
++++ b/config.inc.php
+@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
+ // The value must be available in $g_locales (see cfg/const.inc.php).
+ // Note: An attempt will be done to establish the default locale 
+ // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
+-$tlCfg->default_language = 'en_GB'; 
++$tlCfg->default_language = 'zh_CN';
+ 
+ /** 
+  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
 index f9b9203..afc30ea 100644
 --- a/custom_config.inc.php.example
@@ -118,5 +133,18 @@ index f9b9203..afc30ea 100644
 +//$tlCfg->config_check_warning_mode = "SILENT";
 +
 +?>
+diff --git a/install/sql/mysql/testlink_create_default_data.sql b/install/sql/mysql/testlink_create_default_data.sql
+index fd0b246..345cf1f 100644
+--- a/install/sql/mysql/testlink_create_default_data.sql
++++ b/install/sql/mysql/testlink_create_default_data.sql
+@@ -134,7 +134,7 @@ INSERT INTO `role_rights` (role_id,right_id) VALUES (9,16);
+ # admin account 
+ # SECURITY: change password after first login
+ INSERT INTO `users` (login,password,role_id,email,first,last,locale,active)
+-             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'en_GB',1);
++             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'zh_CN',1);
+ 
+ # Assignment types
+ INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
 -- 
 tg: (f0706d5..) t/custom_config (depends on: master)

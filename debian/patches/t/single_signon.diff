@@ -8,12 +8,12 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  config.inc.php                |   10 +++++++-
  index.php                     |   12 +++++++++-
- lib/functions/doAuthorize.php |   39 ++++++++++++++++++++++++++++------
+ lib/functions/doAuthorize.php |   40 +++++++++++++++++++++++++++++------
  lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++++++++
  lib/functions/user.class.php  |   24 ++++++++++++++++++++-
  login.php                     |   23 +++++++++++++++++--
  logout.php                    |   17 ++++++++++++++-
- 7 files changed, 155 insertions(+), 16 deletions(-)
+ 7 files changed, 156 insertions(+), 16 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
 index 19e46e0..1d2ee5b 100644
@@ -74,7 +74,7 @@ index e1526b3..46d57b7 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index 5f4e32e..d2e2f30 100644
+index 5f4e32e..e2dda40 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
 @@ -1,6 +1,4 @@
@@ -85,7 +85,7 @@ index 5f4e32e..d2e2f30 100644
   * This script is distributed under the GNU General Public License 2 or later. 
   * 
   * @filesource $RCSfile: doAuthorize.php,v $
-@@ -19,20 +17,47 @@
+@@ -19,20 +17,48 @@
   * *********************************************************************************** */
  require_once("users.inc.php");
  require_once("roles.inc.php");
@@ -112,7 +112,8 @@ index 5f4e32e..d2e2f30 100644
 +			{
 +				if (!$login_exists)
 +				{
-+					$user->globalRoleID = $GLOBALS["tlCfg"]->default_roleid ? $GLOBALS["tlCfg"]->default_roleid : TL_ROLES_GUEST;
++					$user->globalRoleID = config_get('default_roleid');
++					$user->locale = config_get('default_language');
 +					$user->bActive = 1;
 +					$login_exists = 1;
 +				}
