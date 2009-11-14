@@ -33,13 +33,17 @@ function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
 		$user = new tlUser();
 		$user->login = $login;
 		$login_exists = ($user->readFromDB($db,tlUser::USER_O_SEARCH_BYLOGIN) >= tl::OK); 
-		if ($sso && !is_null($login))
+		if ($sso)
 		{
 			$user->updateFromLDAP(true);
 			if (!$login_exists || $user->ldap_update)
 			{
-				$user->bActive = 1;
-				$login_exists = 1;
+				if (!$login_exists)
+				{
+					$user->globalRoleID = $GLOBALS["tlCfg"]->default_roleid ? $GLOBALS["tlCfg"]->default_roleid : TL_ROLES_GUEST;
+					$user->bActive = 1;
+					$login_exists = 1;
+				}
 				$user->writeToDB($db);
 				$user->ldap_update = false;
 			}
