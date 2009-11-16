@@ -181,11 +181,20 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
 		if ($bLocalized)
 		{
 	        echo "\tLocalization exists '$localizedLine'\n";
+            if ($localizedLine == $orig_eng)
+            {
+                $var_counter_untrans++;
+            }
+            else
+            {
+                $var_counter_trans++;
+            }
         	$out .= $localizedLine;
 		} 
 		else 
 		{
 	        echo "\tLocalization doesn't exists. Copy English.'\n";
+            $var_counter_untrans++;
 		    $var_counter_new++;
 		    $out .= $orig_eng;
 		}
@@ -224,6 +233,7 @@ fclose($fp);
 
 echo "\n\nUpdated file: ".$file_lang_old;
 echo "\nCompleted! The script has parsed $var_counter strings and add $var_counter_new new variables.\n";
+echo "\nUn-translate items: $var_counter_untrans , translated items: $var_counter_trans\n";
 echo "===== Bye =====\n";
 
 ?>
