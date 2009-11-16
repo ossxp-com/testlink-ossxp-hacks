@@ -91,7 +91,7 @@ for( $i = 0; $i < $lines_eng_count; $i++ )
     {
         echo "Eng: End of header is line = $i \n";
         $begin_line = $i + 1;
-        $i = $lines_eng_count;
+        break;
     }
 }
 
@@ -102,10 +102,10 @@ for( $i = 0; $i < $lines_old_count; $i++ )
     {
         echo "Old: End of header is line = $i \n";
         $begin_line_old = $i + 1;
-        $i = $lines_old_count;
 		$out .= " * Scripted update according en_GB string file (version: ".$revision_comment.") \n";
 		$out .= " * --------------------------------------------------------------------" .
 				"-------------- */\n";
+        break;
     }
     else
 		$out .= $lines_lang_old[$i];
@@ -136,6 +136,7 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
     {
         $var_counter++;
         $var_name = '$TLS_'.$parsed_line[1];
+        // TODO: recored un-tranlated line."
         $bLocalized = FALSE;
         $localizedLine = '';
 //        print_r($parsed_line);

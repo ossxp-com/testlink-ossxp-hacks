@@ -50,7 +50,7 @@ analyse serves as input for the next planning.</p>
 
 
 // --------------------------------------------------------------------------------------
-$TLS_htmltext_title['editTc']	= "Test Specification";
+$TLS_htmltext_title['editTc']	= "测试规范";
 $TLS_htmltext['editTc'] 		= "<h2>Purpose:</h2>
 <h2>Purpose:</h2>
 <p>The <i>Test Specification</i> allows users to view and edit all of the existing " .
