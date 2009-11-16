@@ -1607,7 +1607,7 @@ $TLS_title_requirements = "需求";
 $TLS_title_test_spec = "测试规范";
 $TLS_title_product_mgmt = "产品管理";
 $TLS_href_plan_define_priority = "定义优先级规则";
-$TLS_href_my_testcase_assignments="Test Cases assigned to me";
+$TLS_href_my_testcase_assignments="指派给我的用例";
 
 
 // ----- gui/templates/mainPage_right.tpl -----
