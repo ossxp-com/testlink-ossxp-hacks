@@ -110,7 +110,11 @@ for( $i = 0; $i < $lines_old_count; $i++ )
         break;
     }
     else
+    {
+		if  (trim($lines_lang_old[$i]) == "* Scripted update according en_GB string file (version: $revision_comment)")
+            continue;
 		$out .= $lines_lang_old[$i];
+    }
 }
 
 
