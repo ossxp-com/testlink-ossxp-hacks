@@ -149,7 +149,7 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
         // get localized value if defined - parse old localized strings
 		for( $k = $begin_line_old; $k < $lines_old_count; $k++ )
 		{
-			if (preg_match('/^\\'.$var_name.'[\s]*=[\s].+$/', $lines_lang_old[$k]))
+			if (preg_match('/^\\'.$var_name.'[\s]*=.+$/', $lines_lang_old[$k]))
 			{
 		        echo "\tFound localized variable on (line $k) >>> {$lines_lang_old[$k]}";
 				$bLocalized = TRUE;
