@@ -45,6 +45,8 @@ else
 $out = ''; // data for output file
 $var_counter = 0;
 $var_counter_new = 0;
+$var_counter_untrans = 0;
+$var_counter_trans = 0;
 
 
 
@@ -136,7 +138,6 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
     {
         $var_counter++;
         $var_name = '$TLS_'.$parsed_line[1];
-        // TODO: recored un-tranlated line."
         $bLocalized = FALSE;
         $localizedLine = '';
 //        print_r($parsed_line);
@@ -161,7 +162,21 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
 				$k = $lines_old_count; // exit more parsing old file
 			}
 		}
-		
+
+	    echo "\tLocalization doesn't exists. Copy English.'\n";
+
+        // Jiangxin: save english var and value pairs to orig_eng
+        $orig_eng = $lines_eng[$i];
+
+        // check multiline value (check semicolon or semicolon with comment)
+        while (!(preg_match('/^(.*);[\s]*$/', $lines_eng[$i])
+            || preg_match('/^(.*);[\s]*[\/]{2}/', $lines_eng[$i])))
+        {
+            $i++;
+            echo "(line $i) English multiline value - copy the line >>".$lines_eng[$i];
+            $orig_eng .= $lines_eng[$i];
+        }
+	
         echo "(line $i) Found variable '$var_name'\n";
 		if ($bLocalized)
 		{
@@ -171,18 +186,8 @@ for( $i = $begin_line; $i < $lines_eng_count; $i++ )
 		else 
 		{
 	        echo "\tLocalization doesn't exists. Copy English.'\n";
-		    $out .= $lines_eng[$i];
 		    $var_counter_new++;
-
-        	// check multiline value (check semicolon or semicolon with comment)
-			while (!(preg_match('/^(.*);[\s]*$/', $lines_eng[$i])
-				|| preg_match('/^(.*);[\s]*[\/]{2}/', $lines_eng[$i])))
-			{
-				$i++;
-				echo "(line $i) English multiline value - copy the line >>".$lines_eng[$i];
-				$out .= $lines_eng[$i];
-			}
-
+		    $out .= $orig_eng;
 		}
     }
 

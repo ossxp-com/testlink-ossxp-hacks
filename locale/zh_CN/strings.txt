@@ -25,6 +25,7 @@
  * Scripted update according en_GB string file (version: 1.395) 
  * Scripted update according en_GB string file (version: 1.413.2.20) 
  * Scripted update according en_GB string file (version: 1.413.2.20) 
+ * Scripted update according en_GB string file (version: 1.413.2.20) 
  * ---------------------------------------------------------------------------------- */
 
 // Define character set of this file (UTF-8 is common value)
@@ -1608,7 +1609,7 @@ $TLS_title_requirements = "需求";
 $TLS_title_test_spec = "测试规范";
 $TLS_title_product_mgmt = "产品管理";
 $TLS_href_plan_define_priority = "定义优先级规则";
-$TLS_href_my_testcase_assignments="指派给我的测试用例";
+$TLS_href_my_testcase_assignments="Test Cases assigned to me";
 
 
 // ----- gui/templates/mainPage_right.tpl -----
