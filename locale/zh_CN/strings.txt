@@ -91,15 +91,15 @@ $TLS_undefined="undefined";
 $TLS_add = "add";
 $TLS_assigned = "被指派";
 $TLS_create = "创建";
-$TLS_copy = "copy";
+$TLS_copy = "复制";
 $TLS_delete = "删除";
-$TLS_executed	= "executed";
+$TLS_executed	= "执行";
 $TLS_move	= "Move";
 $TLS_remove = "remove";
 $TLS_unassigned = "未指派";
 
 // Buttons (used wide)
-$TLS_btn_apply 	= "Apply";
+$TLS_btn_apply 	= "使用";
 $TLS_btn_add = "增加";
 $TLS_btn_add_to_testplans = "关联到测试计划";
 $TLS_btn_assign = "指派";
@@ -2160,7 +2160,7 @@ $TLS_no_tplans_to_fix = "You currently have no Test Plans that are not associate
 
 
 // ----- lib/project/project_req_spec_mgmt.tpl -----
-$TLS_btn_new_req_spec = "新建测试规格";
+$TLS_btn_new_req_spec = "新建需求规约";
 $TLS_btn_reorder_req_spec = "重新排序需求归约";
 
 

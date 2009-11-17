@@ -24,7 +24,7 @@ include_once(PCHART_PATH . "/pChart/pChart.class");
 */
 function createChart(&$info,&$cfg)
 {
-    $backgndColor=array('R' => 255, 'G' => 255, 'B' => 255);
+    $backgndColor=array('R' => 254, 'G' => 255, 'B' => 255);
     $chartCfg=new stdClass();
     $chartCfg->XSize=$info->canDraw ? $cfg->XSize : 600;
     $chartCfg->YSize=$info->canDraw ? $cfg->YSize : 50;                    

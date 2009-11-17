@@ -121,7 +121,7 @@ $tlCfg->default_language = 'zh_CN';
 $tlCfg->charset = 'UTF-8';
 
 // BUGID 1133 - needed by email_api
-$TLS_charset = 'utf-8';
+$TLS_charset = 'UTF-8';
 
 
 /** characters used to surround a description in the user interface (for example role)*/
