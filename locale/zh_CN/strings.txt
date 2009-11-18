@@ -136,8 +136,8 @@ $TLS_test_status_not_run = "尚未执行";
 $TLS_test_status_blocked = "锁定";
 $TLS_test_status_failed = "失败";
 $TLS_test_status_passed = "通过";
-$TLS_test_status_not_available = "Not Available";
-$TLS_test_status_unknown 	= "Unknown";
+$TLS_test_status_not_available = "无效";
+$TLS_test_status_unknown 	= "未知";
 
 $TLS_review_status_valid 	= "Valid";
 $TLS_review_status_draft 	= 'Draft';

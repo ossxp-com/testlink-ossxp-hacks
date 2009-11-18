@@ -138,7 +138,8 @@ $tlCfg->gui_title_separator_2 = ' - '; // parent - child
 $tlCfg->testcase_cfg->glue_character = '-';
 
 // used to draw charts:
-$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
+//$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
+$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/SIMLI.TTF";
 $tlCfg->charts_font_size = 8;
 
 
