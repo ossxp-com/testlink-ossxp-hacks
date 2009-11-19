@@ -6,24 +6,10 @@ Custom config files.
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- config.inc.php                                     |    2 +-
  custom_config.inc.php.example                      |   93 +++++++++++++++----
  install/sql/mysql/testlink_create_default_data.sql |    2 +-
- 3 files changed, 75 insertions(+), 22 deletions(-)
+ 2 files changed, 74 insertions(+), 21 deletions(-)
 
-diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..d7bf17b 100644
---- a/config.inc.php
-+++ b/config.inc.php
-@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
- // The value must be available in $g_locales (see cfg/const.inc.php).
- // Note: An attempt will be done to establish the default locale 
- // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
--$tlCfg->default_language = 'en_GB'; 
-+$tlCfg->default_language = 'zh_CN';
- 
- /** 
-  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
 index f9b9203..afc30ea 100644
 --- a/custom_config.inc.php.example
