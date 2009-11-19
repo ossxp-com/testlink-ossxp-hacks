@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
 // The value must be available in $g_locales (see cfg/const.inc.php).
 // Note: An attempt will be done to establish the default locale 
 // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
-$tlCfg->default_language = 'zh_CN';
+$tlCfg->default_language = 'en_GB';
 
 /** 
  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
