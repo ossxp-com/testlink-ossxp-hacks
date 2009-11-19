@@ -298,12 +298,12 @@ $TLS_report_tspec_has_no_tsuites = "There are no Test Suites defined for Test Pr
 $TLS_title_nav_results = "Reports and Metrics";
 $TLS_report_tplan_has_no_build = "Test Plan has no build defined, <br />".
                                "then no execution data can exist => no report can be created";
-$TLS_report_tplan_has_no_tcases = "Test Plan has no Test Cases linked, <br />".
-                                "then no execution data can exist => no report can be created";
+$TLS_report_tplan_has_no_tcases = "还没有任何测试用例集关联到该计划, <br />".
+                                "没有数据可以显示,没有报告可以产生";
 
 // ----- tcEdit.php -----
-$TLS_copy_keyword_assignments = "Copy Keyword Assignments";
-$TLS_copy_requirement_assignments = "Copy Requirement Assignments";
+$TLS_copy_keyword_assignments = "复制关联的关键字";
+$TLS_copy_requirement_assignments = "复制关联的需求";
 $TLS_tc_copied = "测试用例 %s 成功复制到 <br> 测试集 %s";
 $TLS_tc_created = "测试用例 %s 成功创建";
 $TLS_tc_deleted = "测试用例 %s 成功删除";
@@ -315,11 +315,11 @@ $TLS_assign_requirements = "Assign Requirements";
 
 
 // ----- tcexecute.php -----
-$TLS_check_test_automation_server = "Please Check Server Settings";
+$TLS_check_test_automation_server = "请检查服务器配置";
 $TLS_result_after_exec = "Results after execution: ";
-$TLS_service_not_supported = "This service is not supported";
+$TLS_service_not_supported = "不支持该服务";
 $TLS_tcexec_notes = "Testing details";
-$TLS_tcexec_result = "Result";
+$TLS_tcexec_result = "结果";
 $TLS_tcexec_results_for = "Result for ";
 
 
@@ -341,7 +341,7 @@ $TLS_container_title_testsuite = $TLS_test_suite;
 $TLS_linked_but_not_executed = "Linked to one or more Test Plan, but not executed";
 $TLS_question_del = "确认删除";
 $TLS_th_link_exec_status = "关联和执行状态";
-$TLS_no_links = "No dependent data.";
+$TLS_no_links = "没有依赖数据.";
 $TLS_linked_and_executed = "Test case was added into a Test Plan and has results.";
 
 
@@ -836,7 +836,7 @@ $TLS_warning_empty_tc_title = "请为测试用例指定标题";
 
 // ----- gui/templates/tcImport.tpl -----
 $TLS_title_imp_tc_data = "导入测试用例数据";
-$TLS_view_file_format_doc = "(View file formats documentation)";
+$TLS_view_file_format_doc = "(查看支持文件格式)";
 
 
 
@@ -911,7 +911,7 @@ $TLS_btn_mv = "移动";
 $TLS_choose_container = "选择分类";
 $TLS_inst_copy = "复制测试用例到测试集。";
 $TLS_inst_move = "将这个测试用例移动到另一个分类下（同一组件内）";
-$TLS_inst_copy_move_warning = "Important: You can only choose Test Suites belonging to this Test Project.";
+$TLS_inst_copy_move_warning = "注意：你只能选择属于这个测试项目的测试用例集.";
 $TLS_title_mv_cp_tc = "移动/复制测试用例";
 
 
@@ -2351,42 +2351,42 @@ $TLS_audit_events_deleted = "User '{%1}' deleted all events";
 
 
 // ----- eventviewer.php -----
-$TLS_th_loglevel = "Log level";
+$TLS_th_loglevel = "日志级别";
 $TLS_th_timestamp = "Timestamp";
 $TLS_th_activity = "Activity";
-$TLS_label_startdate = "Start date";
-$TLS_label_enddate = "End date";
-$TLS_log_level_AUDIT = "Audit";
-$TLS_log_level_WARNING = "Warning";
-$TLS_log_level_INFO = "Info";
-$TLS_log_level_ERROR = "Error";
-$TLS_log_level_DEBUG = "Debug";
+$TLS_label_startdate = "开始日期";
+$TLS_label_enddate = "结束日期";
+$TLS_log_level_AUDIT = "检查";
+$TLS_log_level_WARNING = "警告";
+$TLS_log_level_INFO = "信息";
+$TLS_log_level_ERROR = "错误";
+$TLS_log_level_DEBUG = "调试";
 $TLS_event_viewer = "Event viewer";
-$TLS_th_session_info = "Session information";
-$TLS_th_sessionID = "Session ID";
+$TLS_th_session_info = "Session信息";
+$TLS_th_sessionID = "Session编号";
 $TLS_th_source = "Source";
-$TLS_click_on_event_info = "Click on any event to see it's details.";
+$TLS_click_on_event_info = "点击事件查看细节.";
 $TLS_th_activity_code = "Activity";
 $TLS_th_object_id = "Object ID";
 $TLS_th_object_type = "Object Type";
-$TLS_message_please_wait = "Please wait ...";
-$TLS_title_eventinfo = "Event information";
-$TLS_title_eventdetails = "Event details";
-$TLS_th_user = "User";
-$TLS_show_event_history = "Show the event history";
-$TLS_btn_clear_events = "Clear All Events";
-$TLS_th_event_description = "Description";
+$TLS_message_please_wait = "请等待 ...";
+$TLS_title_eventinfo = "事件信息";
+$TLS_title_eventdetails = "事件细节";
+$TLS_th_user = "用户";
+$TLS_show_event_history = "显示事件历史";
+$TLS_btn_clear_events = "清除所有事件";
+$TLS_th_event_description = "描述";
 
 
 // ----- int_mantis.php -----
 // Used to display at User interface label as title attribute
-$TLS_issue_status_new = "New issue";
-$TLS_issue_status_feedback = "Feedback";
-$TLS_issue_status_acknowledged = "Acknowledged issue ";
-$TLS_issue_status_confirmed = "Confirmed issue";
-$TLS_issue_status_assigned = "Assigned issue";
-$TLS_issue_status_resolved = "Resolved issue";
-$TLS_issue_status_closed = "Closed issue";
+$TLS_issue_status_new = "新建问题";
+$TLS_issue_status_feedback = "反馈";
+$TLS_issue_status_acknowledged = "公认的问题";
+$TLS_issue_status_confirmed = "确认的问题";
+$TLS_issue_status_assigned = "关联问题";
+$TLS_issue_status_resolved = "已解决的问题";
+$TLS_issue_status_closed = "关闭的问题";
 $TLS_access_to_bts="Access issue tracking system";
 
 
@@ -2412,7 +2412,7 @@ $TLS_interval_header 		= "Interval Type";
 $TLS_interval_number 		= "Number of Intervals";
 $TLS_link_time_charts		= "Time Charts";
 $TLS_time_charts_metrics 	= "Time Charts Metrics";
-$TLS_time_charts_title 		= "Time Charts";
+$TLS_time_charts_title 		= "时间表";
 
 
 // ----- END ------------------------------------------------------------------
