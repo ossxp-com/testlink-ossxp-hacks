@@ -6,22 +6,59 @@ Subject: [PATCH] t/zh_cn_l10n
 Signed-off-by: leiww <leiww@bj.ossxp.com>
 
 ---
- .gitignore                |    1 +
- cfg/mantis.cfg.php        |   12 +-
- config.inc.php            |    4 +-
- locale/tl_lang_parser.php |  223 ++++
- locale/zh_CN/strings.txt  | 2780 +++++++++++++++++++++++----------------------
- 5 files changed, 1664 insertions(+), 1356 deletions(-)
+ .gitignore                            |    2 +
+ cfg/const.inc.php                     |   14 +-
+ cfg/mantis.cfg.php                    |   12 +-
+ cfg/redmine.cfg.php                   |   22 +-
+ config.inc.php                        |   19 +-
+ lib/functions/lang_api.php            |    2 +-
+ lib/results/charts.inc.php            |    2 +-
+ locale/tl_lang_parser.php             |  243 +++
+ locale/zh_CN/strings.txt              | 2758 +++++++++++++++++----------------
+ locale/zh_CN/texts.php                |    4 +-
+ third_party/pchart/pChart/pData.class |    4 +-
+ 11 files changed, 1706 insertions(+), 1376 deletions(-)
 
 diff --git a/.gitignore b/.gitignore
-index bc5075b..1e03e1f 100644
+index bc5075b..11d6256 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -2,3 +2,4 @@ config_db.inc.php
+@@ -2,3 +2,5 @@ config_db.inc.php
  custom_config.inc.php
  logs
  gui/templates_c/*.php
 +upload_area/executions
++third_party/pchart/Fonts/*.TTF
+diff --git a/cfg/const.inc.php b/cfg/const.inc.php
+index 4552e3b..56162fc 100644
+--- a/cfg/const.inc.php
++++ b/cfg/const.inc.php
+@@ -427,12 +427,12 @@ $tlCfg->reportsCfg=new stdClass();
+ 
+ // BUGID 1785
+ // With this change configuration is simplified
+-// $tlCfg->reportsCfg->exec_status = array(
+-//     "passed"  => "test_status_passed",
+-//     "failed"  => "test_status_failed",
+-//     "blocked" => "test_status_blocked",
+-//     "not_run" => "test_status_not_run"
+-// );
++ $tlCfg->reportsCfg->exec_status = array(
++     "passed"  => "test_status_passed",
++     "failed"  => "test_status_failed",
++     "blocked" => "test_status_blocked",
++     "not_run" => "test_status_not_run"
++ );
+ $tlCfg->reportsCfg->exec_status = $tlCfg->results['status_label_for_exec_ui'];
+ 
+ 
+@@ -651,4 +651,4 @@ $tlCfg->gui->custom_fields->time_format = "H:i:s";
+                                                        
+ 
+ // ----- END ----------------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
 diff --git a/cfg/mantis.cfg.php b/cfg/mantis.cfg.php
 index 5206331..d19111e 100644
 --- a/cfg/mantis.cfg.php
@@ -58,32 +95,157 @@ index 5206331..d19111e 100644
 -?>
 \ No newline at end of file
 +?>
+diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
+index a87ea2f..da6d9ba 100644
+--- a/cfg/redmine.cfg.php
++++ b/cfg/redmine.cfg.php
+@@ -14,20 +14,20 @@
+ // Set the bug tracking system Interface to redMine 0.6.3
+ 
+ /** The DB host to use when connecting to the mantis db */
+-define('BUG_TRACK_DB_HOST', '[CONFIGURE_BUG_TRACK_DB_HOST]');
++define('BUG_TRACK_DB_HOST', 'localhost');
+ 
+ /** The name of the database that contains the mantis tables */
+-define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
++define('BUG_TRACK_DB_NAME', 'redmine517');
+ 
+ /** The DB type being used by redMine
+  * Check config/database.yml in redMine install directory.
+  * values: mysql, mssql, postgres
+  */
+-define('BUG_TRACK_DB_TYPE', '[CONFIGURE_BUG_TRACK_DB_TYPE]');
++define('BUG_TRACK_DB_TYPE', 'mysql');
+ 
+ /** The DB password to use for connecting to the redMine db */
+-define('BUG_TRACK_DB_USER', '[CONFIGURE_BUG_TRACK_DB_USER]');
+-define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
++define('BUG_TRACK_DB_USER', 'root');
++define('BUG_TRACK_DB_PASS', 'root');
+ 
+ /**
+  * redMine store information to database with "latain1" char-set by default.
+@@ -44,16 +44,16 @@ define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
+  *     password: xxxxxxxx
+  * ----------------------
+  */
+-define('BUG_TRACK_DB_CHARSET', "latain1");
++define('BUG_TRACK_DB_CHARSET', "utf8");
+ // define('BUG_TRACK_DB_CHARSET',"gb2312");
+ // define('BUG_TRACK_DB_CHARSET',"UTF-8");
+ 
+ 
+ /* link of the web server for redmine */
+-define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
+-// define('BUG_TRACK_HREF', "http://localhost:3000/issues/show/");
++//define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
++define('BUG_TRACK_HREF', "http://localhost:3000/issues/show/");
+ 
+ /** link to the bugtracking system, for entering new bugs */
+-define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
+-// define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
+-?>
+\ No newline at end of file
++//define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
++ define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
++?>
 diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..406798a 100644
+index 4117b9f..3d66c4f 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -222,7 +222,7 @@ $g_removeEventsOlderThan = 30;
+@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
+ // The value must be available in $g_locales (see cfg/const.inc.php).
+ // Note: An attempt will be done to establish the default locale 
+ // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
+-$tlCfg->default_language = 'en_GB'; 
++$tlCfg->default_language = 'zh_CN'; 
+ 
+ /** 
+  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
+@@ -121,7 +121,7 @@ $tlCfg->default_language = 'en_GB';
+ $tlCfg->charset = 'UTF-8';
+ 
+ // BUGID 1133 - needed by email_api
+-$TLS_charset = 'utf-8';
++$TLS_charset = 'UTF-8';
+ 
+ 
+ /** characters used to surround a description in the user interface (for example role)*/
+@@ -138,7 +138,8 @@ $tlCfg->gui_title_separator_2 = ' - '; // parent - child
+ $tlCfg->testcase_cfg->glue_character = '-';
+ 
+ // used to draw charts:
+-$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
++//$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
++$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/SIMLI.TTF";
+ $tlCfg->charts_font_size = 8;
+ 
+ 
+@@ -222,7 +223,7 @@ $g_removeEventsOlderThan = 30;
   * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
   * ]
   */
 -$g_interface_bugs = 'NO';
-+$g_interface_bugs = 'MANTIS';
++$g_interface_bugs = 'REDMINE';
  
  
  
-@@ -943,4 +943,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+@@ -234,12 +235,12 @@ $g_interface_bugs = 'NO';
+ // with code taken from Mantis.
+ // 
+ // SMTP server Configuration ("localhost" is enough in the most cases)
+-$g_smtp_host        = '[smtp_host_not_configured]';  # SMTP server MUST BE configured  
++$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
+ 
+ # Configure using custom_config.inc.php
+-$g_tl_admin_email     = '[testlink_sysadmin_email_not_configured]'; # for problem/error notification 
+-$g_from_email         = '[from_email_not_configured]';  # email sender
+-$g_return_path_email  = '[return_path_email_not_configured]';
++$g_tl_admin_email     = 'leiww@bj.ossxp.com'; # for problem/error notification 
++$g_from_email         = 'no_replay@ossxp.com';  # email sender
++$g_return_path_email  = 'leiww@bj.ossxp.com';
+ 
+ # Urgent = 1, Not Urgent = 5, Disable = 0
+ $g_mail_priority = 5;   
+@@ -943,4 +944,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
  $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
  $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
  // ----- END OF FILE --------------------------------------------------------------------
 -?>
 \ No newline at end of file
 +?>
+diff --git a/lib/functions/lang_api.php b/lib/functions/lang_api.php
+index bfc4092..072e6b6 100644
+--- a/lib/functions/lang_api.php
++++ b/lib/functions/lang_api.php
+@@ -62,7 +62,7 @@ function lang_get( $p_string, $p_lang = null, $bDontFireEvents = false)
+ 	$the_str = $loc_str;
+ 	if (!is_null($loc_str))
+ 	{
+-		$stringFileCharset = "ISO-8859-1";
++		$stringFileCharset = "UTF-8";
+ 		if (isset($g_lang_strings[$t_lang]['STRINGFILE_CHARSET']))
+ 			$stringFileCharset = $g_lang_strings[$t_lang]['STRINGFILE_CHARSET'];
+ 		if ($stringFileCharset != TL_TPL_CHARSET)
+diff --git a/lib/results/charts.inc.php b/lib/results/charts.inc.php
+index 3ad3cc2..47f036a 100644
+--- a/lib/results/charts.inc.php
++++ b/lib/results/charts.inc.php
+@@ -24,7 +24,7 @@ include_once(PCHART_PATH . "/pChart/pChart.class");
+ */
+ function createChart(&$info,&$cfg)
+ {
+-    $backgndColor=array('R' => 255, 'G' => 255, 'B' => 255);
++    $backgndColor=array('R' => 254, 'G' => 255, 'B' => 255);
+     $chartCfg=new stdClass();
+     $chartCfg->XSize=$info->canDraw ? $cfg->XSize : 600;
+     $chartCfg->YSize=$info->canDraw ? $cfg->YSize : 50;                    
 diff --git a/locale/tl_lang_parser.php b/locale/tl_lang_parser.php
 new file mode 100755
-index 0000000..0784725
+index 0000000..dfb19b5
 --- /dev/null
 +++ b/locale/tl_lang_parser.php
-@@ -0,0 +1,223 @@
+@@ -0,0 +1,243 @@
 +#!/usr/bin/php
 +<?php
 +/**
@@ -131,6 +293,8 @@ index 0000000..0784725
 +$out = ''; // data for output file
 +$var_counter = 0;
 +$var_counter_new = 0;
++$var_counter_untrans = 0;
++$var_counter_trans = 0;
 +
 +
 +
@@ -177,7 +341,7 @@ index 0000000..0784725
 +    {
 +        echo "Eng: End of header is line = $i \n";
 +        $begin_line = $i + 1;
-+        $i = $lines_eng_count;
++        break;
 +    }
 +}
 +
@@ -188,13 +352,17 @@ index 0000000..0784725
 +    {
 +        echo "Old: End of header is line = $i \n";
 +        $begin_line_old = $i + 1;
-+        $i = $lines_old_count;
 +		$out .= " * Scripted update according en_GB string file (version: ".$revision_comment.") \n";
 +		$out .= " * --------------------------------------------------------------------" .
 +				"-------------- */\n";
++        break;
 +    }
 +    else
++    {
++		if  (trim($lines_lang_old[$i]) == "* Scripted update according en_GB string file (version: $revision_comment)")
++            continue;
 +		$out .= $lines_lang_old[$i];
++    }
 +}
 +
 +
@@ -229,7 +397,7 @@ index 0000000..0784725
 +        // get localized value if defined - parse old localized strings
 +		for( $k = $begin_line_old; $k < $lines_old_count; $k++ )
 +		{
-+			if (preg_match('/^\\'.$var_name.'[\s]*=[\s].+$/', $lines_lang_old[$k]))
++			if (preg_match('/^\\'.$var_name.'[\s]*=.+$/', $lines_lang_old[$k]))
 +			{
 +		        echo "\tFound localized variable on (line $k) >>> {$lines_lang_old[$k]}";
 +				$bLocalized = TRUE;
@@ -246,28 +414,41 @@ index 0000000..0784725
 +				$k = $lines_old_count; // exit more parsing old file
 +			}
 +		}
-+		
++
++	    echo "\tLocalization doesn't exists. Copy English.'\n";
++
++        // Jiangxin: save english var and value pairs to orig_eng
++        $orig_eng = $lines_eng[$i];
++
++        // check multiline value (check semicolon or semicolon with comment)
++        while (!(preg_match('/^(.*);[\s]*$/', $lines_eng[$i])
++            || preg_match('/^(.*);[\s]*[\/]{2}/', $lines_eng[$i])))
++        {
++            $i++;
++            echo "(line $i) English multiline value - copy the line >>".$lines_eng[$i];
++            $orig_eng .= $lines_eng[$i];
++        }
++	
 +        echo "(line $i) Found variable '$var_name'\n";
 +		if ($bLocalized)
 +		{
 +	        echo "\tLocalization exists '$localizedLine'\n";
++            if ($localizedLine == $orig_eng)
++            {
++                $var_counter_untrans++;
++            }
++            else
++            {
++                $var_counter_trans++;
++            }
 +        	$out .= $localizedLine;
 +		} 
 +		else 
 +		{
 +	        echo "\tLocalization doesn't exists. Copy English.'\n";
-+		    $out .= $lines_eng[$i];
++            $var_counter_untrans++;
 +		    $var_counter_new++;
-+
-+        	// check multiline value (check semicolon or semicolon with comment)
-+			while (!(preg_match('/^(.*);[\s]*$/', $lines_eng[$i])
-+				|| preg_match('/^(.*);[\s]*[\/]{2}/', $lines_eng[$i])))
-+			{
-+				$i++;
-+				echo "(line $i) English multiline value - copy the line >>".$lines_eng[$i];
-+				$out .= $lines_eng[$i];
-+			}
-+
++		    $out .= $orig_eng;
 +		}
 +    }
 +
@@ -304,64 +485,18 @@ index 0000000..0784725
 +
 +echo "\n\nUpdated file: ".$file_lang_old;
 +echo "\nCompleted! The script has parsed $var_counter strings and add $var_counter_new new variables.\n";
++echo "\nUn-translate items: $var_counter_untrans , translated items: $var_counter_trans\n";
 +echo "===== Bye =====\n";
 +
 +?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index a16c224..dc0d6d6 100644
+index a16c224..e292ef9 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -1,129 +1,159 @@
--<?php
--/**
-- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
-- * Chinese Simplified translation-  yfeng.lee@gmail.com 
-- *
-- * Filename $RCSfile: strings.txt,v $
-- *
-- * @version $Revision: 1.17 $
-- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
-- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
-- *
-- * N.B.:
-- * Here we are defining GLOBAL variables.
-- * To avoid override of other globals we are using $TLS_ (Test Link String) prefix.
-- * This must be a reserved prefix.
-- *
-- * @author Francisco Mancardi
-- *
-- * 20070818 - franciscom
-- * 20070705 - franciscom -
-- * 20070520 - franciscom - milestones
-- * 20070206 - franciscom - BUGID 618 - \n on JS messages
-- *
-- *       
-- * Scripted update according en_GB string file (version: 1.395) 
-+<?php
-+/**
-+ * TestLink Open Source Project - http://testlink.sourceforge.net/ 
-+ *
-+ * Filename $RCSfile: strings.txt,v $
-+ *
-+ * @version $Revision: 1.196.2.9 $
-+ * @modified $Date: 2008/02/14 18:08:24 $ $Author: havlat $
-+ *
-+ * N.B.:
-+ * Here we are defining GLOBAL variables.
-+ * To avoid override of other globals we are using $TLS_ (Test Link String) prefix.
-+ * This must be a reserved prefix.
-+ *
-+ * @author Francisco Mancardi
-+ *
-+ * English (en_GB) strings
-+ * 
-+ * 20070930 - franciscom - show_tcase_spec
-+ * 20070818 - franciscom -
-+ * 20070705 - franciscom -
-+ * 20070520 - franciscom - milestones
-+ * 20070206 - franciscom - BUGID 618 - \n on JS messages
-+ *
-+ *       
+@@ -23,141 +23,194 @@
+  *
+  *       
+  * Scripted update according en_GB string file (version: 1.395) 
 + * Scripted update according en_GB string file (version: 1.413.2.20) 
   * ---------------------------------------------------------------------------------- */
 +
@@ -387,14 +522,17 @@ index a16c224..dc0d6d6 100644
 -$TLS_unassigned = "未指派";
 -$TLS_desc 			= "descending";
 -$TLS_description	= "Description";
-+$TLS_days	= "days";
-+$TLS_desc = "降序";
-+$TLS_description = "Description";
- $TLS_delete_confirm_question = "Are your sure you want to delete?";
+-$TLS_delete_confirm_question = "Are your sure you want to delete?";
 -$TLS_file_type		= 'File type';
 -$TLS_help 			= "Help";
 -$TLS_high 			= "High";
--$TLS_hour = "小时";
++$TLS_days	= "days";
++$TLS_desc = "降序";
++$TLS_description = "描述";
++$TLS_delete_confirm_question = "你确定删除吗?";
++$TLS_file_type = '文件类型';
++$TLS_help = "帮助";
+ $TLS_hour = "小时";
 -$TLS_importance		= "Importance";
 -$TLS_low 			= "Low";
 -$TLS_manual 		= "Manual";
@@ -408,9 +546,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_requirement = "需求";
 -$TLS_reqs 			= "Requirements";
 -$TLS_req_spec 		= "Requirements Specification Document";
-+$TLS_file_type = 'File type';
-+$TLS_help = "帮助";
-+$TLS_hour = "小时";
 +$TLS_importance	= "Importance";
 +$TLS_imported = "Imported";
 +$TLS_keyword = "关键字";
@@ -423,8 +558,8 @@ index a16c224..dc0d6d6 100644
 +$TLS_not_imported = "Not imported";
 +$TLS_none = "无";
 +$TLS_ok = "确定";
-+$TLS_priority	= "Priority";
-+$TLS_project = "Project";
++$TLS_priority	= "优先级";
++$TLS_project = "项目";
 +$TLS_requirement = "Requirement";
 +$TLS_reqs = "需求";
 +$TLS_req_spec = "需求规约";
@@ -439,7 +574,17 @@ index a16c224..dc0d6d6 100644
 -$TLS_testcase = $TLS_test_case;
 -$TLS_testcaseversion = 'Test Case Version';
 -$TLS_test_plan 		= "Test Plan";
--$TLS_testplan = $TLS_test_plan;
++$TLS_srs = "SRS";
++$TLS_Role = "角色";
++$TLS_sort_table_by_column = "反向排序";
++$TLS_scope = "范围";
++$TLS_status = "状态";
++$TLS_test_case = "测试用例";
++$TLS_testcase = "测试用例";
++$TLS_testcaseversion 	= '测试用例版本';
++$TLS_tester = "Tester";
++$TLS_test_plan = "测试计划";
+ $TLS_testplan = $TLS_test_plan;
 -$TLS_testproject 	= "Test Project";
 -$TLS_test_report 	= "Test Report";
 -$TLS_test_suite 	= "Test Suite";
@@ -449,27 +594,16 @@ index a16c224..dc0d6d6 100644
 -$TLS_not_imported 	= "Not imported";
 -$TLS_imported 		= "Imported";
 -$TLS_nobody 		= "Nobody";
-+$TLS_srs = "SRS";
-+$TLS_Role = "角色";
-+$TLS_sort_table_by_column = "反向排序";
-+$TLS_scope = "范围";
-+$TLS_status = "状态";
-+$TLS_test_case = "测试用例";
-+$TLS_testcase = "测试用例";
-+$TLS_testcaseversion 	= 'Test Case Version';
-+$TLS_tester = "Tester";
-+$TLS_test_plan = "测试计划";
-+$TLS_testplan = $TLS_test_plan;
 +$TLS_testproject = "测试产品";
 +$TLS_test_report = "详细测试报告";
 +$TLS_test_suite = "测试集";
 +$TLS_testsuite_created = "测试集创建成功";
 +$TLS_title = "标题";
-+$TLS_total = "Total";
++$TLS_total = "总计";
 +$TLS_Unknown = "未知";
 +$TLS_urgency = "Urgency";
 +$TLS_weeks = "weeks";
-+$TLS_undefined="undefined";
++$TLS_undefined="未定义";
  
  
  // Actions (used wide) 
@@ -478,14 +612,14 @@ index a16c224..dc0d6d6 100644
 -$TLS_remove 		= "remove";
 -$TLS_th_delete 		= "Delete";
 -
-+$TLS_add = "add";
++$TLS_add = "添加";
 +$TLS_assigned = "被指派";
 +$TLS_create = "创建";
-+$TLS_copy = "copy";
++$TLS_copy = "复制";
 +$TLS_delete = "删除";
-+$TLS_executed	= "executed";
-+$TLS_move	= "Move";
-+$TLS_remove = "remove";
++$TLS_executed	= "执行";
++$TLS_move	= "移动";
++$TLS_remove = "移除";
 +$TLS_unassigned = "未指派";
  
  // Buttons (used wide)
@@ -506,13 +640,7 @@ index a16c224..dc0d6d6 100644
 -$TLS_btn_low 		= "Low";
 -$TLS_btn_medium 	= "Medium";
 -$TLS_btn_move 		= "Move";
--$TLS_btn_no = "否";
--$TLS_btn_ok 		= "Ok";
--$TLS_btn_save 		= "Save";
--$TLS_btn_unassign 	= "Unassign";
--$TLS_btn_update 	= "Update";
--$TLS_btn_upd 		= $TLS_btn_update; //obsolete
-+$TLS_btn_apply 	= "Apply";
++$TLS_btn_apply 	= "使用";
 +$TLS_btn_add = "增加";
 +$TLS_btn_add_to_testplans = "关联到测试计划";
 +$TLS_btn_assign = "指派";
@@ -525,11 +653,18 @@ index a16c224..dc0d6d6 100644
 +$TLS_btn_edit = "编辑";
 +$TLS_btn_export = "导出";
 +$TLS_btn_find = "查找";
-+$TLS_btn_goback = "Go back";
++$TLS_btn_goback = "后退";
 +$TLS_btn_generate_doc = "Generate document";
 +$TLS_btn_import = "导入";
 +$TLS_btn_move = "移动";
-+$TLS_btn_no = "否";
+ $TLS_btn_no = "否";
+-$TLS_btn_ok 		= "Ok";
+-$TLS_btn_save 		= "Save";
+-$TLS_btn_unassign 	= "Unassign";
+-$TLS_btn_update 	= "Update";
+-$TLS_btn_upd 		= $TLS_btn_update; //obsolete
+-$TLS_btn_advanced_filters = "Advanced Filters";
+-$TLS_btn_simple_filters = "Simple Filters"; 
 +$TLS_btn_ok = "确定";
 +$TLS_btn_print = "打印";
 +$TLS_btn_save = "保存";
@@ -537,9 +672,9 @@ index a16c224..dc0d6d6 100644
 +$TLS_btn_uncheck = "全都不选";
 +$TLS_btn_update = "更新";
 +$TLS_btn_upd = "更新";
-+$TLS_btn_upload = "Upload";
- $TLS_btn_advanced_filters = "Advanced Filters";
- $TLS_btn_simple_filters = "Simple Filters"; 
++$TLS_btn_upload = "上传";
++$TLS_btn_advanced_filters = "高级搜索";
++$TLS_btn_simple_filters = "简单搜索"; 
  
  
  // Status (used wide)
@@ -549,15 +684,17 @@ index a16c224..dc0d6d6 100644
 -$TLS_test_status_blocked 	= "Blocked";
 -$TLS_test_status_failed 	= "Failed";
 -$TLS_test_status_passed 	= "Passed";
+-$TLS_test_status_not_available = "Not Available";
+-$TLS_test_status_unknown 	= "Unknown";
 +$TLS_test_status_all = "全部";
 +$TLS_test_status_any = "任意";
 +$TLS_test_status_not_run = "尚未执行";
 +$TLS_test_status_blocked = "锁定";
 +$TLS_test_status_failed = "失败";
 +$TLS_test_status_passed = "通过";
- $TLS_test_status_not_available = "Not Available";
- $TLS_test_status_unknown 	= "Unknown";
- 
++$TLS_test_status_not_available = "无效";
++$TLS_test_status_unknown 	= "未知";
++
 +$TLS_review_status_valid 	= "Valid";
 +$TLS_review_status_draft 	= 'Draft';
 +$TLS_review_status_future	= 'Future';
@@ -572,11 +709,21 @@ index a16c224..dc0d6d6 100644
 +$TLS_req_type_constrain 	= 'Constrain';
 +
 +$TLS_req_status_not_testable = "Not testable"; // defined for historical reason (should be replaced by $TLS_req_type_info)
-+
+ 
  
  // ----- unsorted (TODO move) -------------------------------------
- $TLS_problems_loading_xml_content = "Unable to load XML data, Check your file."; 
-@@ -138,26 +168,49 @@ $TLS_estimated_time_min = "Estimated time for executing %s test cases (min):";
+-$TLS_problems_loading_xml_content = "Unable to load XML data, Check your file."; 
++$TLS_problems_loading_xml_content = "无法下载XML数据，检查你的文件."; 
+ $TLS_search_type_like = "Search on this value will be done on LIKE mode";
+-$TLS_exec_assign_no_testcase = "Please select at least one Test Case.";
++$TLS_exec_assign_no_testcase = "请至少选择一个测试用例.";
+ $TLS_select_at_least_one_testcase = "Please select at least one Test Case and a target!";
+ $TLS_no_testcases_available = "No Test Cases or no destination Test Suites available!";
+-$TLS_warning_must_be_number = "Value must be a number";
++$TLS_warning_must_be_number = "值必须是一个数字";
+ 
+ $TLS_estimated_time_hours = "Estimated time for executing %s test cases (hours):";
+ $TLS_estimated_time_min = "Estimated time for executing %s test cases (min):";
  $TLS_real_time_hours = "Time used for executing %s test cases (hours):";
  $TLS_real_time_min = "Time used for executing %s test cases (min):";
  
@@ -590,14 +737,12 @@ index a16c224..dc0d6d6 100644
 +$TLS_th_delete = "是否删除？";
  $TLS_th_requirement_feature = "Requirement Feature";
  
--$TLS_import_file_type = "导入文件类型";
+ $TLS_import_file_type = "导入文件类型";
 -$TLS_max_file_size_is = "最大. 文件大小 ";
--$TLS_supported_file_formats = "支持的文件格式";
++$TLS_max_file_size_is = "最大文件大小";
+ $TLS_supported_file_formats = "支持的文件格式";
 -$TLS_no_permissions_for_action = "You do not have permissions to perform this action!" .
 -                                 " Please contact your administrator.";
-+$TLS_import_file_type = "导入文件类型";
-+$TLS_max_file_size_is = "最大文件大小";
-+$TLS_supported_file_formats = "支持的文件格式";
 +$TLS_no_permissions_for_action = "无权限执行这个活动！请与管理员联系！";
 +
 +$TLS_name_already_exists = "Name:%s already exists";
@@ -605,10 +750,10 @@ index a16c224..dc0d6d6 100644
 +
 +
 +$TLS_click_to_open='Click to open';
-+$TLS_testplan_usage="Test Plan usage";
++$TLS_testplan_usage="测试计划用途";
 +
-+$TLS_add_tcversion_to_plans = "Add Test Case Version to Test Plans";
-+$TLS_please_select_one_testplan = "Please select at least one Test Plan.";
++$TLS_add_tcversion_to_plans = "把测试用例版本添加到测试计划";
++$TLS_please_select_one_testplan = "请至少选择一个测试计划.";
 +
 +$TLS_deleted_user = "[deleted user - id=%s]";
 +$TLS_user_not_on_system = "[user with id=%s does not exist on system]";
@@ -617,7 +762,7 @@ index a16c224..dc0d6d6 100644
 +
 +$TLS_design = "Test Spec Design";
 +$TLS_execution = "Test Execution";
-+$TLS_testplan_design = "Test Plan Desing";
++$TLS_testplan_design = "测试计划设计";
 +$TLS_enable_on = "Enable on";
 +
  
@@ -659,11 +804,11 @@ index a16c224..dc0d6d6 100644
 -$TLS_valid_user_name_format = "Login/User name can only contain letters, numbers, spaces, hyphens and underscores.";
 -$TLS_warning_empty_pwd = "The password must not be empty!";
 -$TLS_your_info_please = "Enter Your User Information";
-+$TLS_passwd_dont_match = "两次输入的口令不一致，请说明口令是大小写敏感的。请重新输入。";
++$TLS_passwd_dont_match = "两次输入的密码不一致，请重新输入。";
 +$TLS_user_cant_be_created_because = "你的帐号无法创建,原因是：";
 +$TLS_user_name_exists = "用户名已经被使用,请选择其它的名称。";
 +$TLS_valid_user_name_format = "用户名只能包含字母,数字,空格,连字符和下划线。";
-+$TLS_warning_empty_pwd = "口令不允许为空！";
++$TLS_warning_empty_pwd = "密码不允许为空！";
 +$TLS_your_info_please = "输入你的用户信息";
  
  
@@ -706,9 +851,8 @@ index a16c224..dc0d6d6 100644
  
  // ----- keywordsimport.php -----
 -$TLS_please_choose_keywords_file = "Please choose the file to upload";
--$TLS_keywords_file = "关键字文件";
 +$TLS_please_choose_keywords_file = "选择上传的文件";
-+$TLS_keywords_file = "关键字文件";
+ $TLS_keywords_file = "关键字文件";
  $TLS_wrong_keywords_file = "Wrong Keyword file (wrong format)";
  
  
@@ -721,15 +865,14 @@ index a16c224..dc0d6d6 100644
 -$TLS_mail_problems = "Errors in mail setup, please contact your administrator.";
 -$TLS_page_title_lost_passwd = "TestLink - Lost password";
 -$TLS_your_info_for_passwd = "输入你的用户信息，以便可以通过电子邮件给你发送的新密码。";
--$TLS_your_password_is = "你的TestLink新密码是：<br>";
 +$TLS_bad_user = "用户不存在，请重试";
-+$TLS_contact_admin = "<br>如果你有近一步的问题，请与系统管理员联系。";
-+$TLS_mail_empty_address = "你没有在你的用户档案信息中指定电子邮件地址！请与TestLink系统管理员联系，重新设置你的口令！";
-+$TLS_mail_passwd_subject = "新的TestLink口令";
++$TLS_contact_admin = "<br>如果你还有问题，请与系统管理员联系。";
++$TLS_mail_empty_address = "你没有在你的用户档案信息中指定电子邮件地址！请与TestLink系统管理员联系，重新设置你的密码！";
++$TLS_mail_passwd_subject = "新的TestLink密码";
 +$TLS_mail_problems = "邮件功能没有正确安装，请与系统管理员联系。";
-+$TLS_page_title_lost_passwd = "TestLink - 忘记口令";
-+$TLS_your_info_for_passwd = "输入你的用户信息，以便可以通过电子邮件发送你的新口令。";
-+$TLS_your_password_is = "你的TestLink新口令是：<br>";
++$TLS_page_title_lost_passwd = "TestLink - 忘记密码";
++$TLS_your_info_for_passwd = "输入你的用户信息，以便可以通过电子邮件发送你的新密码。";
+ $TLS_your_password_is = "你的TestLink新密码是：<br>";
  
  
  
@@ -745,11 +888,11 @@ index a16c224..dc0d6d6 100644
 -$TLS_please_login = "Please log in ...";
 -$TLS_session_expired = "你的登陆已经超时！请重新登陆。";
 -$TLS_your_first_login = "欢迎使用 TestLink！你具有访客访问权限。请登陆 ...";
-+$TLS_bad_user_passwd = "重试！错误的用户名或口令！";
++$TLS_bad_user_passwd = "重试！错误的用户名或密码！";
 +$TLS_login_msg_session_exists1 = "浏览器中已经有一个合法的登陆用户。请使用它。";
 +$TLS_login_msg_session_exists2 = " 首先，你是否想重新建立会话。";
 +$TLS_logout_link = "退出";
-+$TLS_passwd_lost = "你的口令已经发送到你注册用户信息时指定的电子邮件地址中。请查看你的邮箱。如果还有其它问题，请与TestLink管理员联系。";
++$TLS_passwd_lost = "你的密码已经发送到你注册用户信息时指定的电子邮件地址中。请查看你的邮箱。如果还有其它问题，请与TestLink管理员联系。";
 +$TLS_password_reseted = "新密码已发送到你的邮箱";
 +$TLS_please_login = "请登陆 ...";
 +$TLS_session_expired = "你的会话已经超时！请重新登陆。";
@@ -925,8 +1068,9 @@ index a16c224..dc0d6d6 100644
  $TLS_alt_edit_testsuite = "Modify this Test Suite data and title";
  $TLS_alt_move_cp_testsuite = "Move or copy this Test Suite to another Test Project";
  $TLS_alt_move_cp_testcases = "Move/Copy Test Cases";
- $TLS_btn_del_testsuite = "Delete Test Suite";
+-$TLS_btn_del_testsuite = "Delete Test Suite";
 -$TLS_btn_edit_testsuite = "Edit";
++$TLS_btn_del_testsuite = "删除用例集";
 +$TLS_btn_edit_testsuite = $TLS_btn_edit;
  $TLS_btn_execute_automatic_testcases = "Execute All Automatic Test Cases";
 -$TLS_btn_export_all_testsuites = "Export All Test Suites";
@@ -934,15 +1078,18 @@ index a16c224..dc0d6d6 100644
 -$TLS_btn_export_testsuite = "Export Test Suite";
 -$TLS_btn_import_tc = "Import Test Cases";
 -$TLS_btn_import_testsuite = "Import Test Suite";
+-$TLS_btn_move_cp_testsuite = "Move/Copy";
+-$TLS_btn_move_cp_testcases = "Move/Copy Test Cases";
+-$TLS_btn_new_testsuite = "New child Test Suite";
+-$TLS_btn_new_tc = "Create Test Cases";
 +$TLS_btn_export_all_testsuites = "导出全部测试集";
 +$TLS_btn_export_tc = "导出测试用例";
 +$TLS_btn_export_testsuite = "导出测试集";
 +$TLS_btn_import_tc = "导入测试用例";
 +$TLS_btn_import_testsuite = "导入测试集";
- $TLS_btn_move_cp_testsuite = "Move/Copy";
- $TLS_btn_move_cp_testcases = "Move/Copy Test Cases";
- $TLS_btn_new_testsuite = "New child Test Suite";
--$TLS_btn_new_tc = "Create Test Cases";
++$TLS_btn_move_cp_testsuite = "删除/复制";
++$TLS_btn_move_cp_testcases = "删除/复制测试用例集";
++$TLS_btn_new_testsuite = "新建用例集";
 +$TLS_btn_new_tc = "创建测试用例";
  $TLS_btn_reorder = "Reorder children";
  $TLS_container_title_testproject = $TLS_testproject;
@@ -977,9 +1124,8 @@ index a16c224..dc0d6d6 100644
 +$TLS_show_on_exec = "显示在<br>测试执行中";
  $TLS_show_on_testplan_design = "Display on <br />test plan design";
 -$TLS_testcase = $TLS_test_case;
--$TLS_title_cfields_mgmt = "自定义字段";
 +$TLS_testcase = "测试用例";
-+$TLS_title_cfields_mgmt = "自定义字段";
+ $TLS_title_cfields_mgmt = "自定义字段";
  $TLS_title_cfield_edit = "Edit ";
 -$TLS_type = "Type";
 -$TLS_warning_empty_cfield_label = "请录入自定义字段的标识";
@@ -1030,8 +1176,7 @@ index a16c224..dc0d6d6 100644
 +$TLS_filter_tcID = "筛选: 测试用例标识";
  $TLS_include_unassigned_testcases = " - include unassigned Test Cases";
 -$TLS_keyword = "Keyword";
--$TLS_test_status_all_status = $TLS_test_status_all;
-+$TLS_test_status_all_status = $TLS_test_status_all;
+ $TLS_test_status_all_status = $TLS_test_status_all;
  $TLS_filter_result_all_prev_builds = "Result on ALL Previous Builds";
 +$TLS_In = "In";
 +$TLS_Out = "Out";
@@ -1053,7 +1198,7 @@ index a16c224..dc0d6d6 100644
  $TLS_th_total_tc = "Test Case number";
  $TLS_th_active_tc = "Active Test Cases";
  $TLS_th_executed_tc = "Executed Test Cases";
-@@ -435,62 +490,61 @@ $TLS_th_executed_vs_active = "Executed/Active [%]";
+@@ -435,61 +490,60 @@ $TLS_th_executed_vs_active = "Executed/Active [%]";
  $TLS_th_executed_vs_total = "Executed/Total [%]";
  
  
@@ -1082,7 +1227,14 @@ index a16c224..dc0d6d6 100644
 -$TLS_check_req_file_structure = "Please check the file format, seems is not possible get any requirement";
 -$TLS_local_file = "File";
 -$TLS_max_size_cvs_file1 = "Max. size of the file is";
--$TLS_max_size_cvs_file2 = "kB";
++// ----- gui/templates/reqImport.tpl -----
++$TLS_Result = "结果";
++$TLS_btn_back2srs = "返回需求规约";
++$TLS_btn_upload_file = "上传文件";
++$TLS_check_req_file_structure = "请检查文件格式，似乎不符合要求";
++$TLS_local_file = "文件:";
++$TLS_max_size_cvs_file1 = "文件最大不超过";
+ $TLS_max_size_cvs_file2 = "kB";
 -$TLS_req_import_check_note = "Please verify possible conflicts, set an appropriate solution and then start import process.";
 -$TLS_req_import_dont_empty = "Do not import items with empty Scope";
 -$TLS_req_import_option_double = "Add a new one with the same title";
@@ -1096,14 +1248,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_title_choose_local_file = "Choose a Local File to Upload";
 -$TLS_title_req_import = "Import requirements";
 -$TLS_title_req_import_check_input = "Check import data";
-+// ----- gui/templates/reqImport.tpl -----
-+$TLS_Result = "结果";
-+$TLS_btn_back2srs = "返回需求规约";
-+$TLS_btn_upload_file = "上传文件";
-+$TLS_check_req_file_structure = "请检查文件格式，似乎不符合要求";
-+$TLS_local_file = "文件:";
-+$TLS_max_size_cvs_file1 = "文件最大不超过";
-+$TLS_max_size_cvs_file2 = "kB";
 +$TLS_req_import_check_note = "请验证可能存在的冲突，选择合适的解决方案，然后再开始执行导入操作。";
 +$TLS_req_import_dont_empty = "不要导入空的项目";
 +$TLS_req_import_option_double = "增加一个相同标题的需求";
@@ -1123,14 +1267,13 @@ index a16c224..dc0d6d6 100644
  // gui/templates/inc_attachments.tpl
 -$TLS_alt_delete_build = "Click here to delete this build";
 -$TLS_alt_delete_attachment = "点击这里删这个附件";
--$TLS_attached_files = "附件";
++$TLS_alt_delete_build = "点击这里删除这个构建";
++$TLS_alt_delete_attachment = "单击这里删除附件";
+ $TLS_attached_files = "附件";
 -$TLS_attachment_feature_disabled = "attachment disabled";
 -$TLS_button_upload = "Upload";
 -$TLS_upload_file_new_file = "Upload new file";
 -$TLS_warning_delete_attachment = "Really delete this attachment?";
-+$TLS_alt_delete_build = "点击这里删除这个构建";
-+$TLS_alt_delete_attachment = "单击这里删除附件";
-+$TLS_attached_files = "附件";
 +$TLS_attachment_feature_disabled = "禁用附件";
 +$TLS_button_upload = "上传";
 +$TLS_upload_file_new_file = "上传新文件";
@@ -1147,7 +1290,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_title_active_build = "Active Build";
 -$TLS_title_report_type = "Report Format";
 -$TLS_via_email = "per eMail";
--$TLS_link_results_import = "导入结果";
 +$TLS_note_email_sent_t = "注意：邮件发送到登记的邮箱";
 +$TLS_send_results = "发送结果";
 +$TLS_send_to = "给:";
@@ -1155,10 +1297,9 @@ index a16c224..dc0d6d6 100644
 +$TLS_title_active_build = "活动的构建";
 +$TLS_title_report_type = "报告格式";
 +$TLS_via_email = "到电子邮件";
-+$TLS_link_results_import = "导入结果";
+ $TLS_link_results_import = "导入结果";
  
  
- // gui/templates/inc_attachments_upload.tpl
 @@ -498,8 +552,8 @@ $TLS_link_results_import = "导入结果";
  
  
@@ -1170,7 +1311,7 @@ index a16c224..dc0d6d6 100644
  
  
  // cfieldsExport.php
-@@ -511,504 +565,499 @@ $TLS_custom_field_already_exists="Custom field %s already exists.";
+@@ -511,535 +565,529 @@ $TLS_custom_field_already_exists="Custom field %s already exists.";
  $TLS_custom_field_imported="Custom field %s imported.";
  
  // gui/templates/inc_cat_viewer_ro_m0.tpl
@@ -1320,12 +1461,11 @@ index a16c224..dc0d6d6 100644
  
  
 -// gui/templates/inc_copyrightnotice.tpl
--$TLS_gnu_gpl = "GNU GPL";
++// ----- gui/templates/inc_copyrightnotice.tpl -----
+ $TLS_gnu_gpl = "GNU GPL";
 -$TLS_lic_home = "首页";
 -$TLS_lic_product = "TestLink project";
 -$TLS_licensed_under = "TestLink is licensed under the";
-+// ----- gui/templates/inc_copyrightnotice.tpl -----
-+$TLS_gnu_gpl = "GNU GPL";
 +$TLS_lic_home = "主页";
 +$TLS_lic_product = "产品";
 +$TLS_licensed_under = "TestLink许可协议";
@@ -1504,7 +1644,9 @@ index a16c224..dc0d6d6 100644
  
 -// gui/templates/rolesedit.tpl
 -$TLS_btn_create_role = "Create";
--$TLS_btn_edit_role = "保存";
++// ----- gui/templates/rolesedit.tpl -----
++$TLS_btn_create_role = "创建";
+ $TLS_btn_edit_role = "保存";
 -$TLS_caption_define_role = "Define role";
 -$TLS_caption_possible_affected_users = "Possibly affected users by role delete operation";
 -$TLS_enter_role_notes = "Role description";
@@ -1513,10 +1655,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_menu_define_roles = "New role";
 -$TLS_menu_mod_user = "Modify User";
 -$TLS_menu_new_user = "New User";
--$TLS_menu_edit_user = "编辑用户";
-+// ----- gui/templates/rolesedit.tpl -----
-+$TLS_btn_create_role = "创建";
-+$TLS_btn_edit_role = "保存";
 +$TLS_caption_define_role = "定义角色";
 +$TLS_caption_possible_affected_users = "删除操作可能影响到角色管理的用户";
 +$TLS_enter_role_notes = "角色描述";
@@ -1525,7 +1663,7 @@ index a16c224..dc0d6d6 100644
 +$TLS_menu_define_roles = "新增角色";
 +$TLS_menu_mod_user = "修改用户";
 +$TLS_menu_new_user = "新增用户";
-+$TLS_menu_edit_user = "编辑用户";
+ $TLS_menu_edit_user = "编辑用户";
  $TLS_menu_edit_role = "Edit Role";
 -$TLS_menu_view_users = "View Users";
 -$TLS_menu_view_roles = "View roles";
@@ -1622,10 +1760,9 @@ index a16c224..dc0d6d6 100644
  
 -// gui/templates/keywordsimport.tpl
 -$TLS_title_keyword_import_to = "Import keywords to";
--$TLS_title_keyword_import = "导入关键字";
 +// ----- gui/templates/keywordsimport.tpl -----
 +$TLS_title_keyword_import_to = "导入关键字到";
-+$TLS_title_keyword_import = "导入关键字";
+ $TLS_title_keyword_import = "导入关键字";
  
  
  
@@ -1705,10 +1842,10 @@ index a16c224..dc0d6d6 100644
  
 +// ----- gui/templates/login.tpl -----
 +$TLS_btn_login = "登录";
-+$TLS_login_name = "登陆名：";
-+$TLS_lost_password_q = "忘记口令？";
-+$TLS_new_user_q = "是新用户吗？";
-+$TLS_password = "口令：";
++$TLS_login_name = "用户名：";
++$TLS_lost_password_q = "忘记密码";
++$TLS_new_user_q = "新用户注册";
++$TLS_password = "密码：";
  
  
 -// gui/templates/loginFirst.tpl
@@ -1719,19 +1856,20 @@ index a16c224..dc0d6d6 100644
 -$TLS_link_back_to_login = "Back to login";
 -$TLS_password_again = "Repeat password";
 -$TLS_password_mgmt_is_external = "Password management is external";
-+
+-$TLS_user_login_valid_regex = "The Login Name contains invalid characters!";
+ 
 +// ----- gui/templates/loginFirst.tpl -----
 +$TLS_btn_add_user_data = "添加用户信息";
-+$TLS_e_mail = "电子邮件地址（用来发送忘记了的口令等）：";
++$TLS_e_mail = "电子邮件地址（用来发送忘记了的密码等）：";
 +$TLS_first_name = "名字：";
 +$TLS_last_name = "姓：";
 +$TLS_link_back_to_login = "返回登录";
-+$TLS_password_again = "再次输入口令：";
++$TLS_password_again = "再次输入密码：";
 +$TLS_password_mgmt_is_external = "密码管理是外部系统管理的";
- $TLS_user_login_valid_regex = "The Login Name contains invalid characters!";
- 
++$TLS_user_login_valid_regex = "用户名包含非法字符!";
  
 -// gui/templates/tcMove.tpl
++
 +// ----- gui/templates/tcMove.tpl -----
  $TLS_as_first_testcase = "Destination position top";
  $TLS_as_last_testcase = "Destination position bottom";
@@ -1844,11 +1982,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_test_exec_summary = "Summary";
 -$TLS_test_plan_notes = "Test plan notes";
 -$TLS_th_test_case_id = "ID ";
--$TLS_th_testsuite = $TLS_test_suite;
--$TLS_title_t_r_on_build = "Test Results on Build";
--$TLS_title_t_r_owner = " 指派给";
--$TLS_title_test_case = "Test Case";
--$TLS_version = "Version";
 +$TLS_test_exec_by = "执行人：";
 +$TLS_test_exec_expected_r = "期望的结果";
 +$TLS_test_exec_last_run_date = "最近的执行：";
@@ -1859,7 +1992,11 @@ index a16c224..dc0d6d6 100644
 +$TLS_test_exec_summary= "摘要";
 +$TLS_test_plan_notes = "测试计划备注";
 +$TLS_th_test_case_id = "标识";
-+$TLS_th_testsuite = $TLS_test_suite;
+ $TLS_th_testsuite = $TLS_test_suite;
+-$TLS_title_t_r_on_build = "Test Results on Build";
+-$TLS_title_t_r_owner = " 指派给";
+-$TLS_title_test_case = "Test Case";
+-$TLS_version = "Version";
 +$TLS_title_t_r_on_build = "测试结果→构建";
 +$TLS_title_t_r_owner = "拥有者";
 +$TLS_title_test_case = "测试用例";
@@ -1936,8 +2073,8 @@ index a16c224..dc0d6d6 100644
 -$TLS_no_testcase_available = "No Test Case available";
 -$TLS_note_keyword_filter = "Test Cases are filtered by keyword";
 -$TLS_remove_tc = "Remove";
-+$TLS_select_all_to_add = "Select/deselect all Test Cases to add";
-+$TLS_select_all_to_remove = "Select/deselect all Test Cases to remove";
++$TLS_select_all_to_add = "全选/反选添加所有测试用例";
++$TLS_select_all_to_remove = "全选/反选删除所有测试用例";
 +
 +$TLS_has_been_executed = "已经被执行";
 +$TLS_inactive_testcase = "不活动的";
@@ -1963,8 +2100,9 @@ index a16c224..dc0d6d6 100644
  
  
 -// gui/templates/planTCNavigator.tpl
+-$TLS_btn_update_all_testcases_to_latest_version = "Update all Test Cases to latest version";
 +// ----- gui/templates/planTCNavigator.tpl -----
- $TLS_btn_update_all_testcases_to_latest_version = "Update all Test Cases to latest version";
++$TLS_btn_update_all_testcases_to_latest_version = "把当前所有用例版本更新为最新版本";
  
  
 -// gui/templates/planPriority.tpl
@@ -1985,7 +2123,11 @@ index a16c224..dc0d6d6 100644
  $TLS_btn_update_testplan_tcversions = "Update Test Plan";
  $TLS_update_to_version = "Update to version";
  $TLS_update_all_testcase_versions = "Update ALL Linked Test Case Versions";
-@@ -1019,27 +1068,26 @@ $TLS_update2latest = "<p>The whole set of Test Cases linked to Test Plan will up
+-$TLS_update_testcase_versions = "Update Linked Test Case Versions";
++$TLS_update_testcase_versions = "更新测试用例的版本";
+ $TLS_no_testcase_checked = "There are no checked Test Cases. Nothing will be done";
+ $TLS_tplan_updated = "Test Plan was updated";
+ $TLS_update2latest = "<p>The whole set of Test Cases linked to Test Plan will updated to latest version.</p>";
  
  
  
@@ -2089,7 +2231,7 @@ index a16c224..dc0d6d6 100644
  $TLS_title_edit_milestone = "Edit Milestone";
  $TLS_delete_milestone = "Delete milestone";
  $TLS_milestone_deleted = "Milestone %s was successfully deleted";
-@@ -1090,19 +1138,19 @@ $TLS_milestone_created = "Milestone Created";
+@@ -1090,173 +1138,169 @@ $TLS_milestone_created = "Milestone Created";
  
  
  
@@ -2107,19 +2249,21 @@ index a16c224..dc0d6d6 100644
 -$TLS_caption_new_tproject = "Create new Test Project";
 -$TLS_color = "Color";
 -$TLS_enable_requirements = "Requirements Management";
+-$TLS_enable_priority = "Priority Management";
 +$TLS_caption_new_tproject = "创建新的测试项目";
 +$TLS_color = "颜色";
 +$TLS_enable_requirements = "启用需求功能";
- $TLS_enable_priority = "Priority Management";
++$TLS_enable_priority = "权限管理";
  $TLS_enable_automation = "Test Automation";
 -$TLS_info_failed_loc_prod = "Failed to localize the Test Project.";
 -$TLS_notes = "Related Notes";
+-$TLS_testproject_alt_delete = "Delete Test Project";
 +$TLS_info_failed_loc_prod = "本地化产品失败";
 +$TLS_notes = "关联的说明";
- $TLS_testproject_alt_delete = "Delete Test Project";
++$TLS_testproject_alt_delete = "删除测试项目";
  $TLS_testproject_alt_active = "Active";
  $TLS_testproject_alt_requirement_feature = "Requirements enabled";
-@@ -1110,153 +1158,149 @@ $TLS_testproject_alt_edit = "Edit Test Project";
+ $TLS_testproject_alt_edit = "Edit Test Project";
  $TLS_testproject_txt_empty_list = "There are no Test Projects defined!";
  
  // Warning!!! - if JS string you must use \\n to get \n
@@ -2129,12 +2273,14 @@ index a16c224..dc0d6d6 100644
 -                            "Recommendation: Execute a dump of database at first.\\n" .
 -                            "Are you sure to delete the Test Project?";
 +$TLS_popup_product_delete = "警告！这个操作会永久删除与产品相关的所有数据（包括测试结果、计划等）。你也可以使用禁用来代替删除操作。\\n建议：首先备份数据库。\\n你确定要删除这个产品吗？";
- 
- $TLS_tcase_id_prefix = "Test Case ID prefix";
- $TLS_warning_empty_tcase_prefix = "Test Case ID prefix cannot be empty!";
--$TLS_warning_empty_tproject_name = "Test Project name cannot be empty!";
-+$TLS_warning_empty_tproject_name = "测试产品的名称不能为空！";
 +
++$TLS_tcase_id_prefix = "测试用例标识";
++$TLS_warning_empty_tcase_prefix = "测试用例标识不能为空!";
++$TLS_warning_empty_tproject_name = "测试产品的名称不能为空！";
+ 
+-$TLS_tcase_id_prefix = "Test Case ID prefix";
+-$TLS_warning_empty_tcase_prefix = "Test Case ID prefix cannot be empty!";
+-$TLS_warning_empty_tproject_name = "Test Project name cannot be empty!";
  
 -// gui/templates/projectView.tpl
 +// ----- gui/templates/projectView.tpl -----
@@ -2334,12 +2480,11 @@ index a16c224..dc0d6d6 100644
 -$TLS_title_test_case_bugs = "Test case bugs";
 -$TLS_title_test_case_timestamp = "Test Case timestamp";
 -$TLS_title_test_case_title = $TLS_test_case;
--$TLS_title_test_suite_name = $TLS_test_suite;
--
 +$TLS_title_test_case_bugs = "测试用例问题";
 +$TLS_title_test_case_timestamp = "测试用例时间戳";
 +$TLS_title_test_case_title = "测试标题";
-+$TLS_title_test_suite_name = $TLS_test_suite;
+ $TLS_title_test_suite_name = $TLS_test_suite;
+ 
  
  
 -// gui/templates/resultsByStatus.tpl
@@ -2349,7 +2494,7 @@ index a16c224..dc0d6d6 100644
 -$TLS_th_bugs = "Bugs";
 -$TLS_th_date = "Date";
 -$TLS_th_run_by = "Run by";
- 
+-
 +// ----- gui/templates/resultsByStatus.tpl -----
 +$TLS_info_test_results = "这里只列出最后一次的测试结果。如果最后构建的测试结果是另外的状态（除非尚未执行测试），测试用例将不会显示。";
 +$TLS_th_bugs = "问题";
@@ -2366,13 +2511,14 @@ index a16c224..dc0d6d6 100644
  $TLS_title_report_tc_priorities = "Test results according to test priorities";
  $TLS_title_report_milestones = "Status of Milestones";
  $TLS_th_completed = "Completed";
-@@ -1273,62 +1317,66 @@ $TLS_th_overall = "Overall";
+@@ -1273,44 +1317,48 @@ $TLS_th_overall = "Overall";
  
  
  
 -// gui/templates/resultsMoreBuilds_query_form.tpl
--$TLS_excel_format = "MS Excel";
--$TLS_html_format = "HTML";
++// ----- gui/templates/resultsMoreBuilds_query_form.tpl -----
+ $TLS_excel_format = "MS Excel";
+ $TLS_html_format = "HTML";
 -$TLS_last_status_any = "Any";
 -$TLS_last_status_blocked = $TLS_test_status_blocked;
 -$TLS_last_status_failed = $TLS_test_status_failed;
@@ -2387,44 +2533,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_submit_query = "Submit Query";
 -$TLS_test_plan_header = $TLS_testplan;
 -$TLS_query_metrics_report = "Query Metrics Report";
--$TLS_enter_start_time = "开始时间";
--$TLS_enter_end_time = "结束时间";
--$TLS_year = "年";
--$TLS_month = "月";
--$TLS_day = "日";
--$TLS_hour = "小时";
--$TLS_search_in_notes = "搜索注释中的字符串";
--$TLS_executor = "执行人：";
--
--// gui/templates/resultsMoreBuilds_report.tpl
--$TLS_caption_show_collapse = "Show / Collapse";
--$TLS_caption_user_selected_query_parameters = "Query Parameters";
--$TLS_not_yet_executed = "Not yet executed";
--$TLS_show_hide_all = "Show / Hide All";
--$TLS_th_builds = "Builds";
--$TLS_th_execution_ts = "Time";
--$TLS_th_last_result = "Last result";
--$TLS_th_report_format = "Report type";
--$TLS_th_test_plan = $TLS_testplan;
--$TLS_th_test_suites = "Suites";
--$TLS_th_tester_id = "Tester";
--$TLS_th_total_block = "#" . $TLS_test_status_blocked;
--$TLS_th_total_cases = "#Test Cases";
--$TLS_th_total_fail = "#" . $TLS_test_status_failed;
--$TLS_th_total_not_run = "#" . $TLS_test_status_not_run;
--$TLS_th_total_pass = "#" . $TLS_test_status_passed;
--$TLS_th_start_time = "开始时间";
--$TLS_th_end_time = "结束时间";
--$TLS_th_executor = "执行人：";
--$TLS_th_search_notes_string = "注释的搜索字符串";
--$TLS_true = "true";
--$TLS_false = "false";
--$TLS_display_suite_summaries = "显示分类摘要";
--$TLS_display_query_params  = "显示查询参数";
--$TLS_display_totals = "显示总计";
-+// ----- gui/templates/resultsMoreBuilds_query_form.tpl -----
-+$TLS_excel_format = "MS Excel";
-+$TLS_html_format = "HTML";
 +$TLS_results_latest = "Latest Results Only";
 +$TLS_results_all = "All Results";
 +$TLS_display_results_tc = "Result Set";
@@ -2442,12 +2550,28 @@ index a16c224..dc0d6d6 100644
 +$TLS_submit_query = "提交查询";
 +$TLS_test_plan_header = "测试计划 : ";
 +$TLS_query_metrics_report = "查询度量报告";
-+$TLS_enter_start_time = "开始时间";
-+$TLS_enter_end_time = "结束时间";
+ $TLS_enter_start_time = "开始时间";
+ $TLS_enter_end_time = "结束时间";
+-$TLS_year = "年";
 +$TLS_year = "[年";
-+$TLS_month = "月";
-+$TLS_day = "日";
-+$TLS_hour = "小时";
+ $TLS_month = "月";
+ $TLS_day = "日";
+ $TLS_hour = "小时";
+-$TLS_search_in_notes = "搜索注释中的字符串";
+-$TLS_executor = "执行人：";
+-
+-// gui/templates/resultsMoreBuilds_report.tpl
+-$TLS_caption_show_collapse = "Show / Collapse";
+-$TLS_caption_user_selected_query_parameters = "Query Parameters";
+-$TLS_not_yet_executed = "Not yet executed";
+-$TLS_show_hide_all = "Show / Hide All";
+-$TLS_th_builds = "Builds";
+-$TLS_th_execution_ts = "Time";
+-$TLS_th_last_result = "Last result";
+-$TLS_th_report_format = "Report type";
+-$TLS_th_test_plan = $TLS_testplan;
+-$TLS_th_test_suites = "Suites";
+-$TLS_th_tester_id = "Tester";
 +$TLS_search_in_notes = "在备注内容中查找";
 +$TLS_executor = "执行人";
 +
@@ -2464,19 +2588,25 @@ index a16c224..dc0d6d6 100644
 +$TLS_th_test_plan = "测试计划";
 +$TLS_th_test_suites = "测试集";
 +$TLS_th_tester_id = "测试人";
-+$TLS_th_total_block = "#" . $TLS_test_status_blocked;
-+$TLS_th_total_cases = "#Test Cases";
-+$TLS_th_total_fail = "#" . $TLS_test_status_failed;
-+$TLS_th_total_not_run = "#" . $TLS_test_status_not_run;
-+$TLS_th_total_pass = "#" . $TLS_test_status_passed;
-+$TLS_th_start_time = "开始时间";
-+$TLS_th_end_time = "结束时间";
+ $TLS_th_total_block = "#" . $TLS_test_status_blocked;
+ $TLS_th_total_cases = "#Test Cases";
+ $TLS_th_total_fail = "#" . $TLS_test_status_failed;
+@@ -1318,17 +1366,17 @@ $TLS_th_total_not_run = "#" . $TLS_test_status_not_run;
+ $TLS_th_total_pass = "#" . $TLS_test_status_passed;
+ $TLS_th_start_time = "开始时间";
+ $TLS_th_end_time = "结束时间";
+-$TLS_th_executor = "执行人：";
+-$TLS_th_search_notes_string = "注释的搜索字符串";
+-$TLS_true = "true";
+-$TLS_false = "false";
+-$TLS_display_suite_summaries = "显示分类摘要";
 +$TLS_th_executor = "执行人";
 +$TLS_th_search_notes_string = "搜索字符串";
 +$TLS_true = "真";
 +$TLS_false = "假";
 +$TLS_display_suite_summaries = "显示测试集摘要";
-+$TLS_display_query_params  = "显示查询参数";
+ $TLS_display_query_params  = "显示查询参数";
+-$TLS_display_totals = "显示总计";
 +$TLS_display_totals = "显示合计";
  $TLS_display_test_cases = "Test Cases";
  $TLS_report_display_options = "Report display options";
@@ -2486,7 +2616,7 @@ index a16c224..dc0d6d6 100644
  $TLS_no_srs_defined = "No Requirements Specification available for this Test Project";
  $TLS_req_without_tcase = "Requirements Not Covered by Test Cases";
  
-@@ -1336,106 +1384,108 @@ $TLS_req_without_tcase = "Requirements Not Covered by Test Cases";
+@@ -1336,738 +1384,750 @@ $TLS_req_without_tcase = "Requirements Not Covered by Test Cases";
  // IMPORTANT for dynamic generation labels
  // $TLS_req_title_<test case status> 
  // If user add a new test case status he/she MUST add a new label
@@ -2625,25 +2755,27 @@ index a16c224..dc0d6d6 100644
 -$TLS_btn_change_passwd = "Change password";
 -$TLS_btn_upd_user_data = "Update";
 +// ----- gui/templates/userInfo.tpl -----
-+$TLS_btn_change_passwd = "修改口令";
++$TLS_btn_change_passwd = "修改密码";
 +$TLS_btn_upd_user_data = "更新";
  $TLS_btn_apikey_generate = "Generate a new key";
 -$TLS_th_new_passwd = "New Password";
 -$TLS_th_new_passwd_again = "Confirm New Password";
 -$TLS_th_old_passwd = "Old Password";
 -$TLS_title_account_settings = "Account Settings";
-+$TLS_th_new_passwd = "新口令";
-+$TLS_th_new_passwd_again = "确认新口令";
-+$TLS_th_old_passwd = "旧口令";
+-$TLS_title_personal_data = "Personal data";
+-$TLS_title_personal_passwd = "Personal password";
++$TLS_th_new_passwd = "输入新密码";
++$TLS_th_new_passwd_again = "确认新密码";
++$TLS_th_old_passwd = "你的旧密码";
 +$TLS_title_account_settings = "帐号设置";
- $TLS_title_personal_data = "Personal data";
- $TLS_title_personal_passwd = "Personal password";
++$TLS_title_personal_data = "个人信息";
++$TLS_title_personal_passwd = "个人密码";
  $TLS_title_api_interface = "API interface";
 -$TLS_warning_different_pwd = "Please re-enter your new password. Added values were different.";
 -$TLS_warning_empty_pwd = "The password must not be empty!";
 -$TLS_your_password_is_external = "您的密码由外部系统管理。<br>您无法通过Testlink进行修改";
-+$TLS_warning_different_pwd = "请重新输入你的新口令。新输入的口令不一致。";
-+$TLS_warning_empty_pwd = "口令不允许为空！";
++$TLS_warning_different_pwd = "请重新输入你的新密码。两次输入的密码不一致。";
++$TLS_warning_empty_pwd = "密码不能为空！";
 +$TLS_your_password_is_external = "您的密码是在外部系统中管理的。<br>".
 +                                 "您无法通过 TestLink 来修改密码。";
  $TLS_user_api_key = "Personal API access key";
@@ -2651,8 +2783,14 @@ index a16c224..dc0d6d6 100644
 +$TLS_audit_login_history = "登录历史";
  $TLS_audit_last_succesful_logins = "Last successful logins";
  $TLS_audit_last_failed_logins = "Last failed logins";
- $TLS_result_password_changed = "Your password was changed succesfully";
-@@ -1446,628 +1496,638 @@ $TLS_never_logged = "Never logged";
+-$TLS_result_password_changed = "Your password was changed succesfully";
++$TLS_result_password_changed = "密码修改成功";
+ $TLS_result_apikey_create_ok = "New API key was generated";
+-$TLS_result_user_changed = "Personal data changed";
+-$TLS_empty_old_passwd = "Empty Old Password. Please enter your Old Password";
++$TLS_result_user_changed = "个人信息已经修改成功";
++$TLS_empty_old_passwd = "旧密码不能为空,请重新输入";
+ $TLS_never_logged = "Never logged";
  
  
  
@@ -2664,10 +2802,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_caption_assign_testproject_user_roles = "Assign Test Project user roles";
 -$TLS_menu_assign_testproject_roles = "Assign Test Project roles";
 -$TLS_th_roles = "Role";
--$TLS_th_roles_testplan = "测试计划角色";
--$TLS_th_roles_testproject = "产品角色";
--$TLS_title_assign_roles = "Assign roles";
--
 +// ----- gui/templates/usersassign.tpl -----
 +$TLS_TestProject = "测试产品";
 +$TLS_User = "用户";
@@ -2676,7 +2810,10 @@ index a16c224..dc0d6d6 100644
 +$TLS_caption_assign_testproject_user_roles = "指派测试产品的用户角色";
 +$TLS_menu_assign_testproject_roles = "指派测试产品的角色";
 +$TLS_th_roles = "角色";
-+$TLS_th_roles_testplan = "测试计划角色";
+ $TLS_th_roles_testplan = "测试计划角色";
+-$TLS_th_roles_testproject = "产品角色";
+-$TLS_title_assign_roles = "Assign roles";
+-
 +$TLS_th_roles_testproject = "测试产品角色";
 +$TLS_title_assign_roles = "指派角色";
 +$TLS_set_roles_to = "Set roles to";
@@ -2694,7 +2831,7 @@ index a16c224..dc0d6d6 100644
 +// ----- gui/templates/usersedit.tpl -----
 +$TLS_button_reset_password = "重置密码";
 +$TLS_caption_user_details = "用户详细信息";
-+$TLS_th_password = "口令";
++$TLS_th_password = "密码";
 +$TLS_warning_empty_first_name = "请输入姓";
 +$TLS_warning_empty_last_name = "请输入名字";
 +$TLS_warning_empty_login = "请输入登录名";
@@ -2724,19 +2861,18 @@ index a16c224..dc0d6d6 100644
 -$TLS_alt_delete_role = "Delete role";
 -$TLS_alt_edit_role = "Edit role";
 -$TLS_btn_confirm_delete = "Delete";
--$TLS_delete_role = "删除角色";
--$TLS_no_roles = "No roles";
--$TLS_th_role_description = "角色描述";
--$TLS_title_roles = "Available roles";
--$TLS_warning_delete_role = "真的要删除这个角色吗？";
--$TLS_warning_users_will_be_reset = "Affected users will get role:";
- 
++
 +// ----- gui/templates/rolesview.tpl -----
 +$TLS_N_A = "否/是";
 +$TLS_alt_delete_role = "删除角色";
 +$TLS_alt_edit_role = "编辑角色";
 +$TLS_btn_confirm_delete = "删除";
-+$TLS_delete_role = "删除角色";
+ $TLS_delete_role = "删除角色";
+-$TLS_no_roles = "No roles";
+-$TLS_th_role_description = "角色描述";
+-$TLS_title_roles = "Available roles";
+-$TLS_warning_delete_role = "真的要删除这个角色吗？";
+-$TLS_warning_users_will_be_reset = "Affected users will get role:";
 +$TLS_no_roles = "无角色";
 +$TLS_th_role_description = "描述";
 +$TLS_title_roles = "有效的角色";
@@ -2744,8 +2880,8 @@ index a16c224..dc0d6d6 100644
 +$TLS_warning_users_will_be_reset = "影响用户的角色：";
  
  
+ 
 -// gui/templates/tcexport.tpl
-+
 +// ----- gui/templates/tcexport.tpl -----
  $TLS_export_filename = "Export filename";
 -$TLS_export_with_keywords = "Export with keywords";
@@ -2857,7 +2993,7 @@ index a16c224..dc0d6d6 100644
 +$TLS_title_test_spec = "测试规范";
 +$TLS_title_product_mgmt = "产品管理";
 +$TLS_href_plan_define_priority = "定义优先级规则";
-+$TLS_href_my_testcase_assignments="指派给我的测试用例";
++$TLS_href_my_testcase_assignments="指派给我的用例";
  
  
  // ----- gui/templates/mainPage_right.tpl -----
@@ -2867,40 +3003,46 @@ index a16c224..dc0d6d6 100644
 -$TLS_href_execute_test = "Execute Tests";
 -$TLS_href_metrics_dashboard = "仪表盘";
 -$TLS_href_newest_tcversions = "查看最新版本的测试用例";
-+$TLS_filter_tp_by_product = "按产品筛选测试计划";
-+$TLS_href_add_remove_test_cases = "添加/删除测试用例";
-+$TLS_href_build_new = "构建管理";
-+$TLS_href_execute_test = "执行测试";
-+$TLS_href_metrics_dashboard = "度量仪表盘";
-+$TLS_href_newest_tcversions = "显示最新的测试用例版本";
- $TLS_href_plan_assign_urgency = "Set urgent tests";
+-$TLS_href_plan_assign_urgency = "Set urgent tests";
 -$TLS_href_plan_management = "Test Plan Management";
 -$TLS_href_plan_mstones = "Milestone overview";
 -$TLS_href_rep_and_metrics = "Test reports and Metrics";
 -$TLS_href_tc_exec_assignment = "Assign Test Case execution";
-+$TLS_href_plan_management = "测试计划管理";
-+$TLS_href_plan_mstones = "编辑/删除里程碑";
-+$TLS_href_rep_and_metrics = "测试报告和度量";
-+$TLS_href_tc_exec_assignment = "指派执行测试用例";
- $TLS_href_update_tplan = "Update Linked Test Case Versions";
- 
+-$TLS_href_update_tplan = "Update Linked Test Case Versions";
+-
 -$TLS_href_upd_mod_tc = "Update modified Test Cases";
 -$TLS_msg_no_rights_for_tp = "<br /> You don't have permissions for any ACTIVE Test Plan";
 -$TLS_testplan_role = "Test Plan role ";
 -$TLS_title_test_case_suite = "Test Plan contents";
 -$TLS_title_test_execution = "Test Execution";
 -$TLS_title_test_plan_mgmt = "Test Plan";
+-
+-
+-
+-// lib/execute/bug_add.php
+-$TLS_bug_added = "Bug added";
++$TLS_filter_tp_by_product = "按产品筛选测试计划";
++$TLS_href_add_remove_test_cases = "添加/删除测试用例到测试计划";
++$TLS_href_build_new = "构建管理";
++$TLS_href_execute_test = "执行测试";
++$TLS_href_metrics_dashboard = "度量仪表盘";
++$TLS_href_newest_tcversions = "显示最新的测试用例版本";
++$TLS_href_plan_assign_urgency = "设置测试用例的级别";
++$TLS_href_plan_management = "测试计划管理";
++$TLS_href_plan_mstones = "编辑/删除里程碑";
++$TLS_href_rep_and_metrics = "测试报告和度量";
++$TLS_href_tc_exec_assignment = "指派执行测试用例";
++$TLS_href_update_tplan = "更新测试用例的版本";
++
 +$TLS_href_upd_mod_tc = "更新修改过的测试用例";
 +$TLS_msg_no_rights_for_tp = "- 无效的(你没有权限访问测试计划)";
 +$TLS_testplan_role = "测试计划角色";
 +$TLS_title_test_case_suite = "测试用例集";
 +$TLS_title_test_execution = "测试执行";
 +$TLS_title_test_plan_mgmt = "测试计划管理";
- 
- 
- 
--// lib/execute/bug_add.php
--$TLS_bug_added = "Bug added";
++
++
++
 +// ----- lib/execute/bug_add.php -----
 +$TLS_bug_added = "问题添加成功";
  $TLS_error_bug_does_not_exist_on_bts = "Bug ID does not exist on BTS!";
@@ -2954,17 +3096,26 @@ index a16c224..dc0d6d6 100644
 -$TLS_tcase_external_id_do_not_exists="Test Case with external id=%s, can not be found " . $TLS_imp_result_ko;
 -$TLS_tcase_internal_id_do_not_exists="Test Case with internal id=%s, can not be found "  . $TLS_imp_result_ko;
 -$TLS_tcase_id_is_not_number="Test Case internal id=%s is not a number " . $TLS_imp_result_ko;
--
--
--
++$TLS_import_results_tc_exists = "测试计划中找到测试用例 %s , 测试用例编号 = %s ";
++$TLS_tcase_external_id_do_not_exists = "Test Case with external id=%s, can not be found " . $TLS_imp_result_ko;
++$TLS_tcase_internal_id_do_not_exists = "Test Case with internal id=%s, can not be found "  . $TLS_imp_result_ko;
++$TLS_tcase_id_is_not_number = "Test Case internal id=%s is not a number " . $TLS_imp_result_ko;
+ 
+ 
+ 
 -// lib/functions/results.inc.php
 -$TLS_trep_failing = "Failing";
 -$TLS_trep_passing = "Passing";
 -$TLS_trep_status_for_build = "Status for build";
 -$TLS_trep_status_for_ts = "Status for Test Suite";
--$TLS_unassigned = "未指派";
--
--
++// ----- lib/functions/results.inc.php -----
++$TLS_trep_failing = "失败";
++$TLS_trep_passing = "通过";
++$TLS_trep_status_for_build = "构建状态";
++$TLS_trep_status_for_ts = "测试集状态";
+ $TLS_unassigned = "未指派";
+ 
+ 
 -// lib/functions/resultsMoreBuilds.inc.php
 -$TLS_bugs = "Related Bugs";
 -$TLS_builds_selected = "Builds";
@@ -2996,21 +3147,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_desc_mgt_view_key = "Keyword view (read only access)";
 -$TLS_desc_mgt_view_req = "Requirement view (read only access)";
 -$TLS_desc_mgt_view_tc = "Test Case view (read only access)";
-+$TLS_import_results_tc_exists = "测试计划中找到测试用例 %s , 测试用例编号 = %s ";
-+$TLS_tcase_external_id_do_not_exists = "Test Case with external id=%s, can not be found " . $TLS_imp_result_ko;
-+$TLS_tcase_internal_id_do_not_exists = "Test Case with internal id=%s, can not be found "  . $TLS_imp_result_ko;
-+$TLS_tcase_id_is_not_number = "Test Case internal id=%s is not a number " . $TLS_imp_result_ko;
-+
-+
-+
-+// ----- lib/functions/results.inc.php -----
-+$TLS_trep_failing = "失败";
-+$TLS_trep_passing = "通过";
-+$TLS_trep_status_for_build = "构建状态";
-+$TLS_trep_status_for_ts = "测试集状态";
-+$TLS_unassigned = "未指派";
-+
-+
 +// ----- lib/functions/resultsMoreBuilds.inc.php -----
 +$TLS_bugs = "关联的问题";
 +$TLS_builds_selected = "构建标识";
@@ -3053,36 +3189,20 @@ index a16c224..dc0d6d6 100644
 -$TLS_error_duplicate_rolename = "There's already a role with that name!";
 -$TLS_error_role_no_rights = "You cannot save roles without any rights!";
 -$TLS_error_role_no_rolename = "You must enter a name for the role!";
-+$TLS_desc_role_management = "角色管理";
-+$TLS_desc_testplan_create_build = "构建创建/编辑";
-+$TLS_desc_testplan_execute = "测试计划执行";
-+$TLS_desc_testplan_metrics = "测试计划度量";
-+$TLS_desc_testplan_planning = "测试计划安排";
-+$TLS_desc_user_role_assignment = "角色指派";
-+$TLS_error_duplicate_rolename = "存在同名的角色！";
-+$TLS_error_role_no_rights = "不能保存无任何权限的角色！";
-+$TLS_error_role_no_rolename = "必须输入角色的名称！";
- $TLS_inherited_role = "<inherited>";
+-$TLS_inherited_role = "<inherited>";
 -$TLS_mgt_testplan_create = "Test Plan create/edit";
-+$TLS_mgt_testplan_create = "测试计划创建/编辑";
- 
- 
- 
+-
+-
+-
 -// lib/functions/testproject.class.php
 -$TLS_error_creating_req_spec = "Error while creating Requirement Specification document";
 -$TLS_info_product_name_empty = "Empty name is not possible.";
 -$TLS_keyword_already_exists = "This keyword already exists";
 -$TLS_string_contains_bad_chars = "Name contains bad chars which cannot be used";
 -$TLS_warning_duplicate_req_title = "There's already a requirement with this title! (%s)";
-+// ----- lib/functions/testproject.class.php -----
-+$TLS_error_creating_req_spec = "创建需求规范时发生错误";
-+$TLS_info_product_name_empty = "不充许名称为空。";
-+$TLS_keyword_already_exists = "关键字已经存在";
-+$TLS_string_contains_bad_chars = "包含错误的字符";
-+$TLS_warning_duplicate_req_title = "存在同名的需求！";
- 
- 
- 
+-
+-
+-
 -// lib/functions/requirements.inc.php
 -$TLS_conflict = "Conflict";
 -$TLS_error_deleting_req = "Error while deleting requirements";
@@ -3093,6 +3213,29 @@ index a16c224..dc0d6d6 100644
 -$TLS_ok = "OK";
 -$TLS_req_import_format_description1 = " - CSV type requires three fields for each row: 'req_doc_id','title','description'";
 -$TLS_req_import_format_description2 = " - CSV exported from DOORS requires header row.";
++$TLS_desc_role_management = "角色管理";
++$TLS_desc_testplan_create_build = "构建创建/编辑";
++$TLS_desc_testplan_execute = "测试计划执行";
++$TLS_desc_testplan_metrics = "测试计划度量";
++$TLS_desc_testplan_planning = "测试计划安排";
++$TLS_desc_user_role_assignment = "角色指派";
++$TLS_error_duplicate_rolename = "存在同名的角色！";
++$TLS_error_role_no_rights = "不能保存无任何权限的角色！";
++$TLS_error_role_no_rolename = "必须输入角色的名称！";
++$TLS_inherited_role = "<继承>";
++$TLS_mgt_testplan_create = "测试计划创建/编辑";
++
++
++
++// ----- lib/functions/testproject.class.php -----
++$TLS_error_creating_req_spec = "创建需求规范时发生错误";
++$TLS_info_product_name_empty = "不充许名称为空。";
++$TLS_keyword_already_exists = "关键字已经存在";
++$TLS_string_contains_bad_chars = "包含错误的字符";
++$TLS_warning_duplicate_req_title = "存在同名的需求！";
++
++
++
 +// ----- lib/functions/requirements.inc.php -----
 +$TLS_conflict = "冲突";
 +$TLS_error_deleting_req = "删除需求时发生错误";
@@ -3148,17 +3291,17 @@ index a16c224..dc0d6d6 100644
 -$TLS_author = "Author";
 -$TLS_printed_by_TestLink_on = "Printed by TestLink on";
 -$TLS_title_toc = "Table Of Contents";
--$TLS_passfail = "通过 / 失败";
--$TLS_testnotes = "执行备注";
 +// ----- lib/functions/print.inc.php -----
 +$TLS_printed_by_TestLink_on = "由TestLink打印";
 +$TLS_title_toc = "内容列表";
-+$TLS_passfail = "通过 / 失败";
-+$TLS_testnotes = "测试备注";
- $TLS_last_exec_result = "Last Result";
+ $TLS_passfail = "通过 / 失败";
+-$TLS_testnotes = "执行备注";
+-$TLS_last_exec_result = "Last Result";
 -$TLS_test_project_notes = "Test Project notes";
--
-+$TLS_test_project_notes = "Test Project description";
++$TLS_testnotes = "测试备注";
++$TLS_last_exec_result = "最终结果";
++$TLS_test_project_notes = "测试项目描述";
+ 
  
 -// lib/functions/testcase.class.php
 -$TLS_create_new_version="Created new version %s"; 
@@ -3169,11 +3312,11 @@ index a16c224..dc0d6d6 100644
 -
 -// lib/functions/info.inc.php
 -$TLS_email_sent_message = "Your mail has been sent";
- 
 +// ----- lib/functions/users.inc.php -----
 +$TLS_duplicate_login = "该用户已经存在！";
 +$TLS_login_must_not_be_empty = "用户登陆名不能为空！";
 +$TLS_wrong_old_password = "旧密码错误！";
+ 
  
 -// lib/functions/users.inc.php
 -$TLS_Unknown = "Unknown";
@@ -3181,19 +3324,21 @@ index a16c224..dc0d6d6 100644
 -$TLS_login_must_not_be_empty = "Login must not be empty!";
 -$TLS_wrong_old_password = "Wrong old password!";
  
- 
 +// ----- lib/functions/email_api.php -----
 +$TLS_stmp_host_unconfigured = "SMTP主机没有配置正确！";
+ 
  
 -// lib/functions/email_api.php
 -$TLS_stmp_host_unconfigured = "SMTP host not properly configured!";
  
- 
+-
 -
 -// lib/functions/common.php
+-$TLS_test_automation_exec_ok = " Execution Successful!";
+-$TLS_test_automation_server_conn_failure = " Could not connect to HTTP server.";
 +// ----- lib/functions/common.php -----
- $TLS_test_automation_exec_ok = " Execution Successful!";
- $TLS_test_automation_server_conn_failure = " Could not connect to HTTP server.";
++$TLS_test_automation_exec_ok = " 执行成功!";
++$TLS_test_automation_server_conn_failure = "不能链接HTTP服务器.";
  $TLS_XMLRPC_error_number = "XML-RPC Fault number:- ";
  
  
@@ -3221,10 +3366,16 @@ index a16c224..dc0d6d6 100644
                                 "Please contact your TestLink administrator";
 -$TLS_sec_note_admin_default_pwd = "You should change the default password for the 'admin' account!";
 -$TLS_sec_note_remove_install_dir = "Install directory should be removed!";
-+$TLS_sec_note_admin_default_pwd = "应该修改系统管理员的缺省口令！";
++$TLS_sec_note_admin_default_pwd = "应该修改系统管理员的缺省密码！";
 +$TLS_sec_note_remove_install_dir = "应该删除安装目录！";
  $TLS_error_domxml_missing = "Domxml doesn't seem to be present. Importing XML stuff will not work!";
 -$TLS_error_gd_missing = "GD PHP extension doesn't seem to be present. Charts will not work!";
+-
+-// lib/general/frmWorkArea.php
+-$TLS_create_a_build = "Create a new build";
+-$TLS_no_build_warning_part1 = "There are no Builds created for this Test Plan ";
+-$TLS_no_build_warning_part2 = "Please create it first or ask your administrator.";
+-
 +$TLS_error_gd_missing = "PHP extension for GD library is not available. Charts will not work. " .
 +		"Locate your php.ini file. Open the file and remove the ; in front of ;extension=php_gd2.dll. " . 
 +		"Restart apache (if you are using apache). If that does not help, you will probably need to " .
@@ -3232,32 +3383,18 @@ index a16c224..dc0d6d6 100644
 +$TLS_error_gd_png_support_disabled = "PHP extension for GD library is available without PNG format support. 
 +		Charts will not work. Configure PHP or install required libraries.";
  
--// lib/general/frmWorkArea.php
--$TLS_create_a_build = "Create a new build";
--$TLS_no_build_warning_part1 = "There are no Builds created for this Test Plan ";
--$TLS_no_build_warning_part2 = "Please create it first or ask your administrator.";
  
+-// lib/general/myTPInfo.php
+-$TLS_no_testplans_available = "I'm sorry there are no Test Plans available";
 +// ----- lib/functions/cfield_mgr.class.php -----
 +$TLS_text_counter_feedback = "You may enter up to %d characters. Left ";
  
  
--// lib/general/myTPInfo.php
--$TLS_no_testplans_available = "I'm sorry there are no Test Plans available";
-+// ----- lib/general/frmWorkArea.php -----
-+$TLS_create_a_build = "创建一个新的构建";
-+$TLS_no_build_warning_part1 = "没有为这个测试计划创建构建。";
-+$TLS_no_build_warning_part2 = "请先创建它或找系统管理员解决。";
- 
- 
-+// ----- lib/general/myTPInfo.php -----
-+$TLS_no_testplans_available = "无法获得测试计划";
- 
+-
 -// lib/general/tlsmarty.inc.php
 -$TLS_show_hide_api_info = "Show / Hide API Info";
- 
-+// ----- lib/general/tlsmarty.inc.php -----
-+$TLS_show_hide_api_info = "Show / Hide API Info";
- 
+-
+-
 -// lib/keywords/keywords.inc.php
 -$TLS_empty_keyword_no = "You cannot enter an empty keyword!";
 -$TLS_keywords_char_not_allowed = "Commas and quotes aren't allowed within keywords!";
@@ -3265,6 +3402,26 @@ index a16c224..dc0d6d6 100644
 -$TLS_tc_kw_update_fails2 = "fails";
 -$TLS_the_format_keyword_csv_import = "keyword;notes";
 -$TLS_the_format_keyword_xml_import = "&lt;keywords>&lt;keyword name=\"name\">Notes&lt;/keyword>&lt;/keywords>";
++// ----- lib/general/frmWorkArea.php -----
++$TLS_create_a_build = "创建一个新的构建";
++$TLS_no_build_warning_part1 = "没有为这个测试计划创建构建。";
++$TLS_no_build_warning_part2 = "请先创建它或找系统管理员解决。";
+ 
+ 
+-
+-// lib/keywords/keywordsView.php
+-$TLS_kw_delete_fails = "Keyword delete operation fails!";
+-$TLS_kw_update_fails = "Update fails";
++// ----- lib/general/myTPInfo.php -----
++$TLS_no_testplans_available = "无法获得测试计划";
+ 
+ 
++// ----- lib/general/tlsmarty.inc.php -----
++$TLS_show_hide_api_info = "Show / Hide API Info";
+ 
+-// lib/keywords/keywordsAssign.php
+-$TLS_assigned_kword = "Assigned Keywords";
+-$TLS_available_kword = "Available Keywords";
  
 +// ----- lib/keywords/keywords.inc.php -----
 +$TLS_empty_keyword_no = "关键字不能为空！";
@@ -3274,34 +3431,14 @@ index a16c224..dc0d6d6 100644
 +$TLS_the_format_keyword_csv_import = "关键字;备注";
  
  
--// lib/keywords/keywordsView.php
--$TLS_kw_delete_fails = "Keyword delete operation fails!";
--$TLS_kw_update_fails = "Update fails";
-+// ----- lib/keywords/keywordsView.php -----
-+$TLS_kw_delete_fails = "删除关键字失败!";
-+$TLS_kw_update_fails = "更新失败";
- 
- 
- 
--// lib/keywords/keywordsAssign.php
--$TLS_assigned_kword = "Assigned Keywords";
--$TLS_available_kword = "Available Keywords";
-+// ----- lib/keywords/keywordsAssign.php -----
-+$TLS_assigned_kword = "指派关键字";
-+$TLS_available_kword = "有效关键字";
- 
- 
- 
 -// lib/plan/buildNew.php
 -$TLS_cannot_add_build = "The build cannot be added!";
 -$TLS_cannot_delete_build = "The build cannot be deleted!";
 -$TLS_cannot_update_build = "Error while updating build!";
 -$TLS_warning_duplicate_build = "There is already a build with this identifier";
-+// ----- lib/plan/buildNew.php -----
-+$TLS_cannot_add_build = "无法增加构建";
-+$TLS_cannot_delete_build = "无法删除构建";
-+$TLS_cannot_update_build = "无法更新构建";
-+$TLS_warning_duplicate_build = "构建标识已存在";
++// ----- lib/keywords/keywordsView.php -----
++$TLS_kw_delete_fails = "删除关键字失败!";
++$TLS_kw_update_fails = "更新失败";
  
  
  
@@ -3310,6 +3447,29 @@ index a16c224..dc0d6d6 100644
 -$TLS_warning_invalid_percentage_value = "Percentage values must range from 0 to 100%";
 -$TLS_warning_milestone_date = "Milestones have to be created at today's date or greater!";
 -$TLS_warning_percentage_value_higher_than_100 = "All percentage values summed up cannot be higher than 100";
++// ----- lib/keywords/keywordsAssign.php -----
++$TLS_assigned_kword = "指派关键字";
++$TLS_available_kword = "有效关键字";
+ 
+ 
+ 
+-// lib/plan/planMilestone*.php
+-$TLS_milestone_delete_fails = "The milestone couldn't be deleted!";
+-$TLS_warning_milestone_add_failed = "Milestone cannot be added!";
+-$TLS_warning_milestone_update_failed = "The milestone couldn't be updated!";
+-$TLS_milestone_name_already_exists = "There's already a Milestone with this name (%s)";
++// ----- lib/plan/buildNew.php -----
++$TLS_cannot_add_build = "无法增加构建";
++$TLS_cannot_delete_build = "无法删除构建";
++$TLS_cannot_update_build = "无法更新构建";
++$TLS_warning_duplicate_build = "构建标识已存在";
+ 
+ 
+ 
+-// lib/plan/planOwner.php
+-$TLS_opt_imp_high = "High";
+-$TLS_opt_imp_low = "Low";
+-$TLS_opt_imp_medium = "Medium";
 +// ----- lib/plan/plan.inc.php -----
 +$TLS_warning_enter_valid_date = "必须输入一个有效日期";
 +$TLS_warning_invalid_percentage_value = "百分比的值必须在0到100%之间";
@@ -3318,50 +3478,36 @@ index a16c224..dc0d6d6 100644
  
  
  
--// lib/plan/planMilestone*.php
--$TLS_milestone_delete_fails = "The milestone couldn't be deleted!";
--$TLS_warning_milestone_add_failed = "Milestone cannot be added!";
--$TLS_warning_milestone_update_failed = "The milestone couldn't be updated!";
+-// lib/plan/planTestersEdit.php
+-$TLS_title_assign_tp = "Assign Test Plans to the user ";
+-$TLS_title_assign_users = "Assign Users to the Test Plan ";
 +// ----- lib/plan/planMilestone*.php -----
 +$TLS_milestone_delete_fails = "无法删除里程碑！";
 +$TLS_warning_milestone_add_failed = "无法增加里程碑！";
 +$TLS_warning_milestone_update_failed = "无法更新里程碑！";
- $TLS_milestone_name_already_exists = "There's already a Milestone with this name (%s)";
++$TLS_milestone_name_already_exists = "这个里程碑名(%s)已经存在";
  
  
  
--// lib/plan/planOwner.php
--$TLS_opt_imp_high = "High";
--$TLS_opt_imp_low = "Low";
--$TLS_opt_imp_medium = "Medium";
--
+-// lib/plan/planTestersNavigator.php
+-$TLS_nav_test_plan = "Navigator - Test Plans";
+-$TLS_nav_users = "Navigator - Users";
 +// ----- lib/plan/planTestersEdit.php -----
 +$TLS_title_assign_tp = "将测试计划指派给用户：";
 +$TLS_title_assign_users = "将用户指派到测试计划: ";
  
  
--// lib/plan/planTestersEdit.php
--$TLS_title_assign_tp = "Assign Test Plans to the user ";
--$TLS_title_assign_users = "Assign Users to the Test Plan ";
 +// ----- lib/plan/planTestersNavigator.php -----
 +$TLS_nav_test_plan = "导航 - 测试计划";
 +$TLS_nav_users = "导航 - 用户";
  
- 
--
--// lib/plan/planTestersNavigator.php
--$TLS_nav_test_plan = "Navigator - Test Plans";
--$TLS_nav_users = "Navigator - Users";
--
--
--
 -// lib/plan/planUpdateTC.php
 -$TLS_deleted = "deleted";
 -$TLS_different_versions = "Diff. Versions";
 -$TLS_plan_update_no_tc_updated = "No Test Cases were updated";
 -$TLS_updated = "updated";
 -$TLS_all_versions_where_latest = "Nothing to do - All Test Cases version are the newest available";
--
+ 
 +//  -----lib/plan/planUpdateTC.php -----
 +$TLS_deleted = "已删除";
 +$TLS_different_versions = "不同版本";
@@ -3376,11 +3522,12 @@ index a16c224..dc0d6d6 100644
 -$TLS_title_test_plan_navigator = "Test plan navigator";
 +// ----- lib/plan/testSetNavigator.php -----
 +$TLS_title_test_plan_navigator = "测试计划导航标题";
-+
  
 -// lib/plan/testSetRemove.php
+-$TLS_tcase_removed_from_tplan = "Test Case removed from Test Plan";
++
 +// ----- lib/plan/testSetRemove.php -----
- $TLS_tcase_removed_from_tplan = "Test Case removed from Test Plan";
++$TLS_tcase_removed_from_tplan = "从测试计划中移除的测试用例";
  $TLS_multiple_tcase_removed_from_tplan = "Test Cases removed from Test Plan";
  
  
@@ -3389,14 +3536,9 @@ index a16c224..dc0d6d6 100644
 -$TLS_update_tp_failed1 = "Update of Test Plan '";
 -$TLS_update_tp_failed2 = "' failed";
 -$TLS_warning_duplicate_tplan_name = "There is already a Test Plan with this name. Please choose another name!";
-+// ----- lib/plan/planEdit.php -----
-+$TLS_testplan_created_ok = "测试计划创建成功";
-+$TLS_update_tp_failed1 = "测试计划'";
-+$TLS_update_tp_failed2 = "' 更新失败";
-+$TLS_warning_duplicate_tplan_name = "存在同名的测试计划。请重新命名！";
- 
- 
- 
+-
+-
+-
 -// lib/print/selectData.php
 -$TLS_opt_show_doc_header = "Test Suite texts";
 -$TLS_opt_show_tc_body = "Test Case Scenario";
@@ -3408,27 +3550,10 @@ index a16c224..dc0d6d6 100644
 -$TLS_opt_show_tc_keys = "TC related Keywords";
 -$TLS_title_tc_print_navigator = "Navigator - Print Test Specification";
 -$TLS_title_tp_print_navigator = "Navigator - Print Test Plan ";
-+// ----- lib/results/printDocOptions.php -----
-+$TLS_opt_show_toc = "显示内容列表";
-+$TLS_opt_show_suite_txt 	= "Test Suite description";
-+$TLS_opt_show_tplan_txt 	= "Test Plan description";
-+$TLS_opt_show_tc_body = "显示测试用例内容";
-+$TLS_opt_show_tc_summary = "显示测试用例摘要";
-+$TLS_opt_show_tc_author = "显示测试用例作者";
-+$TLS_opt_show_tc_reqs 		= "Test Case related Requirements";
-+$TLS_opt_show_tc_keys 		= "Test Case keywords";
-+$TLS_opt_show_cfields		= "Test Case Custom Fields";
-+$TLS_opt_show_passfail = "显示 通过/失败 和备注";
-+$TLS_opt_show_metrics 		= "Metrics";
-+$TLS_title_tc_print_navigator = "导航 - 打印测试规范";
-+$TLS_title_tp_print_navigator = "导航 - 打印测试计划";
- 
+-
 -// lib/project/projectedit.php
 -$TLS_error_product_name_duplicate = "There's already Test Project named %s.";
-+
-+// ----- lib/project/projectedit.php -----
-+$TLS_error_product_name_duplicate = "测试产品 %s 已经存在。 <br>请重新命名";
- $TLS_error_tcase_prefix_exists = "Test Case ID prefix %s already exists";
+-$TLS_error_tcase_prefix_exists = "Test Case ID prefix %s already exists";
 -$TLS_info_no_more_prods = "No more Test Projects.";
 -$TLS_info_product_activated = "Test Project was activated.";
 -$TLS_info_product_inactivated = "Test Project was deactivated.";
@@ -3450,6 +3575,42 @@ index a16c224..dc0d6d6 100644
 -$TLS_results_by_keyword = "Results by Keyword";
 -$TLS_results_by_tester = "Results by Tester";
 -$TLS_results_top_level_suites = "顶级分类的测试结果";
+-$TLS_chart_report = "Report";
+-$TLS_chart_assigned_testers = "Owners";
+-$TLS_chart_keywords = "Keywords";
+-$TLS_chart_testsuites = "Test Suites";
+-
+-
+-// lib/req/reqImport.php
+-$TLS_file_is_not_ok_for_import_type = "导入文件与所选导入类型不兼容";
+-$TLS_file_is_not_text = "导入文件不是文体文件，无法使用";
++// ----- lib/plan/planEdit.php -----
++$TLS_testplan_created_ok = "测试计划创建成功";
++$TLS_update_tp_failed1 = "测试计划'";
++$TLS_update_tp_failed2 = "' 更新失败";
++$TLS_warning_duplicate_tplan_name = "存在同名的测试计划。请重新命名！";
++
++
++
++// ----- lib/results/printDocOptions.php -----
++$TLS_opt_show_toc = "显示内容列表";
++$TLS_opt_show_suite_txt 	= "测试集描述";
++$TLS_opt_show_tplan_txt 	= "测试计划描述";
++$TLS_opt_show_tc_body = "显示测试用例内容";
++$TLS_opt_show_tc_summary = "显示测试用例摘要";
++$TLS_opt_show_tc_author = "显示测试用例作者";
++$TLS_opt_show_tc_reqs 		= "Test Case related Requirements";
++$TLS_opt_show_tc_keys 		= "测试用例关键字";
++$TLS_opt_show_cfields		= "测试用例自定义字段";
++$TLS_opt_show_passfail = "显示 通过/失败 和备注";
++$TLS_opt_show_metrics 		= "Metrics";
++$TLS_title_tc_print_navigator = "导航 - 打印测试规范";
++$TLS_title_tp_print_navigator = "导航 - 打印测试计划";
++
++
++// ----- lib/project/projectedit.php -----
++$TLS_error_product_name_duplicate = "测试产品 %s 已经存在。 <br>请重新命名";
++$TLS_error_tcase_prefix_exists = "测试用例标识: %s 已经存在";
 +$TLS_info_no_more_prods = "没有更多的产品。";
 +$TLS_info_product_activated = "产品已经被激活。";
 +$TLS_info_product_inactivated = "产品已经被禁用。";
@@ -3470,21 +3631,17 @@ index a16c224..dc0d6d6 100644
 +$TLS_results_by_keyword = "按关键字显示";
 +$TLS_results_by_tester = "按测试者显示";
 +$TLS_results_top_level_suites = "顶层测试集结果";
- $TLS_chart_report = "Report";
- $TLS_chart_assigned_testers = "Owners";
- $TLS_chart_keywords = "Keywords";
- $TLS_chart_testsuites = "Test Suites";
- 
- 
--// lib/req/reqImport.php
--$TLS_file_is_not_ok_for_import_type = "导入文件与所选导入类型不兼容";
--$TLS_file_is_not_text = "导入文件不是文体文件，无法使用";
--$TLS_please_choose_req_file = "请选择上传文件";
--$TLS_req_import_finished = "导入完成！";
++$TLS_chart_report = "报告";
++$TLS_chart_assigned_testers = "所有者";
++$TLS_chart_keywords = "关键字";
++$TLS_chart_testsuites = "测试用例集";
++
++
 +// ----- lib/req/reqImport.php -----
 +$TLS_file_is_not_ok_for_import_type = "导入的文件与导入的文件类型不匹配";
 +$TLS_file_is_not_text = "非文本格式文件，无法使用。";
-+$TLS_please_choose_req_file = "请选择上传文件";
+ $TLS_please_choose_req_file = "请选择上传文件";
+-$TLS_req_import_finished = "导入完成！";
 +$TLS_req_import_finished = "导入结束";
  
  
@@ -3547,13 +3704,18 @@ index a16c224..dc0d6d6 100644
  
  
 -// lib/results/resultsNavigator.php
-+// ----- lib/results/resultsNavigator.php -----
- $TLS_link_charts = "Charts";
+-$TLS_link_charts = "Charts";
 -$TLS_link_report_blocked_tcs = "执行阻塞的用例列表";
 -$TLS_link_report_failed = "执行失败的用例列表";
 -$TLS_link_report_general_tp_metrics = "常规测试计划度量";
 -$TLS_link_report_metrics_active_build = "活动的测试计划版本度量";
--$TLS_link_report_metrics_more_builds = "查询度量";
++// ----- lib/results/resultsNavigator.php -----
++$TLS_link_charts = "图表";
++$TLS_link_report_blocked_tcs = "锁定的测试用例";
++$TLS_link_report_failed = "失败的测试用例";
++$TLS_link_report_general_tp_metrics = "总体测试计划度量";
++$TLS_link_report_metrics_active_build = "活动构建的度量";
+ $TLS_link_report_metrics_more_builds = "查询度量";
 -$TLS_link_report_not_run = "Not run Test Cases";
 -$TLS_link_report_overall_build = "全部测试计划版本的状态";
 -$TLS_link_report_reqs_coverage = "需求覆盖率报告";
@@ -3561,11 +3723,6 @@ index a16c224..dc0d6d6 100644
 -$TLS_link_report_total_bugs = "每个测试用例的Bug总数：";
 -$TLS_link_report_uncovered_testcases = "Test Cases without Requirements Assignment";
 -$TLS_link_report_tcases_without_tester = "Test Cases without Tester Assignment";
-+$TLS_link_report_blocked_tcs = "锁定的测试用例";
-+$TLS_link_report_failed = "失败的测试用例";
-+$TLS_link_report_general_tp_metrics = "总体测试计划度量";
-+$TLS_link_report_metrics_active_build = "活动构建的度量";
-+$TLS_link_report_metrics_more_builds = "查询度量";
 +$TLS_link_report_not_run = "尚未执行的测试用例";
 +$TLS_link_report_overall_build = "全部构建的状态";
 +$TLS_link_report_reqs_coverage = "基于需求的报告";
@@ -3576,15 +3733,15 @@ index a16c224..dc0d6d6 100644
 +$TLS_link_report_tcases_with_cf = "Test Cases with Custom Fields info";
 +$TLS_caption_testCasesWithCF = $TLS_link_report_tcases_with_cf;
 +$TLS_link_report_free_testcases_on_testproject = "Test Cases not assigned to Any Test Plan";
++
  
 -// lib/results/resultsSend.php
 -$TLS_send_to_empty_email_warning = "抱歉，Email地址不能为空，请输入正确的地址。";
 -$TLS_warning_create_build_first = "您必须先创建测试计划版本或者先导入数据。";
++$TLS_no_linked_tc_cf='There are no Test Cases with Custom Field information';
  
 -// lib/results/displayMgr.php
 -$TLS_error_sendreport_no_email_credentials = "此用户未指定Email地址，请填写“个人帐号”中的电子邮件字段";
-+$TLS_no_linked_tc_cf='There are no Test Cases with Custom Field information';
- 
 +$TLS_format_html 		= 'HTML';
 +$TLS_format_odt 		= 'OpenOffice Writer';
 +$TLS_format_ods 		= 'OpenOffice Calc';
@@ -3594,42 +3751,41 @@ index a16c224..dc0d6d6 100644
 +$TLS_format_mail_html 	= 'Email (HTML)';
  
  
--// lib/testcases/archive.inc.php
 +// ----- lib/results/resultsSend.php -----
 +$TLS_send_to_empty_email_warning = "很抱歉无法发送邮件，请输入有效的邮件地址。";
 +$TLS_warning_create_build_first = "必须首先创建构建或导入数据。";
  
+-// lib/testcases/archive.inc.php
  
 +// ----- lib/results/displayMgr.php -----
 +$TLS_error_sendreport_no_email_credentials = "指定的用户没有设置Email地址，请修改。";
  
+ 
 -// lib/testcases/listTestCases.php
  
- 
 +// ----- lib/testcases/archive.inc.php -----
-+
-+
-+
-+// ----- lib/testcases/listTestCases.php -----
+ 
  
 -// lib/testcases/tcImport.php
--$TLS_action_on_duplicated_name = "Action for duplicated names";
--$TLS_already_exists_updated = "Already exists, data of LAST version has been updated.";
++
++// ----- lib/testcases/listTestCases.php -----
++
++
++
++// ----- lib/testcases/tcImport.php -----
+ $TLS_action_on_duplicated_name = "Action for duplicated names";
+ $TLS_already_exists_updated = "Already exists, data of LAST version has been updated.";
 -$TLS_please_choose_file_to_import = "请选择导入文件";
--$TLS_title_tc_import_to = "导入测试用例";
++$TLS_please_choose_file_to_import = "请选择需要导入的文件";
+ $TLS_title_tc_import_to = "导入测试用例";
 -$TLS_title_tsuite_import_to = "导入分类";
 -$TLS_wrong_xml_tcase_file = "xml测试用例文件格式错误";
 -$TLS_wrong_xml_tsuite_file = "xml分类文件格式错误";
 -$TLS_cf_value_not_imported_missing_cf_on_testproject = "Value of Custom Field '%s' can not be imported " .
 -                                                     "because there is no Custom Field with this name " .
 -                                                     "and Available for %s on this Test Project"; 
- 
- 
-+// ----- lib/testcases/tcImport.php -----
-+$TLS_action_on_duplicated_name = "Action for duplicated names";
-+$TLS_already_exists_updated = "Already exists, data of LAST version has been updated.";
-+$TLS_please_choose_file_to_import = "请选择需要导入的文件";
-+$TLS_title_tc_import_to = "导入测试用例";
+-
+-
 +$TLS_title_tsuite_import_to = "导入测试集";
 +$TLS_wrong_xml_tcase_file = "错误的测试用例xml文件";
 +$TLS_wrong_xml_tsuite_file = "错误的测试集xml文件";
@@ -3649,40 +3805,32 @@ index a16c224..dc0d6d6 100644
 +    "but can not be imported because there are no Requirement Specification defined for this Test Project"; 
  
  
+-
+-// lib/testcases/tcexport.php
+-$TLS_no_testcases_to_export = "没有测试用例可以导出";
+-$TLS_no_testsuites_to_export = "没有分类可以导出";
 +// ----- lib/testcases/tcexport.php -----
 +$TLS_no_testcases_to_export = "没有测试用例可以被导出";
 +$TLS_no_testsuites_to_export = "没有测试集可以被导出";
-+$TLS_title_tc_export = "导出测试用例";
+ $TLS_title_tc_export = "导出测试用例";
+-$TLS_title_tc_export_all = "导出所有测试用例";
+-$TLS_title_tsuite_export = "导出分类";
+-$TLS_title_tsuite_export_all = "导出所有分类";
 +$TLS_title_tc_export_all = "导出全部测试用例";
 +$TLS_title_tsuite_export = "导出测试集";
 +$TLS_title_tsuite_export_all = "导出全部测试集";
  
--// lib/testcases/tcexport.php
--$TLS_no_testcases_to_export = "没有测试用例可以导出";
--$TLS_no_testsuites_to_export = "没有分类可以导出";
--$TLS_title_tc_export = "导出测试用例";
--$TLS_title_tc_export_all = "导出所有测试用例";
--$TLS_title_tsuite_export = "导出分类";
--$TLS_title_tsuite_export_all = "导出所有分类";
  
  
+-// lib/testcases/containerEdit.php
 +// ----- lib/testcases/containerEdit.php -----
-+$TLS_delete = "删除";
+ $TLS_delete = "删除";
+-$TLS_delete_notice = "Warning: 所有的相关测试结果都将被删除";
+-$TLS_warning_empty_com_name = "请输入分类名";
 +$TLS_delete_notice = "警告：所有关联的执行结果都将被删除。";
 +$TLS_warning_empty_com_name = "请为组件指定名称";
  
--// lib/testcases/containerEdit.php
--$TLS_delete = "删除";
--$TLS_delete_notice = "Warning: 所有的相关测试结果都将被删除";
--$TLS_warning_empty_com_name = "请输入分类名";
  
- 
-+// ----- lib/testcases/tcEdit.php -----
-+$TLS_current = "没有变更的";
-+$TLS_delete_linked = "测试计划的关联关系将被删除";
-+$TLS_delete_linked_and_exec = "关联到测试计划，相关的执行情况将被删除";
-+$TLS_error_tc_add = "增加测试用例发生错误";
-+$TLS_title_del_tc = "删除测试用例";  // add by wangyy
  
 -// lib/testcases/tcEdit.php
 -$TLS_current = "当前";
@@ -3690,15 +3838,21 @@ index a16c224..dc0d6d6 100644
 -$TLS_delete_linked_and_exec = "关联的测试计划以及相关的执行信息都将被删除";
 -$TLS_error_tc_add = "添加测试用例时发生一个错误";
 -$TLS_title_del_tc = "删除测试用例";
++// ----- lib/testcases/tcEdit.php -----
++$TLS_current = "没有变更的";
++$TLS_delete_linked = "测试计划的关联关系将被删除";
++$TLS_delete_linked_and_exec = "关联到测试计划，相关的执行情况将被删除";
++$TLS_error_tc_add = "增加测试用例发生错误";
++$TLS_title_del_tc = "删除测试用例";  // add by wangyy
  
  
-+// ----- lib/usermanagement/rolesview.php -----
-+$TLS_error_role_deletion = "角色不能被删除！";
  
 -// lib/usermanagement/rolesview.php
 -$TLS_error_role_deletion = "无法删除角色！";
++// ----- lib/usermanagement/rolesview.php -----
++$TLS_error_role_deletion = "角色不能被删除！";
  
--
+ 
 -// lib/usermanagement/usersassign.php
 -$TLS_no_test_projects = "尚未定义产品";
 -$TLS_no_test_plans = "本产品尚未定义测试计划";
@@ -3751,25 +3905,30 @@ index a16c224..dc0d6d6 100644
  
  // ----- lib/project/project_req_spec_mgmt.tpl -----
 -$TLS_btn_new_req_spec = "New Requirement Specification";
-+$TLS_btn_new_req_spec = "新建测试规格";
- $TLS_btn_reorder_req_spec = "Reorder Requirement Specifications";
+-$TLS_btn_reorder_req_spec = "Reorder Requirement Specifications";
++$TLS_btn_new_req_spec = "新建需求规约";
++$TLS_btn_reorder_req_spec = "重新排序需求归约";
  
  
  // ----- reqSpecEdit.php -----
 -$TLS_delete_req_spec = "Delete Requirement Specification";
-+$TLS_delete_req_spec = "删除测试规格";
- $TLS_req_spec_created = "Requirement Specification: %s was successfully created";
- $TLS_req_spec_deleted = "Requirement Specification: %s was successfully deleted";
+-$TLS_req_spec_created = "Requirement Specification: %s was successfully created";
+-$TLS_req_spec_deleted = "Requirement Specification: %s was successfully deleted";
 -
- $TLS_title_req_spec = "Requirement Specifications";
- $TLS_warning_empty_req_spec_title = "Requirement Specification title cannot be empty!";
+-$TLS_title_req_spec = "Requirement Specifications";
+-$TLS_warning_empty_req_spec_title = "Requirement Specification title cannot be empty!";
++$TLS_delete_req_spec = "删除测试规格";
++$TLS_req_spec_created = "需求归约: %s 成功创建";
++$TLS_req_spec_deleted = "需求归约: %s 成功删除";
++$TLS_title_req_spec = "需求归约";
++$TLS_warning_empty_req_spec_title = "需求归约标题不能为空!";
  $TLS_create_req_spec = "Create Requirements Specification";
  $TLS_create_child_req_spec = "Create Child Req Specification";
 -
  $TLS_edit_req_spec = "Edit Requirements Specification";
  
  
-@@ -2121,7 +2179,7 @@ $TLS_edit_req_spec = "Edit Requirements Specification";
+@@ -2121,12 +2179,12 @@ $TLS_edit_req_spec = "Edit Requirements Specification";
  $TLS_create_req = "Create Requirement";
  $TLS_delete_req = "Delete Requirement";
  $TLS_edit_req = "Edit Requirement";
@@ -3778,6 +3937,12 @@ index a16c224..dc0d6d6 100644
  $TLS_req_deleted = "Requirement: %s was successfully deleted";
  
  
+ // ----- reqSpecReorder.tpl -----
+-$TLS_title_change_req_spec_order = "Change Requirement Specifications order";
++$TLS_title_change_req_spec_order = "改变需求归约的顺序";
+ 
+ 
+ // ----- requirement_mgr -----
 @@ -2143,42 +2201,41 @@ $TLS_warning_empty_keyword = "Keyword must not be empty!";
  // ----- api/TestlinkXMLRPCServerErrors.php -----
  $TLS_API_INVALID_AUTH = "Can not authenticate client: invalid developer key";
@@ -3859,6 +4024,15 @@ index a16c224..dc0d6d6 100644
  
  // ----- audit log entries -----
  $TLS_audit_login_succeeded = "Login for '{%1}' from '{%2}' succeeded";
+@@ -2321,7 +2392,7 @@ $TLS_access_to_bts="Access issue tracking system";
+ 
+ // ----- uncoveredTestCases.php -----
+ $TLS_report_testcases_without_requirement = $TLS_link_report_uncovered_testcases;
+-$TLS_no_uncovered_testcases = 'No uncovered Test Cases';
++$TLS_no_uncovered_testcases = '没有尚未关联到需求的测试用例';
+ $TLS_testproject_has_no_reqspec = 'There are no Requirement Spec. defined';
+ $TLS_testproject_has_no_requirements = 'There are no Requirements defined';
+ 
 @@ -2330,6 +2401,19 @@ $TLS_testproject_has_no_requirements = 'There are no Requirements defined';
  $TLS_caption_testCasesWithoutTester = $TLS_link_report_tcases_without_tester;
  $TLS_all_testcases_have_tester = 'All Test Cases have Tester Assigned';
@@ -3880,6 +4054,39 @@ index a16c224..dc0d6d6 100644
  // ----- END ------------------------------------------------------------------
 -?>
 \ No newline at end of file
++?>
+diff --git a/locale/zh_CN/texts.php b/locale/zh_CN/texts.php
+index 773333c..23ae3d6 100644
+--- a/locale/zh_CN/texts.php
++++ b/locale/zh_CN/texts.php
+@@ -50,7 +50,7 @@ analyse serves as input for the next planning.</p>
+ 
+ 
+ // --------------------------------------------------------------------------------------
+-$TLS_htmltext_title['editTc']	= "Test Specification";
++$TLS_htmltext_title['editTc']	= "测试规范";
+ $TLS_htmltext['editTc'] 		= "<h2>Purpose:</h2>
+ <h2>Purpose:</h2>
+ <p>The <i>Test Specification</i> allows users to view and edit all of the existing " .
+@@ -396,4 +396,4 @@ $TLS_htmltext['test_urgency'] 		= "<h2>Purpose</h2>
+ 
+ // ------------------------------------------------------------------------------------------
+ 
+-?>
+\ No newline at end of file
++?>
+diff --git a/third_party/pchart/pChart/pData.class b/third_party/pchart/pChart/pData.class
+index 8e1938d..e6447f6 100644
+--- a/third_party/pchart/pChart/pData.class
++++ b/third_party/pchart/pChart/pData.class
+@@ -256,5 +256,5 @@
+     {
+      return($this->DataDescription);
+     }
+-  }
+-?>
+\ No newline at end of file
++   }
 +?>
 -- 
 tg: (f0706d5..) t/zh_cn_l10n (depends on: master)

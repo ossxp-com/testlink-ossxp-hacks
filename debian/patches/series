@@ -1,4 +1,4 @@
-t/single_signon.diff -p1
 t/zh_cn_l10n.diff -p1
 t/custom_config.diff -p1
 t/bugtrac_integration.diff -p1
+t/single_signon.diff -p1

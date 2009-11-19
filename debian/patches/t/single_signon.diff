@@ -8,18 +8,18 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  config.inc.php                |   10 +++++++-
  index.php                     |   12 +++++++++-
- lib/functions/doAuthorize.php |   40 +++++++++++++++++++++++++++++------
+ lib/functions/doAuthorize.php |   36 ++++++++++++++++++++++++++++---
  lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++++++++
  lib/functions/user.class.php  |   24 ++++++++++++++++++++-
  login.php                     |   23 +++++++++++++++++--
  logout.php                    |   17 ++++++++++++++-
- 7 files changed, 156 insertions(+), 16 deletions(-)
+ 7 files changed, 155 insertions(+), 13 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 19e46e0..1d2ee5b 100644
+index 4117b9f..ff0f1f2 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -261,17 +261,23 @@ $g_smtp_password    = '';  # password
+@@ -260,17 +260,23 @@ $g_smtp_password    = '';  # password
  /** 
   * Login authentication method:
   * 		'MD5' => use password stored on db
@@ -74,18 +74,10 @@ index e1526b3..46d57b7 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index 5f4e32e..e2dda40 100644
+index 5f4e32e..a8cb5e2 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
-@@ -1,6 +1,4 @@
--<?php
--/**
-- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
-+<?php /** * TestLink Open Source Project - http://testlink.sourceforge.net/ 
-  * This script is distributed under the GNU General Public License 2 or later. 
-  * 
-  * @filesource $RCSfile: doAuthorize.php,v $
-@@ -19,20 +17,48 @@
+@@ -19,20 +19,48 @@
   * *********************************************************************************** */
  require_once("users.inc.php");
  require_once("roles.inc.php");
@@ -328,4 +320,4 @@ index 5e4d739..ed55309 100644
 \ No newline at end of file
 +?>
 -- 
-tg: (dc52d9d..) t/single_signon (depends on: master)
+tg: (f0706d5..) t/single_signon (depends on: master)

@@ -1,3 +1,10 @@
+ossxp-testlink (1.8.4-7) unstable; urgency=low
+
+  * More zh_ch translation.
+  * Characters in Chinses can display in chart.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Thu, 19 Nov 2009 10:19:05 +0800
+
 ossxp-testlink (1.8.4-6) unstable; urgency=low
 
   * Install custom_config.inc.php as conffiles.
