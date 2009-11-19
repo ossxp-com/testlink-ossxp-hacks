@@ -235,12 +235,12 @@ $g_interface_bugs = 'REDMINE';
 // with code taken from Mantis.
 // 
 // SMTP server Configuration ("localhost" is enough in the most cases)
-$g_smtp_host        = '[smtp_host_not_configured]';  # SMTP server MUST BE configured  
+$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
 
 # Configure using custom_config.inc.php
-$g_tl_admin_email     = '[testlink_sysadmin_email_not_configured]'; # for problem/error notification 
-$g_from_email         = '[from_email_not_configured]';  # email sender
-$g_return_path_email  = '[return_path_email_not_configured]';
+$g_tl_admin_email     = 'leiww@bj.ossxp.com'; # for problem/error notification 
+$g_from_email         = 'no_replay@ossxp.com';  # email sender
+$g_return_path_email  = 'leiww@bj.ossxp.com';
 
 # Urgent = 1, Not Urgent = 5, Disable = 0
 $g_mail_priority = 5;   

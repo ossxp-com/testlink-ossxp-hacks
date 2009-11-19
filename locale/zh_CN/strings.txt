@@ -41,9 +41,9 @@ $TLS_build = "构建标识";
 $TLS_check_uncheck_all = "Toggle all";
 $TLS_days	= "days";
 $TLS_desc = "降序";
-$TLS_description = "Description";
-$TLS_delete_confirm_question = "Are your sure you want to delete?";
-$TLS_file_type = 'File type';
+$TLS_description = "描述";
+$TLS_delete_confirm_question = "你确定删除吗?";
+$TLS_file_type = '文件类型';
 $TLS_help = "帮助";
 $TLS_hour = "小时";
 $TLS_importance	= "Importance";
@@ -58,8 +58,8 @@ $TLS_nobody = "Nobody";
 $TLS_not_imported = "Not imported";
 $TLS_none = "无";
 $TLS_ok = "确定";
-$TLS_priority	= "Priority";
-$TLS_project = "Project";
+$TLS_priority	= "优先级";
+$TLS_project = "项目";
 $TLS_requirement = "Requirement";
 $TLS_reqs = "需求";
 $TLS_req_spec = "需求规约";
@@ -80,22 +80,22 @@ $TLS_test_report = "详细测试报告";
 $TLS_test_suite = "测试集";
 $TLS_testsuite_created = "测试集创建成功";
 $TLS_title = "标题";
-$TLS_total = "Total";
+$TLS_total = "总计";
 $TLS_Unknown = "未知";
 $TLS_urgency = "Urgency";
 $TLS_weeks = "weeks";
-$TLS_undefined="undefined";
+$TLS_undefined="未定义";
 
 
 // Actions (used wide) 
-$TLS_add = "add";
+$TLS_add = "添加";
 $TLS_assigned = "被指派";
 $TLS_create = "创建";
 $TLS_copy = "复制";
 $TLS_delete = "删除";
 $TLS_executed	= "执行";
-$TLS_move	= "Move";
-$TLS_remove = "remove";
+$TLS_move	= "移动";
+$TLS_remove = "移除";
 $TLS_unassigned = "未指派";
 
 // Buttons (used wide)
@@ -112,7 +112,7 @@ $TLS_btn_delete = "删除";
 $TLS_btn_edit = "编辑";
 $TLS_btn_export = "导出";
 $TLS_btn_find = "查找";
-$TLS_btn_goback = "Go back";
+$TLS_btn_goback = "后退";
 $TLS_btn_generate_doc = "Generate document";
 $TLS_btn_import = "导入";
 $TLS_btn_move = "移动";
@@ -124,9 +124,9 @@ $TLS_btn_unassign = "取消指派";
 $TLS_btn_uncheck = "全都不选";
 $TLS_btn_update = "更新";
 $TLS_btn_upd = "更新";
-$TLS_btn_upload = "Upload";
-$TLS_btn_advanced_filters = "Advanced Filters";
-$TLS_btn_simple_filters = "Simple Filters"; 
+$TLS_btn_upload = "上传";
+$TLS_btn_advanced_filters = "高级搜索";
+$TLS_btn_simple_filters = "简单搜索"; 
 
 
 // Status (used wide)
@@ -156,12 +156,12 @@ $TLS_req_status_not_testable = "Not testable"; // defined for historical reason 
 
 
 // ----- unsorted (TODO move) -------------------------------------
-$TLS_problems_loading_xml_content = "Unable to load XML data, Check your file."; 
+$TLS_problems_loading_xml_content = "无法下载XML数据，检查你的文件."; 
 $TLS_search_type_like = "Search on this value will be done on LIKE mode";
-$TLS_exec_assign_no_testcase = "Please select at least one Test Case.";
+$TLS_exec_assign_no_testcase = "请至少选择一个测试用例.";
 $TLS_select_at_least_one_testcase = "Please select at least one Test Case and a target!";
 $TLS_no_testcases_available = "No Test Cases or no destination Test Suites available!";
-$TLS_warning_must_be_number = "Value must be a number";
+$TLS_warning_must_be_number = "值必须是一个数字";
 
 $TLS_estimated_time_hours = "Estimated time for executing %s test cases (hours):";
 $TLS_estimated_time_min = "Estimated time for executing %s test cases (min):";
@@ -185,10 +185,10 @@ $TLS_created_with_new_name = "Create with name:%s, because name:%s already exist
 
 
 $TLS_click_to_open='Click to open';
-$TLS_testplan_usage="Test Plan usage";
+$TLS_testplan_usage="测试计划用途";
 
-$TLS_add_tcversion_to_plans = "Add Test Case Version to Test Plans";
-$TLS_please_select_one_testplan = "Please select at least one Test Plan.";
+$TLS_add_tcversion_to_plans = "把测试用例版本添加到测试计划";
+$TLS_please_select_one_testplan = "请至少选择一个测试计划.";
 
 $TLS_deleted_user = "[deleted user - id=%s]";
 $TLS_user_not_on_system = "[user with id=%s does not exist on system]";
@@ -197,7 +197,7 @@ $TLS_tag_for_inactive_users = "*";
 
 $TLS_design = "Test Spec Design";
 $TLS_execution = "Test Execution";
-$TLS_testplan_design = "Test Plan Desing";
+$TLS_testplan_design = "测试计划设计";
 $TLS_enable_on = "Enable on";
 
 
@@ -227,11 +227,11 @@ $TLS_empty_last_name = " 姓不能为空！";
 $TLS_fatal_page_title = "TestLink ::: 致命错误";
 $TLS_invalid_user_name = "用户名错误，请重新输入。";
 $TLS_no_good_email_address = "Email address format seems no good";
-$TLS_passwd_dont_match = "两次输入的口令不一致，请说明口令是大小写敏感的。请重新输入。";
+$TLS_passwd_dont_match = "两次输入的密码不一致，请重新输入。";
 $TLS_user_cant_be_created_because = "你的帐号无法创建,原因是：";
 $TLS_user_name_exists = "用户名已经被使用,请选择其它的名称。";
 $TLS_valid_user_name_format = "用户名只能包含字母,数字,空格,连字符和下划线。";
-$TLS_warning_empty_pwd = "口令不允许为空！";
+$TLS_warning_empty_pwd = "密码不允许为空！";
 $TLS_your_info_please = "输入你的用户信息";
 
 
@@ -266,22 +266,22 @@ $TLS_wrong_keywords_file = "Wrong Keyword file (wrong format)";
 
 // ----- lostPassword.php -----
 $TLS_bad_user = "用户不存在，请重试";
-$TLS_contact_admin = "<br>如果你有近一步的问题，请与系统管理员联系。";
-$TLS_mail_empty_address = "你没有在你的用户档案信息中指定电子邮件地址！请与TestLink系统管理员联系，重新设置你的口令！";
-$TLS_mail_passwd_subject = "新的TestLink口令";
+$TLS_contact_admin = "<br>如果你还有问题，请与系统管理员联系。";
+$TLS_mail_empty_address = "你没有在你的用户档案信息中指定电子邮件地址！请与TestLink系统管理员联系，重新设置你的密码！";
+$TLS_mail_passwd_subject = "新的TestLink密码";
 $TLS_mail_problems = "邮件功能没有正确安装，请与系统管理员联系。";
-$TLS_page_title_lost_passwd = "TestLink - 忘记口令";
-$TLS_your_info_for_passwd = "输入你的用户信息，以便可以通过电子邮件发送你的新口令。";
-$TLS_your_password_is = "你的TestLink新口令是：<br>";
+$TLS_page_title_lost_passwd = "TestLink - 忘记密码";
+$TLS_your_info_for_passwd = "输入你的用户信息，以便可以通过电子邮件发送你的新密码。";
+$TLS_your_password_is = "你的TestLink新密码是：<br>";
 
 
 
 // ----- login.php -----
-$TLS_bad_user_passwd = "重试！错误的用户名或口令！";
+$TLS_bad_user_passwd = "重试！错误的用户名或密码！";
 $TLS_login_msg_session_exists1 = "浏览器中已经有一个合法的登陆用户。请使用它。";
 $TLS_login_msg_session_exists2 = " 首先，你是否想重新建立会话。";
 $TLS_logout_link = "退出";
-$TLS_passwd_lost = "你的口令已经发送到你注册用户信息时指定的电子邮件地址中。请查看你的邮箱。如果还有其它问题，请与TestLink管理员联系。";
+$TLS_passwd_lost = "你的密码已经发送到你注册用户信息时指定的电子邮件地址中。请查看你的邮箱。如果还有其它问题，请与TestLink管理员联系。";
 $TLS_password_reseted = "新密码已发送到你的邮箱";
 $TLS_please_login = "请登陆 ...";
 $TLS_session_expired = "你的会话已经超时！请重新登陆。";
@@ -895,11 +895,11 @@ $TLS_password = "密码：";
 
 // ----- gui/templates/loginFirst.tpl -----
 $TLS_btn_add_user_data = "添加用户信息";
-$TLS_e_mail = "电子邮件地址（用来发送忘记了的口令等）：";
+$TLS_e_mail = "电子邮件地址（用来发送忘记了的密码等）：";
 $TLS_first_name = "名字：";
 $TLS_last_name = "姓：";
 $TLS_link_back_to_login = "返回登录";
-$TLS_password_again = "再次输入口令：";
+$TLS_password_again = "再次输入密码：";
 $TLS_password_mgmt_is_external = "密码管理是外部系统管理的";
 $TLS_user_login_valid_regex = "用户名包含非法字符!";
 
@@ -1470,28 +1470,28 @@ $TLS_send_mail_to_tester = "Send mail notification to tester";
 
 
 // ----- gui/templates/userInfo.tpl -----
-$TLS_btn_change_passwd = "修改口令";
+$TLS_btn_change_passwd = "修改密码";
 $TLS_btn_upd_user_data = "更新";
 $TLS_btn_apikey_generate = "Generate a new key";
-$TLS_th_new_passwd = "新口令";
-$TLS_th_new_passwd_again = "确认新口令";
-$TLS_th_old_passwd = "旧口令";
+$TLS_th_new_passwd = "输入新密码";
+$TLS_th_new_passwd_again = "确认新密码";
+$TLS_th_old_passwd = "你的旧密码";
 $TLS_title_account_settings = "帐号设置";
-$TLS_title_personal_data = "Personal data";
-$TLS_title_personal_passwd = "Personal password";
+$TLS_title_personal_data = "个人信息";
+$TLS_title_personal_passwd = "个人密码";
 $TLS_title_api_interface = "API interface";
-$TLS_warning_different_pwd = "请重新输入你的新口令。新输入的口令不一致。";
-$TLS_warning_empty_pwd = "口令不允许为空！";
+$TLS_warning_different_pwd = "请重新输入你的新密码。两次输入的密码不一致。";
+$TLS_warning_empty_pwd = "密码不能为空！";
 $TLS_your_password_is_external = "您的密码是在外部系统中管理的。<br>".
                                  "您无法通过 TestLink 来修改密码。";
 $TLS_user_api_key = "Personal API access key";
 $TLS_audit_login_history = "登录历史";
 $TLS_audit_last_succesful_logins = "Last successful logins";
 $TLS_audit_last_failed_logins = "Last failed logins";
-$TLS_result_password_changed = "Your password was changed succesfully";
+$TLS_result_password_changed = "密码修改成功";
 $TLS_result_apikey_create_ok = "New API key was generated";
-$TLS_result_user_changed = "Personal data changed";
-$TLS_empty_old_passwd = "Empty Old Password. Please enter your Old Password";
+$TLS_result_user_changed = "个人信息已经修改成功";
+$TLS_empty_old_passwd = "旧密码不能为空,请重新输入";
 $TLS_never_logged = "Never logged";
 
 
@@ -1515,7 +1515,7 @@ $TLS_testplan_roles_assign_disabled="Your role configuration do not allow you As
 // ----- gui/templates/usersedit.tpl -----
 $TLS_button_reset_password = "重置密码";
 $TLS_caption_user_details = "用户详细信息";
-$TLS_th_password = "口令";
+$TLS_th_password = "密码";
 $TLS_warning_empty_first_name = "请输入姓";
 $TLS_warning_empty_last_name = "请输入名字";
 $TLS_warning_empty_login = "请输入登录名";
@@ -1722,7 +1722,7 @@ $TLS_desc_user_role_assignment = "角色指派";
 $TLS_error_duplicate_rolename = "存在同名的角色！";
 $TLS_error_role_no_rights = "不能保存无任何权限的角色！";
 $TLS_error_role_no_rolename = "必须输入角色的名称！";
-$TLS_inherited_role = "<inherited>";
+$TLS_inherited_role = "<继承>";
 $TLS_mgt_testplan_create = "测试计划创建/编辑";
 
 
@@ -1777,7 +1777,7 @@ $TLS_title_toc = "内容列表";
 $TLS_passfail = "通过 / 失败";
 $TLS_testnotes = "测试备注";
 $TLS_last_exec_result = "最终结果";
-$TLS_test_project_notes = "Test Project description";
+$TLS_test_project_notes = "测试项目描述";
 
 
 // ----- lib/functions/users.inc.php -----
@@ -1793,8 +1793,8 @@ $TLS_stmp_host_unconfigured = "SMTP主机没有配置正确！";
 
 
 // ----- lib/functions/common.php -----
-$TLS_test_automation_exec_ok = " Execution Successful!";
-$TLS_test_automation_server_conn_failure = " Could not connect to HTTP server.";
+$TLS_test_automation_exec_ok = " 执行成功!";
+$TLS_test_automation_server_conn_failure = "不能链接HTTP服务器.";
 $TLS_XMLRPC_error_number = "XML-RPC Fault number:- ";
 
 
@@ -1811,7 +1811,7 @@ $TLS_ldap_extension_not_loaded = "Login method is configured as LDAP<br />" .
                                "but PHP LDAP extension is not loaded => " .
                                "You will not be able to login.<br />".
                                "Please contact your TestLink administrator";
-$TLS_sec_note_admin_default_pwd = "应该修改系统管理员的缺省口令！";
+$TLS_sec_note_admin_default_pwd = "应该修改系统管理员的缺省密码！";
 $TLS_sec_note_remove_install_dir = "应该删除安装目录！";
 $TLS_error_domxml_missing = "Domxml doesn't seem to be present. Importing XML stuff will not work!";
 $TLS_error_gd_missing = "PHP extension for GD library is not available. Charts will not work. " .
@@ -1880,7 +1880,7 @@ $TLS_warning_percentage_value_higher_than_100 = "所有的百分比之和不能�
 $TLS_milestone_delete_fails = "无法删除里程碑！";
 $TLS_warning_milestone_add_failed = "无法增加里程碑！";
 $TLS_warning_milestone_update_failed = "无法更新里程碑！";
-$TLS_milestone_name_already_exists = "There's already a Milestone with this name (%s)";
+$TLS_milestone_name_already_exists = "这个里程碑名(%s)已经存在";
 
 
 
@@ -1909,7 +1909,7 @@ $TLS_title_test_plan_navigator = "测试计划导航标题";
 
 
 // ----- lib/plan/testSetRemove.php -----
-$TLS_tcase_removed_from_tplan = "Test Case removed from Test Plan";
+$TLS_tcase_removed_from_tplan = "从测试计划中移除的测试用例";
 $TLS_multiple_tcase_removed_from_tplan = "Test Cases removed from Test Plan";
 
 
@@ -1923,14 +1923,14 @@ $TLS_warning_duplicate_tplan_name = "存在同名的测试计划。请重新命�
 
 // ----- lib/results/printDocOptions.php -----
 $TLS_opt_show_toc = "显示内容列表";
-$TLS_opt_show_suite_txt 	= "Test Suite description";
-$TLS_opt_show_tplan_txt 	= "Test Plan description";
+$TLS_opt_show_suite_txt 	= "测试集描述";
+$TLS_opt_show_tplan_txt 	= "测试计划描述";
 $TLS_opt_show_tc_body = "显示测试用例内容";
 $TLS_opt_show_tc_summary = "显示测试用例摘要";
 $TLS_opt_show_tc_author = "显示测试用例作者";
 $TLS_opt_show_tc_reqs 		= "Test Case related Requirements";
-$TLS_opt_show_tc_keys 		= "Test Case keywords";
-$TLS_opt_show_cfields		= "Test Case Custom Fields";
+$TLS_opt_show_tc_keys 		= "测试用例关键字";
+$TLS_opt_show_cfields		= "测试用例自定义字段";
 $TLS_opt_show_passfail = "显示 通过/失败 和备注";
 $TLS_opt_show_metrics 		= "Metrics";
 $TLS_title_tc_print_navigator = "导航 - 打印测试规范";
@@ -1960,10 +1960,10 @@ $TLS_overall_metrics = "全面度量";
 $TLS_results_by_keyword = "按关键字显示";
 $TLS_results_by_tester = "按测试者显示";
 $TLS_results_top_level_suites = "顶层测试集结果";
-$TLS_chart_report = "Report";
-$TLS_chart_assigned_testers = "Owners";
-$TLS_chart_keywords = "Keywords";
-$TLS_chart_testsuites = "Test Suites";
+$TLS_chart_report = "报告";
+$TLS_chart_assigned_testers = "所有者";
+$TLS_chart_keywords = "关键字";
+$TLS_chart_testsuites = "测试用例集";
 
 
 // ----- lib/req/reqImport.php -----
