@@ -466,10 +466,11 @@ $g_sort_table_engine='kryogenix.org';
  * Texts and settings for printed documents
  * Leave text values empty if you would like to disable it.
  */
-$tlCfg->document_generator->company_name = 'Testlink Community [configure $tlCfg->document_generator->company_name]';
+//$tlCfg->document_generator->company_name = 'Testlink Community [configure $tlCfg->document_generator->company_name]';
+$tlCfg->document_generator->company_name = '北京群英汇信息技术有限公司';
 
 /** Image is expected in directory <testlink_root>/gui/themes/<your_theme>/images/ */
-$tlCfg->document_generator->company_copyright = '2009 &copy; Testlink Community';
+$tlCfg->document_generator->company_copyright = '2009 &copy; 北京群英汇信息技术有限公司';
 $tlCfg->document_generator->confidential_msg = '';
 
 /** CSS used in printed html documents */
@@ -486,7 +487,7 @@ $tlCfg->document_generator->tc_version_enabled = FALSE;
 // ENABLED -> enable XML-RPC calls to external test automation server
 //      new buttons will be displayed on execution pages
 // DISABLED -> disable
-$tlCfg->exec_cfg->enable_test_automation = DISABLED;
+$tlCfg->exec_cfg->enable_test_automation = ENABLED;
 
 // 1 -> user can edit execution notes, on old executions (Attention: user must have test case execution right)
 // DISABLED -> no edit allowed [STANDARD BEHAVIOUR]

@@ -379,7 +379,7 @@ $tlCfg->results['status_label'] = array(
 	"passed"   		=> "test_status_passed",
 	"failed"   		=> "test_status_failed",
 	"blocked"  		=> "test_status_blocked"
-// "all"      		=> "test_status_all_status",
+//    "all"      		=> "test_status_all_status",
 //	"not_available" => "test_status_not_available",
 //	"unknown"       => "test_status_unknown"
 );

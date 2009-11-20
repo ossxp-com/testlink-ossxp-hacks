@@ -4,3 +4,5 @@ logs
 gui/templates_c/*.php
 upload_area/executions
 third_party/pchart/Fonts/*.TTF
+upload_area/requirements/
+
