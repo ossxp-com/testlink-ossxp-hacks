@@ -35,7 +35,7 @@ if (ARGV.size < 1)
 	exit
 else
 	file_lang_old = ARGV[0];
-
+end
 #$file_lang_old = '/home/havlatm/www/tl_head/locale/cs_CZ/strings.txt';
 out=''; # data for output file
 var_counter = 0;
@@ -51,7 +51,6 @@ if File.exist?(file_eng) && File.readable?(file_eng)
 	lines_eng_content = File.new(file_eng).readlines 
 else
 	puts "English file #{file_eng} is readable - FAILED!. Exit."
-	exit
 end
 # read language file
 if (File.exist?(file_lang_old) && File.readable?(file_lang_old))
@@ -60,14 +59,13 @@ if (File.exist?(file_lang_old) && File.readable?(file_lang_old))
 	lines_lang_old_content = File.new(file_lang_old).readlines
 else
 	puts " #{file_lang_old} file is not readable - FAILED!. Exit."
-	exit
 end
+
 puts "English file lines =#{lines_eng}"
 puts "Old Language file lines =#{lines_lang_old}"
 
 # find end of english header	:\s(\d+)\s
-for i in 1..lines_eng
-
+for i in 0..lines_eng
     if(/Revision:\s(\S+)\s/.match(lines_eng_content[i]))
     revision_comment=Regexp.last_match(1)
     puts "English file revision: #{revision_comment}.";
@@ -75,7 +73,6 @@ for i in 1..lines_eng
 
     if(/\*\//.match(lines_eng_content[i]))
         begin_line = i+1
-        i=i+1
         puts "Eng: End of header is line = #{i} " 
     end
 end
@@ -86,136 +83,109 @@ for i in 1..lines_lang_old
     if(/\*\//.match(lines_lang_old_content[i]))
         puts "Old: End of header is line = #{i} "
         begin_line_old = i + 1
-        i=i+1
-		puts " * Scripted update according en_GB string file (version: #{revision_comment})"
-		puts " * ---------------------------------------------------------------------------------- */"
+	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})"
+        
+		out+=" * ---------------------------------------------------------------------------------- */"
 =begin
     else
-		if(lines_lang_old_content[i].strip== "* Scripted update according en_GB string file (version: #{revision_comment})")
+		if lines_lang_old_content[i].strip== "* Scripted update according en_GB string file (version: #{revision_comment})"
         next
-		puts "#{lines_lang_old_content[i]}"
+		out+=lines_lang_old_content[i]
         end 
-=end   
    end
+=end
+  end
 end
 
 
 # compile output array based on english file
 for i in begin_line..lines_eng
 	# copy comments 
-    if (/^\/\//.lines_eng_content[i]) )
-    
+    if /^\/\//.match(lines_eng_content[i])
         puts "(line #{i}) Copy comment";
-        out+= lines_eng[i];
-    
+        out+= lines_eng_content[i];
 
 	# copy empty line
-    elseif '/^([\s\t]*)/', lines_eng[i]
-    
-        puts "(line #{i}) Empty line";
-        out+= "";
-    
+    elsif /^([\s\t]*)$/.match(lines_eng_content[i])
+        puts "(line #{i}) Empty line"
+        out+= "\n"
 
 	# parse a line with variable definition
-    elseif /^\TLS_([\w]+)[\s]*=[\s]*(.*)/.match(lines_eng_content[i])
-    {
-        var_counter+=1;
-        var_name = 'TLS_'+Regexp.last_match(1)
-        puts var_name
-        bLocalized = FALSE;
-        localizedLine = '';
-#        print_r(parsed_line);
+    elsif /^\$TLS_([\w]+)[\s]*=[\s]*(.*)$/.match(lines_eng_content[i]) 
+        var_name = "TLS_#{Regexp.last_match(1)}"
+        var_counter+=1
+        bLocalized = FALSE
+        localizedLine = ''
+#        print_r(parsed_line)
         
         # get localized value if defined - parse old localized strings
-		for k in begin_line_old..file_lang_old
-			if '/^\\'+var_name+'[\s]*=.+/'.match(lines_lang_old_content[k])
-		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old[k]}";
-				bLocalized = TRUE;
-		        localizedLine = Regexp.last_match[1] 
-			    k=k+1	
+		for k in begin_line_old..lines_lang_old
+        	if /^\$#{var_name}[\s]*=.+$/.match(lines_lang_old_content[k])
+		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old_content[k]}"
+				bLocalized = TRUE
+		        localizedLine = Regexp.last_match.to_s
 				# check if localized value exceed to more lines - semicolon is not found
-				while (!(preg_match('/;[\s]*/', lines_lang_old[k])
-				|| preg_match('/;[\s]*[\/]{2}/', lines_lang_old[k])))
-				{
-			        k++;
-			        puts "\tMultiline localized value (line k)";
-				    localizedLine .= lines_lang_old[k];
-				}
+            	while (!(/;[\s]*/.match(lines_lang_old_content[k.to_i])||(/;[\s]*[\/]{2}/.match(lines_lang_old_content[k.to_i]))))
+                    k+=1
+			        puts "Multiline localized value (line #{k})"
+				    localizedLine += lines_lang_old_content[k.to_i]
+		        end
 				k = file_lang_old; # exit more parsing old file
-			}
-		}
-
-	    puts "\tLocalization doesn't exists. Copy English.'";
+	        end	
+       end
+	    puts "Localization doesn't exists. Copy English.'";
 
         # Jiangxin: save english var and value pairs to orig_eng
         orig_eng = lines_eng[i];
 
         # check multiline value (check semicolon or semicolon with comment)
-        while (!(preg_match('/^(.*);[\s]*/', lines_eng[i])
-            || preg_match('/^(.*);[\s]*[\/]{2}/', lines_eng[i])))
-        {
-            i++;
-            puts "(line i) English multiline value - copy the line >>".lines_eng[i];
-            orig_eng .= lines_eng[i];
-        }
-	
-        puts "(line i) Found variable 'var_name'";
-		if (bLocalized)
-		{
-	        puts "\tLocalization exists 'localizedLine'";
-            if (localizedLine == orig_eng)
-            {
-                var_counter_untrans++;
-            }
+        while (!(/^(.*);[\s]*$/.match(lines_eng_content[i])||(/^(.*);[\s]*[\/]{2}/.match(lines_eng_content[i]))))
+            puts "(line #{i}) English multiline value - copy the line >>#{lines_eng_content[i]}"
+            break
+        end
+      #      orig_eng += lines_eng_content[i];
+        
+        puts "(line #{i}) Found variable '$#{var_name}'";
+        if bLocalized
+	        puts "Localization exists #{localizedLine}"
+            puts
+            if localizedLine == orig_eng
+                var_counter_untrans+=1;
             else
-            {
-                var_counter_trans++;
-            }
-        	out+= localizedLine;
-		} 
+                var_counter_trans+=1
+            end
+        	out+= localizedLine
 		else 
-		{
-	        puts "\tLocalization doesn't exists. Copy English.'";
-            var_counter_untrans++;
-		    var_counter_new++;
-		    out+= orig_eng;
-		}
-    }
-
+	        puts "Localization doesn't exists. Copy English.";
+            var_counter_untrans+=1
+		    var_counter_new+=1
+		    out+=orig_eng
+        end
 	# end of file    
-    elseif (preg_match('/^\?\>/', lines_eng[i]))
-    {
+    elsif /^\?\>/.match(lines_eng_content[i])
         out+= "?>";
-    }
 
 	# skip unused multiline values (any text started by whitespace)
 	# it could start with bracket, but there could be just any text that continues 
 	# from previous without+rackets
-    elseif (preg_match('/^\s+\S.*/', lines_eng[i]))
-    	puts "(line i) Skipped line (expected unused multiline value)";
+    elsif /^\s+\S.*/.match(lines_eng_content[i])
+    	puts "(line #{i}) Skipped line (expected unused multiline value)";
 
 	# something wrong?
     else
-    {
-    	puts "ERROR: please fix the unparsed line (i): " . lines_eng[i];
-    	exit;
-    }
-}
-
-
+    	puts "ERROR: please fix the unparsed line #{i}: #{lines_eng_content[i]};"
+  end
 # create backup if defined
-if (do_backup_file)
-	rename(file_lang_old, file_lang_old.'.bck');
-
-	
+    if (do_backup_file)
+    	rename(file_lang_old, "#{file_lang_old}.bck");
+    end
 # save output
-fp = fopen(file_lang_old, "w");
-fwrite(fp, out);
-fclose(fp);
+fp = open(file_lang_old, "w")
+fp.puts out
+fp.close
 
-puts "Updated file: ".file_lang_old;
-puts "Completed! The script has parsed var_counter strings and add var_counter_new new variables.";
-puts "Un-translate items: var_counter_untrans , translated items: var_counter_trans";
-puts "===== Bye =====";
-=end
 end
+puts "Updated file: #{file_lang_old}";
+puts "Completed! The script has parsed #{var_counter} strings and add #{var_counter_new} new variables.";
+puts "Un-translate items: #{var_counter_untrans} , translated items: #{var_counter_trans}";
+puts "===== Bye =====";
