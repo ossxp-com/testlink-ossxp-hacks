@@ -22,8 +22,7 @@
  * 20070206 - franciscom - BUGID 618 - \n on JS messages
  *
  *       
- * Scripted update according en_GB string file (version: 1.395) 
- * Scripted update according en_GB string file (version: 1.413.2.20) 
+ * Scripted update according en_GB string file (version: 1.413.2.20)
  * ---------------------------------------------------------------------------------- */
 
 // Define character set of this file (UTF-8 is common value)
