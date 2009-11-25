@@ -36,7 +36,7 @@ if (ARGV.size < 1)
 else
 	file_lang_old = ARGV[0];
 end
-#$file_lang_old = '/home/havlatm/www/tl_head/locale/cs_CZ/strings.txt';
+
 out=''; # data for output file
 var_counter = 0;
 var_counter_new = 0;
@@ -90,19 +90,7 @@ for i in 0...lines_lang_old
         next if lines_lang_old_content[i] =~ /\s*\*\s*Scripted update according en_GB string file/
         out+=lines_lang_old_content[i]
     end
-=begin
-    puts lines_lang_old_content[i]
-    if(!(/\*\//.match(lines_lang_old_content[i])))
-		out+=lines_lang_old_content[i]
-        next
-    else
-        puts "Old: End of header is line = #{i} "
-        begin_line_old = i + 1
-	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})\n"
-        
-		out+=" * ---------------------------------------------------------------------------------- */\n"
-    end
-=end
+
 end
 
 # compile output array based on english file
