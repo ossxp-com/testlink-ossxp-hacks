@@ -79,39 +79,50 @@ end
 
 # copy existing localization file header
 for i in 1..lines_lang_old
-
     if(/\*\//.match(lines_lang_old_content[i]))
         puts "Old: End of header is line = #{i} "
         begin_line_old = i + 1
-	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})"
+	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})\n"
         
-		out+=" * ---------------------------------------------------------------------------------- */"
-=begin
+		out+=" * ---------------------------------------------------------------------------------- */\n"
+        break
     else
-		if lines_lang_old_content[i].strip== "* Scripted update according en_GB string file (version: #{revision_comment})"
-        next
+        next if lines_lang_old_content[i] =~ /\s*\*\s*Scripted update according en_GB string file/
+        out+=lines_lang_old_content[i]
+    end
+=begin
+    puts lines_lang_old_content[i]
+    if(!(/\*\//.match(lines_lang_old_content[i])))
 		out+=lines_lang_old_content[i]
-        end 
-   end
+        next
+    else
+        puts "Old: End of header is line = #{i} "
+        begin_line_old = i + 1
+	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})\n"
+        
+		out+=" * ---------------------------------------------------------------------------------- */\n"
+    end
 =end
-  end
 end
 
-
 # compile output array based on english file
-for i in begin_line..lines_eng
+i = begin_line-1
+while true
+    i += 1
+    break if i >= lines_eng
+
 	# copy comments 
     if /^\/\//.match(lines_eng_content[i])
         puts "(line #{i}) Copy comment";
-        out+= lines_eng_content[i];
+        out+= "#{lines_eng_content[i]}";
 
 	# copy empty line
-    elsif /^([\s\t]*)$/.match(lines_eng_content[i])
+    elsif /^\s*$/.match(lines_eng_content[i])
         puts "(line #{i}) Empty line"
         out+= "\n"
 
 	# parse a line with variable definition
-    elsif /^\$TLS_([\w]+)[\s]*=[\s]*(.*)$/.match(lines_eng_content[i]) 
+    elsif /^\$TLS_([\w]+)\s*=\s*(.*)$/.match(lines_eng_content[i]) 
         var_name = "TLS_#{Regexp.last_match(1)}"
         var_counter+=1
         bLocalized = FALSE
@@ -120,50 +131,53 @@ for i in begin_line..lines_eng
         
         # get localized value if defined - parse old localized strings
 		for k in begin_line_old..lines_lang_old
-        	if /^\$#{var_name}[\s]*=.+$/.match(lines_lang_old_content[k])
+        	if /^\$#{var_name}\s*=.+$/ =~ lines_lang_old_content[k]
 		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old_content[k]}"
 				bLocalized = TRUE
-		        localizedLine = Regexp.last_match.to_s
+		        localizedLine = Regexp.last_match.to_s + "\n"
 				# check if localized value exceed to more lines - semicolon is not found
-            	while (!(/;[\s]*/.match(lines_lang_old_content[k.to_i])||(/;[\s]*[\/]{2}/.match(lines_lang_old_content[k.to_i]))))
+            	while ( !(  /;[\s]*/ =~ lines_lang_old_content[k] ||
+                            /;[\s]*[\/]{2}/ =~ lines_lang_old_content[k] ) )
                     k+=1
 			        puts "Multiline localized value (line #{k})"
-				    localizedLine += lines_lang_old_content[k.to_i]
+		            localizedLine += lines_lang_old_content[k]
 		        end
-				k = file_lang_old; # exit more parsing old file
+                break
 	        end	
-       end
+       end 
 	    puts "Localization doesn't exists. Copy English.'";
 
         # Jiangxin: save english var and value pairs to orig_eng
-        orig_eng = lines_eng[i];
-
+        orig_eng = lines_eng_content[i];
+        
         # check multiline value (check semicolon or semicolon with comment)
-        while (!(/^(.*);[\s]*$/.match(lines_eng_content[i])||(/^(.*);[\s]*[\/]{2}/.match(lines_eng_content[i]))))
+        while ( !( /^(.*);[\s]*$/ =~ lines_eng_content[i] ||
+                   /^(.*);[\s]*[\/]{2}/ =~ lines_eng_content[i] ) )
+            i += 1
             puts "(line #{i}) English multiline value - copy the line >>#{lines_eng_content[i]}"
+            orig_eng += lines_eng_content[i];
             break
         end
-      #      orig_eng += lines_eng_content[i];
         
         puts "(line #{i}) Found variable '$#{var_name}'";
         if bLocalized
 	        puts "Localization exists #{localizedLine}"
             puts
-            if localizedLine == orig_eng
-                var_counter_untrans+=1;
+            if localizedLine.strip == orig_eng.strip
+                var_counter_untrans=var_counter_untrans+1
             else
-                var_counter_trans+=1
+                var_counter_trans=var_counter_trans+1
             end
-        	out+= localizedLine
+        	out+= "#{localizedLine}"
 		else 
 	        puts "Localization doesn't exists. Copy English.";
             var_counter_untrans+=1
 		    var_counter_new+=1
-		    out+=orig_eng
+		    out+="#{orig_eng}"
         end
 	# end of file    
     elsif /^\?\>/.match(lines_eng_content[i])
-        out+= "?>";
+        out+= "?>\n";
 
 	# skip unused multiline values (any text started by whitespace)
 	# it could start with bracket, but there could be just any text that continues 
