@@ -131,10 +131,10 @@ while true
         
         # get localized value if defined - parse old localized strings
 		for k in begin_line_old...lines_lang_old
-        	if /^\$#{var_name}\s*=.+$/ =~ lines_lang_old_content[k]
+        	if /^\$#{var_name}\s*=.+$/m =~ lines_lang_old_content[k]
 		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old_content[k]}"
 				bLocalized = TRUE
-		        localizedLine = Regexp.last_match.to_s + "\n"
+		        localizedLine = Regexp.last_match.to_s
 				# check if localized value exceed to more lines - semicolon is not found
             	while ( !(  /;\s*$/ =~ lines_lang_old_content[k] ||
                             /;\s*[\/]{2}[^'"]*$/ =~ lines_lang_old_content[k] ) )
