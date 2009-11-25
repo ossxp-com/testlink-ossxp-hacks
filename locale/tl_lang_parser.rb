@@ -65,7 +65,7 @@ puts "English file lines =#{lines_eng}"
 puts "Old Language file lines =#{lines_lang_old}"
 
 # find end of english header	:\s(\d+)\s
-for i in 0..lines_eng
+for i in 0...lines_eng
     if(/Revision:\s(\S+)\s/.match(lines_eng_content[i]))
     revision_comment=Regexp.last_match(1)
     puts "English file revision: #{revision_comment}.";
@@ -78,8 +78,8 @@ for i in 0..lines_eng
 end
 
 # copy existing localization file header
-for i in 1..lines_lang_old
-    if(/\*\//.match(lines_lang_old_content[i]))
+for i in 0...lines_lang_old
+    if /\*\// =~ lines_lang_old_content[i]
         puts "Old: End of header is line = #{i} "
         begin_line_old = i + 1
 	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})\n"
@@ -130,14 +130,14 @@ while true
 #        print_r(parsed_line)
         
         # get localized value if defined - parse old localized strings
-		for k in begin_line_old..lines_lang_old
+		for k in begin_line_old...lines_lang_old
         	if /^\$#{var_name}\s*=.+$/ =~ lines_lang_old_content[k]
 		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old_content[k]}"
 				bLocalized = TRUE
 		        localizedLine = Regexp.last_match.to_s + "\n"
 				# check if localized value exceed to more lines - semicolon is not found
-            	while ( !(  /;[\s]*/ =~ lines_lang_old_content[k] ||
-                            /;[\s]*[\/]{2}/ =~ lines_lang_old_content[k] ) )
+            	while ( !(  /;\s*$/ =~ lines_lang_old_content[k] ||
+                            /;\s*[\/]{2}[^'"]*$/ =~ lines_lang_old_content[k] ) )
                     k+=1
 			        puts "Multiline localized value (line #{k})"
 		            localizedLine += lines_lang_old_content[k]
@@ -151,8 +151,8 @@ while true
         orig_eng = lines_eng_content[i];
         
         # check multiline value (check semicolon or semicolon with comment)
-        while ( !( /^(.*);[\s]*$/ =~ lines_eng_content[i] ||
-                   /^(.*);[\s]*[\/]{2}/ =~ lines_eng_content[i] ) )
+        while ( !( /;\s*$/ =~ lines_eng_content[i] ||
+                   /;\s*[\/]{2}[^'"]*$/ =~ lines_eng_content[i] ) )
             i += 1
             puts "(line #{i}) English multiline value - copy the line >>#{lines_eng_content[i]}"
             orig_eng += lines_eng_content[i];
