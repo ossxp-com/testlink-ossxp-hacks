@@ -26,7 +26,7 @@
 file_eng = 'en_GB/strings.txt';
 
 # Set true if you would like to have original file with 'bck' extension 
-do_backup_file = FALSE;
+do_backup_file = TRUE 
 
 
 # ---------------------------------------------------------------------------
@@ -177,16 +177,18 @@ while true
     else
     	puts "ERROR: please fix the unparsed line #{i}: #{lines_eng_content[i]};"
   end
+end
 # create backup if defined
     if (do_backup_file)
-    	rename(file_lang_old, "#{file_lang_old}.bck");
+    	File.rename(file_lang_old, "#{file_lang_old}.bck");
     end
+    puts "成功创建备份文件"
 # save output
 fp = open(file_lang_old, "w")
 fp.puts out
 fp.close
+    puts "成功写入文件"
 
-end
 puts "Updated file: #{file_lang_old}";
 puts "Completed! The script has parsed #{var_counter} strings and add #{var_counter_new} new variables.";
 puts "Un-translate items: #{var_counter_untrans} , translated items: #{var_counter_trans}";
