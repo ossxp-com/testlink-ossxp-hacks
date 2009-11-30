@@ -22,7 +22,7 @@
  * 20070206 - franciscom - BUGID 618 - \n on JS messages
  *
  *       
- * Scripted update according en_GB string file (version: 1.413.2.20)
+ * Scripted update according en_GB string file (version: 1.413.2.20) 
  * ---------------------------------------------------------------------------------- */
 
 // Define character set of this file (UTF-8 is common value)
@@ -1276,12 +1276,12 @@ $TLS_title_met_of_build = "中的度量结果→构建";
 
 
 // ----- gui/templates/resultsBugs.tpl -----
-$TLS_bugs_open = "Open";
-$TLS_bugs_resolved = "Resolved";
-$TLS_bugs_total = "Total";
+$TLS_bugs_open = "打开";
+$TLS_bugs_resolved = "已解决";
+$TLS_bugs_total = "总计";
 $TLS_date = "日期：";
 $TLS_printed_by = "由TestLink打印";
-$TLS_tcs_with_bugs = "Test Cases with bugs";
+$TLS_tcs_with_bugs = "报告问题的测试用例";
 $TLS_title_test_case_bugs = "测试用例问题";
 $TLS_title_test_case_timestamp = "测试用例时间戳";
 $TLS_title_test_case_title = "测试标题";
@@ -1300,14 +1300,14 @@ $TLS_th_assigned_to = "指派给";
 
 // ----- gui/templates/resultsGeneral.tpl -----
 $TLS_title_gen_test_rep = "总体测试计划度量";
-$TLS_title_report_tc_priorities = "Test results according to test priorities";
-$TLS_title_report_milestones = "Status of Milestones";
-$TLS_th_completed = "Completed";
+$TLS_title_report_tc_priorities = "根据测试用例的优先级显示测试结果";
+$TLS_title_report_milestones = "里程碑的状态";
+$TLS_th_completed = "已完成";
 $TLS_th_milestone = "Milestone [date]";
-$TLS_th_not_run = "Not run";
-$TLS_th_tc_priority_high = "High priority";
-$TLS_th_tc_priority_medium = "Medium priority";
-$TLS_th_tc_priority_low = "Low priority";
+$TLS_th_not_run = "尚未执行";
+$TLS_th_tc_priority_high = "最高级";
+$TLS_th_tc_priority_medium = "中等级别";
+$TLS_th_tc_priority_low = "低级";
 $TLS_th_progress = "Test progress [%]";
 $TLS_th_goal = "Execution goal [%]";
 $TLS_th_overall_priority = "Overall test priority";
@@ -1319,9 +1319,9 @@ $TLS_th_overall = "Overall";
 // ----- gui/templates/resultsMoreBuilds_query_form.tpl -----
 $TLS_excel_format = "MS Excel";
 $TLS_html_format = "HTML";
-$TLS_results_latest = "Latest Results Only";
-$TLS_results_all = "All Results";
-$TLS_display_results_tc = "Result Set";
+$TLS_results_latest = "仅最新结果";
+$TLS_results_all = "所有结果";
+$TLS_display_results_tc = "结果设置";
 $TLS_last_status_any = "不限";
 $TLS_last_status_blocked = "锁定";
 $TLS_last_status_failed = "失败";
@@ -1372,7 +1372,7 @@ $TLS_false = "假";
 $TLS_display_suite_summaries = "显示测试集摘要";
 $TLS_display_query_params  = "显示查询参数";
 $TLS_display_totals = "显示合计";
-$TLS_display_test_cases = "Test Cases";
+$TLS_display_test_cases = "测试用例集";
 $TLS_report_display_options = "Report display options";
 
 // ----- gui/templates/resultsReqs.tpl -----
@@ -1927,7 +1927,7 @@ $TLS_opt_show_tplan_txt 	= "测试计划描述";
 $TLS_opt_show_tc_body = "显示测试用例内容";
 $TLS_opt_show_tc_summary = "显示测试用例摘要";
 $TLS_opt_show_tc_author = "显示测试用例作者";
-$TLS_opt_show_tc_reqs 		= "Test Case related Requirements";
+$TLS_opt_show_tc_reqs 		= "测试用例相关的需求";
 $TLS_opt_show_tc_keys 		= "测试用例关键字";
 $TLS_opt_show_cfields		= "测试用例自定义字段";
 $TLS_opt_show_passfail = "显示 通过/失败 和备注";
