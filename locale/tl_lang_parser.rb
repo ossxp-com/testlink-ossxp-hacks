@@ -42,6 +42,7 @@ var_counter = 0;
 var_counter_new = 0;
 var_counter_untrans = 0;
 var_counter_trans = 0;
+
 puts "===== Start TestLink lang_parser =====";
 
 # read english file
@@ -90,7 +91,6 @@ for i in 0...lines_lang_old
         next if lines_lang_old_content[i] =~ /\s*\*\s*Scripted update according en_GB string file/
         out+=lines_lang_old_content[i]
     end
-
 end
 
 # compile output array based on english file
@@ -115,7 +115,6 @@ while true
         var_counter+=1
         bLocalized = FALSE
         localizedLine = ''
-#        print_r(parsed_line)
         
         # get localized value if defined - parse old localized strings
 		for k in begin_line_old...lines_lang_old
@@ -135,7 +134,6 @@ while true
        end 
 	    puts "Localization doesn't exists. Copy English.'";
 
-        # Jiangxin: save english var and value pairs to orig_eng
         orig_eng = lines_eng_content[i];
         
         # check multiline value (check semicolon or semicolon with comment)

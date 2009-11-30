@@ -48,7 +48,7 @@ $TLS_hour = "小时";
 $TLS_importance	= "Importance";
 $TLS_imported = "Imported";
 $TLS_keyword = "关键字";
-$TLS_manual = "Manual";
+$TLS_manual = "手工";
 $TLS_Milestone = "里程碑";
 $TLS_months	= "months";
 $TLS_name = "名称";
@@ -59,7 +59,7 @@ $TLS_none = "无";
 $TLS_ok = "确定";
 $TLS_priority	= "优先级";
 $TLS_project = "项目";
-$TLS_requirement = "Requirement";
+$TLS_requirement = "需求";
 $TLS_reqs = "需求";
 $TLS_req_spec = "需求规约";
 $TLS_req_spec_short = "Req. Spec.";
@@ -138,7 +138,7 @@ $TLS_test_status_passed = "通过";
 $TLS_test_status_not_available = "无效";
 $TLS_test_status_unknown 	= "未知";
 
-$TLS_review_status_valid 	= "Valid";
+$TLS_review_status_valid 	= "有效的";
 $TLS_review_status_draft 	= 'Draft';
 $TLS_review_status_future	= 'Future';
 $TLS_review_status_obsolete = 'Obsolete';
@@ -151,7 +151,7 @@ $TLS_req_type_interface 	= 'Interface';
 $TLS_req_type_non_functional = 'Non functional';
 $TLS_req_type_constrain 	= 'Constrain';
 
-$TLS_req_status_not_testable = "Not testable"; // defined for historical reason (should be replaced by $TLS_req_type_info)
+$TLS_req_status_not_testable = "不可测试的"; // defined for historical reason (should be replaced by $TLS_req_type_info)
 
 
 // ----- unsorted (TODO move) -------------------------------------
@@ -159,7 +159,7 @@ $TLS_problems_loading_xml_content = "无法下载XML数据，检查你的文件.
 $TLS_search_type_like = "Search on this value will be done on LIKE mode";
 $TLS_exec_assign_no_testcase = "请至少选择一个测试用例.";
 $TLS_select_at_least_one_testcase = "Please select at least one Test Case and a target!";
-$TLS_no_testcases_available = "No Test Cases or no destination Test Suites available!";
+$TLS_no_testcases_available = "没有测试用例或目标测试套件可用!";
 $TLS_warning_must_be_number = "值必须是一个数字";
 
 $TLS_estimated_time_hours = "Estimated time for executing %s test cases (hours):";
@@ -172,30 +172,30 @@ $TLS_th_name = "名称";
 $TLS_th_notes = "说明";
 $TLS_th_testcase 	= $TLS_test_case; // obsolete
 $TLS_th_delete = "是否删除？";
-$TLS_th_requirement_feature = "Requirement Feature";
+$TLS_th_requirement_feature = "启用需求管理?";
 
 $TLS_import_file_type = "导入文件类型";
 $TLS_max_file_size_is = "最大文件大小";
 $TLS_supported_file_formats = "支持的文件格式";
 $TLS_no_permissions_for_action = "无权限执行这个活动！请与管理员联系！";
 
-$TLS_name_already_exists = "Name:%s already exists";
+$TLS_name_already_exists = "名称:%s 已经存在";
 $TLS_created_with_new_name = "Create with name:%s, because name:%s already exists";
 
 
-$TLS_click_to_open='Click to open';
+$TLS_click_to_open='点击打开';
 $TLS_testplan_usage="测试计划用途";
 
 $TLS_add_tcversion_to_plans = "把测试用例版本添加到测试计划";
 $TLS_please_select_one_testplan = "请至少选择一个测试计划.";
 
 $TLS_deleted_user = "[deleted user - id=%s]";
-$TLS_user_not_on_system = "[user with id=%s does not exist on system]";
+$TLS_user_not_on_system = "[这个系统不存在 id=%s 的用户]";
 
 $TLS_tag_for_inactive_users = "*";
 
-$TLS_design = "Test Spec Design";
-$TLS_execution = "Test Execution";
+$TLS_design = "测试规约设计";
+$TLS_execution = "测试执行";
 $TLS_testplan_design = "测试计划设计";
 $TLS_enable_on = "Enable on";
 
@@ -211,9 +211,9 @@ $TLS_warn_demo = "We are sorry. This feature is disabled for Demo.";
 
 // Installation/Migration (TODO remove - migration is English only)
 $TLS_start_warning = '---- Warning ----';
-$TLS_testlink_warning = 'TestLink Warning';
-$TLS_testcase_name_too_long = 'test case name is too long (%s chars) > %s => has been truncated';
-$TLS_original_name = 'Original name';
+$TLS_testlink_warning = 'TestLink 警告';
+$TLS_testcase_name_too_long = '测试用例名称太长(%s chars) > %s => 已经被截取';
+$TLS_original_name = '原始名称';
 $TLS_end_warning = '---- *** ----';
 
 
@@ -225,7 +225,7 @@ $TLS_empty_first_name = " 名字不能为空！";
 $TLS_empty_last_name = " 姓不能为空！";
 $TLS_fatal_page_title = "TestLink ::: 致命错误";
 $TLS_invalid_user_name = "用户名错误，请重新输入。";
-$TLS_no_good_email_address = "Email address format seems no good";
+$TLS_no_good_email_address = "Email格式不正确，请重新输入";
 $TLS_passwd_dont_match = "两次输入的密码不一致，请重新输入。";
 $TLS_user_cant_be_created_because = "你的帐号无法创建,原因是：";
 $TLS_user_name_exists = "用户名已经被使用,请选择其它的名称。";
@@ -260,7 +260,7 @@ $TLS_config_check_warnings = "There are security warnings for your consideration
 // ----- keywordsimport.php -----
 $TLS_please_choose_keywords_file = "选择上传的文件";
 $TLS_keywords_file = "关键字文件";
-$TLS_wrong_keywords_file = "Wrong Keyword file (wrong format)";
+$TLS_wrong_keywords_file = "错误的关键字文件(格式错误)";
 
 
 // ----- lostPassword.php -----
@@ -315,9 +315,9 @@ $TLS_assign_requirements = "Assign Requirements";
 
 // ----- tcexecute.php -----
 $TLS_check_test_automation_server = "请检查服务器配置";
-$TLS_result_after_exec = "Results after execution: ";
+$TLS_result_after_exec = "执行结果: ";
 $TLS_service_not_supported = "不支持该服务";
-$TLS_tcexec_notes = "Testing details";
+$TLS_tcexec_notes = "测试细节";
 $TLS_tcexec_result = "结果";
 $TLS_tcexec_results_for = "Result for ";
 
@@ -337,7 +337,7 @@ $TLS_title_delete_attachment = "删除附件";
 // ----- gui/templates/containerDelete.tpl -----
 $TLS_btn_yes_del_comp = "是的，删除组件！";
 $TLS_container_title_testsuite = $TLS_test_suite;
-$TLS_linked_but_not_executed = "Linked to one or more Test Plan, but not executed";
+$TLS_linked_but_not_executed = "关联到一个或更多的测试计划，但尚未执行";
 $TLS_question_del = "确认删除";
 $TLS_th_link_exec_status = "关联和执行状态";
 $TLS_no_links = "没有依赖数据.";
@@ -950,7 +950,7 @@ $TLS_exec_current_build = "(current build)";
 $TLS_exec_notes = "备注";
 $TLS_exec_status = "状态";
 $TLS_execution_history = "用例执行历史";
-$TLS_execution_type_manual = "Manual";
+$TLS_execution_type_manual = "手工";
 $TLS_execution_type_auto = "Automated";
 $TLS_has_no_assignment = "没有指派测试者";
 $TLS_img_title_bug_mgmt = "问题管理";
@@ -1207,7 +1207,7 @@ $TLS_btn_mv_cp = "移动/复制";
 $TLS_btn_new_version = "创建一个新版本";
 $TLS_can_not_edit_tc = "您不能编辑这个版本因为已经被执行过";
 $TLS_deactivate_this_tcversion = "禁用这个版本";
-$TLS_execution_type = 'Execution type';
+$TLS_execution_type = '测试方式';
 $TLS_tcversion_is_inactive_msg = "这个版本是不活动的 => 不能包含到测试计划中";
 
 

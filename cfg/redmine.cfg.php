@@ -51,9 +51,9 @@ define('BUG_TRACK_DB_CHARSET', "utf8");
 
 /* link of the web server for redmine */
 //define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
-define('BUG_TRACK_HREF', "http://localhost:3000/issues/show/");
+define('BUG_TRACK_HREF', "http://redmine.bj.ossxp.com/issues/show/");
 
 /** link to the bugtracking system, for entering new bugs */
 //define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
- define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
+ define('BUG_TRACK_ENTER_BUG_HREF',"http://redmine.bj.ossxp.com/");
 ?>
