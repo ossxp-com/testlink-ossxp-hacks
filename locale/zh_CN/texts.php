@@ -26,11 +26,11 @@
  * ------------------------------------------------------------------------------------ */
 
 
-$TLS_htmltext_title['assignReqs']	= "Assign Requirements to Test Case";
-$TLS_htmltext['assignReqs'] 		= "<h2>Purpose:</h2>
-<p>Users can set relations between requirements and test cases. A designer could
-define relations 0..n to 0..n. I.e. One test case could be assigned to none, one or more
-test cases and vice versa. Such traceability matrix helps to investigate test coverage
+$TLS_htmltext_title['assignReqs']	= "分配需求给测试用例";
+$TLS_htmltext['assignReqs'] 		= "<h2>目的:</h2>
+<p>用户可以设置测试用例集和需求规约之间的关系. 设计者可以把此处的测试用例集和需求规约一一关联
+.例如:一个测试用例可以被关联到零个、一个、多个测试用例集,反之亦然.
+Such traceability matrix helps to investigate test coverage
 of requirements and find out which ones successfully failed during a testing. This
 analyse serves as input for the next planning.</p>
 
@@ -51,40 +51,31 @@ analyse serves as input for the next planning.</p>
 
 // --------------------------------------------------------------------------------------
 $TLS_htmltext_title['editTc']	= "测试规范";
-$TLS_htmltext['editTc'] 		= "<h2>Purpose:</h2>
-<h2>Purpose:</h2>
-<p>The <i>Test Specification</i> allows users to view and edit all of the existing " .
-		"<i>Test Suites</i> and <i>Test Cases</i>. Test Cases are versioned and all " .
-		"of the previous versions are available and can be viewed and managed here.</p>
+$TLS_htmltext['editTc'] 		= "<h2>目的:</h2>
+<h2>目的:</h2>
+<p> <i>测试规范</i> 允许用户查看和编辑所有现在有的测试案例集" .
+		"<i>测试用例集</i> 和 <i>测使用例</i>. 同一个测试案例可以保留多个版本.".
+		"并且所有以前的历史版本都将被保留并在这里可以查看和管理.</p>
 
-<h2>Getting Started:</h2>
+<h2>开始:</h2>
 <ol>
-	<li>Select your Test Project in the navigation tree (the root node). <i>Please note: " .
-	"You can always change the activate Test Project by selecting a different one from the " .
-	"drop-down list in the top-right corner.</i></li>
-	<li>Create a new Test Suite by clicking on <b>New Child Test Suite</b>. Test Suites can " .
-	"bring structure to your test documents according to your conventions (functional/non-functional " .
-	"tests, product components or features, change requests, etc.). The description of " .
-	"a Test Suite could hold the scope of the included test cases, default configuration, " .
-	"links to relevant documents, limitations and other useful information. In general, " .
-	"all annotations that are common to the Child Test Cases. Test Suites follow " .
-	"the &quot;folder&quot; metaphor, thus users can move and copy Test Suites within " .
-	"the Test project. Also, they can be imported or exported (including the contained Test cases).</li>
-	<li>Test suites are scalable folders. User can move or copy Test Suites within " .
-	"the Test project. Test suites could be imported or exported (include Test cases).
-	<li>Select your newly created Test Suite in the navigation tree and create " .
-	"a new Test Case by clicking on <b>Create Test Case</b>. A Test Case specifies " .
-	"a particular testing scenario, expected results and custom fields defined " .
-	"in the Test Project (refer to the user manual for more information). It is also possible " .
-	"to assign <b>keywords</b> for improved traceability.</li>
-	<li>Navigate via the tree view on the left side and edit data. Test cases stores own history.</li>
-	<li>Assign your created Test Specification to <span class=\"help\" onclick=
-	\"javascript:open_help_window('glosary','$locale');\">Test Plan</span> when your Test cases are ready.</li>
+	<li>从左边的导航树(顶级树)中找出你的测试项目. <i>注意: " .
+	"你永远可以从右上角的下拉菜单选择改变当前的测试项目." .
+	".</i></li>
+	<li>点击 <b>新测试案例子集</b>将创建一个新的测试案例子集. " .
+	"测试案例子集可以为你的测试文档归类 归类可以是按照你的需要来(功能/非功能, 测试案例, 产品部件, 产品功能, 更改需求, 等等)." .
+	"测试案例子集积聚了一类相关的测试, 他们用在同一个功能范围, 具有相同的系统配置信息等 他们还可能共同和其他一些文档资料, 测试局限性, 或者其他信息. 通常这些信息是该测试案例子集所共同具有的. 他们组成了一个测试案例的文件夹的概念 测试案例子集是可以扩充的文件夹. 用户可以在同一个测试计划里移动或者复制它们.同时, 他们可以作为一个整体(包括其中的测试案例)输出或者输入到其他格式." .".</li>
+	<li>在导航树中选择一个刚创建的新的测试子集" .
+	"然后点击<b>创建测使用例</b>. 就可以在这个子集里创建一个新的案例." .
+	"一个测试案例定义了一个单一的测试过程 它包括测试的环境, 步骤, 期望的结果, 已经可以自定义的栏目 在测试计划里(参见用户手册), 还可以给测试案例增添一个" .
+	"<b>关键字</b> 以方便跟踪查询.</li>
+	<li>从左边的导航树里选择和编辑数据. 测试案例本身可以保存多个版本和修改历史.</li>
+	<li>测试案例编写完毕后, 你可以给把它的上级测试规范关联到 <span class=\"help\" onclick=
+	\"javascript:open_help_window('glosary','$locale');\">Test Plan</span> .</li>
 </ol>
 
-<p>With TestLink you organize test cases into test suites." .
-"Test suites can be nested within other test suites, enabling you to create hierarchies of test suites.
- You can then print this information together with the test cases.</p>";
+    <p>TL测试管理系统帮你整理测试案例, 分类成为不同的测试案例子集. 测试案例子集还可以包含更下级的测试案例子集. 
+       你因此可以组织成一个树状体系. 最后可以打印成册." ."</p>";
 
 
 // ------------------------------------------------------------------------------------------
@@ -207,126 +198,84 @@ to Test Case for Build. See help for more information about filter and settings 
 if you would like to create/trace a problem report directly from the GUI.</i></p>";
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['showMetrics']	= "Description of Test Reports and Metrics";
-$TLS_htmltext['showMetrics'] 		= "<p>Reports are related to a Test Plan " .
-		"(defined in top of navigator). This Test Plan could differs from the
-current Test Plan for execution. You can also select Report format:</p>
+$TLS_htmltext_title['showMetrics']	= "测试报告和统计数据";
+$TLS_htmltext['showMetrics'] 		= "<p>一个测试计划的报告" .
+		"(在导航条里定义了). 这个测试计划可能个当前执行的测试计划不同. 可以选择的格式有:</p>
 <ul>
-<li><b>Normal</b> - report is displayed in web page</li>
-<li><b>MS Excel</b> - report exported to Microsoft Excel</li>
-<li><b>HTML Email</b> - report is emailed to user's email address</li>
-<li><b>Charts</b> - report include graphs (flash technology)</li>
+<li><b>正常</b> - 报告显示为网页格式</li>
+<li><b>MS Excel</b> - 报告输出为 Microsoft Excel</li>
+<li><b>HTML Email</b> -报告以邮件形式发送到用户的心想 </li>
+<li><b>图表</b> - 报告以图表形式出现(flash 技术)</li>
 </ul>
 
-<p>The print button activate print of a report only (without navigation).</p>
-<p>There are several seperate reports to choose from, their purpose and function are explained below.</p>
+<p>打印键将激活当前报告的打印功能.</p>
+<p>报表有多种形式. 其格式, 目的和功能如下.</p>
 
-<h3>General Test Plan Metrics</h3>
-<p>This page shows you only the most current status of a Test plan by test suite, owner, and keyword.
-The most 'current status' is determined by the most recent build test cases were executed on.  For
-instance, if a test case was executed over multiple builds, only the latest result is taken into account.</p>
+<h3>通用测试统计报告</h3>
+<p>该页只显示测试计划里测试用例集,所有者, 关键字的最新状态.
+'当前状态' 是指最近的测试版本的测试执行状态.例如. 一个测试案例在多个构建版本上执行过. 这里只显示最新版本的结果.</p>
 
-<p>'Last Test Result' is a concept used in many reports, and is determined as follows:</p>
+<p>'最终测试结果'是许多报告里用的一个概念. 它是这样定义的:</p>
 <ul>
-<li>The order in which builds are added to a Test Plan determines which build is most recent. The results
-from the most recent build will take precendence over older builds. For example, if you mark a test as
-'fail' in build 1, and mark it as 'pass' in build 2, it's latest result will be 'pass'.</li>
-<li>If a test case is executed mulitple times on the same build, the most recent execution will take
-precedence.  For example, if build 3 is released to your team and tester 1 marks it as 'pass' at 2PM,
-and tester 2 marks it as 'fail' at 3PM - it will appear as 'fail'.</li>
-<li>Test cases listed as 'not run' against a build are not taken into account. For example, if you mark
-a case as 'pass' in build 1, and don't execute it in build 2, it's last result will be considered as
-'pass'.</li>
+<li>构建版本加入到测试计划里的先后顺序决定了哪个构建版本是最新的. 最新版本的测试结果比旧版本的测试结果优先. 例如, 如果你在版本1里记录了一个测试用例的测试结果是’失败’. 你在版本2里记录同一个测试用例的测试结果是'通过',则最终的测试结果是 '通过'.</li>
+<li>如果同一个测试用例在同一个构建版本上执行了多次. 那么最后一次执行的结果优先. 例如. 如果版本 3 发布了. 你的团队里的 tester 1 在 2:00pm 报告结果为'通过',而 tester 2 在 3:00pm 报告结果为'失败'- 则最终结果显示为'失败'.</li>
+<li>在某个版本里显示为'未执行'的测试用例不会覆盖上一次的测试结果. 例如, 如果你在版本 1 中测试结束后记录为'通过', 在版本2里还没有执行, 则显示的最终结果是'通过'.
+</li>
 </ul>
-<p>The following tables are displayed:</p>
+<p>显示的列表:</p>
 <ul>
-	<li><b>Results by top level Test Suites</b>
-	Lists the results of each top level suite. Total cases, passed, failed, blocked, not run, and percent
-	completed are listed. A 'completed' test case is one that has been marked pass, fail, or block.
-	Results for top level suites include all children suites.</li>
-	<li><b>Results By Keyword</b>
-	Lists all keywords that are assigned to cases in the current test plan, and the results associated
-	with them.</li>
-	<li><b>Results by owner</b>
-	Lists each owner that has test cases assigned to them in the current test plan. Test cases which
-	are not assigned are tallied under the 'unassigned' heading.</li>
+	<li><b>按顶级测试案例子集</b>
+	表中列出顶级的测试案例. 总案例数目, 通过数目, 失败数目, 受阻数目, 未执行数目, 顶级测试子级和下级子集的百分比.</li>
+	<li><b>按关键字</b>
+	表中列出当前测试计划里所有测试案例里的关键词, 以及对应的测试结果.</li>
+	<li><b>按测试者</b>
+	列出当前测试计划里分派给各用户的测试案例. 未分配给用户的归类到 '(未分派)unassigned' 栏里.</li>
 </ul>
 
-<h3>The Overall Build Status</h3>
-<p>Lists the execution results for every build. For each build, the total test cases, total pass,
-% pass, total fail, % fail, blocked, % blocked, not run, %not run.  If a test case has been executed
-twice on the same build, the most recent execution will be taken into account.</p>
+<h3>总体版本状态</h3>
+<p>列出各个版本的执行结果. 对于每一个版本, 有总测试案例数, 总通过数, 通过的比例, 总失败数, 失败的比例, 总受阻的数目, 受阻的比例, 未执行的总数, 未执行的比例. 如果一个测试案例在同一个构建版本上执行了多次, 则最近一次的结果才计入统计.</p>
 
-<h3>Query Metrics</h3>
-<p>This report consists of a query form page, and a query results page which contains the queried data.
-Query Form Page presents with a query page with 4 controls. Each control is set to a default which
-maximizes the number of test cases and builds the query should be performed against. Altering the controls
-allows the user to filter the results and generate specific reports for specific owner, keyword, suite,
-and build combinations.</p>
+<h3>查询统计</h3>
+<p>该报表包括一个查询输入表, 一个查询结果页. 查询输入表有四个按钮. 每个按钮的缺省值设置为查询可以包括的最大范围. 用户可以更改 按钮以缩小查询范围. 可以按分派人, 关键词, 子类, 版本等组合过滤.</p>
 
 <ul>
-<li><b>keyword</b> 0->1 keywords can be selected. By default - no keyword is selected. If a keyword is not
-selected, then all test cases will be considered regardless of keyword assignments. Keywords are assigned
-in the test specification or Keyword Management pages.  Keywords assigned to test cases span all test plans,
-and span across all versions of a test case.  If you are interested in the results for a specific keyword
-you would alter this control.</li>
-<li><b>owner</b> 0->1 owners can be selected. By default - no owner is selected. If an owner is not selected,
-then all test cases will be considered regardless of owner assignment.  Currently there is no functionality
-to search for 'unassigned' test cases.  Ownership is assigned through the 'Assign Test Case execution' page,
-and is done on a per test plan basis.  If you are interested in the work done by a specific tester you would
-alter this control.</li>
-<li><b>top level suite</b> 0->n top level suites can be selected. By default - all suites are selected.
-Only suites that are selected will be queried for result metrics.  If you are only intested in the results
-for a specific suite you would alter this control.</li>
-<li><b>Builds</b> 1->n builds can be selected.  By default - all builds are selected.  Only executions
-performed on builds you select will be taken into account when producing metrics.  For example - if you
-wanted to see how many test cases were executed on the last 3 builds - you would alter this control.
-Keyword, owner, and top level suite selections will dictate the number of test cases from your test plan
-are used to computate per suite and per test plan metrics.  For example, if you select owner = 'Greg',
-Keyword='Priority 1', and all available test suites - only Priority 1 test cases assigned to Greg will be
-considered. The '# of Test Cases' totals you will see on the report will be influenced by these 3 controls.
-Build selections will influence if a case is considered 'pass', 'fail', 'blocked', or 'not run'.  Please
-refer to 'Last Test Result' rules as they appear above.</li>
+<li><b>关键字</b>可以选择 0->1 个关键词. 系统缺省的设置是不选. 如果该关键词不被选中, 则测试规范里和关键词管理 页不管有没有分配该关键词的所有测试案例都包括. 一个关键词进入一个测试案例后, 将传播到该测试案例所属于的所有的 测试计划, 以及该案例的所有版本. 如果你只关心有特定的关键词的测试结果, 你要改变控制按钮的值. </li>
+<li><b>所有者</b> 可以选择 0->1 个主人. 系统缺省的设置是不选. 如果不选. 则所有案例都选择,不管测试任务分派给谁了. 目前还没有搜索'未指派'执行人的测试案例的功能. 主人是通过 '指派测试任务(Assign Test Case execution)'页来实现的, 而且是每个测试计划都要单独做的. 如果你关心工作是谁做的, 你要修改这个按钮的值.</li>
+<li><b>顶级子集</b>可以选择 0->n 级测试子集. 缺省状态是所有子集.
+    只有被选取的子集才出现在查询结果中.如果你只关心某个子集,你可以修改这项控制.</li>
+<li><b>版本</b> 可以选择 1->n 个版本. 缺省状态是选择所有子集. 在做统计的时候只把你选取的版本同时是执行过的测试结果计算在内. 例如, 如果你只想看到在过去的三个版本上做过多少次测试, 你可以修改这个按钮. 关键词, 所有者, 顶级子集的三项过滤决定了计入统计数据中的案例数目. 例如, 如果你选择了 主人 = '张三', 关键词 = '优先 1', 以及所有的子集- 那末只有分派给张三的优先级为 1 的测试案例被计算在内. 报表中看到的测试案例的总数目会随着这三个过滤过滤按钮给出的条件的不同而不同. 版本过滤只对'通过', '失败', '受阻', 或者'未执行' 的案例有过滤作用. 参见上面关于最后测试结果的说明.</li>
 </ul>
-<p>Press the 'submit' button to proceed with the query and display the output page.</p>
+<p>点击"提交"按钮启动查询和输出显示的文件</p>
 
-<p>Query Report Page will display: </p>
+<p>查询报表页将显示: </p>
 <ol>
-<li>the query parameters used to create report</li>
-<li>totals for the entire test plan</li>
-<li>a per suite breakdown of totals (sum / pass / fail / blocked / not run) and all executions performed
-on that suite.  If a test case has been executed more than once on multiple builds - all executions will be
-displayed that were recorded against the selected builds. However, the summary for that suite will only
-include the 'Last Test Result' for the selected builds.</li>
+<li>用于创建报表的查询参数</li>
+<li>测试计划的全部参数</li>
+<li>显示了一个子集里所有执行的结果和按(总和/通过/失败/受阻/未执行)分类的结果. 如果一个测试用例在多个版本上执行过多次, 各次执行的结果都会显示出来. 然而在该子集的总结里, 只有选定版本的测试结果才会被显示出来.</li>
 </ol>
 
-<h3>Blocked, Failed, and  Not Run Test Case Reports</h3>
-<p>These reports show all of the currently blocked, failing, or not run test cases.  'Last test Result'
-logic (which is described above under General Test Plan Metrics) is again employed to determine if
-a test case should be considered blocked, failed, or not run.  Blocked and failed test case reports will
-display the associated bugs if the user is using an integrated bug tracking system.</p>
+<h3>受阻, 失败, 未执行的测试用例报表</h3>
+<p>这些报表显示当前受阻, 失败或者未执行的测试用例. 使用的数据是'最终测试结果' (见前面通用测试统计段落). 如果系统整和了错误跟踪系统, 那些受阻和失败的测试案例报告还将显示错误编号.</p>
 
-<h3>Test Report</h3>
-<p>View status of every test case on every build. The most recent execution result will be used
-if a test case was executed multiple times on the same build. It is recommended to export this report
-to Excel format for easier browsing if a large data set is being used.</p>
+<h3>测试报告</h3>
+<p>阅读各个版本的每个测试案例的结果. 如果一个测使用例被执行过多次, 只显示最近的结果. 如果数据很多, 建议输出到excel表格中来阅读.
+</p>
 
-<h3>Charts - General Test Plan Metrics</h3>
-<p>'Last test Result' logic is used for all four charts that you will see. The graphs are animated to help
-the user visualize the metrics from the current test plan. The four charts provide are :</p>
-<ul><li>Pie chart of overall pass / fail / blocked / and not run test cases</li>
-<li>Bar chart of Results by Keyword</li>
-<li>Bar chart of Results By Owner</li>
-<li>Bar chart of Results By Top Level Suite</li>
+<h3>图表 - 通用测试计划图表</h3>
+<p>
+所有四个图表都使用'最终测试结果'. 图表有动画显示, 方便查看当前测试计划的统计结果.四个报表提供了:
+</p>
+<ul><li>通过/失败/受阻/未执行的测试用例的分布饼图</li>
+<li>按关键词显示的图表</li>
+<li>按所有者显示的图表</li>
+<li>按顶级子集显示的图表</li>
 </ul>
-<p>The bars in the bar charts are colored such that the user can identify the approximate number of
-pass, fail, blocked, and not run cases.</p>
-<p><i>This report page requires your browser have a flash plugin (by http://www.maani.us) to display
-results in a graphical format.</i></p>
+<p>图表中的方块都有颜色标记, 方便用户识别出通过,失败, 受阻, 未执行的测使用例的大概数目.
+</p>
+<p><i>该报告中的图表显示需要你安装一个插件(by http://www.maani.us).</i></p>
 
-<h3>Total Bugs For Each Test Case</h3>
-<p>This report shows each test case with all of the bugs filed against it for the entire project.
-This report is only available if a Bug Tracking System is connected.</p>";
+<h3>每个测试用例报告的错误总数</h3>
+<p>该报表显示了每个测试用例所发现的所有错误. 包括全部项目中的所有错误. 该报表只有在和错误跟踪系统整合了以后才可见.</p>";
 
 
 // ------------------------------------------------------------------------------------------
