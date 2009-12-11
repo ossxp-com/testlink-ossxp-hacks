@@ -38,7 +38,7 @@ $TLS_automated = "Automated";
 $TLS_automatic = "Automatic";
 $TLS_build = "构建标识";
 $TLS_check_uncheck_all = "Toggle all";
-$TLS_days	= "days";
+$TLS_days	= "天数";
 $TLS_desc = "降序";
 $TLS_description = "描述";
 $TLS_delete_confirm_question = "你确定删除吗?";
@@ -50,10 +50,10 @@ $TLS_imported = "Imported";
 $TLS_keyword = "关键字";
 $TLS_manual = "手工";
 $TLS_Milestone = "里程碑";
-$TLS_months	= "months";
+$TLS_months	= "月份";
 $TLS_name = "名称";
 $TLS_not_aplicable = "否/是";
-$TLS_nobody = "Nobody";
+$TLS_nobody = "无人";
 $TLS_not_imported = "Not imported";
 $TLS_none = "无";
 $TLS_ok = "确定";
@@ -82,7 +82,7 @@ $TLS_title = "标题";
 $TLS_total = "总计";
 $TLS_Unknown = "未知";
 $TLS_urgency = "Urgency";
-$TLS_weeks = "weeks";
+$TLS_weeks = "星期";
 $TLS_undefined="未定义";
 
 
@@ -245,7 +245,7 @@ $TLS_low_importance = "低";
 $TLS_urgency_high 		= "High";
 $TLS_urgency_medium 	= "Medium";
 $TLS_urgency_low 		= "Low";
-$TLS_test_importance 	= "Test importance";
+$TLS_test_importance 	= "测试用例等级";
 $TLS_testcases_assigned_to_user = 'Test Project: %s - Test Cases Assigned to User: %s';
 $TLS_assigned_on = 'Assigment date';
 
@@ -2007,7 +2007,7 @@ $TLS_list_of_not_run = "没有运行测试用例";
 
 
 // ----- lib/results/testPlanWithCF----
-$TLS_link_report_tplans_with_cf = "Test Plan with Custom Field info";
+$TLS_link_report_tplans_with_cf = "使用自定义字段的测试计划";
 $TLS_caption_testPlanWithCF = $TLS_link_report_tplans_with_cf;
 
 // ----- lib/results/resultsTC.php -----
@@ -2028,9 +2028,9 @@ $TLS_link_report_tcases_without_tester = "还未分配的测试用例";
 $TLS_link_report_test = "简要测试报告";
 $TLS_link_report_total_bugs = "每个测试用例的全部问题";
 $TLS_link_report_uncovered_testcases = "尚未关联到需求的测试用例";
-$TLS_link_report_tcases_with_cf = "Test Cases with Custom Fields info";
+$TLS_link_report_tcases_with_cf = "使用自定义字段的测试用例";
 $TLS_caption_testCasesWithCF = $TLS_link_report_tcases_with_cf;
-$TLS_link_report_free_testcases_on_testproject = "Test Cases not assigned to Any Test Plan";
+$TLS_link_report_free_testcases_on_testproject = "没有关联到任何测试计划的测试用例";
 
 
 $TLS_no_linked_tc_cf='There are no Test Cases with Custom Field information';
