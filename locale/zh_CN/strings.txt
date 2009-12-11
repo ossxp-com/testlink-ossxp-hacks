@@ -1,7 +1,7 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
- * Chinese Simplified translation-  yfeng.lee@gmail.com 
+ * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * Chinese Simplified translation-  yfeng.lee@gmail.com
  *
  * Filename $RCSfile: strings.txt,v $
  *
@@ -21,8 +21,8 @@
  * 20070520 - franciscom - milestones
  * 20070206 - franciscom - BUGID 618 - \n on JS messages
  *
- *       
- * Scripted update according en_GB string file (version: 1.413.2.20) 
+ *
+ * Scripted update according en_GB string file (version: 1.413.2.20)
  * ---------------------------------------------------------------------------------- */
 
 // Define character set of this file (UTF-8 is common value)
@@ -86,7 +86,7 @@ $TLS_weeks = "星期";
 $TLS_undefined="未定义";
 
 
-// Actions (used wide) 
+// Actions (used wide)
 $TLS_add = "添加";
 $TLS_assigned = "被指派";
 $TLS_create = "创建";
@@ -125,7 +125,7 @@ $TLS_btn_update = "更新";
 $TLS_btn_upd = "更新";
 $TLS_btn_upload = "上传";
 $TLS_btn_advanced_filters = "高级搜索";
-$TLS_btn_simple_filters = "简单搜索"; 
+$TLS_btn_simple_filters = "简单搜索";
 
 
 // Status (used wide)
@@ -155,7 +155,7 @@ $TLS_req_status_not_testable = "不可测试的"; // defined for historical reas
 
 
 // ----- unsorted (TODO move) -------------------------------------
-$TLS_problems_loading_xml_content = "无法下载XML数据，检查你的文件."; 
+$TLS_problems_loading_xml_content = "无法下载XML数据，检查你的文件.";
 $TLS_search_type_like = "Search on this value will be done on LIKE mode";
 $TLS_exec_assign_no_testcase = "请至少选择一个测试用例.";
 $TLS_select_at_least_one_testcase = "Please select at least one Test Case and a target!";
@@ -1381,7 +1381,7 @@ $TLS_req_without_tcase = "Requirements Not Covered by Test Cases";
 
 
 // IMPORTANT for dynamic generation labels
-// $TLS_req_title_<test case status> 
+// $TLS_req_title_<test case status>
 // If user add a new test case status he/she MUST add a new label
 $TLS_req_title_blocked = "锁定的需求";
 $TLS_req_title_failed = "错误的需求";
@@ -1751,7 +1751,7 @@ $TLS_warning_duplicate_reqdoc_id = "重复的文档编号";
 
 
 // ----- lib/functions/testcase.class.php -----
-$TLS_create_new_version="Created new version %s"; 
+$TLS_create_new_version="Created new version %s";
 $TLS_testcase_name_already_exists = "存在同名的测试用例！";
 $TLS_created_with_title = "Created with title (%s)";
 $TLS_the_format_tc_xml_import = "";
@@ -1799,7 +1799,7 @@ $TLS_XMLRPC_error_number = "XML-RPC Fault number:- ";
 
 // ----- lib/functions/configCheck.php -----
 $TLS_attachments_dir = "附件目录：";
-$TLS_bts_connection_problems = "连接问题跟踪系统失败：<br> 
+$TLS_bts_connection_problems = "连接问题跟踪系统失败：<br>
                                 请检查相关的配置参数是否正确。";
 $TLS_but_directory_is_not_writable = "目录不可写！";
 $TLS_check_email_config="Check following parameters of email feature:";
@@ -1814,10 +1814,10 @@ $TLS_sec_note_admin_default_pwd = "应该修改系统管理员的缺省密码！
 $TLS_sec_note_remove_install_dir = "应该删除安装目录！";
 $TLS_error_domxml_missing = "Domxml doesn't seem to be present. Importing XML stuff will not work!";
 $TLS_error_gd_missing = "PHP extension for GD library is not available. Charts will not work. " .
-		"Locate your php.ini file. Open the file and remove the ; in front of ;extension=php_gd2.dll. " . 
+		"Locate your php.ini file. Open the file and remove the ; in front of ;extension=php_gd2.dll. " .
 		"Restart apache (if you are using apache). If that does not help, you will probably need to " .
 		"install php-GD libraries. ";
-$TLS_error_gd_png_support_disabled = "PHP extension for GD library is available without PNG format support. 
+$TLS_error_gd_png_support_disabled = "PHP extension for GD library is available without PNG format support.
 		Charts will not work. Configure PHP or install required libraries.";
 
 
@@ -2072,7 +2072,7 @@ $TLS_wrong_xml_tcase_file = "错误的测试用例xml文件";
 $TLS_wrong_xml_tsuite_file = "错误的测试集xml文件";
 $TLS_cf_value_not_imported_missing_cf_on_testproject = "Value of Custom Field '%s' ".
     "can not be imported because there is no Custom Field with this name " .
-    "and Available for %s on this Test Project"; 
+    "and Available for %s on this Test Project";
 $TLS_req_not_in_req_spec_on_tcimport = "Requirement DOCID=%s can not be linked to testcase," .
 		"because is not direct child of Req. Spec: %s";
 $TLS_req_spec_ko_on_tcimport = "Req. Spec=%s do not exists, requirements can not be " .
@@ -2081,9 +2081,9 @@ $TLS_update_last_testcase_version='Update data on Latest version';
 $TLS_create_new_testcase_version='Create a new version';
 $TLS_generate_new_testcase='Create a new test case with different title';
 $TLS_no_cf_defined_can_not_import="Custom Field values are present on import file ".
-    "but can not be imported because there are no Custom Fields with Test Spec. Design Scope on this Test Project"; 
+    "but can not be imported because there are no Custom Fields with Test Spec. Design Scope on this Test Project";
 $TLS_no_reqspec_defined_can_not_import="Requirements are present on import file ".
-    "but can not be imported because there are no Requirement Specification defined for this Test Project"; 
+    "but can not be imported because there are no Requirement Specification defined for this Test Project";
 
 
 // ----- lib/testcases/tcexport.php -----
@@ -2405,7 +2405,7 @@ $TLS_report_free_testcases_on_testproject=$TLS_link_report_free_testcases_on_tes
 $TLS_all_testcases_has_testplan="All Test Cases has been assigned to a Test Plan";
 $TLS_all_testcases_are_free="No Test Case has been assigned to a Test Plan";
 
-// ----- timeCharts ----- 
+// ----- timeCharts -----
 $TLS_interval_end_date 		= "Last Interval Date";
 $TLS_interval_header 		= "Interval Type";
 $TLS_interval_number 		= "Number of Intervals";

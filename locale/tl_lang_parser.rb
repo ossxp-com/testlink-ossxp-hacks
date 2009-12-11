@@ -4,7 +4,7 @@
 
 require 'getoptlong'
 
-DEFAULT_REFERENCE="en.yml"
+DEFAULT_REFERENCE="en_GB/strings.txt"
 $opt_verbose = 0
 
 def verbose(msg, level=1)
@@ -48,25 +48,25 @@ def translate(ref, trans, out)
 
   # find end of reference file header  :\s(\d+)\s
   ref_header_size = 0
+  ref_revision = ""
   for line in ref_lines
-    if line =~ /(^[_#])|(^\s*$)/
-      ref_header_size += 1
-    else
-      verbose "Ref: End of header is line = #{ref_header_size}", 2
-      break
-    end
+    break if not ( line =~ /<\?php/ or line =~ /^\/\*/ or line =~ /^ \*/ )
+    ref_header_size += 1
+    ref_revision = $1 if line =~ /\$Revision:\s*(\S+)\s*\$/
+    break if line =~ /\*\//
   end
 
   trans_header_size = 0
   # copy existing localization file header
   for line in trans_lines
-    if line =~ /(^[_#])|(^\s*$)/
-      buffers << line.rstrip
-      trans_header_size += 1
-    else
-      verbose "Trans: End of header is line = #{trans_header_size}", 2
-      break
+    break if not ( line =~ /<\?php/ or line =~ /^\/\*/ or line =~ /^ \*/ )
+    trans_header_size += 1
+		if  line =~ /\* Scripted update according en_GB string file/
+      buffers << " * Scripted update according en_GB string file (version: #{ref_revision})"
+      next
     end
+    buffers << line.rstrip
+    break if line =~ /\*\//
   end
 
   # compile output array based on reference file
@@ -81,7 +81,7 @@ def translate(ref, trans, out)
       buffers << ""
 
     # parse a line with variable definition
-    elsif /^([\w]+)\s*:\s*(.*)/.match(ref_lines[i])
+    elsif ref_lines[i] =~ /^\$TLS_([\w]+)\s*=\s*(.*)/
       key = $1
       value = ($2 or "")
       counter_total+=1
@@ -89,15 +89,30 @@ def translate(ref, trans, out)
       localizedLine = ''
       ref_origin = ref_lines[i].rstrip
 
-      verbose "(line #{i}) Found variable '$#{key}'", 3
+      verbose "(line #{i}) Found variable '$TLS_#{key}'", 3
+
+      # check multiline value (check semicolon or semicolon with comment)
+      while not ref_lines[i] =~ /^(.*);\s*$/ and not ref_lines[i] =~ /^(.*);[\s]*[\/]{2}/
+        i += 1
+        value += "\n" + ref_lines[i].strip
+        ref_origin += "\n" + ref_lines[i].rstrip
+        verbose "(line #{i}) reference file key ($TLS_#{key}) with multiline value.", 3
+      end
 
       # get localized value if defined - parse trans localized strings
       for k in trans_header_size...trans_lines.size
-        if trans_lines[k] =~ /^#{key}\s*:\s*(.*)$/
+        if trans_lines[k] =~ /^\$TLS_#{key}\s*=\s*(.*)$/
           trans_value = ($1 or "")
-          verbose "Found localized variable on (line #{k}) >>> #{trans_lines[k]}", 3
-          bLocalized = TRUE
           localizedLine = $&.rstrip
+          verbose "Found localized variable on (line #{k}) >>> #{trans_lines[k]}", 3
+          # check multiline value (check semicolon or semicolon with comment)
+          while not trans_lines[k] =~ /^(.*);\s*$/ and not trans_lines[k] =~ /^(.*);[\s]*[\/]{2}/
+            k += 1
+            trans_value += "\n" + trans_lines[k].strip
+            localizedLine += "\n" + trans_lines[k].rstrip
+            verbose "(line #{k}) translate file key ($TLS_#{key}) with multiline value.", 3
+          end
+          bLocalized = TRUE
           break
         end
       end
@@ -120,6 +135,10 @@ def translate(ref, trans, out)
         counter_new += 1
         buffers << ref_origin
       end
+
+    # Otherwize, copy to output
+    else
+      buffers << ref_lines[i].rstrip
     end
   end
 
@@ -195,8 +214,12 @@ def main
   end
 
   if ARGV.size != 1
-    usage "Only one arguments, but #{ARGV.size} provided."
-    exit 1
+    if out
+      trans = out
+    else
+      usage "No --out option provided, and needs one argument, but you provide #{ARGV.size}."
+      exit 1
+    end
   else
     trans = ARGV[0]
   end
@@ -204,7 +227,4 @@ def main
 end
 
 main
-
-exit 1
-
 
