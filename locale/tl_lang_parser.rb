@@ -81,6 +81,12 @@ def translate(ref, input, out=$stdout, untrans=$stderr)
     break if line =~ /\*\//
   end
 
+  if input_header_size == 0 and ref_header_size > 0
+    for i in 0...ref_header_size
+      buffers << ref_lines[i].rstrip
+    end
+  end
+
   # compile output array based on reference file
   i = ref_header_size-1
   while true
