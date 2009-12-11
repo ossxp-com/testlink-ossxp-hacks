@@ -30,22 +30,18 @@ $TLS_htmltext_title['assignReqs']	= "分配需求给测试用例";
 $TLS_htmltext['assignReqs'] 		= "<h2>目的:</h2>
 <p>用户可以设置测试用例集和需求规约之间的关系. 设计者可以把此处的测试用例集和需求规约一一关联
 .例如:一个测试用例可以被关联到零个、一个、多个测试用例集,反之亦然.
-Such traceability matrix helps to investigate test coverage
-of requirements and find out which ones successfully failed during a testing. This
-analyse serves as input for the next planning.</p>
+这些可追踪的模型帮助我们去研究测试用例对需求的覆盖情况已经测试用例是否通过的情况.
+这些分析为下次的计划充当输入</p>
 
-<h2>Get Started:</h2>
+<h2>开始:</h2>
 <ol>
-	<li>Choose an Test Case in tree at the left. The combo box with list of Requirements
-	Specifications is shown at the top of workarea.</li>
-	<li>Choose a Requirements Specification Document if more once defined. 
-	TestLink automatically reload the page.</li>
-	<li>A middle block of workarea lists all requirements (from choosen Specification), which
-	are connected with the test case. Bottom block 'Available Requirements' lists all
-	requirements which have not relation
-	to the current test case. A designer could mark requirements which are covered by this
-	test case and then click the button 'Assign'. These new assigned test case are shown in
-	the middle block 'Assigned Requirements'.</li>
+	<li>在左边的树状图中选择一个测试用例.工作区的上方列出了所有需求规约的复选框.</li>
+	<li>如果有多个需求规约文档的话，从中选择一个.
+        TestLink会自动加载当前页面.</li>
+	<li>工作区中间会列出所有测试需求(对应于选择的需求规约),这些测试需求会关联到相应的测试用例.
+        底部的'Available Requirements'列出了所有尚未关联到当前测试用例的需求.
+	    测试设计者可以点击'Assign'按钮把需求和测试用例管理起来.这些新关联的
+        测试用例会在'Assigned Requirements'中显示.</li>
 </ol>";
 
 
@@ -79,123 +75,106 @@ $TLS_htmltext['editTc'] 		= "<h2>目的:</h2>
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['searchTc']	= "Test Case Search Page";
-$TLS_htmltext['searchTc'] 		= "<h2>Purpose:</h2>
+$TLS_htmltext_title['searchTc']	= "测试用例搜索页";
+$TLS_htmltext['searchTc'] 		= "<h2>目的:</h2>
 
-<p>Navigation according to keywords and/or searched strings. The search is not
-case sensitive. Result include just test cases from actual Test Project.</p>
+<p>按照关键字和搜索字符串来导航. 英文搜索是不区分大小写. 结果只包括当前测试项目中已有的测试用例.</p>
 
-<h2>To search:</h2>
+<h2>搜索:</h2>
 
 <ol>
-	<li>Write searched string to an appropriate box. Left blank unused fields in form.</li>
-	<li>Choose required keyword or left value 'Not applied'.</li>
-	<li>Click the Search button.</li>
-	<li>All fulfilled test cases are shown. You can modify test cases via 'Title' link.</li>
+	<li>在搜索栏中输入搜索字符串.不关心的栏目留空.</li>
+	<li>选择必须的关键字或者让该栏目留空为'Not applied'.</li>
+	<li>点击“查找”.</li>
+	<li>所有符合搜索条件的测试案例均在此. 你可以点'标题(Title)'链接开始编辑修改.</li>
 </ol>";
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['printTestSpec']	= "Print Test Specification"; //printTC.html
-$TLS_htmltext['printTestSpec'] 			= "<h2>Purpose:</h2>
-<p>From here you can print a single test case, all the test cases within a test suite,
-or all the test cases in a test project or plan.</p>
-<h2>Get Started:</h2>
+$TLS_htmltext_title['printTestSpec']	= "打印需求规约"; //printTC.html
+$TLS_htmltext['printTestSpec'] 			= "<h2>目的:</h2>
+<p>在这里你可以打印单个测试用例，测试套件中的所有测试用例或者测试项目或计划中的所有测试用例.</p>
+<h2>开始:</h2>
 <ol>
 <li>
-<p>Select the parts of the test cases you want to display, and then click on a test case, test suite, or the test project.
-A printable page will be displayed.</p>
+<p>选择你希望显示的测试用例,点击一个测试用例、测试套件或者测试项目.
+一个可打印的页面就会显示出来.</p>
 </li>
-<li><p>Use the \"Show As\" drop-box in the navigation pane to specify whether you want the information displayed as HTML or in a
-Microsoft Word document. See <span class=\"help\" onclick=\"javascript:open_help_window('printFilter',
-'{$locale}');\">help</span> for more information.</p>
+<li><p>使用导航栏下拉框中的\"Show As\" 来决定把信息显示成HTML或者Word文档. 更多信息请查看:<span class=\"help\" onclick=\"javascript:open_help_window('printFilter','{$locale}');\">help</span> .</p>
 </li>
-<li><p>Use your browser's print functionality to actually print the information.<br />
- <i>Note: Make sure to only print the right-hand frame.</i></p></li>
+<li><p>使用浏览器的打印功能来输出信息.<br />
+ <i>注意:保证之打印右边的框架.</i></p></li>
 </ol>";
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['reqSpecMgmt']	= "Requirements Specification Design"; //printTC.html
-$TLS_htmltext['reqSpecMgmt'] 			= "<p>You can manage Requirement Specification documents.</p>
+$TLS_htmltext_title['reqSpecMgmt']	= "需求规约设计"; //printTC.html
+$TLS_htmltext['reqSpecMgmt'] 			= "<p>你可以管理需求规约文档.</p>
 
-<h2>Requirements Specification</h2>
+<h2>需求规约</h2>
 
-<p>Requirements are grouped by <b>Requirements Specification document</b>, which is related to
-Test Project.<br /> TestLink doesn't support (yet) versions for both Requirements Specification
-and Requirements itself. So, version of document should be added after
-a Specification <b>Title</b>.
-An user can add simple description or notes to <b>Scope</b> field.</p>
+<p>需求是由<b>需求规约文档</b>来约定的,然后关联到测试项目.
+<br /> TestLink(当前版本)暂时还不支持需求规约版本中包括了需求本身的情况. 
+所以，文档的版本必须在需求规约之后创建 <b>标题</b>.
+用户可以添加简单描述到 <b>Scope</b> 区域.</p>
 
-<p><b><a name='total_count'>Overwritten count of REQs</a></b> serves for
-evaluation Req. coverage in case that not all requirements are added to TestLink.
-The value <b>0</b> means that current count of requirements is used
-for metrics.</p>
-<p><i>E.g. SRS includes 200 requirements but only 50 are added in TestLink. Test
-coverage is 25% (if all these added requirements will be tested).</i></p>
+<p><b><a name='total_count'>写在需求数量之前</a></b> 
+为统计Req. coverage如果不把所有的需求添加到TestLink提供的服务
+值 <b>0</b>意味着当前结果分析中需求的数量 .</p>
+<p><i>例如: SRS包括200个需求,但是只有50个需求被TestLink管理起来.那么测试覆盖率就是25% 
+ (如果所有的测试需求被测试的情况下).</i></p>
 
-<h2><a name='req'>Requirements</a></h2>
+<h2><a name='req'>需求</a></h2>
 
-<p>Click on title of a created Requirements Specification, if none exists click on the project node to create one. You can create, edit, delete
-or import requirements for the document. Each requirement has title, scope and status.
-Status should be 'Normal' or 'Not testable'. Not testable requirements are not counted
-to metrics. This parameter should be used for both unimplemented features and
-wrong designed requirements.</p>
+<p>点击已创建的需求规约，如果项目中还不存在需求规约先创建一个.
+   每个需求包括标题，作用域和当前状态.需求规约的状态可以是'Normal'或者'Not testable'.
+   不能被测试的需求在结果分析时不被列出来。这个参数可以被用来那些不可用的动能特点或者
+   错误的需求.</p>
 
-<p>You can create new test cases for requirements by using multi action with checked
-requirements within the specification screen. These Test Cases are created into Test Suite
-with name defined in configuration <i>(default is: \$tlCfg->req_cfg->default_testsuite_name =
-'Test suite created by Requirement - Auto';)</i>. Title and Scope are copied to these Test cases.</p>";
+<p>用户可以在需求界面中使用已创建的需求自动创建测试用例.这些测试用例被创建在名字定义
+在配置文件<i>(default is: \$tlCfg->req_cfg->default_testsuite_name ='Test suite created by Requirement - Auto';)</i>
+中的测试用例. 标题和作用域被服知道测试用例中.</p>";
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['keywordsAssign']	= "Keyword Assignment";
-$TLS_htmltext['keywordsAssign'] 			= "<h2>Purpose:</h2>
-<p>The Keyword Assignment page is the place where users can batch
-assign keywords to the existing Test Suite or Test Case</p>
-
-<h2>To Assign Keywords:</h2>
-<ol>
-	<li>Select a Test Suite, or Test Case on the tree view
-		on the left.</li>
-	<li>The top most box that shows up on the right hand side will
-		allow you to assign available keywords to every single test
-		case.</li>
-	<li>The selections below allow you to assign cases at a more
-		granular level.</li>
-</ol>
-
-<h2>Important Information Regarding Keyword Assignments in Test Plans:</h2>
-<p>Keyword assignments you make to the specification will only effect test cases
-in your Test plans if and only if the test plan contains the latest version of the Test case.
-Otherwise if a test plan contains older versions of a test case, assignments you make
-now WILL NOT appear in the test plan.
+$TLS_htmltext_title['keywordsAssign']	= "指派关键字";
+$TLS_htmltext['keywordsAssign'] 			= "<h2>目的:</h2>
+<p>用户可以使用批量地把关键字设置到现有的测试用例和测试套件中
 </p>
-<p>TestLink uses this approach so that older versions of test cases in test plans are not effected
-by keyword assignments you make to the most recent version of the test case. If you want your
-test cases in your test plan to be updated, first verify they are up to date using the 'Update
-Modified Test Cases' functionality BEFORE making keyword assignments.</p>";
+
+<h2>指派关键字:</h2>
+<ol>
+	<li>在左边的视图中选择一个测试用例或者用例套件.</li>
+	<li>页面右上角中的设置可以让你把可用的关键字指派到每一个单独的测试用例上.</li>
+	<li>下面的选项可以让你更细微地对测试用例进行指派.</li>
+</ol>
+
+<h2>有关测试计划中显示的关键字的重要提示:</h2>
+<p>当且仅当测试计划中包含最新版本的测试用例时，你指派的关键字才能影响到你的测试用例上.
+如果你的测试计划中包含的是旧版本的测试用例，你设置的关键字将不会被看到</p>
+<p>TestLink会使用这种要求，以至于你对当前版本中指派的关键字对测试计划中的就版本没什么影响. 
+如果你希望测试计划中的关键字随之更新，首先使用'Update Modified Test Cases'来验证是否是最新版本
+在指派关键字之前.</p>";
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['executeTest']	= "Test Case Execution";
-$TLS_htmltext['executeTest'] 		= "<h2>Purpose:</h2>
+$TLS_htmltext_title['executeTest']	= "测试用例执行";
+$TLS_htmltext['executeTest'] 		= "<h2>目的:</h2>
 
-<p>Allows user to execute Test cases. User can assign Test result
-to Test Case for Build. See help for more information about filter and settings " .
-		"(click on the question mark icon).</p>
+<p>允许用户执行测试用例.用户为了构建可以把测试结果指派到测试用例.
+ 查看关于过滤器和设置的更多帮助 " .
+		"(点击问题按钮).</p>
 
-<h2>Get started:</h2>
+<h2>开始:</h2>
 
 <ol>
-	<li>User must have defined a Build for the Test Plan.</li>
-	<li>Select a Build from the drop down box and the \"Apply\" button in the navigation pane.</li>
-	<li>Click on a test case in the tree menu.</li>
-	<li>Fill out the test case result and any applicable notes or bugs.</li>
-	<li>Save results.</li>
+	<li>用户必须为测试计划定义一个构建.</l>
+	<li>从下拉框中选择一个构建，然后点击导航栏中的应用按钮.</li>
+	<li>点击菜单树中的测试用例.</li>
+	<li>完善测试用例的结果和任何适用的标记或问题报告.</li>
+	<li>保存结果.</li>
 </ol>
-<p><i>Note: TestLink must be configurated to collaborate with your Bug tracker 
-if you would like to create/trace a problem report directly from the GUI.</i></p>";
+<p><i>注意:如果你打算直接创建/跟踪问题，必须先配置TestLink关联到相关的bug跟踪工具.</i></p>";
 
 // ------------------------------------------------------------------------------------------
 $TLS_htmltext_title['showMetrics']	= "测试报告和统计数据";
@@ -279,68 +258,64 @@ $TLS_htmltext['showMetrics'] 		= "<p>一个测试计划的报告" .
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['planAddTC']	= "Add / Remove Test cases to Test Plan"; // testSetAdd
-$TLS_htmltext['planAddTC'] 			= "<h2>Purpose:</h2>
-<p>Allows user (with lead level permissions) to add or remove test cases into a Test plan.</p>
+$TLS_htmltext_title['planAddTC']	= "添加/删除测试用例到测试计划"; // testSetAdd
+$TLS_htmltext['planAddTC'] 			= "<h2>目的:</h2>
+<p>用户可以从测试计划中添加或者删除测试用例(至少项目经理).</p>
 
-<h2>To add or remove Test cases:</h2>
+<h2>添加／删除测试用例的步骤:</h2>
 <ol>
-	<li>Click on a test suite to see all of its test suites and all of its test cases.</li>
-	<li>When you are done click the 'Add / Remove Test Cases' button to add or remove the test cases.
-		Note: Is not possible to add the same test case multiple times.</li>
+	<li>点击测试套件查看它的所有的子测试套件以及所有的测试用例.</li>
+	<li>当你点击"添加/删除测试用例"来添加或者删除测试用例时
+    	注意: 不可能多次添加相同的测试用例.</li>
 </ol>";
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['tc_exec_assignment']	= "Assign Testers to test execution";
-$TLS_htmltext['tc_exec_assignment'] 		= "<h2>Purpose</h2>
-<p>This page allows test leaders to assign users to particular tests within the Test Plan.</p>
+$TLS_htmltext_title['tc_exec_assignment']	= "给测试员分配执行任务";
+$TLS_htmltext['tc_exec_assignment'] 		= "<h2>目的</h2>
+<p>管理者通过该页面来对测试人员分配具体工作.</p>
 
-<h2>Get Started</h2>
+<h2>开始</h2>
 <ol>
-	<li>Choose a Test case or Test Suite to test.</li>
-	<li>Select a planned tester.</li>
-	<li>Press button to submit assignement.</li>
-	<li>Open execution page to verify assignment. You can set-up a filter for users.</li>
-</ol>";
-
-
-// ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['planUpdateTC']	= "Update Test Cases in the Test Plan";
-$TLS_htmltext['planUpdateTC'] 		= "<h2>Purpose</h2>
-<p>This page allows update Test case to a newer (different) version in  the case that Test
-Specification is changed. It often happens that some functionality is clarified during testing." .
-		" User modifies Test Specification, but changes needs to propagate to Test Plan too. Otherwise Test" .
-		" plan holds original version to be sure, that results refer to the correct text of a Test case.</p>
-
-<h2>Get Started</h2>
-<ol>
-	<li>Choose a Test case or Test Suite to test.</li>
-	<li>Choose a new version from bombo boxmenu for particular Test case.</li>
-	<li>Press button 'Update Test plan' to submit changes.</li>
-	<li>To verify: Open execution page to view text of the test case(s).</li>
+	<li>选择要测试的测试用例或者测试套件.</li>
+	<li>选择该项目的测试员.</li>
+	<li>点击按钮提交.</li>
+	<li>打开测试员的页面验证关联的情况.可以为使用者设置过滤器.</li>
 </ol>";
 
 
 // ------------------------------------------------------------------------------------------
-$TLS_htmltext_title['test_urgency']	= "Specify tests with high or low urgency";
-$TLS_htmltext['test_urgency'] 		= "<h2>Purpose</h2>
-<p>TestLink allows set urgency of Test Suite to affect a testing Priority of test cases. 
-		Test priority depends on both Importance of Test cases and Urgency defined in 
-		the Test Plan. Test leader should specify a set of test cases that could be tested
-		at first. It helps to assure that testing will cover the most important tests
-		also under time pressure.</p>
+$TLS_htmltext_title['planUpdateTC']	= "更新测试计划中的测试用例";
+$TLS_htmltext['planUpdateTC'] 		= "<h2>目的</h2>
+<p>如果需求规约版本改变了，可以通过该页面对测试用例进行更新.
+        经常发生一些功能尚未被告知的情况在测试过程中." .
+		" 例如:用户更改了测试规约，但是这个改变需要传达到测试计划中. " .
+		" 否则测试计划继续使用着旧版本的需求规约,测试结果还在关联测试用例中的字段.</p>
 
-<h2>Get Started</h2>
+<h2>开始</h2>
 <ol>
-	<li>Choose a Test Suite to set urgency of a product/component feature in navigator
-	on the left side of window.</li>
-	<li>Choose a urgency level (high, medium or low). Medium is default. You can
-	decrease priority for untouched parts of product and increase for components with
-	significant changes.</li>
-	<li>Press the button 'Save' to submit changes.</li>
+	<li>选择要测试的测试用例或者测试套件.</li>
+	<li>从复选框中为指定的测试用例选择新版本.</li>
+	<li>点击'Update Test plan'来提交改变.</li>
+	<li>验证方法: 查看执行页面中的测试用例(集).</li>
+</ol>";
+
+
+// ------------------------------------------------------------------------------------------
+$TLS_htmltext_title['test_urgency']	= "设置测试的紧急程度";
+$TLS_htmltext['test_urgency'] 		= "<h2>目的</h2>
+<p>TestLink允许设置测试套件的紧急程度来影响测试用例执行的优先级. 
+	测试的优先级取决于测试用例的重要程度和定义在测试计划中的紧急程度两个方面.
+    项目领导者可以设置一套测试用例先被执行. 使用这个功能来确保在时间允许的情
+    况下覆盖最重要的测试用例.</p>
+
+<h2>开始</h2>
+<ol>
+	<li>在左上角的窗口中选择一个测试用例集来设置product/component的严重程度.</li>
+	<li>设置严重程度(包括high,medium和low).默认是medium. 你可以改变一个尚未
+    执行的产品的严重程度.</li>
+	<li>点击'Save'来提交改变.</li>
 </ol>
-<p><i>For example, a Test case with a High importance in a Test suite with Low urgency " .
-		"will be Medium priority.</i>";
+<p><i>例如:一个High重要程度的测试套件中的low紧急程度的测试用例在执行时是medium级别 " ."</i>";
 
 
 // ------------------------------------------------------------------------------------------
