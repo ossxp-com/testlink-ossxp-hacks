@@ -1,193 +1,263 @@
 #!/usr/bin/ruby
-=begin
- * TestLink Open Source Project - http:#testlink.sourceforge.net/
- * This script is distributed under the GNU General Public License 2 or later.
- * 
- * @filesource $RCSfile: common.php,v $
- * @version $Revision: 1.138 $ $Author: franciscom $
- * @modified $Date: 2009/01/26 21:52:49 $
- * @author 	Martin Havlat
- *
- * SCOPE: command line script: update localization files according the current english
- * 		file - add a new variables.
- * 
- * Usage: 
- * 	1. correct the first line to point php binary
- *  2. Modify a path to master file (en_GB) - $file_eng
- *  3. Linux: Allow execute - #chmod u+x tl_lang_parser.php
- *  4. Run the file with to-be-updated file as argument
- * 		#tl_lang_parser.php /home/havlatm/www/tl_head/locale/cs_CZ/strings.txt
- * 
- *  Note: to have report about+arsing redirect script to file; for example
- * 		#tl_lang_parser.php strings.txt > report.txt
-=end
 
-#Set path to your en_GB english file 
-file_eng = 'en_GB/strings.txt';
+# lang_parser.rb : rewrite from testlink tl_lang_parser.php
 
-# Set true if you would like to have original file with 'bck' extension 
-do_backup_file = TRUE 
+require 'getoptlong'
 
+DEFAULT_REFERENCE="en_GB/strings.txt"
+$opt_verbose = 0
 
-# ---------------------------------------------------------------------------
-if (ARGV.size < 1)
-	puts "Usage: #tl_lang_parser.php <localization_file_to_be_updated>"
-	exit
-else
-	file_lang_old = ARGV[0];
+def verbose(msg, level=1)
+    $stderr.puts msg if level <= $opt_verbose
 end
 
-out=''; # data for output file
-var_counter = 0;
-var_counter_new = 0;
-var_counter_untrans = 0;
-var_counter_trans = 0;
+def translate(ref, input, out=$stdout, untrans=$stderr)
+  if out == input and not out.is_a?(IO)
+    do_backup_file = TRUE
+  else
+    do_backup_file = FALSE
+  end
 
-puts "===== Start TestLink lang_parser =====";
+  if not File.readable?(ref)
+    $stderr.puts "Reference file #{ref} not found or not readable."
+    exit 1
+  elsif not File.readable? input
+    $stderr.puts "Translate file #{input} not found or not readable."
+    exit 1
+  elsif out and not out.is_a?(IO) and File.exists? out and not File.writable? out
+    $stderr.puts "Output file #{out} not writable."
+    exit 1
+  elsif untrans and not untrans.is_a?(IO) and File.exists? untrans and not File.writable? untrans
+    $stderr.puts "Untranslate file #{untrans} not writable."
+    exit 1
+  end
 
-# read english file
-if File.exist?(file_eng) && File.readable?(file_eng)
-	puts"English file #{file_eng} is readable OK."
-	lines_eng = File.new(file_eng).readlines.size 
-	lines_eng_content = File.new(file_eng).readlines 
-else
-	puts "English file #{file_eng} is readable - FAILED!. Exit."
-end
-# read language file
-if (File.exist?(file_lang_old) && File.readable?(file_lang_old))
-	puts "File #{file_lang_old} is readable OK."
-	lines_lang_old = File.new(file_lang_old).readlines.size
-	lines_lang_old_content = File.new(file_lang_old).readlines
-else
-	puts " #{file_lang_old} file is not readable - FAILED!. Exit."
-end
+  # open untrans file
+  if !untrans
+    fp_untrans = $stderr
+  elsif untrans.is_a? IO
+    fp_untrans = untrans
+  else
+    fp_untrans = open(untrans, "w")
+  end
+ 
+  buffers=[] # data for output file
+  counter_total = 0
+  counter_new = 0
+  counter_untrans = 0
+  counter_trans = 0
 
-puts "English file lines =#{lines_eng}"
-puts "Old Language file lines =#{lines_lang_old}"
+  verbose "===== Start lang_parser ====="
 
-# find end of english header	:\s(\d+)\s
-for i in 0...lines_eng
-    if(/Revision:\s(\S+)\s/.match(lines_eng_content[i]))
-    revision_comment=Regexp.last_match(1)
-    puts "English file revision: #{revision_comment}.";
-    end 
+  # read ref file
+  ref_lines = File.new(ref).readlines
 
-    if(/\*\//.match(lines_eng_content[i]))
-        begin_line = i+1
-        puts "Eng: End of header is line = #{i} " 
+  # read language file
+  input_lines = File.new(input).readlines
+
+  verbose "Reference file lines =#{ref_lines.size}", 2
+  verbose "Translate file lines =#{input_lines.size}", 2
+
+  # find end of reference file header  :\s(\d+)\s
+  ref_header_size = 0
+  ref_revision = ""
+  for line in ref_lines
+    break if not ( line =~ /<\?php/ or line =~ /^\/\*/ or line =~ /^ \*/ )
+    ref_header_size += 1
+    ref_revision = $1 if line =~ /\$Revision:\s*(\S+)\s*\$/
+    break if line =~ /\*\//
+  end
+
+  input_header_size = 0
+  # copy existing localization file header
+  for line in input_lines
+    break if not ( line =~ /<\?php/ or line =~ /^\/\*/ or line =~ /^ \*/ )
+    input_header_size += 1
+		if  line =~ /\* Scripted update according en_GB string file/
+      buffers << " * Scripted update according en_GB string file (version: #{ref_revision})"
+      next
     end
-end
+    buffers << line.rstrip
+    break if line =~ /\*\//
+  end
 
-# copy existing localization file header
-for i in 0...lines_lang_old
-    if /\*\// =~ lines_lang_old_content[i]
-        puts "Old: End of header is line = #{i} "
-        begin_line_old = i + 1
-	    out+=" * Scripted update according en_GB string file (version: #{revision_comment})\n"
-        
-		out+=" * ---------------------------------------------------------------------------------- */\n"
-        break
-    else
-        next if lines_lang_old_content[i] =~ /\s*\*\s*Scripted update according en_GB string file/
-        out+=lines_lang_old_content[i]
+  if input_header_size == 0 and ref_header_size > 0
+    for i in 0...ref_header_size
+      buffers << ref_lines[i].rstrip
     end
-end
+  end
 
-# compile output array based on english file
-i = begin_line-1
-while true
+  # compile output array based on reference file
+  i = ref_header_size-1
+  while true
     i += 1
-    break if i >= lines_eng
+    break if i >= ref_lines.size
 
-	# copy comments 
-    if /^\/\//.match(lines_eng_content[i])
-        puts "(line #{i}) Copy comment";
-        out+= "#{lines_eng_content[i]}";
+    # copy empty line
+    if ref_lines[i] =~ /^\s*$/
+      verbose "(line #{i}) Empty line", 3
+      buffers << ""
 
-	# copy empty line
-    elsif /^\s*$/.match(lines_eng_content[i])
-        puts "(line #{i}) Empty line"
-        out+= "\n"
+    # parse a line with variable definition
+    elsif ref_lines[i] =~ /^\$TLS_([\w]+)\s*=\s*(.*)/
+      key = $1
+      value = ($2 or "")
+      counter_total+=1
+      bLocalized = FALSE
+      localizedLine = ''
+      ref_origin = ref_lines[i].rstrip
 
-	# parse a line with variable definition
-    elsif /^\$TLS_([\w]+)\s*=\s*(.*)$/.match(lines_eng_content[i]) 
-        var_name = "TLS_#{Regexp.last_match(1)}"
-        var_counter+=1
-        bLocalized = FALSE
-        localizedLine = ''
-        
-        # get localized value if defined - parse old localized strings
-		for k in begin_line_old...lines_lang_old
-        	if /^\$#{var_name}\s*=.+$/m =~ lines_lang_old_content[k]
-		        puts "Found localized variable on (line #{k}) >>> #{lines_lang_old_content[k]}"
-				bLocalized = TRUE
-		        localizedLine = Regexp.last_match.to_s
-				# check if localized value exceed to more lines - semicolon is not found
-            	while ( !(  /;\s*$/ =~ lines_lang_old_content[k] ||
-                            /;\s*[\/]{2}[^'"]*$/ =~ lines_lang_old_content[k] ) )
-                    k+=1
-			        puts "Multiline localized value (line #{k})"
-		            localizedLine += lines_lang_old_content[k]
-		        end
-                break
-	        end	
-       end 
-	    puts "Localization doesn't exists. Copy English.'";
+      verbose "(line #{i}) Found variable '$TLS_#{key}'", 3
 
-        orig_eng = lines_eng_content[i];
-        
-        # check multiline value (check semicolon or semicolon with comment)
-        while ( !( /;\s*$/ =~ lines_eng_content[i] ||
-                   /;\s*[\/]{2}[^'"]*$/ =~ lines_eng_content[i] ) )
-            i += 1
-            puts "(line #{i}) English multiline value - copy the line >>#{lines_eng_content[i]}"
-            orig_eng += lines_eng_content[i];
-            break
+      # check multiline value (check semicolon or semicolon with comment)
+      while not ref_lines[i] =~ /^(.*);\s*$/ and not ref_lines[i] =~ /^(.*);[\s]*[\/]{2}/
+        i += 1
+        value += "\n" + ref_lines[i].strip
+        ref_origin += "\n" + ref_lines[i].rstrip
+        verbose "(line #{i}) reference file key ($TLS_#{key}) with multiline value.", 3
+      end
+
+      # get localized value if defined - parse trans localized strings
+      for k in input_header_size...input_lines.size
+        if input_lines[k] =~ /^\$TLS_#{key}\s*=\s*(.*)$/
+          trans_value = ($1 or "")
+          localizedLine = $&.rstrip
+          verbose "Found localized variable on (line #{k}) >>> #{input_lines[k]}", 3
+          # check multiline value (check semicolon or semicolon with comment)
+          while not input_lines[k] =~ /^(.*);\s*$/ and not input_lines[k] =~ /^(.*);[\s]*[\/]{2}/
+            k += 1
+            trans_value += "\n" + input_lines[k].strip
+            localizedLine += "\n" + input_lines[k].rstrip
+            verbose "(line #{k}) translate file key ($TLS_#{key}) with multiline value.", 3
+          end
+          bLocalized = TRUE
+          break
         end
-        
-        puts "(line #{i}) Found variable '$#{var_name}'";
-        if bLocalized
-	        puts "Localization exists #{localizedLine}"
-            puts
-            if localizedLine.strip == orig_eng.strip
-                var_counter_untrans=var_counter_untrans+1
-            else
-                var_counter_trans=var_counter_trans+1
-            end
-        	out+= "#{localizedLine}"
-		else 
-	        puts "Localization doesn't exists. Copy English.";
-            var_counter_untrans+=1
-		    var_counter_new+=1
-		    out+="#{orig_eng}"
+      end
+
+      if bLocalized
+        verbose "Localization exists #{localizedLine}", 3
+        if value.strip == trans_value.strip and not value.strip.none?
+            counter_untrans += 1
+            fp_untrans.puts ref_origin
+            verbose "Not translate: #{ref_origin}", 3
+        elsif value.strip.none?
+            counter_trans += 1
+            fp_untrans.puts ref_origin
+            verbose "Blank translate: #{ref_origin}/#{localizedLine} !!!", 3
+        else
+            counter_trans += 1
         end
-	# end of file    
-    elsif /^\?\>/.match(lines_eng_content[i])
-        out+= "?>\n";
+        buffers << localizedLine
+      else
+        verbose "Localization doesn't exists. Copy from reference."
+        counter_untrans +=1
+        counter_new += 1
+        buffers << ref_origin
+      end
 
-	# skip unused multiline values (any text started by whitespace)
-	# it could start with bracket, but there could be just any text that continues 
-	# from previous without+rackets
-    elsif /^\s+\S.*/.match(lines_eng_content[i])
-    	puts "(line #{i}) Skipped line (expected unused multiline value)";
-
-	# something wrong?
+    # Otherwize, copy to output
     else
-    	puts "ERROR: please fix the unparsed line #{i}: #{lines_eng_content[i]};"
+      buffers << ref_lines[i].rstrip
+    end
+  end
+
+  # create backup if defined
+  if do_backup_file
+    File.rename input, "#{input}.bak"
+  end
+
+  # save output
+  if out.is_a? IO
+    out.puts buffers.join("\n")
+  elsif not out
+    $stdout.puts buffers.join("\n")
+  else
+    verbose "Updated file: #{out}"
+    fp = open(out, "w")
+    fp.puts buffers.join("\n")
+    fp.close
+  end
+
+  if fp_untrans and fp_untrans != untrans
+    fp_untrans.close
+  end
+
+  verbose "Completed! The script has parsed #{counter_total} strings and add #{counter_new} new variables.", 0
+  verbose "Un-translate items: #{counter_untrans} , translated items: #{counter_trans}", 0
+  verbose "===== Bye ====="
+end
+
+def usage(msg="")
+  puts <<END
+Command:
+  #{$0} [options...] <input_file>
+Usage:
+  --reference, -r  <reference_file>
+      Default is en_GB/string.txt
+
+  --output, -o <output_file>
+      Default is stdout
+
+  --untrans, -u <untrans_output_file>
+      Default is stderr
+
+  --verbose
+      Show verbose message on stderr
+
+  --help
+      This screen
+
+  <input_file>
+      Target l10n file.
+END
+  if not msg.none?
+    puts
+    puts msg
   end
 end
-# create backup if defined
-    if (do_backup_file)
-    	File.rename(file_lang_old, "#{file_lang_old}.bck");
-    end
-    puts "成功创建备份文件"
-# save output
-fp = open(file_lang_old, "w")
-fp.puts out
-fp.close
-    puts "成功写入文件"
 
-puts "Updated file: #{file_lang_old}";
-puts "Completed! The script has parsed #{var_counter} strings and add #{var_counter_new} new variables.";
-puts "Un-translate items: #{var_counter_untrans} , translated items: #{var_counter_trans}";
-puts "===== Bye =====";
+def main
+  ref = DEFAULT_REFERENCE
+  input = nil
+  out = $stdout
+  untrans = $stderr
+  opts = GetoptLong.new(
+    [ "--reference","--source","-s","-r", GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--output",   "-o",                 GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--untrans",  "-u",                 GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--verbose",  "-v",                 GetoptLong::NO_ARGUMENT ],
+    [ "--help",     "-h",                 GetoptLong::NO_ARGUMENT ]
+  )
+  # process the parsed options
+  opts.each do |opt, arg|
+    case opt
+    when "--reference"
+      ref = arg
+    when "--output"
+      out = arg
+    when "--untrans"
+      untrans = arg
+    when "--verbose"
+      $opt_verbose += 1
+    when "--help"
+      usage
+      exit 0
+    end
+  end
+
+  if ARGV.size != 1
+    if out and not out.is_a? IO
+      input = out
+    else
+      usage "No --out option provided, and needs one argument, but you provide #{ARGV.size}."
+      exit 1
+    end
+  else
+    input = ARGV[0]
+  end
+  translate ref, input, out, untrans
+end
+
+main
+
