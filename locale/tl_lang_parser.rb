@@ -11,8 +11,8 @@ def verbose(msg, level=1)
     $stderr.puts msg if level <= $opt_verbose
 end
 
-def translate(ref, trans, out)
-  if out == trans
+def translate(ref, input, out=$stdout, untrans=$stderr)
+  if out == input and not out.is_a?(IO)
     do_backup_file = TRUE
   else
     do_backup_file = FALSE
@@ -21,14 +21,26 @@ def translate(ref, trans, out)
   if not File.readable?(ref)
     $stderr.puts "Reference file #{ref} not found or not readable."
     exit 1
-  elsif not File.readable? trans
-    $stderr.puts "Translate file #{trans} not found or not readable."
+  elsif not File.readable? input
+    $stderr.puts "Translate file #{input} not found or not readable."
     exit 1
-  elsif out and not File.writable? out
+  elsif out and not out.is_a?(IO) and File.exists? out and not File.writable? out
     $stderr.puts "Output file #{out} not writable."
+    exit 1
+  elsif untrans and not untrans.is_a?(IO) and File.exists? untrans and not File.writable? untrans
+    $stderr.puts "Untranslate file #{untrans} not writable."
     exit 1
   end
 
+  # open untrans file
+  if !untrans
+    fp_untrans = $stderr
+  elsif untrans.is_a? IO
+    fp_untrans = untrans
+  else
+    fp_untrans = open(untrans, "w")
+  end
+ 
   buffers=[] # data for output file
   counter_total = 0
   counter_new = 0
@@ -41,10 +53,10 @@ def translate(ref, trans, out)
   ref_lines = File.new(ref).readlines
 
   # read language file
-  trans_lines = File.new(trans).readlines
+  input_lines = File.new(input).readlines
 
   verbose "Reference file lines =#{ref_lines.size}", 2
-  verbose "Translate file lines =#{trans_lines.size}", 2
+  verbose "Translate file lines =#{input_lines.size}", 2
 
   # find end of reference file header  :\s(\d+)\s
   ref_header_size = 0
@@ -56,11 +68,11 @@ def translate(ref, trans, out)
     break if line =~ /\*\//
   end
 
-  trans_header_size = 0
+  input_header_size = 0
   # copy existing localization file header
-  for line in trans_lines
+  for line in input_lines
     break if not ( line =~ /<\?php/ or line =~ /^\/\*/ or line =~ /^ \*/ )
-    trans_header_size += 1
+    input_header_size += 1
 		if  line =~ /\* Scripted update according en_GB string file/
       buffers << " * Scripted update according en_GB string file (version: #{ref_revision})"
       next
@@ -100,16 +112,16 @@ def translate(ref, trans, out)
       end
 
       # get localized value if defined - parse trans localized strings
-      for k in trans_header_size...trans_lines.size
-        if trans_lines[k] =~ /^\$TLS_#{key}\s*=\s*(.*)$/
+      for k in input_header_size...input_lines.size
+        if input_lines[k] =~ /^\$TLS_#{key}\s*=\s*(.*)$/
           trans_value = ($1 or "")
           localizedLine = $&.rstrip
-          verbose "Found localized variable on (line #{k}) >>> #{trans_lines[k]}", 3
+          verbose "Found localized variable on (line #{k}) >>> #{input_lines[k]}", 3
           # check multiline value (check semicolon or semicolon with comment)
-          while not trans_lines[k] =~ /^(.*);\s*$/ and not trans_lines[k] =~ /^(.*);[\s]*[\/]{2}/
+          while not input_lines[k] =~ /^(.*);\s*$/ and not input_lines[k] =~ /^(.*);[\s]*[\/]{2}/
             k += 1
-            trans_value += "\n" + trans_lines[k].strip
-            localizedLine += "\n" + trans_lines[k].rstrip
+            trans_value += "\n" + input_lines[k].strip
+            localizedLine += "\n" + input_lines[k].rstrip
             verbose "(line #{k}) translate file key ($TLS_#{key}) with multiline value.", 3
           end
           bLocalized = TRUE
@@ -120,11 +132,13 @@ def translate(ref, trans, out)
       if bLocalized
         verbose "Localization exists #{localizedLine}", 3
         if value.strip == trans_value.strip and not value.strip.none?
-            verbose "Not translate: #{ref_origin}"
             counter_untrans += 1
+            fp_untrans.puts ref_origin
+            verbose "Not translate: #{ref_origin}", 3
         elsif value.strip.none?
-            verbose "Blank translate: #{ref_origin}/#{localizedLine} !!!"
             counter_trans += 1
+            fp_untrans.puts ref_origin
+            verbose "Blank translate: #{ref_origin}/#{localizedLine} !!!", 3
         else
             counter_trans += 1
         end
@@ -144,17 +158,23 @@ def translate(ref, trans, out)
 
   # create backup if defined
   if do_backup_file
-    File.rename trans, "#{trans}.bak"
+    File.rename input, "#{input}.bak"
   end
 
   # save output
-  if out
+  if out.is_a? IO
+    out.puts buffers.join("\n")
+  elsif not out
+    $stdout.puts buffers.join("\n")
+  else
     verbose "Updated file: #{out}"
     fp = open(out, "w")
     fp.puts buffers.join("\n")
     fp.close
-  else
-    $stdout.puts buffers.join("\n")
+  end
+
+  if fp_untrans and fp_untrans != untrans
+    fp_untrans.close
   end
 
   verbose "Completed! The script has parsed #{counter_total} strings and add #{counter_new} new variables.", 0
@@ -165,13 +185,16 @@ end
 def usage(msg="")
   puts <<END
 Command:
-  #{$0} [options...] <translate_file>
+  #{$0} [options...] <input_file>
 Usage:
   --reference, -r  <reference_file>
-      Default is en.yml
+      Default is en_GB/string.txt
 
   --output, -o <output_file>
       Default is stdout
+
+  --untrans, -u <untrans_output_file>
+      Default is stderr
 
   --verbose
       Show verbose message on stderr
@@ -179,7 +202,7 @@ Usage:
   --help
       This screen
 
-  <translate_file>
+  <input_file>
       Target l10n file.
 END
   if not msg.none?
@@ -190,11 +213,13 @@ end
 
 def main
   ref = DEFAULT_REFERENCE
-  out = nil
-  trans = nil
+  input = nil
+  out = $stdout
+  untrans = $stderr
   opts = GetoptLong.new(
     [ "--reference","--source","-s","-r", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--output",   "-o",                 GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--untrans",  "-u",                 GetoptLong::REQUIRED_ARGUMENT ],
     [ "--verbose",  "-v",                 GetoptLong::NO_ARGUMENT ],
     [ "--help",     "-h",                 GetoptLong::NO_ARGUMENT ]
   )
@@ -205,6 +230,8 @@ def main
       ref = arg
     when "--output"
       out = arg
+    when "--untrans"
+      untrans = arg
     when "--verbose"
       $opt_verbose += 1
     when "--help"
@@ -214,16 +241,16 @@ def main
   end
 
   if ARGV.size != 1
-    if out
-      trans = out
+    if out and not out.is_a? IO
+      input = out
     else
       usage "No --out option provided, and needs one argument, but you provide #{ARGV.size}."
       exit 1
     end
   else
-    trans = ARGV[0]
+    input = ARGV[0]
   end
-  translate ref, trans, out
+  translate ref, input, out, untrans
 end
 
 main
