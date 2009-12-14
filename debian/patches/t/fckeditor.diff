@@ -1,0 +1,54 @@
+From: leiww <leiww@bj.ossxp.com>
+Subject: [PATCH] t/fckeditor
+
+For issue #53: testlink中需求规格说明书编辑器不能使用
+
+Signed-off-by: leiww <leiww@bj.ossxp.com>
+
+---
+ .../browser/default/connectors/php/config.php      |    6 +++---
+ third_party/fckeditor/fckconfig.js                 |    4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/third_party/fckeditor/editor/filemanager/browser/default/connectors/php/config.php b/third_party/fckeditor/editor/filemanager/browser/default/connectors/php/config.php
+index 97fbc6d..3454a94 100644
+--- a/third_party/fckeditor/editor/filemanager/browser/default/connectors/php/config.php
++++ b/third_party/fckeditor/editor/filemanager/browser/default/connectors/php/config.php
+@@ -25,11 +25,11 @@
+ global $Config ;
+ 
+ // SECURITY: You must explicitelly enable this "connector". (Set it to "true").
+-$Config['Enabled'] = false ;
++$Config['Enabled'] = true;
+ 
+ 
+ // Path to user files relative to the document root.
+-$Config['UserFilesPath'] = '/userfiles/' ;
++$Config['UserFilesPath'] = 'TestLink_upload' ;
+ 
+ // Fill the following value it you prefer to specify the absolute path for the
+ // user files directory. Usefull if you are using a virtual directory, symbolic
+@@ -53,4 +53,4 @@ $Config['DeniedExtensions']['Flash']	= array() ;
+ $Config['AllowedExtensions']['Media']	= array('swf','fla','jpg','gif','jpeg','png','avi','mpg','mpeg') ;
+ $Config['DeniedExtensions']['Media']	= array() ;
+ 
+-?>
+\ No newline at end of file
++?>
+diff --git a/third_party/fckeditor/fckconfig.js b/third_party/fckeditor/fckconfig.js
+index 931dacd..cdeaac3 100644
+--- a/third_party/fckeditor/fckconfig.js
++++ b/third_party/fckeditor/fckconfig.js
+@@ -183,8 +183,8 @@ FCKConfig.CleanWordKeepsStructure = false ;
+ // inline when creating the editor instance. In that cases you must set the
+ // values of LinkBrowserURL, ImageBrowserURL and so on.
+ // Custom implementations should just ignore it.
+-var _FileBrowserLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | perl | php | py
+-var _QuickUploadLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | php
++var _FileBrowserLanguage	= 'php' ;	// asp | aspx | cfm | lasso | perl | php | py
++var _QuickUploadLanguage	= 'php' ;	// asp | aspx | cfm | lasso | php
+ 
+ 
+ // Don't care about the following line. It just calculates the correct connector
+-- 
+tg: (7b2beb5..) t/fckeditor (depends on: master)

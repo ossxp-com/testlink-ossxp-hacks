@@ -6,12 +6,13 @@ Subject: [PATCH] t/bugtrac_integration
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- cfg/redmine.cfg.php |    4 ++--
- config.inc.php      |    1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ cfg/redmine.cfg.php                 |   10 +++++-----
+ config.inc.php                      |    1 +
+ lib/bugtracking/int_bugtracking.php |    9 ++++++++-
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
-index a87ea2f..c636781 100644
+index a87ea2f..a709581 100644
 --- a/cfg/redmine.cfg.php
 +++ b/cfg/redmine.cfg.php
 @@ -13,10 +13,10 @@
@@ -27,6 +28,25 @@ index a87ea2f..c636781 100644
  define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
  
  /** The DB type being used by redMine
+@@ -44,9 +44,9 @@ define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
+  *     password: xxxxxxxx
+  * ----------------------
+  */
+-define('BUG_TRACK_DB_CHARSET', "latain1");
++// define('BUG_TRACK_DB_CHARSET', "latain1");
+ // define('BUG_TRACK_DB_CHARSET',"gb2312");
+-// define('BUG_TRACK_DB_CHARSET',"UTF-8");
++define('BUG_TRACK_DB_CHARSET',"UTF-8");
+ 
+ 
+ /* link of the web server for redmine */
+@@ -56,4 +56,4 @@ define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
+ /** link to the bugtracking system, for entering new bugs */
+ define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
+ // define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
+-?>
+\ No newline at end of file
++?>
 diff --git a/config.inc.php b/config.inc.php
 index 4117b9f..df2914c 100644
 --- a/config.inc.php
@@ -39,5 +59,25 @@ index 4117b9f..df2914c 100644
   * 'GFORGE'    : edit configuration in TL_ABS_PATH/cfg/gforge.cfg.php
   * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
   * ]
+diff --git a/lib/bugtracking/int_bugtracking.php b/lib/bugtracking/int_bugtracking.php
+index e166e92..961f0c8 100644
+--- a/lib/bugtracking/int_bugtracking.php
++++ b/lib/bugtracking/int_bugtracking.php
+@@ -329,7 +329,14 @@ if (isset($bts[$g_interface_bugs]))
+ 	$configPHP = $btsname . '.cfg.php';
+ 	$interfacePHP = 'int_' . $btsname . '.php';  
+ 
+-	require_once(TL_ABS_PATH . 'cfg/'. $configPHP);
++	if (file_exists(TL_ABS_PATH . 'cfg/custom_'. $configPHP))
++	{
++		require_once(TL_ABS_PATH . 'cfg/custom_'. $configPHP);
++	}
++	else
++	{
++		require_once(TL_ABS_PATH . 'cfg/'. $configPHP);
++	}
+ 	require_once(TL_ABS_PATH . 'lib/bugtracking/'. $interfacePHP);
+ 	
+ 	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
 -- 
-tg: (f0706d5..) t/bugtrac_integration (depends on: master)
+tg: (7b2beb5..) t/bugtrac_integration (depends on: master)

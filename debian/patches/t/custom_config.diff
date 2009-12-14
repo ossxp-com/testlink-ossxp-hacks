@@ -6,10 +6,62 @@ Custom config files.
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
+ cfg/const.inc.php                                  |   14 ++--
+ config.inc.php                                     |    4 +-
  custom_config.inc.php.example                      |   93 +++++++++++++++----
  install/sql/mysql/testlink_create_default_data.sql |    2 +-
- 2 files changed, 74 insertions(+), 21 deletions(-)
+ 4 files changed, 83 insertions(+), 30 deletions(-)
 
+diff --git a/cfg/const.inc.php b/cfg/const.inc.php
+index 4552e3b..091cfe5 100644
+--- a/cfg/const.inc.php
++++ b/cfg/const.inc.php
+@@ -427,12 +427,12 @@ $tlCfg->reportsCfg=new stdClass();
+ 
+ // BUGID 1785
+ // With this change configuration is simplified
+-// $tlCfg->reportsCfg->exec_status = array(
+-//     "passed"  => "test_status_passed",
+-//     "failed"  => "test_status_failed",
+-//     "blocked" => "test_status_blocked",
+-//     "not_run" => "test_status_not_run"
+-// );
++$tlCfg->reportsCfg->exec_status = array(
++    "passed"  => "test_status_passed",
++    "failed"  => "test_status_failed",
++    "blocked" => "test_status_blocked",
++    "not_run" => "test_status_not_run"
++);
+ $tlCfg->reportsCfg->exec_status = $tlCfg->results['status_label_for_exec_ui'];
+ 
+ 
+@@ -651,4 +651,4 @@ $tlCfg->gui->custom_fields->time_format = "H:i:s";
+                                                        
+ 
+ // ----- END ----------------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
+diff --git a/config.inc.php b/config.inc.php
+index 4117b9f..d3b6ceb 100644
+--- a/config.inc.php
++++ b/config.inc.php
+@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
+ // The value must be available in $g_locales (see cfg/const.inc.php).
+ // Note: An attempt will be done to establish the default locale 
+ // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
+-$tlCfg->default_language = 'en_GB'; 
++$tlCfg->default_language = 'zh_CN'; 
+ 
+ /** 
+  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
+@@ -943,4 +943,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+ $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
+ $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
+ // ----- END OF FILE --------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
 index f9b9203..afc30ea 100644
 --- a/custom_config.inc.php.example
@@ -133,4 +185,4 @@ index fd0b246..345cf1f 100644
  # Assignment types
  INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
 -- 
-tg: (f0706d5..) t/custom_config (depends on: master)
+tg: (7b2beb5..) t/custom_config (depends on: master)

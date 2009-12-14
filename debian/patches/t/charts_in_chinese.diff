@@ -1,0 +1,48 @@
+From: leiww <leiww@bj.ossxp.com>
+Subject: [PATCH] t/charts_in_chinese
+
+For Issue #78: 点击结果／图表查看以图表形式显示测试用例的情况时，图表上中文显示为乱码
+
+Signed-off-by: leiww <leiww@bj.ossxp.com>
+
+---
+ custom_config.inc.php.example |   10 ++++++++++
+ lib/results/charts.inc.php    |    2 +-
+ 2 files changed, 11 insertions(+), 1 deletions(-)
+
+diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
+index afc30ea..daed99a 100644
+--- a/custom_config.inc.php.example
++++ b/custom_config.inc.php.example
+@@ -183,6 +183,16 @@ $g_smtp_password    = '';  # password
+ /** [LOCALIZATION] */
+ $tlCfg->default_language = 'zh_CN'; 
+ 
++// Set Chinese font for pchart.
++foreach (array("simsun.ttc", "SIMLI.TTF", "simhei.ttf", "STSONG.TTF") as $font)
++{
++    if (file_exists(TL_ABS_PATH . "third_party/pchart/Fonts/$font"))
++    {
++        $tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/$font";
++        break;
++    }
++}
++
+ /** 
+  *  How to warning user when security weak points exists.
+  *
+diff --git a/lib/results/charts.inc.php b/lib/results/charts.inc.php
+index 3ad3cc2..47f036a 100644
+--- a/lib/results/charts.inc.php
++++ b/lib/results/charts.inc.php
+@@ -24,7 +24,7 @@ include_once(PCHART_PATH . "/pChart/pChart.class");
+ */
+ function createChart(&$info,&$cfg)
+ {
+-    $backgndColor=array('R' => 255, 'G' => 255, 'B' => 255);
++    $backgndColor=array('R' => 254, 'G' => 255, 'B' => 255);
+     $chartCfg=new stdClass();
+     $chartCfg->XSize=$info->canDraw ? $cfg->XSize : 600;
+     $chartCfg->YSize=$info->canDraw ? $cfg->YSize : 50;                    
+-- 
+tg: (7ddeacc..) t/charts_in_chinese (depends on: t/custom_config)
