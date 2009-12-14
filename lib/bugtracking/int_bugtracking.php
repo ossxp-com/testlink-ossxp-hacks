@@ -329,11 +329,14 @@ if (isset($bts[$g_interface_bugs]))
 	$configPHP = $btsname . '.cfg.php';
 	$interfacePHP = 'int_' . $btsname . '.php';  
 
-	require_once(TL_ABS_PATH . 'cfg/'. $configPHP);
-    if (file_exists(TL_ABS_PATH . 'cfg/custom_'. $configPHP))
-    {
-	    require_once(TL_ABS_PATH . 'cfg/custom_'. $configPHP);
-    }
+	if (file_exists(TL_ABS_PATH . 'cfg/custom_'. $configPHP))
+	{
+		require_once(TL_ABS_PATH . 'cfg/custom_'. $configPHP);
+	}
+	else
+	{
+		require_once(TL_ABS_PATH . 'cfg/'. $configPHP);
+	}
 	require_once(TL_ABS_PATH . 'lib/bugtracking/'. $interfacePHP);
 	
 	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
