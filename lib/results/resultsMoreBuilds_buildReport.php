@@ -1,7 +1,7 @@
 <?php
 /** 
 * TestLink Open Source Project - http://testlink.sourceforge.net/ 
-* $Id: resultsMoreBuilds_buildReport.php,v 1.64.2.3 2009/04/10 10:37:14 amkhullar Exp $ 
+* $Id: resultsMoreBuilds_buildReport.php,v 1.64.2.5 2009/12/09 11:52:29 havlat Exp $ 
 *
 * @author	Kevin Levy <kevinlevy@users.sourceforge.net>
 * 
@@ -9,6 +9,7 @@
 * the builds they would like to query results against.
 *
 * rev :
+*      20091027 - franciscom - BUGID 2500
 *      20090409 - amitkhullar- code refactor for results object
 *      20090327 - amitkhullar- BUGID 2156 - added option to get latest/all results in Query metrics report.
 *      20090122 - franciscom - BUGID 2012 
@@ -139,14 +140,15 @@ function initializeGui(&$dbHandler,&$argsObj)
     // amitkhullar - added this parameter to get the latest results. 
 	$latest_resultset = $argsObj->display->latest_results;
 	
-    $assignee = $argsObj->ownerSelected ? TL_USER_ANYBODY : null;
-    $tester = $argsObj->executorSelected ? TL_USER_ANYBODY : null;
-    // $keyword_filter = $argsObj->keywordSelected ?
+	// 20091027 - franciscom - BUGID 2500
+    $assignee = $argsObj->ownerSelected > 0 ? $argsObj->ownerSelected : TL_USER_ANYBODY;
+    $tester = $argsObj->executorSelected > 0 ? $argsObj->executorSelected : TL_USER_ANYBODY  ;
+    
     $re = new newResults($dbHandler, $tplan_mgr,$tproject_info,$tplan_info, 
-                      $testsuiteIds, $buildsToQuery, $statusForClass, $latest_resultset,
-                      $argsObj->keywordSelected,$assignee, 
-                      $date_range->start->time, $date_range->end->time, 
-                      $tester, $argsObj->search_notes_string, $argsObj->execution_link_build);
+                         $testsuiteIds, $buildsToQuery, $statusForClass, $latest_resultset,
+                         $argsObj->keywordSelected,$assignee, 
+                         $date_range->start->time, $date_range->end->time, 
+                         $tester, $argsObj->search_notes_string, $argsObj->execution_link_build);
                       
     $gui->suiteList = $re->getSuiteList();  // test executions results
     $gui->flatArray = $re->getFlatArray();
@@ -215,6 +217,7 @@ function initializeGui(&$dbHandler,&$argsObj)
 */
 function init_args()
 {
+	$_REQUEST=strings_stripSlashes($_REQUEST);
     $args = new stdClass();  
     $args->format = isset($_REQUEST['format']) ? $_REQUEST['format'] : 'HTML';
   

@@ -2,7 +2,7 @@
 $Revision: 1.2.8.1 $
 $Date: 2009/05/25 18:39:04 $
 $Author: schlundus $
-$Name: branch_testlink_1_8 $
+$Name: testlink_1_8_5 $
 
 Migration from 1.6BETA  to 1.6 POST RC1 - 20050925 - fm
 bug correction - missing join conditions found by am

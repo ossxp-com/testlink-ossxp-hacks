@@ -2,7 +2,7 @@
 $Revision: 1.1.4.1 $
 $Date: 2009/05/25 18:39:04 $
 $Author: schlundus $
-$Name: branch_testlink_1_8 $
+$Name: testlink_1_8_5 $
 */
 UPDATE rights SET description = 'testplan_user_role_assignment' WHERE id=5;
 DELETE FROM rights WHERE id=19;
