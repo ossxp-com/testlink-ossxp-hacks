@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: eventviewer.php,v $
  *
- * @version $Revision: 1.20 $
- * @modified $Date: 2009/02/09 20:37:38 $ by $Author: schlundus $
+ * @version $Revision: 1.20.2.1 $
+ * @modified $Date: 2009/11/30 21:19:01 $ by $Author: havlat $
  *
  * rev: 20081029 - franciscom - added 'clear' action to delete all events and transactions
  *                              present on database.
@@ -79,11 +79,12 @@ function init_args()
 {
 	$args = new stdClass();
     $_REQUEST = strings_stripSlashes($_REQUEST);
-    $nullable_keys = array('logLevel','startDate','endDate','object_id',"object_type",'doAction');
+    $nullable_keys = array('startDate','endDate','object_id',"object_type",'doAction');
 	foreach($nullable_keys as $value)
 	{
-	  	$args->$value = isset($_REQUEST[$value]) ? $_REQUEST[$value] : null;
+	  	$args->$value = isset($_REQUEST[$value]) ? htmlspecialchars($_REQUEST[$value]) : null;
 	}
+  	$args->logLevel = isset($_REQUEST['logLevel']) ? intval($_REQUEST['logLevel']) : null;
     return $args;
 }
 
