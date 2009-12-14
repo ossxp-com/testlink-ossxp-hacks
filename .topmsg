@@ -1,0 +1,6 @@
+From: leiww <leiww@bj.ossxp.com>
+Subject: [PATCH] t/charts_in_chinese
+
+For Issue #78: 点击结果／图表查看以图表形式显示测试用例的情况时，图表上中文显示为乱码
+
+Signed-off-by: leiww <leiww@bj.ossxp.com>
