@@ -44,9 +44,9 @@ define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
  *     password: xxxxxxxx
  * ----------------------
  */
-define('BUG_TRACK_DB_CHARSET', "latain1");
+// define('BUG_TRACK_DB_CHARSET', "latain1");
 // define('BUG_TRACK_DB_CHARSET',"gb2312");
-// define('BUG_TRACK_DB_CHARSET',"UTF-8");
+define('BUG_TRACK_DB_CHARSET',"UTF-8");
 
 
 /* link of the web server for redmine */
