@@ -18,6 +18,8 @@ $(SOURCEDIR):
 	fi
 
 clean: $(SOURCEDIR) stub.clean
+	-rm stub.*
+
 stub.clean:
 	#(cd $(SOURCEDIR); rm -f $$(dirname $$(pwd -P))/ossxp-testlink*changes; rm -f $$(dirname $$(pwd -P))/ossxp-testlink*deb;)
 	-rm -f ossxp-testlink*changes ossxp-testlink*deb

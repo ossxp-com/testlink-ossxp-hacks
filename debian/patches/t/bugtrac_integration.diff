@@ -48,10 +48,10 @@ index a87ea2f..a709581 100644
 \ No newline at end of file
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..df2914c 100644
+index 331a77a..9ce2505 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -218,6 +218,7 @@ $g_removeEventsOlderThan = 30;
+@@ -220,6 +220,7 @@ $g_removeEventsOlderThan = 30;
   * 'TRACKPLUS' : edit configuration in TL_ABS_PATH/cfg/trackplus.cfg.php
   * 'EVENTUM'   : edit configuration in TL_ABS_PATH/cfg/eventum.cfg.php
   * 'SEAPINE'   : edit configuration in TL_ABS_PATH/cfg/seapine.cfg.php
@@ -80,4 +80,4 @@ index e166e92..961f0c8 100644
  	
  	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
 -- 
-tg: (7b2beb5..) t/bugtrac_integration (depends on: master)
+tg: (ee4073d..) t/bugtrac_integration (depends on: master)

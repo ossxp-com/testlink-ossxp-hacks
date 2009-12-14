@@ -6,12 +6,66 @@ Subject: [PATCH] t/zh_cn_l10n
 Signed-off-by: leiww <leiww@bj.ossxp.com>
 
 ---
- locale/tl_lang_parser.rb     |  263 +++
- locale/zh_CN/description.php |  313 ++--
- locale/zh_CN/strings.txt     | 3714 +++++++++++++++++++++---------------------
- locale/zh_CN/texts.php       |  476 +++----
- 4 files changed, 2498 insertions(+), 2268 deletions(-)
+ config.inc.php                  |   10 +-
+ lib/results/resultsByStatus.php |    2 +-
+ locale/en_GB/strings.txt        |    1 +
+ locale/tl_lang_parser.rb        |  263 +++
+ locale/zh_CN/description.php    |  313 ++--
+ locale/zh_CN/strings.txt        | 3715 ++++++++++++++++++++-------------------
+ locale/zh_CN/texts.php          |  476 +++---
+ 7 files changed, 2506 insertions(+), 2274 deletions(-)
 
+diff --git a/config.inc.php b/config.inc.php
+index 331a77a..d717b34 100644
+--- a/config.inc.php
++++ b/config.inc.php
+@@ -703,10 +703,10 @@ $tlCfg->req_cfg->reqdoc_id->is_system_wide = FALSE;
+  * 	TRUE  => REQuirement Specification Title is used as testsuite name     
+  */
+ $tlCfg->req_cfg->use_req_spec_as_testsuite_name = TRUE;
+-$tlCfg->req_cfg->default_testsuite_name = "Auto-created Test cases";
+-$tlCfg->req_cfg->testsuite_details = "Test Cases in the Test Suite are generated from Requirements. " .
+-		                            "A refinement of test scenario is highly recommended.";
+-$tlCfg->req_cfg->testcase_summary_prefix = "<b>The Test Case was generated from the assigned requirement.</b><br />";
++$tlCfg->req_cfg->default_testsuite_name = "自动声称的测试用例";
++$tlCfg->req_cfg->testsuite_details = "测试用例套件中的测试用例是由根据需求生成的. " .
++		                            "强烈建议做进一步的修改.";
++$tlCfg->req_cfg->testcase_summary_prefix = "<b>该测试用例是由相关联的需求自动生成的.</b><br />";
+ 
+ 
+ // ENABLED: allow N level depth tree 
+@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+ $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
+ $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
+ // ----- END OF FILE --------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/results/resultsByStatus.php b/lib/results/resultsByStatus.php
+index 9883f03..0825305 100644
+--- a/lib/results/resultsByStatus.php
++++ b/lib/results/resultsByStatus.php
+@@ -144,7 +144,7 @@ if (is_array($mapOfLastResult))
+ 	  	    	}
+ 			if ($testerName == "")
+ 			{
+-				$testerName = "Not Assigned Yet";
++				$testerName = lang_get('result_unassigned');
+ 			}
+ 	            // 20080602 - francisco.mancardi@gruppotesi.com
+ 	            // To get executed Version, we can not do anymore this 
+diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
+index 471fb9e..82aed73 100644
+--- a/locale/en_GB/strings.txt
++++ b/locale/en_GB/strings.txt
+@@ -1321,6 +1321,7 @@ $TLS_th_date = "Date";
+ $TLS_th_run_by = "Run by";
+ $TLS_th_bugs_not_linked = "Test Cases with missing/linked Bugs";
+ $TLS_th_assigned_to = "Assigned To";
++$TLS_result_unassigned = "Not Assigned Yet";
+ 
+ 
+ // ----- gui/templates/resultsGeneral.tpl -----
 diff --git a/locale/tl_lang_parser.rb b/locale/tl_lang_parser.rb
 new file mode 100755
 index 0000000..6b123b9
@@ -282,7 +336,7 @@ index 0000000..6b123b9
 +main
 +
 diff --git a/locale/zh_CN/description.php b/locale/zh_CN/description.php
-index 811937a..12be6ae 100644
+index 811937a..ac1f233 100644
 --- a/locale/zh_CN/description.php
 +++ b/locale/zh_CN/description.php
 @@ -26,229 +26,196 @@
@@ -446,7 +500,7 @@ index 811937a..12be6ae 100644
 -and browse exesting ones then.</p>";
 +$TLS_hlp_executeMain = "<h2>执行测试用例</h2>
 +<p>允许用户执行测试用例。执行本身只是一个对选择的构建的测试案例分配结果（通过，失败，锁定）</p>
-+<p>通过配置缺陷跟踪系统，用户可以直接新建问题和浏览已经存在的问题。</p>";
++<p>通过配置缺陷跟踪系统，用户可以直接新建问题和浏览已经存在的问题。更多信息请查看安装手册。</p>";
  
  //bug_add.html
 -$TLS_hlp_btsIntegration = "<h2>Add Bugs to Test Case</h2>
@@ -657,7 +711,7 @@ index 811937a..12be6ae 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index a16c224..f296105 100644
+index a16c224..c74c062 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
 @@ -1,7 +1,7 @@
@@ -1563,7 +1617,7 @@ index a16c224..f296105 100644
  $TLS_link_results_import = "导入结果";
  
  
-@@ -498,1838 +551,1861 @@ $TLS_link_results_import = "导入结果";
+@@ -498,1838 +551,1862 @@ $TLS_link_results_import = "导入结果";
  
  
  // gui/templates/cfields/cfieldsView.tpl
@@ -1625,7 +1679,7 @@ index a16c224..f296105 100644
 -$TLS_test_case_id = "ID";
 -$TLS_title_created = "Created on";
 -$TLS_title_last_mod = "Last modified on ";
-+$TLS_by = "源自:";
++$TLS_by = "作者:";
 +$TLS_coverage = "覆盖率";
 +$TLS_popup_delete_req = "你确定要删除这个需求吗？";
 +$TLS_req_edit = "编辑需求";
@@ -2511,7 +2565,7 @@ index a16c224..f296105 100644
 +$TLS_title_events = "查看网站后台";
 +$TLS_title_execute = "执行";
 +$TLS_title_results = "结果";
-+$TLS_title_specification = "测试规约";
++$TLS_title_specification = "测试规范";
 +$TLS_session_inactivity_timeout_at = "会话空闲过期时间";
 +
 +
@@ -2908,6 +2962,7 @@ index a16c224..f296105 100644
 +$TLS_th_run_by = "执行人";
 +$TLS_th_bugs_not_linked = "关联/未关联bug的测试用例";
 +$TLS_th_assigned_to = "指派给";
++$TLS_result_unassigned = "尚未指派";
  
 -// gui/templates/resultsGeneral.tpl
 -$TLS_title_gen_test_rep = "Test Plan Metrics";
@@ -3488,7 +3543,7 @@ index a16c224..f296105 100644
 +$TLS_href_user_management = "用户管理";
 +$TLS_href_admin_modules = "系统配置";
 +$TLS_title_requirements = "需求";
-+$TLS_title_test_spec = "测试规约";
++$TLS_title_test_spec = "测试规范";
 +$TLS_title_product_mgmt = "产品管理";
 +$TLS_href_plan_define_priority = "定义优先级规则";
 +$TLS_href_my_testcase_assignments="指派给我的用例";
@@ -3813,7 +3868,7 @@ index a16c224..f296105 100644
 -$TLS_login_must_not_be_empty = "Login must not be empty!";
 -$TLS_wrong_old_password = "Wrong old password!";
 +// ----- lib/functions/info.inc.php -----
-+$TLS_email_sent_message = "您的邮件已被发送";
++$TLS_email_sent_message = "你查看的信息已经以邮件形式发送到你的邮箱，请注意查收";
  
  
 +// ----- lib/functions/print.inc.php -----
@@ -4252,7 +4307,7 @@ index a16c224..f296105 100644
 +$TLS_format_xls 		= 'MS Excel';
 +$TLS_format_msword 		= 'MS Word';
 +$TLS_format_pdf 		= 'PDF';
-+$TLS_format_mail_html 	= '邮件(HTML)';
++$TLS_format_mail_html 	= 'Email(HTML)';
  
  
 -// lib/testcases/archive.inc.php
@@ -4880,7 +4935,7 @@ index a16c224..f296105 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/texts.php b/locale/zh_CN/texts.php
-index 773333c..e80337f 100644
+index 773333c..9006b02 100644
 --- a/locale/zh_CN/texts.php
 +++ b/locale/zh_CN/texts.php
 @@ -26,374 +26,298 @@
@@ -4937,9 +4992,9 @@ index 773333c..e80337f 100644
 +$TLS_htmltext_title['editTc']	= "测试规范";
 +$TLS_htmltext['editTc'] 		= "<h2>目的:</h2>
 +<h2>目的:</h2>
-+<p> <i>测试规范</i> 允许用户查看和编辑所有现在有的测试案例集" .
-+		"<i>测试用例集</i> 和 <i>测使用例</i>. 同一个测试案例可以保留多个版本.".
-+		"并且所有以前的历史版本都将被保留并在这里可以查看和管理.</p>
++<p> <i>测试规范</i> 允许用户查看和编辑所有现有的" .
++		"<i>测试套件</i> 和 <i>测试用例</i>. 同一个测试案例可以保留多个版本.".
++		"所有以前的历史版本都将被保留,并且可以在这里进行查看和管理.</p>
 +
 +<h2>开始:</h2>
  <ol>
@@ -5183,8 +5238,8 @@ index 773333c..e80337f 100644
 -<li><b>Charts</b> - report include graphs (flash technology)</li>
 +<li><b>正常</b> - 报告显示为网页格式</li>
 +<li><b>MS Excel</b> - 报告输出为 Microsoft Excel</li>
-+<li><b>HTML Email</b> -报告以邮件形式发送到用户的心想 </li>
-+<li><b>图表</b> - 报告以图表形式出现(flash 技术)</li>
++<li><b>HTML Email</b> -报告以邮件形式发送到用户的信箱 </li>
++<li><b>图表</b> - 报告以图表形式显示(flash 技术)</li>
  </ul>
  
 -<p>The print button activate print of a report only (without navigation).</p>
@@ -5197,8 +5252,8 @@ index 773333c..e80337f 100644
 -The most 'current status' is determined by the most recent build test cases were executed on.  For
 -instance, if a test case was executed over multiple builds, only the latest result is taken into account.</p>
 +<h3>通用测试统计报告</h3>
-+<p>该页只显示测试计划里测试用例集,所有者, 关键字的最新状态.
-+'当前状态' 是指最近的测试版本的测试执行状态.例如. 一个测试案例在多个构建版本上执行过. 这里只显示最新版本的结果.</p>
++<p>该页只显示测试计划中的测试套件,所有者, 关键字的最新状态.
++'当前状态' 是指最近的测试版本的测试执行状态.例如. 一个测试用例在多个构建版本上执行过. 这里只显示最新版本的结果.</p>
  
 -<p>'Last Test Result' is a concept used in many reports, and is determined as follows:</p>
 +<p>'最终测试结果'是许多报告里用的一个概念. 它是这样定义的:</p>
@@ -5230,12 +5285,12 @@ index 773333c..e80337f 100644
 -	<li><b>Results by owner</b>
 -	Lists each owner that has test cases assigned to them in the current test plan. Test cases which
 -	are not assigned are tallied under the 'unassigned' heading.</li>
-+	<li><b>按顶级测试案例子集</b>
-+	表中列出顶级的测试案例. 总案例数目, 通过数目, 失败数目, 受阻数目, 未执行数目, 顶级测试子级和下级子集的百分比.</li>
++	<li><b>按顶级测试套件</b>
++	表中列出顶级的测试套件. 总的测试用例数目, 通过数目, 失败数目, 受阻数目, 未执行数目, 顶级测试套件的子集及下级子集的百分比.</li>
 +	<li><b>按关键字</b>
-+	表中列出当前测试计划里所有测试案例里的关键词, 以及对应的测试结果.</li>
++	表中列出当前测试计划里所有测试用例里的关键词, 以及对应的测试结果.</li>
 +	<li><b>按测试者</b>
-+	列出当前测试计划里分派给各用户的测试案例. 未分配给用户的归类到 '(未分派)unassigned' 栏里.</li>
++	列出当前测试计划里分派给各用户的测试用例. 未分配给用户的归类到 'unassigned(未分派)' 栏里.</li>
  </ul>
  
 -<h3>The Overall Build Status</h3>
@@ -5243,7 +5298,7 @@ index 773333c..e80337f 100644
 -% pass, total fail, % fail, blocked, % blocked, not run, %not run.  If a test case has been executed
 -twice on the same build, the most recent execution will be taken into account.</p>
 +<h3>总体版本状态</h3>
-+<p>列出各个版本的执行结果. 对于每一个版本, 有总测试案例数, 总通过数, 通过的比例, 总失败数, 失败的比例, 总受阻的数目, 受阻的比例, 未执行的总数, 未执行的比例. 如果一个测试案例在同一个构建版本上执行了多次, 则最近一次的结果才计入统计.</p>
++<p>列出各个版本的执行结果. 对于每一个版本, 有总测试用例数, 总通过数, 通过的比例, 总失败数, 失败的比例, 总受阻数, 受阻的比例, 未执行的总数, 未执行的比例. 如果一个测试用例在同一构建版本上执行了多次, 则最近一次的结果才计入统计结果.</p>
  
 -<h3>Query Metrics</h3>
 -<p>This report consists of a query form page, and a query results page which contains the queried data.
@@ -5252,7 +5307,7 @@ index 773333c..e80337f 100644
 -allows the user to filter the results and generate specific reports for specific owner, keyword, suite,
 -and build combinations.</p>
 +<h3>查询统计</h3>
-+<p>该报表包括一个查询输入表, 一个查询结果页. 查询输入表有四个按钮. 每个按钮的缺省值设置为查询可以包括的最大范围. 用户可以更改 按钮以缩小查询范围. 可以按分派人, 关键词, 子类, 版本等组合过滤.</p>
++<p>该报表包括一个查询输入表, 一个查询结果页. 查询输入表有四个按钮. 每个按钮的缺省值设置为查询可以包括的最大范围. 用户可以更改按钮以缩小查询范围. 可以按分派人, 关键字, 子类, 版本等组合过滤.</p>
  
  <ul>
 -<li><b>keyword</b> 0->1 keywords can be selected. By default - no keyword is selected. If a keyword is not
@@ -5277,7 +5332,7 @@ index 773333c..e80337f 100644
 -considered. The '# of Test Cases' totals you will see on the report will be influenced by these 3 controls.
 -Build selections will influence if a case is considered 'pass', 'fail', 'blocked', or 'not run'.  Please
 -refer to 'Last Test Result' rules as they appear above.</li>
-+<li><b>关键字</b>可以选择 0->1 个关键词. 系统缺省的设置是不选. 如果该关键词不被选中, 则测试规范里和关键词管理 页不管有没有分配该关键词的所有测试案例都包括. 一个关键词进入一个测试案例后, 将传播到该测试案例所属于的所有的 测试计划, 以及该案例的所有版本. 如果你只关心有特定的关键词的测试结果, 你要改变控制按钮的值. </li>
++<li><b>关键字</b>可以选择 0->1 个关键字. 系统缺省的设置是不选. 如果该关键字不被选中, 则测试规范里和关键字管理页不管有没有分配该关键字的所有测试案例都包括. 一个关键词进入一个测试案例后, 将传播到该测试案例所属于的所有的 测试计划, 以及该案例的所有版本. 如果你只关心有特定的关键词的测试结果, 你要改变控制按钮的值. </li>
 +<li><b>所有者</b> 可以选择 0->1 个主人. 系统缺省的设置是不选. 如果不选. 则所有案例都选择,不管测试任务分派给谁了. 目前还没有搜索'未指派'执行人的测试案例的功能. 主人是通过 '指派测试任务(Assign Test Case execution)'页来实现的, 而且是每个测试计划都要单独做的. 如果你关心工作是谁做的, 你要修改这个按钮的值.</li>
 +<li><b>顶级子集</b>可以选择 0->n 级测试子集. 缺省状态是所有子集.
 +    只有被选取的子集才出现在查询结果中.如果你只关心某个子集,你可以修改这项控制.</li>
@@ -5460,4 +5515,4 @@ index 773333c..e80337f 100644
 \ No newline at end of file
 +?>
 -- 
-tg: (7b2beb5..) t/zh_cn_l10n (depends on: master)
+tg: (ee4073d..) t/zh_cn_l10n (depends on: master)

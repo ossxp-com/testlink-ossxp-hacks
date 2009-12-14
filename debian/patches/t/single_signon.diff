@@ -16,10 +16,10 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  7 files changed, 155 insertions(+), 13 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..ff0f1f2 100644
+index 331a77a..d4b5db7 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -260,17 +260,23 @@ $g_smtp_password    = '';  # password
+@@ -262,17 +262,23 @@ $g_smtp_password    = '';  # password
  /** 
   * Login authentication method:
   * 		'MD5' => use password stored on db
@@ -247,10 +247,10 @@ index 84bd6b0..7084b70 100644
 \ No newline at end of file
 +?>
 diff --git a/login.php b/login.php
-index c80aef7..cf20164 100644
+index 1ef2a62..85a8f1e 100644
 --- a/login.php
 +++ b/login.php
-@@ -35,13 +35,23 @@ if (!$op['status'])
+@@ -37,13 +37,23 @@ if (!$op['status'])
  $args = init_args();
  $gui = init_gui($db,$args);
  
@@ -277,7 +277,7 @@ index c80aef7..cf20164 100644
  	{
  		if (!$msg)
  		{
-@@ -61,6 +71,13 @@ if(!is_null($args->login))
+@@ -63,6 +73,13 @@ if(!is_null($args->login))
  	}
  }
  
@@ -320,4 +320,4 @@ index 5e4d739..ed55309 100644
 \ No newline at end of file
 +?>
 -- 
-tg: (7b2beb5..) t/single_signon (depends on: master)
+tg: (ee4073d..) t/single_signon (depends on: master)

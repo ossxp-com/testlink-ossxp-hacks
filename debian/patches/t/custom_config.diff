@@ -6,14 +6,14 @@ Custom config files.
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- cfg/const.inc.php                                  |   14 ++--
+ cfg/const.inc.php                                  |   14 +-
  config.inc.php                                     |    4 +-
- custom_config.inc.php.example                      |   93 +++++++++++++++----
+ custom_config.inc.php.example                      |  122 ++++++++++++++------
  install/sql/mysql/testlink_create_default_data.sql |    2 +-
- 4 files changed, 83 insertions(+), 30 deletions(-)
+ 4 files changed, 97 insertions(+), 45 deletions(-)
 
 diff --git a/cfg/const.inc.php b/cfg/const.inc.php
-index 4552e3b..091cfe5 100644
+index 837fee0..27160f9 100644
 --- a/cfg/const.inc.php
 +++ b/cfg/const.inc.php
 @@ -427,12 +427,12 @@ $tlCfg->reportsCfg=new stdClass();
@@ -43,10 +43,10 @@ index 4552e3b..091cfe5 100644
 \ No newline at end of file
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 4117b9f..d3b6ceb 100644
+index 331a77a..0480918 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
+@@ -112,7 +112,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
  // The value must be available in $g_locales (see cfg/const.inc.php).
  // Note: An attempt will be done to establish the default locale 
  // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
@@ -55,7 +55,7 @@ index 4117b9f..d3b6ceb 100644
  
  /** 
   * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
-@@ -943,4 +943,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
  $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
  $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
  // ----- END OF FILE --------------------------------------------------------------------
@@ -63,16 +63,53 @@ index 4117b9f..d3b6ceb 100644
 \ No newline at end of file
 +?>
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index f9b9203..afc30ea 100644
+index f9b9203..514e70c 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
-@@ -70,25 +70,6 @@
- // $tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'none');
+@@ -40,54 +40,34 @@
+ // Your reports WILL BE ON TOP OF standard TL Reports on left frame
  //
  //
+-// $tlCfg->gui->text_editor['all'] = array( 'type' => 'fckeditor', 
+-//                                          'toolbar' => 'tl_default', 
+-//                                          'configFile' => 'cfg/tl_fckeditor_config.js');
++// Use 'fckeditor' as default editor toolbox.
++$tlCfg->gui->text_editor['all'] = array( 'type' => 'fckeditor',
++                                         'toolbar' => 'tl_default',
++                                         'configFile' => 'cfg/tl_fckeditor_config.js');
+ //
+-// Copy this to custom_config.inc.php if you want use 'tinymce' as default.
++// Use 'tinymce' as default editor toolbox.
+ //$tlCfg->gui->text_editor['all'] = array( 'type' => 'tinymce');
+ // 
+ // Copy this to custom_config.inc.php if you want use 'nome' as default.
+ // $tlCfg->gui->text_editor['all'] = array( 'type' => 'none');
+ //
+ // Suggested for BETTER Performance with lot of testcases
+-//$tlCfg->gui->text_editor['execution'] = array( 'type' => 'none');
++$tlCfg->gui->text_editor['execution'] = array( 'type' => 'none');
+ //
+ // Enable and configure this if you want to have different
+ // webeditor type in different TL areas
+ // You can not define new areas without making changes to php code
+ //
+-// $tlCfg->gui->text_editor['execution'] = array( 'type' => 'none');  // BETTER Performance with lot of testcases
+-// 
+ // This configuration is useful only if default type is set to 'fckeditor'
+-// $tlCfg->gui->text_editor['design'] = array('toolbar' => 'tl_mini');
+-// 
+-// $tlCfg->gui->text_editor['testplan'] = array( 'type' => 'none');
+-// $tlCfg->gui->text_editor['build'] = array( 'type' => 'fckeditor','toolbar' => 'tl_mini');
+-// $tlCfg->gui->text_editor['testproject'] = array( 'type' => 'tinymce');
+-// $tlCfg->gui->text_editor['role'] = array( 'type' => 'tinymce');
+-// $tlCfg->gui->text_editor['requirement'] = array( 'type' => 'none');
+-// $tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'none');
+-//
+-//
 -// SMTP server Configuration ("localhost" is enough in the most cases)
 -//$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
--
++$tlCfg->gui->text_editor['design'] = array('toolbar' => 'tl_mini');
+ 
 -# Configure using custom_config.inc.php
 -//$g_tl_admin_email     = 'tl_admin@127.0.0.1'; # for problem/error notification 
 -//$g_from_email         = 'testlink@127.0.0.1';  # email sender
@@ -88,11 +125,17 @@ index f9b9203..afc30ea 100644
 -// Configure only if SMTP server requires authentication
 -//$g_smtp_username    = '';  # user  
 -//$g_smtp_password    = '';  # password 
--//
++$tlCfg->gui->text_editor['testplan'] = array( 'type' => 'fckeditor');
++$tlCfg->gui->text_editor['build'] = array( 'type' => 'fckeditor','toolbar' => 'tl_default');
++$tlCfg->gui->text_editor['testproject'] = array( 'type' => 'fckeditor');
++$tlCfg->gui->text_editor['role'] = array( 'type' => 'fckeditor');
++$tlCfg->gui->text_editor['requirement'] = array( 'type' => 'fckeditor');
++$tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'fckeditor');
++//
+ //
  
  // TRUE  -> the whole execution history for the choosen build will be showed
- // FALSE -> just last execution for the choosen build will be showed [STANDARD BEHAVIOUR]
-@@ -140,4 +121,76 @@
+@@ -140,4 +120,76 @@
  // ); 
  // 
  // $tlCfg->results['default_status'] = "not_run"; 
@@ -185,4 +228,4 @@ index fd0b246..345cf1f 100644
  # Assignment types
  INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
 -- 
-tg: (7b2beb5..) t/custom_config (depends on: master)
+tg: (ee4073d..) t/custom_config (depends on: master)

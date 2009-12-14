@@ -1,3 +1,11 @@
+ossxp-testlink (1.8.5-10) unstable; urgency=low
+
+  * Upstream upgrade to 1.8.5
+  * Enable fckeditor
+  * More translation.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Mon, 14 Dec 2009 22:14:18 +0800
+
 ossxp-testlink (1.8.4-9) unstable; urgency=low
 
   * Source code branch refector;
