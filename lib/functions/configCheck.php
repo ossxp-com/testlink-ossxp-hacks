@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *
  * Filename $RCSfile: configCheck.php,v $
- * @version $Revision: 1.40.2.1 $
- * @modified $Date: 2009/04/16 11:12:03 $ by $Author: havlat $
+ * @version $Revision: 1.40.2.2 $
+ * @modified $Date: 2009/12/09 11:42:35 $ by $Author: havlat $
  *
  * @author Martin Havlat
  * 
@@ -737,11 +737,13 @@ function checkPhpVersion(&$errCounter)
 {
 	// 5.2 is required because json is used in ext-js component
 	$min_version = '5.2.0'; 
+	$too_new_version = '5.3.0'; 
 	$my_version = phpversion();
 
 	// version_compare:
 	// -1 if left is less, 0 if equal, +1 if left is higher
 	$php_ver_comp = version_compare($my_version, $min_version);
+	$php_ver_comp2 = version_compare($my_version, $too_new_version);
 
 	$final_msg = '<tr><td>PHP version</td>';
 
@@ -752,9 +754,16 @@ function checkPhpVersion(&$errCounter)
 	        'This is fatal problem. You must upgrade it.</td>';
 		$errCounter += 1;
 	} 
-	else 
+	elseif($php_ver_comp2 > 0) 
 	{
-		$final_msg .= "<td><span class='tab-success'>OK ( {$min_version} [minimum version] ";
+		$final_msg .= "<td><span class='tab-warning'>Warning! ( PHP {$min_version} version (and fixes) are supported. " .
+				"Newer versions are not fully compatible with. We highly recommned to use it. Your version";
+		$final_msg .= ($php_ver_comp == 0 ? " = " : " <= ");
+		$final_msg .=	$my_version . " ) </span></td></tr>";
+	} 
+	else
+	{
+		$final_msg .= "<td><span class='tab-success'>OK ( {$min_version} [supported minimal version] ";
 		$final_msg .= ($php_ver_comp == 0 ? " = " : " <= ");
 		$final_msg .=	$my_version . " [your version] " ;
 		$final_msg .= " ) </span></td></tr>";

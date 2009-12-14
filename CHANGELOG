@@ -3,6 +3,17 @@
    Change log for TestLink
 ***************************************************************
 
+TestLink - 1.8.5 (bug fixing)
+=============================
+- 0002927: [Third party software components] Upgrade FCKEditor for supporting Safari and avoiding data loss (mhavlat) - resolved.
+- 0002678: [Reports, Metrics, Export and Print] The Charts text are not displayed correctly (mhavlat) - resolved.
+- 0002901: [User Interface General] Saving a test case will exit editing mode with a pop up window (mhavlat) - resolved.
+- 0002947: [General] HTML tags stripping (mhavlat) - resolved.
+- 0002993: [Internal issue] Error in configuration (mhavlat) - resolved.
+- 0002975: [Test Plan (builds, milestones, test assign)] Space missing for SQL concatenation (mhavlat) - resolved.
+- 0002909: [Documentation (Install, User Manual, help)] existing spelled wrong as "exesting" (mhavlat) - resolved.
+
+
 TestLink - 1.8.4 (bug fixing)
 =============================
 - 0002325: [Database Postgres] Cannot upgrade from 1.7.x to 1.8.0 with PostgreSQL (toshi) - resolved.

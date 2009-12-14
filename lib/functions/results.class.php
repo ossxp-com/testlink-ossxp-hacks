@@ -5,8 +5,8 @@
  *
  * @filesource $RCSfile: results.class.php,v $
  *
- * @version $Revision: 1.132.2.8 $
- * @modified $Date: 2009/04/28 10:42:52 $ by $Author: amkhullar $
+ * @version $Revision: 1.132.2.10 $
+ * @modified $Date: 2009/12/09 11:51:52 $ by $Author: havlat $
  * @copyright Copyright (c) 2008, TestLink community
  * @author franciscom
  *-------------------------------------------------------------------------
@@ -273,6 +273,7 @@ class results
 		    $this->suiteStructure = $this->generateExecTree($db,$keywordId, $owner);
 		}
 
+        
 		// KL - if no builds are specified, no need to execute the following block of code
 		if ($builds_to_query != -1) {
 			// retrieve results from executions table
@@ -1093,7 +1094,8 @@ class results
 		if (($builds_to_query != -1) && ($builds_to_query != 'a')) {
 			$sqlFilters .= " AND build_id IN ($builds_to_query) ";
 		}
-		if (!is_null($executor)) {
+		// BUGID 2023
+		if (!is_null($executor) && $executor != '' && $executor != TL_USER_ANYBODY) {
 		    $sqlFilters .= " AND tester_id = $executor ";
 		}
 		if ($search_notes_string != null) {
@@ -1323,6 +1325,7 @@ class results
 	    $test_spec = $tproject_mgr->get_subtree($this->tprojectID,$RECURSIVE_MODE);
 		$tp_tcs = $tplan_mgr->get_linked_tcversions($this->testPlanID,null,$keyword_id, null, $owner);
 		
+	
 		$this->linked_tcversions = &$tp_tcs;
 		if (is_null($tp_tcs)) {
 			$tp_tcs = array();
@@ -1605,6 +1608,7 @@ class newResults extends results
 							&$suiteStructure = null, &$flatArray = null, &$linked_tcversions = null)
 	{
 
+        // new dBug(func_get_args());
 		$this->latest_results = $latest_results_arg;
 		return $this->results_overload($db, $tplan_mgr,$tproject_info, $tplan_info,
 	                        $suitesSelected ,
