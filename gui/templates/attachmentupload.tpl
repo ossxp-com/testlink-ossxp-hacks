@@ -1,5 +1,5 @@
 {* TestLink Open Source Project - http://testlink.sourceforge.net/ *}
-{* $Id: attachmentupload.tpl,v 1.10 2009/01/29 20:58:22 schlundus Exp $ *}
+{* $Id: attachmentupload.tpl,v 1.10.2.1 2009/11/30 20:52:00 havlat Exp $ *}
 {* Purpose: smarty template - template for attachment upload dialog 
 
    rev :
@@ -30,7 +30,7 @@ var warning_empty_title = "{lang_get s='enter_attachment_title'}";
 		<input type="hidden" name="MAX_FILE_SIZE" value="{$import_limit}" /> {* restrict file size *}
 		<p>{lang_get s='local_file'}
 			<input type='hidden' value='{$id}' name='id' />
-			<input type='hidden' value='{$tableName}' name='tableName' />
+			<input type='hidden' value='{$tableName|escape}' name='tableName' />
 			<input type="file" name="uploadedFile" size="{#UPLOAD_FILENAME_SIZE#}" />
 		</p>
 		<p>

@@ -3,8 +3,8 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * 
  * Filename $RCSfile: description.php,v $
- * @version $Revision: 1.6 $
- * @modified $Date: 2008/10/30 11:25:50 $ $Author: havlat $
+ * @version $Revision: 1.6.2.1 $
+ * @modified $Date: 2009/10/23 10:10:14 $ $Author: havlat $
  * @author Martin Havlat
  *
  * LOCALIZATION:
@@ -123,7 +123,7 @@ $TLS_hlp_executeMain = "<h2>Executing Test Cases</h2>
 <p>Allows users to 'execute' test cases. Execution itself is merely
 assigning a test case a result (pass,fail,blocked) against a selected build.</p>
 <p>Access to a bug tracking system could be configured. User can directly add a new bugs
-and browse exesting ones then.</p>";
+and browse existing ones then. See Installation manual for more.</p>";
 
 //bug_add.html
 $TLS_hlp_btsIntegration = "<h2>Add Bugs to Test Case</h2>

@@ -3,8 +3,8 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * 
  * @filesource $RCSfile: database.class.php,v $
- * @version $Revision: 1.35 $
- * @modified $Date: 2009/02/04 08:14:18 $ by $Author: franciscom $
+ * @version $Revision: 1.35.2.2 $
+ * @modified $Date: 2009/12/09 11:52:29 $ by $Author: havlat $
  * @author Francisco Mancardi
  * 
  *
@@ -136,6 +136,15 @@ class database
 		return ($result);
 	}
 
+	function reportFatal($msg)
+	{
+		tLog($msg, 'ERROR', "DATABASE");			
+		echo '<html><head><title>TestLink Database error</title></head><body>' .
+				'<h1>TestLink Database error</h1><p>' .
+				htmlspecialchars($msg) . '</p></body>';
+		exit;
+	}
+
 	# --------------------
 	# execute query, requires connection to be opened
 	function exec_query( $p_query, $p_limit = -1, $p_offset = -1 )
@@ -171,17 +180,22 @@ class database
 		    tLog($message,$logLevel,"DATABASE");
 		}
 		
-    // 20080927 - may be this causes lot of memory usage
-    if($this->logQueries)
-    {
-		    array_push ($this->queries_array, array( $p_query, $t_elapsed, $ec, $emsg ) );
-    }
-    
-		if ( !$t_result ) {
-			echo "ERROR ON exec_query() - database.class.php <br>" . $this->error($p_query) . "<br>";
-      echo "<br> THE MESSAGE :: $message <br>";			
+		// 20080927 - may be this causes lot of memory usage
+		if($this->logQueries)
+		{
+			array_push ($this->queries_array, array( $p_query, $t_elapsed, $ec, $emsg ) );
+		}
+		
+		if ( !$t_result ) 
+		{
+			$errorMsg = "ERROR ON exec_query() - database.class.php <br />" . $this->error(htmlspecialchars($p_query)) . 
+					"<br />THE MESSAGE : $message ";			
+			reportFatal($errorMsg);
+
 			return false;
-		} else {
+		} 
+		else 
+		{
 			return $t_result;
 		}
 	}

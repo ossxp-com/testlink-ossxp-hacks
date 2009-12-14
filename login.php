@@ -3,14 +3,16 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later. 
  *
- * Filename $RCSfile: login.php,v $
+ * Login page with configuratin checking and authorization
  *
- * @version $Revision: 1.47 $
- * @modified $Date: 2009/01/07 19:55:34 $ by $Author: schlundus $
- * @author Martin Havlat
+ * @package 	TestLink
+ * @author 		Martin Havlat
+ * @copyright 	2006, TestLink community 
+ * @version    	CVS: $Id: login.php,v 1.47.2.1 2009/11/28 23:16:17 havlat Exp $
+ * @filesource	http://testlink.cvs.sourceforge.net/viewvc/testlink/testlink/login.php?view=markup
+ * @link 		http://www.teamst.org/index.php
  * 
- * Login management
- *
+ * @internal 
  * rev: 20081231 - franciscom - minor refactoring
  *      20081015 - franciscom - access to config parameters following development standard
  **/
@@ -85,25 +87,20 @@ $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
 $smarty->display('login.tpl');
 
-/*
-  function: 
-
-  args:
-  
-  returns: 
-
-*/
+/**
+ * Initialize input parameters
+ */
 function init_args()
 {
     $args = new stdClass();
     $_REQUEST = strings_stripSlashes($_REQUEST);
     
-    $args->note = isset($_REQUEST['note']) ? $_REQUEST['note'] : null;
+    $args->note = isset($_REQUEST['note']) ? htmlspecialchars($_REQUEST['note']) : null;
     $args->login = isset($_REQUEST['tl_login']) ? trim($_REQUEST['tl_login']) : null;
     $args->pwd = isset($_REQUEST['tl_password']) ? $_REQUEST['tl_password'] : null;
 
-    $args->reqURI = isset($_REQUEST['req']) ? $_REQUEST['req'] : null;
-    $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? $_REQUEST['reqURI'] : null;
+    $args->reqURI = isset($_REQUEST['req']) ? urlencode($_REQUEST['req']) : null;
+    $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? urlencode($_REQUEST['reqURI']) : null;
   
     return $args;
 }
