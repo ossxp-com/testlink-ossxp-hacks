@@ -2,7 +2,7 @@
 $Revision: 1.3.8.1 $
 $Date: 2009/05/25 18:39:04 $
 $Author: schlundus $
-$Name: branch_testlink_1_8 $
+$Name: testlink_1_8_5 $
 
 20051013 - fm - added Test Plan info in build name
 Migration from 1.5.x to 1.6 POST RC1 - 20050925 - fm

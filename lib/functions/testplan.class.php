@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *
  * @filesource $RCSfile: testplan.class.php,v $
- * @version $Revision: 1.102.2.8 $
- * @modified $Date: 2009/08/05 07:46:24 $ by $Author: franciscom $
+ * @version $Revision: 1.102.2.10 $
+ * @modified $Date: 2009/11/26 21:50:52 $ by $Author: havlat $
  * 
  * @copyright Copyright (c) 2008, TestLink community
  * @author franciscom
@@ -24,6 +24,7 @@
  * --------------------------------------------------------------------------------------
  * Revisions:
  *
+ *  20091027 - franciscom - BUGID 2500 - get_linked_tcversions()
  *  20090214 - franciscom - BUGID 2099 - get_linked_tcversions() - added new columns in output recordset
  *  20090208 - franciscom - testplan class - new method get_build_by_id()
  *  20090201 - franciscom - copy_milestones() - wrong SQL sentece 
@@ -278,7 +279,7 @@ public function getTestPlanNames($projectId, $activeOnly=TRUE)
 			'WHERE testplans.testproject_id=' . $projectId;
 	if ($activeOnly)
 	{
-		$sql .= 'AND testplans.active=1 ';
+		$sql .= ' AND testplans.active=1 ';
 	}
 	$sql .= ' ORDER BY nodes_hierarchy.name';
 
@@ -532,6 +533,7 @@ function setExecutionOrder($id,&$executionOrder)
                            tcversion_id if has executions
 
 	rev :
+	    20091027 - francisco - BUGID 2500
 	    20090214 - franciscom - added tcversions.execution_type and 
 	                            executions.execution_type AS execution_run_type in result
 		  20081220 - franciscom - exec_status can be an array to allow OR filtering 
@@ -742,7 +744,8 @@ public function get_linked_tcversions($id,$tcase_id=null,$keyword_id=0,$executed
 		        $sql .= "(";
 		        $sql_unassigned=" OR UA.user_id IS NULL)";
 		    }
-		    $sql .= " UA.user_id IN (" . implode(",",$assigned_to) . ") " . $sql_unassigned;
+		    // BUGID 2500
+		    $sql .= " UA.user_id IN (" . implode(",",(array)$assigned_to) . ") " . $sql_unassigned;
 		}
 	}
 	
@@ -766,6 +769,7 @@ public function get_linked_tcversions($id,$tcase_id=null,$keyword_id=0,$executed
 	
 	  // BUGID 989 - added NHB.node_order
 	  $sql .= " ORDER BY testsuite_id,NHB.node_order,tc_id,E.id ASC";
+	  
 	  $recordset = $this->db->fetchRowsIntoMap($sql,'tc_id');
 
 	  // 20070913 - jbarchibald

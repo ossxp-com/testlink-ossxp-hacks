@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: tcEdit.tpl,v 1.11.2.4 2009/09/08 14:44:48 havlat Exp $ 
+$Id: tcEdit.tpl,v 1.11.2.5 2009/12/08 10:50:40 havlat Exp $ 
 Purpose: smarty template - edit test specification: test case
 
 rev:20080908 - franciscom - added logic to validate Custom Field user input
@@ -31,7 +31,10 @@ var {$opt_cfg->js_ot_name} = new OptionTransfer("{$opt_cfg->from->name}","{$opt_
 var warning_empty_testcase_name = "{$labels.warning_empty_tc_title}";
 var alert_box_title = "{$labels.warning}";
 var UNLOAD_MSG = "{$labels.warning_unsaved}";
+var UNLOAD_ENABLED = {$tlCfg->gui->checkNotSaved};
 var TC_EDITOR = "{$tlCfg->gui->text_editor.all.type}";
+var IGNORE_UNLOAD = true;
+var UNLOAD_ASKED = false;
 {literal}
 function validateForm(f)
 {
@@ -55,7 +58,7 @@ function validateForm(f)
 	      	return false;
 		}
 	}
-	IGNORE_UNLOAD = true;
+
 	return true;
 }
 </script>
@@ -64,12 +67,12 @@ function validateForm(f)
 // Notify on exit with unsaved data 
 // @TODO use EXTJS dialog
 
-var IGNORE_UNLOAD = true;
-
 function doBeforeUnload() 
 {
-   checkFCKEditorChanged(); //check FCKeditors 
-   if(IGNORE_UNLOAD) return; // Let the page unload
+	if(UNLOAD_ASKED) return; 
+
+	checkFCKEditorChanged(); //check FCKeditors 
+	if(IGNORE_UNLOAD) return; // Let the page unload
 
    if(window.event)
       window.event.returnValue = UNLOAD_MSG; // IE
@@ -77,12 +80,18 @@ function doBeforeUnload()
       return UNLOAD_MSG; // FX
 }
 
-if(window.body)
-   window.body.onbeforeunload = doBeforeUnload; // IE
-else
-   window.onbeforeunload = doBeforeUnload; // FX
+// set unload checking if configured to use 
+if (UNLOAD_ENABLED)
+{
+	if(window.body)
+		window.body.onbeforeunload = doBeforeUnload; // IE
+	else
+		window.onbeforeunload = doBeforeUnload; // FX
+}
 
 // verify if content of any editor changed
+// TODO havlatm: something changed - and IsDirty() doesn't work correctly
+// need to investigate the problem
 function checkFCKEditorChanged()
 {
 	if (TC_EDITOR == "fckeditor")
@@ -91,8 +100,25 @@ function checkFCKEditorChanged()
 		var edSteps = FCKeditorAPI.GetInstance('steps') ;
 		var edExpResults = FCKeditorAPI.GetInstance('expected_results') ;
 
-		if(edSummary.IsDirty() || edSteps.IsDirty() || edExpResults.IsDirty()) 
+		if ( edSummary.IsDirty() || edSteps.IsDirty() || edExpResults.IsDirty() ) 
+		{
 			IGNORE_UNLOAD = false;
+		}
+	}
+}
+
+// not used yet
+function resetFCKEditorStatus()
+{
+	if (TC_EDITOR == "fckeditor")
+	{
+		var edSummary = FCKeditorAPI.GetInstance('summary') ;
+		var edSteps = FCKeditorAPI.GetInstance('steps') ;
+		var edExpResults = FCKeditorAPI.GetInstance('expected_results') ;
+
+		edSummary.ResetIsDirty();
+		edSteps.ResetIsDirty(); 
+		edExpResults.ResetIsDirty(); 
 	}
 }
 
@@ -123,21 +149,21 @@ function checkFCKEditorChanged()
 
 	<div class="groupBtn">
 		<input id="do_update" type="submit" name="do_update" 
-		       onclick="IGNORE_UNLOAD = true; doAction.value='doUpdate';"  
+		       onclick="UNLOAD_ASKED=true; doAction.value='doUpdate'"  
 		       value="{$labels.btn_save}" />
 		
 		<input type="button" name="go_back" value="{$labels.cancel}" 
-		       onclick="javascript: history.back();"/>
+		       onclick="javascript: UNLOAD_ASKED=true; history.back();"/>
 	</div>	
 
 	{assign var=this_template_dir value=$smarty.template|dirname}
 	{include file="$this_template_dir/tcEdit_New_viewer.tpl"}
 	<div class="groupBtn">
 		<input id="do_update" type="submit" name="do_update" 
-		       onclick="IGNORE_UNLOAD = true; doAction.value='doUpdate';"  
+		       onclick="UNLOAD_ASKED=true; doAction.value='doUpdate'"  
 		       value="{$labels.btn_save}" />
 		<input type="button" name="go_back" value="{$labels.cancel}" 
-		       onclick="javascript: history.back();"/>
+		       onclick="javascript: UNLOAD_ASKED=true; history.back();"/>
 	</div>	
 </form>
 

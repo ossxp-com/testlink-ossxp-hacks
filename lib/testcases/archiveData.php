@@ -3,7 +3,7 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
- * @version $Id: archiveData.php,v 1.43.2.3 2009/04/09 21:02:21 schlundus Exp $
+ * @version $Id: archiveData.php,v 1.43.2.5 2009/11/30 22:19:34 havlat Exp $
  * @author Martin Havlat
  *
  * Allows you to show test suites, test cases.
@@ -49,7 +49,8 @@ switch($args->feature)
     $args->id = is_null($args->id) ? 0 : $args->id;
     
     // has been called from a test case search
-		if( !is_null($args->targetTestCase) && strcmp($args->targetTestCase,$args->tcasePrefix) != 0)
+		if( !is_null($args->targetTestCase) && (strcmp($args->targetTestCase,$args->tcasePrefix) != 0)
+				&& (strlen($args->targetTestCase) < 20))
 		{
 			$viewerArgs['show_title'] = 'no';
 			$viewerArgs['display_testproject'] = 1;
@@ -94,7 +95,7 @@ switch($args->feature)
 */
 function init_args(&$viewerCfg)
 {
-	  $args = new stdClass();
+	$args = new stdClass();
     $_REQUEST = strings_stripSlashes($_REQUEST);
 
     $args->user_id = isset($_SESSION['userID']) ? $_SESSION['userID'] : 0;

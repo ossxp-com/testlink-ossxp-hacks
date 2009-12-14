@@ -1,10 +1,11 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_show_tc_exec.tpl,v 1.3.2.1 2009/05/25 20:38:14 franciscom Exp $
+$Id: inc_exec_show_tc_exec.tpl,v 1.3.2.2 2009/09/30 17:40:08 franciscom Exp $
 Purpose: 
 Author: franciscom
 
 Rev:  
+  20090930 - franciscom - BUGID 2593
   20090525 - franciscom - avoid deleted user crash
   20090212 - amitkhullar - BUGID 2068
 *}	
@@ -75,7 +76,7 @@ Rev:
     </div>
 
  		{if $cfg->exec_cfg->show_last_exec_any_build}
-   		{assign var="abs_last_exec" value=$map_last_exec_any_build.$tcversion_id}
+   		{assign var="abs_last_exec" value=$gui->map_last_exec_any_build.$tcversion_id}
  		  {assign var="my_build_name" value=$abs_last_exec.build_name|escape}
  		  {assign var="show_current_build" value=1}
     {/if}
