@@ -62,7 +62,7 @@ $TLS_project = "项目";
 $TLS_requirement = "需求";
 $TLS_reqs = "需求";
 $TLS_req_spec = "需求规约";
-$TLS_req_spec_short = "Req. Spec.";
+$TLS_req_spec_short = "需求规约";
 $TLS_srs = "SRS";
 $TLS_Role = "角色";
 $TLS_sort_table_by_column = "反向排序";
@@ -149,7 +149,7 @@ $TLS_req_type_feature 		= '功能';
 $TLS_req_type_use_case	 	= '用例';
 $TLS_req_type_interface 	= '界面';
 $TLS_req_type_non_functional = '不能使用的';
-$TLS_req_type_constrain 	= 'Constrain';
+$TLS_req_type_constrain 	= '约束';
 
 $TLS_req_status_not_testable = "不可测试的"; // defined for historical reason (should be replaced by $TLS_req_type_info)
 
@@ -189,7 +189,7 @@ $TLS_testplan_usage="测试计划用途";
 $TLS_add_tcversion_to_plans = "把测试用例版本添加到测试计划";
 $TLS_please_select_one_testplan = "请至少选择一个测试计划.";
 
-$TLS_deleted_user = "[deleted user - id=%s]";
+$TLS_deleted_user = "[删除的用户 - id=%s]";
 $TLS_user_not_on_system = "[这个系统不存在 id=%s 的用户]";
 
 $TLS_tag_for_inactive_users = "*";
@@ -242,9 +242,9 @@ $TLS_low_priority = "低";
 $TLS_high_importance = "高";
 $TLS_medium_importance = "中";
 $TLS_low_importance = "低";
-$TLS_urgency_high 		= "High";
-$TLS_urgency_medium 	= "Medium";
-$TLS_urgency_low 		= "Low";
+$TLS_urgency_high 		= "高";
+$TLS_urgency_medium 	= "中";
+$TLS_urgency_low 		= "低";
 $TLS_test_importance 	= "测试用例等级";
 $TLS_testcases_assigned_to_user = '测试项目: %s - 测试用例指派给使用者: %s';
 $TLS_assigned_on = '指定日期';
@@ -806,7 +806,7 @@ $TLS_th_tcid = "测试用例标识";
 $TLS_th_tcversion = "版本";
 $TLS_th_title = "标题";
 $TLS_title_search_tcs = "搜索";
-$TLS_requirement_document_id = "Req. Doc. ID";
+$TLS_requirement_document_id = "需求文档ID";
 
 
 // ----- gui/templates/testcases/searchData.tpl -----
@@ -1003,7 +1003,7 @@ $TLS_title_events = "查看网站后台";
 $TLS_title_execute = "执行";
 $TLS_title_results = "结果";
 $TLS_title_specification = "测试规约";
-$TLS_session_inactivity_timeout_at = "Session 空闲过期时间";
+$TLS_session_inactivity_timeout_at = "会话空闲过期时间";
 
 
 
@@ -2354,12 +2354,12 @@ $TLS_log_level_INFO = "信息";
 $TLS_log_level_ERROR = "错误";
 $TLS_log_level_DEBUG = "调试";
 $TLS_event_viewer = "事件查看器";
-$TLS_th_session_info = "Session信息";
-$TLS_th_sessionID = "Session编号";
-$TLS_th_source = "Source";
+$TLS_th_session_info = "会话信息";
+$TLS_th_sessionID = "会话ID";
+$TLS_th_source = "源";
 $TLS_click_on_event_info = "点击事件查看细节.";
 $TLS_th_activity_code = "活动";
-$TLS_th_object_id = "对象 ID";
+$TLS_th_object_id = "对象ID";
 $TLS_th_object_type = "对象类型";
 $TLS_message_please_wait = "请等待 ...";
 $TLS_title_eventinfo = "事件信息";
