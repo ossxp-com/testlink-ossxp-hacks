@@ -34,13 +34,6 @@ index 331a77a..d717b34 100644
  
  
  // ENABLED: allow N level depth tree 
-@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
- $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
- $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
- // ----- END OF FILE --------------------------------------------------------------------
--?>
-\ No newline at end of file
-+?>
 diff --git a/lib/results/resultsByStatus.php b/lib/results/resultsByStatus.php
 index 9883f03..0825305 100644
 --- a/lib/results/resultsByStatus.php
