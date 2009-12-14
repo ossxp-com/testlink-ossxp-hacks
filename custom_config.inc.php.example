@@ -183,6 +183,16 @@ $g_smtp_password    = '';  # password
 /** [LOCALIZATION] */
 $tlCfg->default_language = 'zh_CN'; 
 
+// Set Chinese font for pchart.
+foreach (array("simsun.ttc", "SIMLI.TTF", "simhei.ttf", "STSONG.TTF") as $font)
+{
+    if (file_exists(TL_ABS_PATH . "third_party/pchart/Fonts/$font"))
+    {
+        $tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/$font";
+        break;
+    }
+}
+
 /** 
  *  How to warning user when security weak points exists.
  *
