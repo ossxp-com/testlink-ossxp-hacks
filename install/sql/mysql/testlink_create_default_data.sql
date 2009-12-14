@@ -134,7 +134,7 @@ INSERT INTO `role_rights` (role_id,right_id) VALUES (9,16);
 # admin account 
 # SECURITY: change password after first login
 INSERT INTO `users` (login,password,role_id,email,first,last,locale,active)
-             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'en_GB',1);
+             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'zh_CN',1);
 
 # Assignment types
 INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');

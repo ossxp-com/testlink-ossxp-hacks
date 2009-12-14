@@ -70,25 +70,6 @@
 // $tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'none');
 //
 //
-// SMTP server Configuration ("localhost" is enough in the most cases)
-//$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
-
-# Configure using custom_config.inc.php
-//$g_tl_admin_email     = 'tl_admin@127.0.0.1'; # for problem/error notification 
-//$g_from_email         = 'testlink@127.0.0.1';  # email sender
-//$g_return_path_email  = 'francisco@127.0.0.1';
-
-# Urgent = 1, Not Urgent = 5, Disable = 0
-// $g_mail_priority = 5;   
-
-# Taken from mantis for phpmailer config
-#define ("SMTP_SEND",2);
-#$g_phpMailer_method = SMTP_SEND;
-
-// Configure only if SMTP server requires authentication
-//$g_smtp_username    = '';  # user  
-//$g_smtp_password    = '';  # password 
-//
 
 // TRUE  -> the whole execution history for the choosen build will be showed
 // FALSE -> just last execution for the choosen build will be showed [STANDARD BEHAVIOUR]
@@ -140,4 +121,76 @@
 // ); 
 // 
 // $tlCfg->results['default_status'] = "not_run"; 
+
+// ----------------------------------------------------------------------------
+/** [User Authentication] */                 
+
+/** 
+ * Login authentication method:
+ * 		'MD5' => use password stored on db
+ * 		'LDAP' => use password from LDAP Server
+ * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
+ */ 
+/** Before enable COSIGN login, add your self as administrator */
+//$tlCfg->authentication['method'] = 'COSIGN';
+$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
+
+/** LDAP authentication credentials */
+$tlCfg->authentication['ldap_server']		= 'localhost';
+$tlCfg->authentication['ldap_port']			= '389';
+$tlCfg->authentication['ldap_version']		= '3'; // could be '2' in some cases
+$tlCfg->authentication['ldap_root_dn']		= 'dc=foo,dc=bar';
+$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(authorizedService=testlink)'
+$tlCfg->authentication['ldap_uid_field']	= 'uid'; // Use 'sAMAccountName' for Active Directory
+$tlCfg->authentication['ldap_firstname_field']	= 'givenName';
+$tlCfg->authentication['ldap_lastname_field']	= 'sn';
+$tlCfg->authentication['ldap_fullname_field']	= 'cn';
+$tlCfg->authentication['ldap_email_field']	    = 'mail';
+$tlCfg->authentication['ldap_bind_dn']		= ''; // Left empty for anonymous LDAP binding 
+$tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
+
+/** Enable/disable Users to create accounts on login page */
+$tlCfg->user_self_signup = TRUE; 
+
+// ----------------------------------------------------------------------------
+/** [SMTP] */
+
+// SMTP server Configuration ("localhost" is enough in the most cases)
+$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
+
+# Configure using custom_config.inc.php
+$g_tl_admin_email     = 'webmaster@foo.bar'; # for problem/error notification 
+$g_from_email         = 'testlink@foo.bar';  # email sender
+$g_return_path_email  = 'noreply@foo.bar';
+
+# Urgent = 1, Not Urgent = 5, Disable = 0
+// $g_mail_priority = 5;   
+
+// Configure only if SMTP server requires authentication
+$g_smtp_username    = '';  # user  
+$g_smtp_password    = '';  # password 
+
+// ----------------------------------------------------------------------------
+/** [Bug Tracking systems] */
+//$g_interface_bugs = 'REDMINE';
+
+/** Company logo (used by navigation bar and login page page) */
+//$tlCfg->company_logo = '<img alt="TestLink" title="TestLink" style="width: 115px; height: 53px;" src="' . 
+//                          $tlCfg->theme_dir . 'images/company_logo.png" />';
+//$tlCfg->company_logo = 'company_logo.png';
+
+// ----------------------------------------------------------------------------
+/** [LOCALIZATION] */
+$tlCfg->default_language = 'zh_CN'; 
+
+/** 
+ *  How to warning user when security weak points exists.
+ *
+ * 'SCREEN': messages will displayed on login screen, and tl desktop (default)
+ * 'FILE': a file with a list is created but users are not notified via GUI
+ *         user will receive a message on screen.
+ * 'SILENT': same that FILE, but user will not receive message on screen.
+ */
+//$tlCfg->config_check_warning_mode = "SILENT";
+
 ?>
