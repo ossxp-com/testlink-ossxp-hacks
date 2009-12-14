@@ -583,7 +583,7 @@ $TLS_cat_tools = "工具";
 
 
 // gui/templates/reqEdit.tpl
-$TLS_by = "源自:";
+$TLS_by = "作者:";
 $TLS_coverage = "覆盖率";
 $TLS_popup_delete_req = "你确定要删除这个需求吗？";
 $TLS_req_edit = "编辑需求";
@@ -1295,6 +1295,7 @@ $TLS_th_date = "日期";
 $TLS_th_run_by = "执行人";
 $TLS_th_bugs_not_linked = "关联/未关联bug的测试用例";
 $TLS_th_assigned_to = "指派给";
+$TLS_result_unassigned = "尚未指派";
 
 
 // ----- gui/templates/resultsGeneral.tpl -----
@@ -1764,7 +1765,7 @@ $TLS_test_results_submitted = "提交测试结果成功。";
 
 
 // ----- lib/functions/info.inc.php -----
-$TLS_email_sent_message = "您的邮件已被发送";
+$TLS_email_sent_message = "你查看的信息已经以邮件形式发送到你的邮箱，请注意查收";
 
 
 // ----- lib/functions/print.inc.php -----
@@ -2036,7 +2037,7 @@ $TLS_format_ods 		= 'OpenOffice Calc';
 $TLS_format_xls 		= 'MS Excel';
 $TLS_format_msword 		= 'MS Word';
 $TLS_format_pdf 		= 'PDF';
-$TLS_format_mail_html 	= '邮件(HTML)';
+$TLS_format_mail_html 	= 'Email(HTML)';
 
 
 // ----- lib/results/resultsSend.php -----

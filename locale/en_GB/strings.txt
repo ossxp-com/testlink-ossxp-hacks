@@ -1321,6 +1321,7 @@ $TLS_th_date = "Date";
 $TLS_th_run_by = "Run by";
 $TLS_th_bugs_not_linked = "Test Cases with missing/linked Bugs";
 $TLS_th_assigned_to = "Assigned To";
+$TLS_result_unassigned = "Not Assigned Yet";
 
 
 // ----- gui/templates/resultsGeneral.tpl -----

@@ -698,10 +698,10 @@ $tlCfg->req_cfg->reqdoc_id->is_system_wide = FALSE;
  * 	TRUE  => REQuirement Specification Title is used as testsuite name     
  */
 $tlCfg->req_cfg->use_req_spec_as_testsuite_name = TRUE;
-$tlCfg->req_cfg->default_testsuite_name = "Auto-created Test cases";
-$tlCfg->req_cfg->testsuite_details = "Test Cases in the Test Suite are generated from Requirements. " .
-		                            "A refinement of test scenario is highly recommended.";
-$tlCfg->req_cfg->testcase_summary_prefix = "<b>The Test Case was generated from the assigned requirement.</b><br />";
+$tlCfg->req_cfg->default_testsuite_name = "自动声称的测试用例";
+$tlCfg->req_cfg->testsuite_details = "测试用例套件中的测试用例是由根据需求生成的. " .
+		                            "强烈建议做进一步的修改.";
+$tlCfg->req_cfg->testcase_summary_prefix = "<b>该测试用例是由相关联的需求自动生成的.</b><br />";
 
 
 // ENABLED: allow N level depth tree 

@@ -144,7 +144,7 @@ if (is_array($mapOfLastResult))
 	  	    	}
 			if ($testerName == "")
 			{
-				$testerName = "Not Assigned Yet";
+				$testerName = lang_get('result_unassigned');
 			}
 	            // 20080602 - francisco.mancardi@gruppotesi.com
 	            // To get executed Version, we can not do anymore this 
