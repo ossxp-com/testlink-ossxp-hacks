@@ -1002,7 +1002,7 @@ $TLS_title_edit_personal_data = "个人帐号";
 $TLS_title_events = "查看网站后台";
 $TLS_title_execute = "执行";
 $TLS_title_results = "结果";
-$TLS_title_specification = "测试规约";
+$TLS_title_specification = "测试规范";
 $TLS_session_inactivity_timeout_at = "会话空闲过期时间";
 
 
@@ -1601,7 +1601,7 @@ $TLS_href_tproject_management = "测试项目管理";
 $TLS_href_user_management = "用户管理";
 $TLS_href_admin_modules = "系统配置";
 $TLS_title_requirements = "需求";
-$TLS_title_test_spec = "测试规约";
+$TLS_title_test_spec = "测试规范";
 $TLS_title_product_mgmt = "产品管理";
 $TLS_href_plan_define_priority = "定义优先级规则";
 $TLS_href_my_testcase_assignments="指派给我的用例";
