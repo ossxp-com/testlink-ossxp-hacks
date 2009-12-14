@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: resultsMoreBuilds_report.tpl,v 1.9.2.1 2009/04/09 10:24:02 amkhullar Exp $
+$Id: resultsMoreBuilds_report.tpl,v 1.9.2.2 2009/12/04 13:00:02 havlat Exp $
 
 rev :
      20090409 - amitkhullar - BUGID 2156 - added new option on 
@@ -77,13 +77,13 @@ rev :
 				{/foreach}
       </td>
 
-			<td>{$gui->startTime}</td>
-			<td>{$gui->endTime}</td>
+			<td>{$gui->startTime|escape}</td>
+			<td>{$gui->endTime|escape}</td>
 			<td>
 			  {$gui->executorSelected|escape}
 				&nbsp;
 			</td>
-			<td>{$gui->search_notes_string}</td>
+			<td>{$gui->search_notes_string|escape}</td>
 			{if ($gui->display->latest_results == 0) }
 			<td>{$labels.results_latest}</td>
 			{else}

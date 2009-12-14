@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *
  * Filename $RCSfile: config.inc.php,v $
- * @version $Revision: 1.236.2.5 $
- * @modified $Date: 2009/08/29 23:17:58 $ by $Author: havlat $
+ * @version $Revision: 1.236.2.7 $
+ * @modified $Date: 2009/12/07 15:18:41 $ by $Author: havlat $
  *
  * SCOPE:
  * 		Constants and configuration parameters used throughout TestLink 
@@ -82,12 +82,13 @@
 // ----------------------------------------------------------------------------
 /** [INITIALIZATION] - DO NOT CHANGE THE SECTION */
 
-/** @global array Global configuration class */
+/** Initiation of Global configuration class */
 $tlCfg = new stdClass();
 $tlCfg->api = new stdClass();
 $tlCfg->document_generator = new stdClass();
 $tlCfg->exec_cfg = new stdClass();
 $tlCfg->gui = new stdClass();
+$tlCfg->gui->custom_fields = new stdClass();
 $tlCfg->testcase_cfg = new stdClass();
 $tlCfg->req_cfg = new stdClass();
 $tlCfg->validation_cfg = new stdClass();
@@ -148,10 +149,11 @@ $tlCfg->charts_font_size = 8;
 /** Error reporting - do we want php errors to show up for users */
 error_reporting(E_ALL);
 
-/** Set the session timeout for inactivity (in minutes).
-* Default is 60 minutes
-*/
-$tlCfg->sessionInactivityTimeout = 60;
+/** 
+ * Set the session timeout for inactivity (in minutes). 
+ * Default high value disables this feature.
+ */
+$tlCfg->sessionInactivityTimeout = 9900;
 
 /** Set the session timeout value (in minutes).
  * This will prevent sessions timing out after very short periods of time 
@@ -428,6 +430,9 @@ $tlCfg->gui->layoutMainPageLeft = array( 'testProject' => 1, 'userAdministration
 
 $tlCfg->gui->layoutMainPageRight = array( 'testPlan' => 1, 'testExecution' => 2 ,
                                           'testPlanContents' => 3);
+
+/** Enable warning on a changed content before an user leave a page */
+$tlCfg->gui->checkNotSaved = FALSE;
 
 // ----------------------------------------------------------------------------
 /** [GUI: TREE] */

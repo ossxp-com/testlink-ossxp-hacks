@@ -1,6 +1,6 @@
 {* 
    TestLink Open Source Project - http://testlink.sourceforge.net/ 
-   $Id: tcTree.tpl,v 1.15 2009/02/10 20:02:16 franciscom Exp $ 
+   $Id: tcTree.tpl,v 1.15.2.2 2009/11/26 22:03:08 havlat Exp $ 
    Purpose: smarty template - show test specification tree menu 
 
 rev: 
@@ -16,7 +16,7 @@ rev:
 {lang_get var="labels"
           s="caption_nav_filter_settings,testsuite,do_auto_update,keywords_filter_help,
              button_update_tree,no_tc_spec_av,keyword"}
-
+{config_load file="input_dimensions.conf" section="tcTree"}
 
 {if $tlCfg->treemenu_type == 'EXTJS'}
     {include file="inc_head.tpl" openHead="yes"}
@@ -139,7 +139,7 @@ rev:
 
 {if $tlCfg->treemenu_type == 'EXTJS'}
     {* 20080805 - franciscom - BUGID 1656 *}
-    <div id="tree" style="overflow:auto; height:400px;border:1px solid #c3daf9;"></div>
+    <div id="tree" style="overflow:auto; height:{#TREE_HEIGHT#};border:1px solid #c3daf9;"></div>
 {else}
     <div class="tree" id="tree">
         {if $gui->tree eq ''}
