@@ -40,35 +40,6 @@
 // Your reports WILL BE ON TOP OF standard TL Reports on left frame
 //
 //
-// Use 'fckeditor' as default editor toolbox.
-$tlCfg->gui->text_editor['all'] = array( 'type' => 'fckeditor',
-                                         'toolbar' => 'tl_default',
-                                         'configFile' => 'cfg/tl_fckeditor_config.js');
-//
-// Use 'tinymce' as default editor toolbox.
-//$tlCfg->gui->text_editor['all'] = array( 'type' => 'tinymce');
-// 
-// Copy this to custom_config.inc.php if you want use 'nome' as default.
-// $tlCfg->gui->text_editor['all'] = array( 'type' => 'none');
-//
-// Suggested for BETTER Performance with lot of testcases
-$tlCfg->gui->text_editor['execution'] = array( 'type' => 'none');
-//
-// Enable and configure this if you want to have different
-// webeditor type in different TL areas
-// You can not define new areas without making changes to php code
-//
-// This configuration is useful only if default type is set to 'fckeditor'
-$tlCfg->gui->text_editor['design'] = array('toolbar' => 'tl_mini');
-
-$tlCfg->gui->text_editor['testplan'] = array( 'type' => 'fckeditor');
-$tlCfg->gui->text_editor['build'] = array( 'type' => 'fckeditor','toolbar' => 'tl_default');
-$tlCfg->gui->text_editor['testproject'] = array( 'type' => 'fckeditor');
-$tlCfg->gui->text_editor['role'] = array( 'type' => 'fckeditor');
-$tlCfg->gui->text_editor['requirement'] = array( 'type' => 'fckeditor');
-$tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'fckeditor');
-//
-//
 
 // TRUE  -> the whole execution history for the choosen build will be showed
 // FALSE -> just last execution for the choosen build will be showed [STANDARD BEHAVIOUR]
@@ -83,8 +54,6 @@ $tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'fckeditor');
 // TRUE  ->  History for all builds will be shown
 // FALSE ->  Only history of the current build will be shown  [STANDARD BEHAVIOUR]
 //$tlCfg->exec_cfg->show_history_all_builds = TRUE;
-
-//$tlCfg->treemenu_type='JTREE';
 
 // $tlCfg->gui->custom_fields->types = array(100 => 'radio head');
 // $tlCfg->gui->custom_fields->possible_values_cfg = array('radio head' => 1);
@@ -131,6 +100,8 @@ $tlCfg->gui->text_editor['requirement_spec'] = array( 'type' => 'fckeditor');
  * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
  */ 
 /** Before enable COSIGN login, add your self as administrator */
+//$tlCfg->authentication['method'] = 'MD5';  # Default
+//$tlCfg->authentication['method'] = 'LDAP';
 //$tlCfg->authentication['method'] = 'COSIGN';
 $tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 
@@ -149,7 +120,7 @@ $tlCfg->authentication['ldap_bind_dn']		= ''; // Left empty for anonymous LDAP b
 $tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
 
 /** Enable/disable Users to create accounts on login page */
-$tlCfg->user_self_signup = TRUE; 
+// $tlCfg->user_self_signup = FALSE; 
 
 // ----------------------------------------------------------------------------
 /** [SMTP] */
