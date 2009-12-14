@@ -62,7 +62,7 @@ function lang_get( $p_string, $p_lang = null, $bDontFireEvents = false)
 	$the_str = $loc_str;
 	if (!is_null($loc_str))
 	{
-		$stringFileCharset = "UTF-8";
+		$stringFileCharset = "ISO-8859-1";
 		if (isset($g_lang_strings[$t_lang]['STRINGFILE_CHARSET']))
 			$stringFileCharset = $g_lang_strings[$t_lang]['STRINGFILE_CHARSET'];
 		if ($stringFileCharset != TL_TPL_CHARSET)

@@ -111,7 +111,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
 // The value must be available in $g_locales (see cfg/const.inc.php).
 // Note: An attempt will be done to establish the default locale 
 // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
-$tlCfg->default_language = 'zh_CN';
+$tlCfg->default_language = 'en_GB'; 
 
 /** 
  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
@@ -121,7 +121,7 @@ $tlCfg->default_language = 'zh_CN';
 $tlCfg->charset = 'UTF-8';
 
 // BUGID 1133 - needed by email_api
-$TLS_charset = 'UTF-8';
+$TLS_charset = 'utf-8';
 
 
 /** characters used to surround a description in the user interface (for example role)*/
@@ -138,8 +138,7 @@ $tlCfg->gui_title_separator_2 = ' - '; // parent - child
 $tlCfg->testcase_cfg->glue_character = '-';
 
 // used to draw charts:
-//$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
-$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/SIMLI.TTF";
+$tlCfg->charts_font_path = TL_ABS_PATH . "third_party/pchart/Fonts/tahoma.ttf";
 $tlCfg->charts_font_size = 8;
 
 
@@ -223,7 +222,7 @@ $g_removeEventsOlderThan = 30;
  * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
  * ]
  */
-$g_interface_bugs = 'REDMINE';
+$g_interface_bugs = 'NO';
 
 
 
@@ -235,12 +234,12 @@ $g_interface_bugs = 'REDMINE';
 // with code taken from Mantis.
 // 
 // SMTP server Configuration ("localhost" is enough in the most cases)
-$g_smtp_host        = 'localhost';  # SMTP server MUST BE configured  
+$g_smtp_host        = '[smtp_host_not_configured]';  # SMTP server MUST BE configured  
 
 # Configure using custom_config.inc.php
-$g_tl_admin_email     = 'leiww@bj.ossxp.com'; # for problem/error notification 
-$g_from_email         = 'no_replay@ossxp.com';  # email sender
-$g_return_path_email  = 'leiww@bj.ossxp.com';
+$g_tl_admin_email     = '[testlink_sysadmin_email_not_configured]'; # for problem/error notification 
+$g_from_email         = '[from_email_not_configured]';  # email sender
+$g_return_path_email  = '[return_path_email_not_configured]';
 
 # Urgent = 1, Not Urgent = 5, Disable = 0
 $g_mail_priority = 5;   
@@ -466,11 +465,10 @@ $g_sort_table_engine='kryogenix.org';
  * Texts and settings for printed documents
  * Leave text values empty if you would like to disable it.
  */
-//$tlCfg->document_generator->company_name = 'Testlink Community [configure $tlCfg->document_generator->company_name]';
-$tlCfg->document_generator->company_name = '北京群英汇信息技术有限公司';
+$tlCfg->document_generator->company_name = 'Testlink Community [configure $tlCfg->document_generator->company_name]';
 
 /** Image is expected in directory <testlink_root>/gui/themes/<your_theme>/images/ */
-$tlCfg->document_generator->company_copyright = '2009 &copy; 北京群英汇信息技术有限公司';
+$tlCfg->document_generator->company_copyright = '2009 &copy; Testlink Community';
 $tlCfg->document_generator->confidential_msg = '';
 
 /** CSS used in printed html documents */
@@ -487,7 +485,7 @@ $tlCfg->document_generator->tc_version_enabled = FALSE;
 // ENABLED -> enable XML-RPC calls to external test automation server
 //      new buttons will be displayed on execution pages
 // DISABLED -> disable
-$tlCfg->exec_cfg->enable_test_automation = ENABLED;
+$tlCfg->exec_cfg->enable_test_automation = DISABLED;
 
 // 1 -> user can edit execution notes, on old executions (Attention: user must have test case execution right)
 // DISABLED -> no edit allowed [STANDARD BEHAVIOUR]
