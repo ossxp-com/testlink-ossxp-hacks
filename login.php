@@ -73,12 +73,11 @@ if(!is_null($args->login) || $cosign_loggedin)
 	}
 }
 
-/** no needs to do this, because TL does not have anonymous login.
-if ($tlCfg->authentication['method'] == 'COSIGN')
+if (strtolower($tlCfg->authentication['method']) == 'cosign')
 {
-	// Redirect to cosign login page.
+  // Redirect to cosign login page.
+  sso_redirect();
 }
-*/
 
 $logPeriodToDelete = config_get('removeEventsOlderThan');
 $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
@@ -86,6 +85,35 @@ $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
 $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
 $smarty->display('login.tpl');
+
+/**
+ * Single Sign-on redirect
+ */
+function sso_redirect()
+{
+    global $tlCfg;
+
+    $cosign_login_url    = $tlCfg->authentication['login_url'] ?
+                           $tlCfg->authentication['login_url'] :
+                           "https://weblogin.foo.bar/cgi-bin/login";
+    $cosign_service_name = $tlCfg->authentication['sso_service_name'] ?
+                           $tlCfg->authentication['sso_service_name'] :
+                           "testlink";
+
+    $service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+    $sample_string =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    $cookie_name = "cosign-" . $cosign_service_name;
+    $cookie_data = '';
+    for ($i=0;$i<125;$i++) {
+            $cookie_data .= $sample_string[mt_rand(0,61)];
+    }
+    setcookie( $cookie_name, $cookie_data );
+    $dest_url = $cosign_login_url . "?" . $cookie_name . "=" . $cookie_data . ";&" .  $service_url;
+    header( "Location: $dest_url" );
+    exit;
+}
 
 /**
  * Initialize input parameters
