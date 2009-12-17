@@ -28,6 +28,7 @@ window.onload=function()
 
 <div class="forms" id="login_div">
 
+{if !$link_login}
 	<form method="post" name="login_form" action="login.php">
     {if $gui->login_disabled eq 0}		
   	  <div class="messages" style="text-align:center;">{$gui->note}</div>
@@ -41,7 +42,20 @@ window.onload=function()
 		<input type="submit" name="login_submit" value="{$labels.btn_login}" />
 		{/if}
 	</form>
+{else}
+  <div>
+  	<div class="messages" style="text-align:center;">{$gui->note}</div>
+	  {$link_login}
+	</div>
+{/if}
 	
+{if $link_demo_users}
+	<div>
+  	<div class="messages" style="text-align:center;">{$demo_login_title}</div>
+		{$link_demo_users}
+	</div>
+{/if}
+
 	<p>
 	{if $gui->user_self_signup}
 		<a href="firstLogin.php">{$labels.new_user_q}</a><br />

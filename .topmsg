@@ -1,6 +1,6 @@
 From: Jiang Xin <worldhello.net@gmail.com>
-Subject: [PATCH] t/single_signon
+Subject: [PATCH] t/demo_login
 
-TestLink 单点登录支持
+See #81: 在登录页面提供演示帐号。如果用户尚未注册帐号，可以先使用演示帐号登录系统。
 
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>

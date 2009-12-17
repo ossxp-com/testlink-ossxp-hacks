@@ -2448,6 +2448,10 @@ $TLS_link_time_charts		= "Time Charts";
 $TLS_time_charts_metrics 	= "Time Charts Metrics";
 $TLS_time_charts_title 		= "Time Charts";
 
+// ----- login.php -----
+$TLS_sso_login_url_text = "Click to login...";
+$TLS_demo_login_title = "TestLink demo";
+$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
 
 // ----- END ------------------------------------------------------------------
 ?>

@@ -47,12 +47,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign')
 	}
 }
 
-if(!is_null($args->login) || $cosign_loggedin)
+if(!is_null($args->login) || $cosign_loggedin || $args->demo)
 {
 	doSessionStart();
 	unset($_SESSION['basehref']);
 	setPaths();
 
+	if($args->demo)
+	{
+		if (array_key_exists($args->demo, $tlCfg->authentication['demo_users']))
+		{
+			$args->login = $args->demo;
+			$cosign_loggedin = 1;
+		}
+		else
+		{
+			$args->demo = "";
+			$gui->note = lang_get('bad_user_passwd');
+		}
+	}
 	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
 	{
 		if (!$msg)
@@ -73,17 +86,51 @@ if(!is_null($args->login) || $cosign_loggedin)
 	}
 }
 
-if (strtolower($tlCfg->authentication['method']) == 'cosign')
+if (strtolower($tlCfg->authentication['method']) == 'cosign' &&
+		($args->sso || !@$tlCfg->authentication['demo_users']))
 {
 	// Redirect to cosign login page.
 	sso_redirect();
 }
+
+$link_demo_users = "";
+$link_login = "";
+if (@$tlCfg->authentication['demo_users'])
+{
+	if (strtolower($tlCfg->authentication['method']) == 'cosign')
+	{
+		$link_login = "<p><div align=\"center\" ".
+                  "<a href=\"" .
+		              $_SERVER["PHP_SELF"] .
+		              "?sso\" class=\"urlbtn\">" .
+		              lang_get('sso_login_url_text') .
+	                "</a></div><p>";
+	}
+
+  $link_demo_users =  "<p>" .
+                      lang_get('demo_login_text') .
+                      "<p>";
+	foreach ($tlCfg->authentication['demo_users'] as $role => $text)
+	{
+		$link_demo_users .= "<a href=\"" .
+		                    $_SERVER["PHP_SELF"] .
+	                      "?demo=$role\" class=\"rlbtn\">" .
+		                    "&#187;". $text .
+	                      "</a>, ";
+	}
+	$link_demo_users = "<div align=\"center\" width=\"80%\">" .
+                     rtrim($link_demo_users," ,") . "<div>" ;
+}
+
 
 $logPeriodToDelete = config_get('removeEventsOlderThan');
 $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
 
 $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
+$smarty->assign('demo_login_title', lang_get('demo_login_title'));
+$smarty->assign('link_demo_users', $link_demo_users);
+$smarty->assign('link_login', $link_login);
 $smarty->display('login.tpl');
 
 /**
@@ -130,6 +177,9 @@ function init_args()
     $args->reqURI = isset($_REQUEST['req']) ? urlencode($_REQUEST['req']) : null;
     $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? urlencode($_REQUEST['reqURI']) : null;
   
+    $args->sso = isset($_REQUEST['sso']) ? 1 : 0;
+    $args->demo = isset($_REQUEST['demo']) ? $_REQUEST['demo'] : '';
+
     return $args;
 }
 
