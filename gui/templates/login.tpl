@@ -53,6 +53,12 @@ window.onload=function()
 	</p>
 	{/if}
 
+	{if $gui->login_page_msg}
+		<p>
+		<div class="login_page_msg">
+			{$gui->login_page_msg}
+		</div>
+	{/if}
 	
 	{include file="inc_copyrightnotice.tpl"}
 

@@ -1,0 +1,7 @@
+From: Jiang Xin <worldhello.net@gmail.com>
+Subject: [PATCH] t/login_page_msg
+
+See #82: 登录页面提供可定制的显示信息:
+可以在 custom_… 配置文件中提供自定义字串，如果不为空，则在登录页面的下方显示。
+
+Signed-off-by: Jiang Xin <worldhello.net@gmail.com>

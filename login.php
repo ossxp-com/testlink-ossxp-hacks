@@ -97,6 +97,7 @@ function init_gui(&$db,$args)
 	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
 	$gui->user_self_signup = config_get('user_self_signup');
+	$gui->login_page_msg = config_get('login_page_msg');
 
 	switch($args->note)
     {
