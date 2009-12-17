@@ -10,23 +10,23 @@
  * @copyright Copyright (c) 2003-9, TestLink community
  * @author Francisco Mancardi, Andreas Morsing, Martin Havlat
  * --------------------------------------------------------------------------------------
- * 
+ *
  * English (en_GB) strings (en_GB is default development language)
  *
- * This list of labels is defined as GLOBAL string variables. The first sections are general 
- * for strings used over all GUI. These definition should not be redefined. Next sections are 
- * related to particular pages. Comment with page filename indicate a begin of section. There 
- * must be defined all other strings. 
+ * This list of labels is defined as GLOBAL string variables. The first sections are general
+ * for strings used over all GUI. These definition should not be redefined. Next sections are
+ * related to particular pages. Comment with page filename indicate a begin of section. There
+ * must be defined all other strings.
  *
  * To avoid override of other globals we are using $TLS_ (Test Link String) prefix.
- * This must be a reserved prefix. The second part of variable name (after 
+ * This must be a reserved prefix. The second part of variable name (after
  * prefix) should indicate usage (warning, title), the third one indicate the page relation
  * and text at the end.
  *
  * Warning: be careful about format - the file is parsed by script
  * Warning: if JS string you must use \\n to get \n for end of line
  * Note: API interface is not localized (except error messages)
- * 
+ *
  * --------------------------------------------------------------------------------------
  * Revisions:
  * 20071102 - franciscom - tcexecute strings
@@ -60,11 +60,9 @@
  *
  * @modified $Date: 2009/09/07 01:41:06 $ $Author: tosikawa $
  *-------------------------------------------------------------------
-**/
 
 // Define character set of this file (UTF-8 is common value)
 $TLS_STRINGFILE_CHARSET = "UTF-8";
-$TLS_charset = 'utf-8';
 
 
 // ----- General terms (used wide) ----------------------------
@@ -163,7 +161,7 @@ $TLS_btn_update = "更新";
 $TLS_btn_upd = $TLS_btn_update; //obsolete
 $TLS_btn_upload = "アップロード";
 $TLS_btn_advanced_filters = "アドバンスフィルタ";
-$TLS_btn_simple_filters = "シンプルフィルタ"; 
+$TLS_btn_simple_filters = "シンプルフィルタ";
 
 
 // Status (used wide)
@@ -193,7 +191,7 @@ $TLS_req_status_not_testable = "テスト不能"; // defined for historical reas
 
 
 // ----- unsorted (TODO move) -------------------------------------
-$TLS_problems_loading_xml_content = "XML データをロードできません, ファイルをチェックしてください。"; 
+$TLS_problems_loading_xml_content = "XML データをロードできません, ファイルをチェックしてください。";
 $TLS_search_type_like = "Search on this value will be done on LIKE mode";
 $TLS_exec_assign_no_testcase = "最低でもひとつのテストケースを選択してください。";
 $TLS_select_at_least_one_testcase = "最低でもひとつのテストケースと対象を選択してください!";
@@ -480,7 +478,7 @@ $TLS_possible_values = "取りうる値";
 $TLS_show_on_design = "テスト仕様<br />に表示する";
 $TLS_show_on_exec = "テスト実行<br />に表示する";
 $TLS_show_on_testplan_design = "テスト計画<br />に表示する";
-$TLS_testcase = $TLS_test_case;
+$TLS_testcase = $TLS_test_case; // obsolete
 $TLS_title_cfields_mgmt = "カスタムフィールド";
 $TLS_title_cfield_edit = "編集 ";
 $TLS_type = "型";
@@ -638,11 +636,11 @@ $TLS_title_last_mod = "修正 ";
 
 
 
-// gui/templates/buildNew.tpl
+// gui/templates/buildEdit.tpl
 $TLS_enter_build = "タイトル";
 $TLS_enter_build_notes = "説明";
-//$TLS_msg_build = "注意：各ビルドは有効なテスト計画に関連づけられます。:" .
-//                 "説明には以下の項目を含めます: 配布パッケージ、承認、ステータスなど。";
+//$TLS_msg_build = "Notes: Each build is related to the active Test Plan. " .
+//                 "Description should include: list of delivered packages, approvals, status,etc.";
 $TLS_open = "オープン";
 $TLS_title_build_2 = "ビルド管理";
 $TLS_title_build_create = "新規ビルドの作成";
@@ -803,7 +801,7 @@ $TLS_expected_results = "期待結果";
 $TLS_steps = "ステップ";
 $TLS_summary = "要約";
 $TLS_tc_title = "テストケースタイトル";
-
+$TLS_warning_unsaved = "You will lose any unsaved changes!";
 
 
 // ----- gui/templates/show_exec_notes.tpl -----
@@ -920,7 +918,7 @@ $TLS_th_locale = "言語";
 $TLS_th_login = "ログイン名";
 $TLS_th_role = "役割";
 $TLS_th_api = "API Key";
-//$TLS_api_gen_key_action = "作成";
+//$TLS_api_gen_key_action = "generate";
 $TLS_warning_delete_user = "本当に選択したユーザを削除しますか?";
 $TLS_order_by_login_dir = "ログイン順";
 $TLS_order_by_role_dir = "役割順";
@@ -1206,7 +1204,7 @@ $TLS_popup_product_delete = "警告! この操作は、プロジェクトに関�
                             "データ (テスト結果、テスト計画等)を削除します。" .
                             "削除の代わりにプロジェクトを無効化することができます。??n" .
                             "推奨: 最初にデータベースのバックアップを実行してください。??n" .
-                            "本当にテストプロジェクトを削除しますか?"; 
+                            "本当にテストプロジェクトを削除しますか?";
 
 $TLS_tcase_id_prefix = "テストケースIDプレフィックス";
 $TLS_warning_empty_tcase_prefix = "テストケースプレフィックスは空欄にできません!";
@@ -1347,7 +1345,8 @@ $TLS_th_bugs = "バグ";
 $TLS_th_date = "日付";
 $TLS_th_run_by = "実行 by";
 $TLS_th_bugs_not_linked = "失敗/バグがあるテストケース";
-
+$TLS_th_assigned_to = "Assigned To";
+$TLS_result_unassigned = "Not Assigned Yet";
 
 
 // ----- gui/templates/resultsGeneral.tpl -----
@@ -1393,7 +1392,7 @@ $TLS_enter_end_time = "終了時間";
 $TLS_year 		= "年";
 $TLS_month 		= "月";
 $TLS_day 		= "日";
-$TLS_hour 		= "時";
+$TLS_hour = "時";
 $TLS_search_in_notes = "備考文字列内の検索";
 $TLS_executor = "実行者";
 
@@ -1433,7 +1432,7 @@ $TLS_req_without_tcase = "要件がテストケースによってカバーされ
 
 
 // IMPORTANT for dynamic generation labels
-// $TLS_req_title_<test case status> 
+// $TLS_req_title_<test case status>
 // If user add a new test case status he/she MUST add a new label
 $TLS_req_title_blocked = "ブロックされた要件";
 $TLS_req_title_failed = "失敗した要件";
@@ -1532,7 +1531,7 @@ $TLS_title_personal_data = "個人情報";
 $TLS_title_personal_passwd = "個人パスワード";
 $TLS_title_api_interface = "API インタフェース";
 $TLS_warning_different_pwd = "パスワードが異なります。再度パスワードを入力してください。";
-$TLS_warning_empty_pwd = "パスワードが空欄です!";
+$TLS_warning_empty_pwd = "パスワードを空白にすることはできません!";
 $TLS_your_password_is_external = "あなたのパスワードは外部システムで管理されています。<br>".
                                  "TestLinkで変更することはできません。";
 $TLS_user_api_key = "個人 API アクセスキー";
@@ -1616,7 +1615,6 @@ $TLS_th_open = "オープン";
 $TLS_title_build_list = "既存のビルドの一覧";
 $TLS_warning_delete_build = "<p>本当にこのビルドを削除しますか？</p>" .
                             "<p>すべての依存するデータ（テスト結果）が削除されます!</p>";
-                            "<p>本当によろしいですか?</p>";
 $TLS_builds_description = "各ビルドはタイトルによって識別されています。" .
                     "<br />以下のような説明を記述するとよいでしょう:&nbsp;" .
                     "配布されたパッケージのリスト、修正項目、実装機能、承認、状態、など。<br />" .
@@ -1809,7 +1807,7 @@ $TLS_warning_duplicate_reqdoc_id = "重複したドキュメントID";
 
 
 // ----- lib/functions/testcase.class.php -----
-$TLS_create_new_version = "%sの新バージョンを作成しました"; 
+$TLS_create_new_version = "%sの新バージョンを作成しました";
 $TLS_testcase_name_already_exists = "同じタイトルのテストケースが既に存在しています!";
 $TLS_created_with_title = "以下のタイトルで作成しました (%s)";
 $TLS_the_format_tc_xml_import = "";
@@ -1857,7 +1855,7 @@ $TLS_XMLRPC_error_number = "XML-RPC 失敗 番号:- ";
 
 // ----- lib/functions/configCheck.php -----
 $TLS_attachments_dir = "添付ファイルのためのディレクトリ:";
-$TLS_bts_connection_problems = "バグ管理システムとの通信に失敗:<br> 
+$TLS_bts_connection_problems = "バグ管理システムとの通信に失敗:<br>
                                 システムの構成を確認してください。<br>
                                 この問題はTestLinkのパフォーマンスを低下させる可能性があるので注意してください。";
 $TLS_but_directory_is_not_writable = "ディレクトリに書き込み権限がありません!";
@@ -1873,7 +1871,7 @@ $TLS_sec_note_admin_default_pwd = "'admin' アカウントのパスワードを�
 $TLS_sec_note_remove_install_dir = "インストールディレクトリを削除してください!";
 $TLS_error_domxml_missing = "Domxml が使用できません。XMLによるインポートが動作しません!";
 $TLS_error_gd_missing = "GD PHP拡張が使用できません。グラフが機能しません。" .
-		"php.iniファイル上から ;extension=php_gd2.dll という記述の先頭にある ; を削除してください。 " . 
+		"php.iniファイル上から ;extension=php_gd2.dll という記述の先頭にある ; を削除してください。 " .
 		"その後 apache (もしくは他のWebサーバ)を再起動してください。" .
 		"この設定を行ってもこの問題が解決されない場合は、php-GDライブラリをインストールする必要があるでしょう。";
 $TLS_error_gd_png_support_disabled = "GDライブラリのPHP拡張がPNGフォーマットを使用できるように構成されていません。" .
@@ -2134,7 +2132,7 @@ $TLS_wrong_xml_tcase_file = "対応できないXML形式のテストケースフ
 $TLS_wrong_xml_tsuite_file = "対応できないXML形式のテストスイートファイルです。";
 $TLS_cf_value_not_imported_missing_cf_on_testproject = "カスタムフィールド '%s' の値はインポートできませんでした。" .
     "この名前のカスタムフィールドを「テスト仕様の設計」を有効として作成し、" .
-    "アサインしてから %s へインポートしてください。"; 
+    "アサインしてから %s へインポートしてください。";
 $TLS_req_not_in_req_spec_on_tcimport = "要件DOCID=%s はテストケースに紐付けることができません。" .
 		"これは要件仕様 %s の直接の子要素ではありません。";
 $TLS_req_spec_ko_on_tcimport = "要件仕様=%s は存在しません。" .
@@ -2240,7 +2238,7 @@ $TLS_edit_req_spec = "要件仕様の編集";
 $TLS_create_req = "要件の作成";
 $TLS_delete_req = "要件の削除";
 $TLS_edit_req = "要件の編集";
-$TLS_req_created = "要件: %s の作成に成功しました";
+$TLS_req_created = "要件 %s を作成しました";
 $TLS_req_deleted = "要件: %s の削除に成功しました";
 
 
@@ -2279,7 +2277,7 @@ $TLS_API_INVALID_TPLANID = "規定されたテスト計画ID(tpid)は存在し�
 $TLS_API_INVALID_STATUS = "規定されたステータス(status)は無効です！";
 $TLS_API_INVALID_TESTCASE_EXTERNAL_ID = "規定されたテストケース外部IDは存在しません！";
 
-$TLS_API_TCID_NOT_INTEGER = "テストケースIDが整数(integer)ではありません。";
+$TLS_API_TCASEID_NOT_INTEGER = "Test Case ID (testcaseid) must be an integer!";
 $TLS_API_TESTCASENAME_NOT_STRING = "テストケース名は文字列(string)でなければなりません。";
 $TLS_API_NO_BUILD_FOR_TPLANID = "規定された tpid のビルドは存在しません！ ビルドにはレポート結果が作られてなければなりません。";
 $TLS_API_BUILDID_NOGUESS = "指定されたビルドIDは無効な可能性があります！";
@@ -2295,7 +2293,7 @@ $TLS_API_NO_CUSTOMFIELD_BY_THIS_NAME = "名前 (%s) のカスタムフィール�
 
 $TLS_API_NO_USER_BY_THIS_LOGIN = "ユーザが見つかりません";
 $TLS_API_MISSING_REQUIRED_PARAMETER = "パラメータ %s が必要です";
- 
+
 $TLS_API_INVALID_TESTCASE_VERSION_NUMBER = "要求されたバージョン番号はテストケースにありません";
 $TLS_API_PARAMETER_NOT_INT = "パラメータ %s は整数でないといけません";
 
@@ -2467,7 +2465,7 @@ $TLS_report_free_testcases_on_testproject=$TLS_link_report_free_testcases_on_tes
 $TLS_all_testcases_has_testplan="すでに全テストケースがテスト計画にアサインされています。";
 $TLS_all_testcases_are_free="ひとつのテストケースもテスト計画にアサインされていません。";
 
-// ----- timeCharts ----- 
+// ----- timeCharts -----
 $TLS_interval_end_date 		= "最後の日付間隔";
 $TLS_interval_header 		= "間隔のタイプ";
 $TLS_interval_number 		= "間隔の数";
@@ -2475,12 +2473,10 @@ $TLS_link_time_charts		= "タイムチャート";
 $TLS_time_charts_metrics 	= "タイムチャートメトリクス";
 $TLS_time_charts_title 		= "タイムチャート";
 
+// ----- login.php -----
+$TLS_sso_login_url_text = "Click to login...";
+$TLS_demo_login_title = "TestLink demo";
+$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
 
 // ----- END ------------------------------------------------------------------
-/* 
- * Local Variables:
- *   mode:   php
- *   coding: utf-8-unix
- * End:
- */
 ?>
