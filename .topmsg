@@ -1,0 +1,8 @@
+From: Jiang Xin <worldhello.net@gmail.com>
+Subject: [PATCH] t/tl_bugfix
+
+TestLink Bugfix:
+
+* Fixed #81: 测试用例关联到测试计划时发生的内部错误.
+
+Signed-off-by: Jiang Xin <worldhello.net@gmail.com>

@@ -190,7 +190,7 @@ class database
 		{
 			$errorMsg = "ERROR ON exec_query() - database.class.php <br />" . $this->error(htmlspecialchars($p_query)) . 
 					"<br />THE MESSAGE : $message ";			
-			reportFatal($errorMsg);
+			$this->reportFatal($errorMsg);
 
 			return false;
 		} 
