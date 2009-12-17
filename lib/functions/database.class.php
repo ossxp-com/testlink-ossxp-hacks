@@ -139,10 +139,8 @@ class database
 	function reportFatal($msg)
 	{
 		tLog($msg, 'ERROR', "DATABASE");			
-		echo '<html><head><title>TestLink Database error</title></head><body>' .
-				'<h1>TestLink Database error</h1><p>' .
-				htmlspecialchars($msg) . '</p></body>';
-		exit;
+    // reportFatal shouldn't exit and shouldn't display error message on webpage,
+    // report by log is just ok.
 	}
 
 	# --------------------
