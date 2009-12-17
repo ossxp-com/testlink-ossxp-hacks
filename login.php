@@ -75,8 +75,8 @@ if(!is_null($args->login) || $cosign_loggedin)
 
 if (strtolower($tlCfg->authentication['method']) == 'cosign')
 {
-  // Redirect to cosign login page.
-  sso_redirect();
+	// Redirect to cosign login page.
+	sso_redirect();
 }
 
 $logPeriodToDelete = config_get('removeEventsOlderThan');
@@ -91,28 +91,28 @@ $smarty->display('login.tpl');
  */
 function sso_redirect()
 {
-    global $tlCfg;
+	global $tlCfg;
 
-    $cosign_login_url    = $tlCfg->authentication['login_url'] ?
-                           $tlCfg->authentication['login_url'] :
-                           "https://weblogin.foo.bar/cgi-bin/login";
-    $cosign_service_name = $tlCfg->authentication['sso_service_name'] ?
-                           $tlCfg->authentication['sso_service_name'] :
-                           "testlink";
+	$cosign_login_url    = $tlCfg->authentication['login_url'] ?
+												 $tlCfg->authentication['login_url'] :
+												 "https://weblogin.foo.bar/cgi-bin/login";
+	$cosign_service_name = $tlCfg->authentication['sso_service_name'] ?
+												 $tlCfg->authentication['sso_service_name'] :
+												 "testlink";
 
-    $service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
-    $sample_string =
-    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	$service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+	$sample_string =
+	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    $cookie_name = "cosign-" . $cosign_service_name;
-    $cookie_data = '';
-    for ($i=0;$i<125;$i++) {
-            $cookie_data .= $sample_string[mt_rand(0,61)];
-    }
-    setcookie( $cookie_name, $cookie_data );
-    $dest_url = $cosign_login_url . "?" . $cookie_name . "=" . $cookie_data . ";&" .  $service_url;
-    header( "Location: $dest_url" );
-    exit;
+	$cookie_name = "cosign-" . $cosign_service_name;
+	$cookie_data = '';
+	for ($i=0;$i<125;$i++) {
+					$cookie_data .= $sample_string[mt_rand(0,61)];
+	}
+	setcookie( $cookie_name, $cookie_data );
+	$dest_url = $cosign_login_url . "?" . $cookie_name . "=" . $cookie_data . ";&" .  $service_url;
+	header( "Location: $dest_url" );
+	exit;
 }
 
 /**
@@ -139,7 +139,7 @@ function init_gui(&$db,$args)
 	
 	$authCfg = config_get('authentication');
 	$gui->securityNotes = getSecurityNotes($db);
-	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
+	$gui->external_password_mgmt = (strtolower($authCfg['method']) == 'cosign' || strtolower($authCfg['method']) == 'ldap') ? 1 : 0;
 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
 	$gui->user_self_signup = config_get('user_self_signup');
 
