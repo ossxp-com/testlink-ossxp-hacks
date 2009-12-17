@@ -1,7 +1,7 @@
 <?php
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * Chinese Simplified translation-  yfeng.lee@gmail.com
+ * Chinese Simplified translation- leiww@ossxp.com 
  *
  * Filename $RCSfile: strings.txt,v $
  *
@@ -1459,8 +1459,8 @@ $TLS_user_bulk_assignment = "用户指派";
 // ----- tc_exec_assignment.php -----
 $TLS_mail_subject_testcase_assigned = 'Test Link - 测试用例指派 - 测试计划';
 $TLS_mail_subject_testcase_assignment_removed = 'Test Link - 测试用例指派被删除 - 测试计划';
-$TLS_mail_testcase_assigned = "下面的测试用例已分配给你 %s 由 %s  <br /><br />";
-$TLS_mail_testcase_assignment_removed = "%s - 下面指派给您的测试用例被 %s 删除 <br /><br />";
+$TLS_mail_testcase_assigned = "下面的测试用例已分配给你%s,由%s分配的<br /><br />";
+$TLS_mail_testcase_assignment_removed = "%s - 已指派给您的测试用例被%s删除 <br /><br />";
 $TLS_send_mail_to_tester = "给测试者发送邮件通知";
 
 
