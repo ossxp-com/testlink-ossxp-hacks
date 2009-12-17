@@ -8,12 +8,12 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
 ---
  config.inc.php                  |   10 +-
  lib/results/resultsByStatus.php |    2 +-
- locale/en_GB/strings.txt        |    1 +
+ locale/en_GB/strings.txt        |    8 +
  locale/tl_lang_parser.rb        |  263 +++
- locale/zh_CN/description.php    |  351 ++--
- locale/zh_CN/strings.txt        | 3715 ++++++++++++++++++++-------------------
- locale/zh_CN/texts.php          |  470 ++---
- 7 files changed, 2519 insertions(+), 2293 deletions(-)
+ locale/zh_CN/description.php    |  353 ++--
+ locale/zh_CN/strings.txt        | 3731 ++++++++++++++++++++-------------------
+ locale/zh_CN/texts.php          |  469 ++---
+ 7 files changed, 2541 insertions(+), 2295 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
 index 331a77a..d717b34 100644
@@ -55,10 +55,20 @@ index 9883f03..0825305 100644
  	            // 20080602 - francisco.mancardi@gruppotesi.com
  	            // To get executed Version, we can not do anymore this 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 471fb9e..82aed73 100644
+index 471fb9e..5821605 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
-@@ -1321,6 +1321,7 @@ $TLS_th_date = "Date";
+@@ -29,6 +29,9 @@
+  * 
+  * --------------------------------------------------------------------------------------
+  * Revisions:
++ * 20091217 - www.ossxp.com - Add strings for demo login feature.
++ *            See: http://redmine.ossxp.com/redmine/issues/show/81
++ *                 http://git.ossxp.com/gitweb/pub/testlink-1.8.x.git
+  * 20071102 - franciscom - tcexecute strings
+  * 20071101 - franciscom - view_file_format_doc
+  * 20070930 - franciscom - show_tcase_spec
+@@ -1321,6 +1324,7 @@ $TLS_th_date = "Date";
  $TLS_th_run_by = "Run by";
  $TLS_th_bugs_not_linked = "Test Cases with missing/linked Bugs";
  $TLS_th_assigned_to = "Assigned To";
@@ -66,6 +76,17 @@ index 471fb9e..82aed73 100644
  
  
  // ----- gui/templates/resultsGeneral.tpl -----
+@@ -2448,6 +2452,10 @@ $TLS_link_time_charts		= "Time Charts";
+ $TLS_time_charts_metrics 	= "Time Charts Metrics";
+ $TLS_time_charts_title 		= "Time Charts";
+ 
++// ----- login.php -----
++$TLS_sso_login_url_text = "Click to login...";
++$TLS_demo_login_title = "TestLink demo";
++$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
+ 
+ // ----- END ------------------------------------------------------------------
+ ?>
 diff --git a/locale/tl_lang_parser.rb b/locale/tl_lang_parser.rb
 new file mode 100755
 index 0000000..6b123b9
@@ -336,10 +357,19 @@ index 0000000..6b123b9
 +main
 +
 diff --git a/locale/zh_CN/description.php b/locale/zh_CN/description.php
-index 811937a..bcabd37 100644
+index 811937a..f94defa 100644
 --- a/locale/zh_CN/description.php
 +++ b/locale/zh_CN/description.php
-@@ -25,230 +25,197 @@
+@@ -4,6 +4,8 @@
+  * 
+  * Filename $RCSfile: description.php,v $
+  * @version $Revision: 1.1 $
++ * @modified $Date: 2009/12/16 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
++ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Wang Sheng <wangsheng AT ossxp.com> $
+  * @modified $Date: 2009/02/02 22:30:53 $ $Author: havlat $
+  * @author Martin Havlat
+  *
+@@ -25,230 +27,197 @@
   *
   * ----------------------------------------------------------------------------------- */
  
@@ -731,20 +761,39 @@ index 811937a..bcabd37 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index a16c224..b4ef20b 100644
+index a16c224..0aa504f 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -1,7 +1,7 @@
+@@ -1,12 +1,14 @@
  <?php
  /**
 - * TestLink Open Source Project - http://testlink.sourceforge.net/ 
 - * Chinese Simplified translation-  yfeng.lee@gmail.com 
 + * TestLink Open Source Project - http://testlink.sourceforge.net/
-+ * Chinese Simplified translation-  yfeng.lee@gmail.com
++ * Chinese Simplified translation- leiww@ossxp.com
   *
   * Filename $RCSfile: strings.txt,v $
   *
-@@ -21,475 +21,528 @@
+  * @version $Revision: 1.17 $
+- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
++ * @modified $Date: 2009/12/17 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
++ * @modified $Date: 2009/12/12 --:--:-- $ $Author: Cui Rui <cuirui AT ossxp.com> $
++ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Jiang Xin <jiangxin AT ossxp.com> $
+  * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
+  *
+  * N.B.:
+@@ -16,480 +18,537 @@
+  *
+  * @author Francisco Mancardi
+  *
+- * 20070818 - franciscom
+- * 20070705 - franciscom -
++ * 20091217 - www.ossxp.com - Add strings for demo login feature.
++ *            See: http://redmine.ossxp.com/redmine/issues/show/81
++ *                 http://git.ossxp.com/gitweb/pub/testlink-1.8.x.git
++ * 20071102 - franciscom - tcexecute strings
++ * 20071101 - franciscom - view_file_format_doc
++ * 20070930 - franciscom - show_tcase_spec
   * 20070520 - franciscom - milestones
   * 20070206 - franciscom - BUGID 618 - \n on JS messages
   *
@@ -1637,7 +1686,7 @@ index a16c224..b4ef20b 100644
  $TLS_link_results_import = "导入结果";
  
  
-@@ -498,1838 +551,1862 @@ $TLS_link_results_import = "导入结果";
+@@ -498,1838 +557,1866 @@ $TLS_link_results_import = "导入结果";
  
  
  // gui/templates/cfields/cfieldsView.tpl
@@ -3323,8 +3372,8 @@ index a16c224..b4ef20b 100644
 +// ----- tc_exec_assignment.php -----
 +$TLS_mail_subject_testcase_assigned = 'Test Link - 测试用例指派 - 测试计划';
 +$TLS_mail_subject_testcase_assignment_removed = 'Test Link - 测试用例指派被删除 - 测试计划';
-+$TLS_mail_testcase_assigned = "下面的测试用例已分配给你 %s 由 %s  <br /><br />";
-+$TLS_mail_testcase_assignment_removed = "%s - 下面指派给您的测试用例被 %s 删除 <br /><br />";
++$TLS_mail_testcase_assigned = "下面的测试用例已分配给你%s,由%s分配的<br /><br />";
++$TLS_mail_testcase_assignment_removed = "%s - 已指派给您的测试用例被%s删除 <br /><br />";
 +$TLS_send_mail_to_tester = "给测试者发送邮件通知";
 +
 +
@@ -4940,7 +4989,7 @@ index a16c224..b4ef20b 100644
 +$TLS_report_free_testcases_on_testproject=$TLS_link_report_free_testcases_on_testproject;
 +$TLS_all_testcases_has_testplan="所有测试用例已被分配到测试计划中";
 +$TLS_all_testcases_are_free="没有测试用例被分配到测试计划中";
-+
+ 
 +// ----- timeCharts -----
 +$TLS_interval_end_date 		= "最后间隔日期";
 +$TLS_interval_header 		= "间隔类型";
@@ -4948,17 +4997,29 @@ index a16c224..b4ef20b 100644
 +$TLS_link_time_charts		= "时间表";
 +$TLS_time_charts_metrics 	= "时间表度量";
 +$TLS_time_charts_title 		= "时间表";
- 
++
++// ----- login.php -----
++$TLS_sso_login_url_text = "点击这里完成登录...";
++$TLS_demo_login_title = "TestLink 演示";
++$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
  
  // ----- END ------------------------------------------------------------------
 -?>
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/texts.php b/locale/zh_CN/texts.php
-index 773333c..84a5abe 100644
+index 773333c..de251a8 100644
 --- a/locale/zh_CN/texts.php
 +++ b/locale/zh_CN/texts.php
-@@ -26,374 +26,292 @@
+@@ -5,6 +5,7 @@
+  *
+  * Filename $RCSfile: texts.php,v $
+  * @version $Revision: 1.2 $
++ * @modified $Date: 2009/12/15 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
+  * @modified $Date: 2009/03/05 18:38:50 $ by $Author: schlundus $
+  * @author Martin Havlat and reviewers from TestLink Community
+  *
+@@ -26,374 +27,292 @@
   * ------------------------------------------------------------------------------------ */
  
  
@@ -4969,14 +5030,13 @@ index 773333c..84a5abe 100644
 -test cases and vice versa. Such traceability matrix helps to investigate test coverage
 -of requirements and find out which ones successfully failed during a testing. This
 -analyse serves as input for the next planning.</p>
--
--<h2>Get Started:</h2>
 +$TLS_htmltext_title['assignReqs']	= "分配需求给测试用例"; //已校对
 +$TLS_htmltext['assignReqs'] 		= "<h2>目的:</h2>
 +<p>用户可以设置测试套件和需求规约之间的关系. 设计者可以把此处的测试套件和需求规约一一关联
 +.例如:一个测试用例可以被关联到零个、一个、多个测试套件,反之亦然.
 +这些可追踪的模型帮助我们去研究测试用例对需求的覆盖情况,并且找出测试用例是否通过的情况.这些分析用来验证测试的覆盖程度是否达到预期的结果。</p>
-+
+ 
+-<h2>Get Started:</h2>
 +<h2>开始:</h2>
  <ol>
 -	<li>Choose an Test Case in tree at the left. The combo box with list of Requirements

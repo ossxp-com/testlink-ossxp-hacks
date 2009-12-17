@@ -1,3 +1,10 @@
+ossxp-testlink (1.8.5-12) unstable; urgency=low
+
+  * New feature: demo login.
+  * New feature: login page message.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Thu, 17 Dec 2009 21:08:10 +0800
+
 ossxp-testlink (1.8.5-11) unstable; urgency=low
 
   * zh_CN l10n fix.

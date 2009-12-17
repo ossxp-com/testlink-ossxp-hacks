@@ -1,0 +1,44 @@
+From: Jiang Xin <worldhello.net@gmail.com>
+Subject: [PATCH] t/login_page_msg
+
+See #82: 登录页面提供可定制的显示信息:
+可以在 custom_… 配置文件中提供自定义字串，如果不为空，则在登录页面的下方显示。
+
+Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
+
+---
+ gui/templates/login.tpl |    6 ++++++
+ login.php               |    1 +
+ 2 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
+index 77bdd48..9382a4d 100644
+--- a/gui/templates/login.tpl
++++ b/gui/templates/login.tpl
+@@ -53,6 +53,12 @@ window.onload=function()
+ 	</p>
+ 	{/if}
+ 
++	{if $gui->login_page_msg}
++		<p>
++		<div class="login_page_msg">
++			{$gui->login_page_msg}
++		</div>
++	{/if}
+ 	
+ 	{include file="inc_copyrightnotice.tpl"}
+ 
+diff --git a/login.php b/login.php
+index 1ef2a62..0f5b497 100644
+--- a/login.php
++++ b/login.php
+@@ -97,6 +97,7 @@ function init_gui(&$db,$args)
+ 	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
+ 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
+ 	$gui->user_self_signup = config_get('user_self_signup');
++	$gui->login_page_msg = config_get('login_page_msg');
+ 
+ 	switch($args->note)
+     {
+-- 
+tg: (ee4073d..) t/login_page_msg (depends on: master)
