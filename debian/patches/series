@@ -3,3 +3,4 @@ t/custom_config.diff -p1
 t/bugtrac_integration.diff -p1
 t/single_signon.diff -p1
 t/charts_in_chinese.diff -p1
+t/tl_bugfix.diff -p1

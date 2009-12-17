@@ -1,5 +1,6 @@
 debian/conf/apache2  /etc/
-debian/package_info/*.conf  opt/ossxp/lib/packages/
+debian/package_info/*.conf    opt/ossxp/lib/packages/
+custom_config.inc.php.example opt/testlink/web
 *.php           /opt/testlink/web
 cfg             /opt/testlink/web
 custom          /opt/testlink/web

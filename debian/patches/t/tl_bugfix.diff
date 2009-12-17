@@ -1,0 +1,48 @@
+From: Jiang Xin <worldhello.net@gmail.com>
+Subject: [PATCH] t/tl_bugfix
+
+TestLink Bugfix:
+
+* Fixed #81: 测试用例关联到测试计划时发生的内部错误.
+
+Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
+
+---
+ lib/functions/database.class.php |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/lib/functions/database.class.php b/lib/functions/database.class.php
+index e1514ca..0b0a22b 100644
+--- a/lib/functions/database.class.php
++++ b/lib/functions/database.class.php
+@@ -139,10 +139,8 @@ class database
+ 	function reportFatal($msg)
+ 	{
+ 		tLog($msg, 'ERROR', "DATABASE");			
+-		echo '<html><head><title>TestLink Database error</title></head><body>' .
+-				'<h1>TestLink Database error</h1><p>' .
+-				htmlspecialchars($msg) . '</p></body>';
+-		exit;
++    // reportFatal shouldn't exit and shouldn't display error message on webpage,
++    // report by log is just ok.
+ 	}
+ 
+ 	# --------------------
+@@ -190,7 +188,7 @@ class database
+ 		{
+ 			$errorMsg = "ERROR ON exec_query() - database.class.php <br />" . $this->error(htmlspecialchars($p_query)) . 
+ 					"<br />THE MESSAGE : $message ";			
+-			reportFatal($errorMsg);
++			$this->reportFatal($errorMsg);
+ 
+ 			return false;
+ 		} 
+@@ -714,4 +712,4 @@ class database
+ 
+ 
+ }
+-?>
+\ No newline at end of file
++?>
+-- 
+tg: (ee4073d..) t/tl_bugfix (depends on: master)

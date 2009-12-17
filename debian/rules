@@ -12,12 +12,14 @@ $(patsubst %,binary-fixup/%,$(DEB_ALL_PACKAGES)) ::
 
 binary-fixup/ossxp-testlink::
 	# Remove runtime files used for development, or runtime files in development.
+	# Dynamic generated templates files.
 	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c
+	# Database settings
 	-rm -f debian/ossxp-testlink/opt/testlink/web/config_db.inc.php
+	# TestLink custom config file...
 	-rm -f debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
-
-	# Copy from template file
-	cp custom_config.inc.php.example debian/ossxp-testlink/opt/testlink/web/custom_config.inc.php
+	# BTS custom config file...
+	-rm -f debian/ossxp-testlink/opt/testlink/web/cfg/custom_*.php
 
 	# Create runtime directory.
 	mkdir   debian/ossxp-testlink/opt/testlink/web/gui/templates_c

@@ -19,6 +19,10 @@ esac
 if [ -z "$2" ]; then
     [ -e /opt/testlink/web/install ] || cp -a /opt/testlink/install /opt/testlink/web/
     a2ensite testlink
+    if [ ! -f /opt/testlink/web/custom_config.inc.php ]; then
+      cp /opt/testlink/web/custom_config.inc.php.example \
+         /opt/testlink/web/custom_config.inc.php || true
+    fi
 fi
 
 #DEBHELPER#

@@ -1,3 +1,10 @@
+ossxp-testlink (1.8.5-11) unstable; urgency=low
+
+  * zh_CN l10n fix.
+  * Fix reportFatal in database.class.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Mon, 14 Dec 2009 22:14:18 +0800
+
 ossxp-testlink (1.8.5-10) unstable; urgency=low
 
   * Upstream upgrade to 1.8.5

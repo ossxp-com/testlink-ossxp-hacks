@@ -10,10 +10,10 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
  lib/results/resultsByStatus.php |    2 +-
  locale/en_GB/strings.txt        |    1 +
  locale/tl_lang_parser.rb        |  263 +++
- locale/zh_CN/description.php    |  313 ++--
+ locale/zh_CN/description.php    |  351 ++--
  locale/zh_CN/strings.txt        | 3715 ++++++++++++++++++++-------------------
- locale/zh_CN/texts.php          |  476 +++---
- 7 files changed, 2506 insertions(+), 2274 deletions(-)
+ locale/zh_CN/texts.php          |  470 ++---
+ 7 files changed, 2519 insertions(+), 2293 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
 index 331a77a..d717b34 100644
@@ -34,6 +34,13 @@ index 331a77a..d717b34 100644
  
  
  // ENABLED: allow N level depth tree 
+@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+ $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
+ $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
+ // ----- END OF FILE --------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
 diff --git a/lib/results/resultsByStatus.php b/lib/results/resultsByStatus.php
 index 9883f03..0825305 100644
 --- a/lib/results/resultsByStatus.php
@@ -329,54 +336,41 @@ index 0000000..6b123b9
 +main
 +
 diff --git a/locale/zh_CN/description.php b/locale/zh_CN/description.php
-index 811937a..ac1f233 100644
+index 811937a..bcabd37 100644
 --- a/locale/zh_CN/description.php
 +++ b/locale/zh_CN/description.php
-@@ -26,229 +26,196 @@
+@@ -25,230 +25,197 @@
+  *
   * ----------------------------------------------------------------------------------- */
  
- // printFilter.html
+-// printFilter.html
 -$TLS_hlp_generateDocOptions = "<h2>Options for a generated document</h2>
-+$TLS_hlp_generateDocOptions = "<h2>选项生成的文档</h2>
- 
+-
 -<p>This table allows the user to filter test cases before they are viewed. If
 -selected (checked) the data will be shown. In order to change the data
 -presented, check or uncheck, click on Filter, and select the desired data
 -level from the tree.</p>
-+<p>该列表允许用户在浏览测试用例之前对其进行过滤。
-+如果选择了将被显示的数据。为了改变所提出的数据，
-+选中或者取消，点击过滤器，并在树上选择希望的数据等级。</p>
- 
+-
 -<p><b>Document Header:</b> Users can filter out Document Header information. 
 -Document Header information includes: Introduction, Scope, References, 
 -Test Methodology, and Test Limitations.</p>
-+<p><b>文档头部：</b>用户可以过滤文档的头部信息。
-+文档的头部信息包括：介绍，范围，参考，测试方法和测试规约。</p>
- 
+-
 -<p><b>Test Case Body:</b> Users can filter out Test Case Body information. Test Case Body information
 -includes: Summary, Steps, Expected Results, and Keywords.</p>
-+<p><b>测试用例的内容：</b>用户可以过滤测试用例的内容。测试用例的内容包括：
-+摘要，步骤，预期结果和关键字。</p>
- 
+-
 -<p><b>Test Case Summary:</b> Users can filter out Test Case Summary information from the Test Case Title,
 -however, they cannot filter out Test Case Summary information from the Test
 -Case Body. Test Case Summary has only been partially separated from Test Case
 -Body in order to support viewing Titles with a brief Summary and the absence of
 -Steps, Expected Results, and Keywords. If a user decides to view Test Case
 -Body, Test Case Summary will always be included.</p>
-+<p><b>测试用例摘要：</b>通过测试用例的标题，用户可以过滤测试用例摘要的信息。
-+但是，用户不能通过测试用例的内容过滤测试用例摘要信息。
-+为了在浏览标题时显示摘要信息和遗漏的步骤，预期结果和关键字，我们把测试摘要从测试用例内容中单独分离出来。
-+当用户浏览测试用例的时候，测试摘要会被自动包含进来供浏览。</p>
- 
+-
 -<p><b>Table of Content:</b> TestLink inserts list of all titles with internal hypertext links if checked.</p>
-+<p><b>表中的内容：</b>TestLink 通过内部超连接插入所有标题</p>
- 
+-
 -<p><b>Output format:</b> There are two possibilities: HTML and MS Word. Browser calls MS word component 
 -in second case.</p>";
-+<p><b>导出格式：</b>共有两种格式：HTML和MS word。在第二种情况下，浏览器会自动调用MS word组件。</p>";
- 
- // testPlan.html
+-
+-// testPlan.html
 -$TLS_hlp_testPlan = "<h2>Test Plan</h2>
 -
 -<h3>General</h3>
@@ -400,28 +394,53 @@ index 811937a..ac1f233 100644
 -In this situation all links (except lead enabled ones) will be unlinked. If you 
 -are in this situation you must contact a lead or admin to grant you the proper 
 -project rights or create a Test Plan for you.</p>"; 
+-
+-// custom_fields.html
+-$TLS_hlp_customFields = "<h2>Custom Fields</h2>
+-<p>Following are some facts about the implementation of custom fields:</p>
++// printFilter.html //已校对
++$TLS_hlp_generateDocOptions = "<h2>根据选项生成的文档</h2>
++
++<p>该列表允许用户在浏览测试用例之前对其进行过滤。
++通过筛选可以显示你所需要的数据。为了改变显示的数据，
++你可以选择或者取消选择条件，点击过滤器，并在树上选择希望的数据等级。</p>
++
++<p><b>文档头部：</b>用户可以过滤文档的头部信息。
++文档的头部信息包括：介绍，范围，参考，测试方法和测试规范。</p>
++
++<p><b>测试用例的内容：</b>用户可以过滤测试用例的内容。测试用例的内容包括：
++摘要，步骤，预期结果和关键字。</p>
++
++<p><b>测试用例摘要：</b>通过测试用例的标题，用户可以过滤测试用例摘要的信息。
++但是，用户不能通过测试用例的内容过滤测试用例摘要信息。
++为了在浏览标题时显示摘要信息和遗漏的步骤，预期结果和关键字，我们把测试摘要从测试用例内容中单独分离出来。
++当用户浏览测试用例的时候，测试用例摘要会被自动包含进来供浏览。</p>
++
++<p><b>表中的内容：</b>TestLink通过内部超连接插入所有标题</p>
++
++<p><b>导出格式：</b>共有两种格式：HTML和MS word。在第二种情况下，浏览器会自动调用MS word组件。</p>";
++
++// testPlan.html //已校对
 +$TLS_hlp_testPlan = "<h2>测试计划</h2>
 +
-+<h3>通用的</h3>
++<h3>一般定义</h3>
 +<p>测试计划是测试软件系统的一个系统性的方法。你可以根据特定的产品周期和问题跟踪结果组织你的测试活动。</p>
 +
 +<h3>测试执行</h3>
-+<p>在该小节用户可以执行测试用例（记录测试结果），并输出测试计划所包含的测试套件。
++<p>在该部分用户可以执行测试用例（记录测试结果），并输出测试计划所包含的测试套件。
 +同时用户也可以跟踪测试用例执行的结果。</p>
 +
 +<h2>测试计划的管理</h2>
-+<p>这一节，仅管理人员可以访问，管理测试计划。
-+管理测试计划涉及到创建、编辑和删除计划，添加、编辑、删除和更新测试计划所包含的测试用例，创建构建以及确定谁可以访问的测试计划。<br/>
-+授权用户可以设置测试套件（类别）的优先级／风险和属主，以及创建测试里程碑。</p>
++<p>这部分，仅管理人员可以访问，管理测试计划。
++管理测试计划涉及到创建、编辑和删除测试计划，添加、编辑、删除和更新测试计划所包含的测试用例，创建构建以及指派用户在项目中的权限。<br/>
++权限高的用户可以设置测试套件（类别）的优先级／风险和所有关系(测试套件由谁负责)，以及创建测试里程碑。</p>
 +
 +<p>注意：用户有可能看不到一个包含任何测试计划的下拉菜单。
-+在改种情况下，所有的连接（除了管理人员开启的）都不能连接。如果出现这种情况，你一定要跟领导或管理员联系，给你在项目中授予适当的权限或者以你的身份创建一个测试计划。</p>"; 
- 
- // custom_fields.html
--$TLS_hlp_customFields = "<h2>Custom Fields</h2>
--<p>Following are some facts about the implementation of custom fields:</p>
++在这种情况下，所有的链接（除了管理人员开启的）都不能使用。如果出现这种情况，你一定要跟领导或管理员联系，给你在项目中授予适当的权限或者为你创建一个测试计划。</p>"; 
++
++// custom_fields.html //已校对
 +$TLS_hlp_customFields = "<h2>自定义字段</h2>
-+<p>以下是对自定义字段实现中的一些实例：</p>
++<p>下面是关于自定义字段应用的一些实例：</p>
  <ul>
 -<li>Custom fields are defined system wide.</li>
 -<li>Custom fields are linked to a type of element (Test Suite, Test Case)</li>
@@ -432,14 +451,14 @@ index 811937a..ac1f233 100644
 +<li>自定义字段定义系统范围。</li>
 +<li>自定义字段关联到一种元素类型（测试套件，测试用例）。</li>
 +<li>自定义字段可以关联到多个测试项目。</li>
-+<li>在每个测试项目中这些自定义字段的显示顺序各自不同。</li>
++<li>每个测试项目中自定义字段的显示顺序不同。</li>
 +<li>可以在特定的测试项目中锁定自定义字段。</li>
 +<li>自定义字段的数量不受限制。</li>
  </ul>
  
 -<p>The definition of a custom field includes the following logical
 -attributes:</p>
-+<p>自定义字段包括一下逻辑属性：</p>
++<p>自定义字段的定义中包括一下属性：</p>
  <ul>
 -<li>Custom field name</li>
 -<li>Caption variable name (eg: This is the value that is
@@ -470,46 +489,49 @@ index 811937a..ac1f233 100644
 -<li>Enable on test plan design. User can change the value during Test Plan design (add test cases to test plan)</li>
 -<li>Available for. User choose to what kind of item the field belows.</li>
 +<li>默认值: 尚未实现</li>
-+<li>自定义字段的最大／最小值 (用0代表禁用). (尚未实现)</li>
++<li>自定义字段的最大／最小长度 (用0代表禁用). (尚未实现)</li>
 +<li>用正则表达式验证用户的输入
 +(用 <a href=\"http://au.php.net/manual/en/function.ereg.php\">ereg()</a>
 +语法). <b>(尚未实现)</b></li>
 +<li>所有的自定义字段目前以VARCHAE(255)的字段类型被保存在数据库中。</li>
-+<li>显示所有的测试规格说明。</li>
++<li>显示在所有的测试规格说明中。</li>
 +<li>启用测试规格。当设计测试用例规格时，用户可以对其进行修改。</li>
-+<li>显示测试执行。</li>
++<li>显示在测试执行中。</li>
 +<li>启用测试执行。当测试用例执行时用户可以对其进行修改</li>
-+<li>显示测试计划设计</li>
-+<li>启用测试计划设计。当测试计划设计（向测试计划添加测试用例）时用户可以对其进行修改</li>
++<li>显示在测试计划设计中</li>
++<li>启用测试计划设计。当设计测试计划(向测试计划中添加测试用例时),用户可以对其进行修改</li>
 +<li>可用于。用户选择什么类型的字段选项。</li>
  </ul>
  ";
  
- // execMain.html
+-// execMain.html
 -$TLS_hlp_executeMain = "<h2>Executing Test Cases</h2>
 -<p>Allows users to 'execute' test cases. Execution itself is merely
 -assigning a test case a result (pass,fail,blocked) against a selected build.</p>
 -<p>Access to a bug tracking system could be configured. User can directly add a new bugs
 -and browse exesting ones then.</p>";
-+$TLS_hlp_executeMain = "<h2>执行测试用例</h2>
-+<p>允许用户执行测试用例。执行本身只是一个对选择的构建的测试案例分配结果（通过，失败，锁定）</p>
-+<p>通过配置缺陷跟踪系统，用户可以直接新建问题和浏览已经存在的问题。更多信息请查看安装手册。</p>";
- 
- //bug_add.html
+-
+-//bug_add.html
 -$TLS_hlp_btsIntegration = "<h2>Add Bugs to Test Case</h2>
 -<p><i>(only if it is configured)</i>
 -TestLink has a very simple integration with Bug Tracking Systems (BTS),
 -not being able either send a bug creationg request to BTS, neither get back the bug id.
 -The integration is done using links to pages on BTS, that calls the following features:
++// execMain.html  //已校对
++$TLS_hlp_executeMain = "<h2>执行测试用例</h2>
++<p>允许用户执行测试用例。执行本身只是一个对选择的构建的测试用例分配结果（通过，失败，锁定）的过程</p>
++<p>通过配置可以关联到缺陷跟踪系统。用户可以直接新建问题和浏览已经存在的问题。更多信息请查看安装手册。</p>";
++
++//bug_add.html //已校对
 +$TLS_hlp_btsIntegration = "<h2>给测试用例添加问题</h2>
 +<p><i>(仅在已经配置好的情况下)</i>
 +TestLink 仅仅简单地跟缺陷跟踪系统（BTS）进行了集成，即不能向BTS发送创建bug的请求，也不能取回bug id号。
-+该集成仅仅于BTS建立了一个页面连接，调用以下功能：
++该集成仅仅与BTS建立了一个页面连接，调用以下功能：
  <ul>
 -	<li>Insert new bug.</li>
 -	<li>Display existent bug info. </li>
-+	<li>插入新的问题</li>
-+	<li>显示存在的问题信息 </li>
++	<li>添加新问题</li>
++	<li>显示已存在问题的信息 </li>
  </ul>
  </p>  
  
@@ -521,17 +543,17 @@ index 811937a..ac1f233 100644
 -   <li>Step 2: write down the BUGID assigned by BTS.</li>
 -   <li>Step 3: write BUGID on the input field.</li>
 -   <li>Step 4: use add bug button.</li>
-+   <li>第一步: 点击连接打开BTS，插入一个新的问题</li>
++   <li>第一步: 点击连接打开BTS，添加一个新的问题</li>
 +   <li>第二步: 记下BTS指定的BUGID</li>
 +   <li>第三步: 将BUGID写入输入框中</li>
 +   <li>第四步: 点击添加问题按钮</li>
     </ul>  
  
 -After closing the add bug page, you will see relevant bug data on the execute page.
-+关闭添加问题页面后，你将在执行页面上看见一个问题数据的关联。
++关闭添加问题页面后，你将在执行页面上看见一个问题数据的关联信息。
  </p>";
  
- // execFilter.html
+-// execFilter.html
 -$TLS_hlp_executeFilter = "<h2>Setup Filter and Build for test execution</h2>
 -
 -<p>The left pane consists from navigator through test cases assigned to the current " .
@@ -563,35 +585,36 @@ index 811937a..ac1f233 100644
 -<h3>User filter</h3>
 -<p>Users can filter test cases by their assignee. The check-box allows to include also " .
 -"\"unassigned\" tests into the resulted set in addtion.</p>";
++// execFilter.html  //已校对
 +$TLS_hlp_executeFilter = "<h2>设置过滤器并构建测试的实施</h2>
 +
-+<p>左方框包含指派给当前项目的测试用例集的导航" .
-+"测试计划和列表包含设置和过滤器。这些过滤器允许用户提供完善的测试案例，否则不会被执行。" .
-+"设置过滤器，点击 \"应用\" 按钮并从树形菜单选择适当的测试用例 " .
++<p>左方框中包含指派给当前项目测试计划的测试用例的导航,左方框的列表包含了测试用例筛选的过滤器。" .
++"这些过滤器允许用户提炼出的一组测试用例，然后去执行。" .
++"设置好过滤器，然后点击 \"应用\" 按钮并从树形菜单中选择适当的测试用例 " .
 +"</p>
 +
 +<h3>构建</h3>
-+<p>用户必须选择一个构建，该构建将和测试结果建立连接。" .
++<p>用户必须选择一个用来和测试结果建立连接的构建。" .
 +"构建是当前测试计划的基本组件。在每个构建中每一个测试用例都可能被执行多次。" .
-+"但最终的执行结果仅被统计一次。 
-+<br />leader可以在新建构建页面创建构建。</p>
++"然而统计时只计入最终的执行结果。 
++<br />项目负责人可以在新建构建页面创建构建。</p>
 +
 +<h3>测试用例ID过滤器</h3>
-+<p>通过唯一标识符，用户可以过滤测试用例。该ID在创建测试用例的时候自动生成。 
++<p>用户可以过滤测试用例通过唯一的标识符。该ID在创建测试用例的时候自动生成。 
 +空列表意味着还没有应用过滤器。</p> 
 +
 +<h3>优先级过滤器</h3>
-+<p>用户可以通过优先级来过滤测试用例。每个测试用例的重要性与该测试用例在当前测试计划里的紧急程度相结合。" .
-+"例如'HIGH'优先级的测试用例是说如果重要或者紧急就是HIGH，第二个属性至少是MEDIUM水平。</p> 
++<p>用户可以通过优先级来过滤测试用例。每个测试用例的重要性还与该测试用例在当前测试计划里的紧急程度有关。" .
++"例如'HIGH'优先级的测试用例会显示那些如果重要程度是HIGH，在测试计划中的紧急程度至少是MEDIUM级别的测试用例。</p> 
 +
 +<h2>结果过滤器</h2>
-+<p>用户可以通过结果过滤测试用例。结果集是测试用例基于某一构建的产物。测试用例通过，失败，锁定或者没有运行。" .
++<p>用户可以通过测试结果过滤测试用例。测试结果是测试用例基于某一构建的产物。测试用例的状态包括通过，失败，锁定或者尚未运行。" .
 +"该过滤器默认情况下是禁用的。</p>
 +
 +<h3>用户过滤器</h3>
-+<p>用户可以通过测试用例的委托人来过滤测试用例。复选框允许包含”未指派“ 的选项。</p>";
++<p>用户可以根据测试用例的指派者来过滤测试用例。复选框允许包含\"未指派\"的选项。</p>";
  /*
- <h2>Most Current Result</h2>
+-<h2>Most Current Result</h2>
 -<p>By default or if the 'most current' checkbox is unchecked, the tree will be sorted 
 -by the build that is chosen from the dropdown box. In this state the tree will display 
 -the test cases status. 
@@ -604,28 +627,31 @@ index 811937a..ac1f233 100644
 -the 'most current' checkbox. All test cases will be shown with most current 
 -status. So, if test case 1 passed in build 3, even though the user has also selected 
 -build 2, it will be colored green.</p>
-+<p>默认情况或者没有选择复选框里的”most  current"B选项，树形目录将按照下拉选择框里选择的构建排序。
-+这是树形目录将显示测试用例的状态。<br />
++<h2>当前结果</h2>
++<p>默认情况下或者没有选择复选框里的"most  current"选项时，树形目录将按照下拉选择框里选择的构建排序。
++这时树形目录将显示测试用例的状态。<br />
 +例如：用户从下来选择框里选择构建2而且没有选择复选框里的"most current"。
-+所有测试用例连同他们在构建2里的状态一起显示出来。 
-+因此，如果测试用例1在构建2里通过，它将被显示为绿色。
-+<br />如果用户选择了复选框里的"most current"，那么树形目录里的测试用例将根据他们最新的执行结果显示具体的颜色。
-+<br />另外：如果用户选择了构建2而且选择了复选框里的"most current"，那么所有的测试用例将根据他们最近的状态显示。
++所有测试用例会显示它们在构建2里的执行状态。 
++因此，如果测试用例1在构建2里执行通过的情况下，它会显示为绿色。
++<br />如果用户选择了复选框里的"most current"，那么树形目录里的测试用例将根据他们最新的执行结果显示相应的颜色。
++<br />例如：如果用户选择了构建2而且选择了复选框里的"most current"，那么所有的测试用例将根据他们最近的状态显示。
 +因此，如果测试用例1在构建3里通过，即使用户选择了构建2，它也会显示为绿色。</p>
   */
  
  
- // newest_tcversions.html
+-// newest_tcversions.html
 -$TLS_hlp_planTcModified = "<h2>Newest versions of linked Test Cases</h2>
 -<p>The whole set of Test Cases linked to Test Plan is analyzed, and a list of Test Cases
 -which have a newest version is displayed (against the current set of the Test Plan).
++// newest_tcversions.html //已校对
 +$TLS_hlp_planTcModified = "<h2>被关联测试用例的最新版本</h2>
-+<p>通过分析与测试计划关联的所有测试用例集，那些有最新版本的测试用例将被罗列出来（相对于当前测试计划的测试集）
++<p>通过分析与测试计划关联的所有测试用例，那些有最新版本的测试用例将被罗列出来（相对应于当前测试计划的测试用例）
  </p>";
  
  
- // requirementsCoverage.html
+-// requirementsCoverage.html
 -$TLS_hlp_requirementsCoverage = "<h3>Requirements Coverage</h3>
++// requirementsCoverage.html //已校对
 +$TLS_hlp_requirementsCoverage = "<h3>需求覆盖</h3>
  <br />
 -<p>This feature allows to map a coverage of user or system requirements by
@@ -655,45 +681,46 @@ index 811937a..ac1f233 100644
 -requirements within the specification screen. These Test Cases are created into Test Suite
 -with name defined in configuration <i>(default is: &#36;tlCfg->req_cfg->default_testsuite_name = 
 -\"Test suite created by Requirement - Auto\";)</i>. Title and Scope are copied to these Test cases.</p>
-+<p>这个功能允许通过测试用例来映射对用户和系统需求的覆盖度。
-+通过主页的\"需求规格\" 可以连接到。</p>
++<p>这个功能允许通过测试用例来映射对用户或系统需求的覆盖度。
++通过主页的\"需求规格\" 可以进行导航。</p>
 +
 +<h3>需求规格</h3>
-+<p>需求被分为若干个与测试项目相关联的'需求规约'文档。<br />
++<p>需求是根据测试项目中相关联的'需求规约'文档来组织的。<br />
 +TestLink 不支持即包含需求规约又包含需求的版本。
-+因此，只有创建好规约之后才能往里添加版本里的需求文档。 
++因此，只有创建好规约之后才能往里添加需求文档版本。 
 +<b>标题</b>.
-+用户于可以给<b>Scope</b>字段添加简单的描述或注释。</p> 
++用户于可以向<b>范围</b>中添加简单的描述或注释。</p> 
 +
-+<p><b><a name='total_count'>REQs覆盖度</a></b>服务评估Req.覆盖度并非要求添加所有的需求（导入）。 
-+值<b>0</b> 意味着当前需求数量被用作度量。</p> 
++<p><b><a name='total_count'>需求覆盖数目</a></b>用来评估需求覆盖度如果并没有把所有的需求添加(导入)到TestLink的情况下。 
++需求覆盖数目的值<b>0</b> 指的是当前被用来做结果分析的需求数量。</p> 
 +<p><i>例如 SRS 包含200个需求，但是仅有50个被添加到TestLink。测试覆盖度为25%（如果这些被添加的需求都将被测试）。 
 +</i></p>
 +
 +<h3><a name=\"req\">需求</a></h3>
 +<p>点击需求规约的标题，你就可以创建，编辑，删除和导入需求文档。每个需求都有标题，范围和状态。
-+状态包括 \"Normal\" 和 \"Not testable\". 不可测试的需求不会被统计度量。
++状态包括 \"有效的\" 和 \"不可测试的\". 不可测试的需求不会被统计度量。
 +该参数用于没有实现的功能和错误的设计需求。</p> 
 +
-+<p>你可以在需求规约页面通过多种检查需求的途径为需求创建新的测试用例。
++<p>你可以在需求规约页面通过多种查看需求的途径为需求创建新的测试用例。
 +这些测试用例被包含在通过配置命名的测试套件里。<i>(默认是: &#36;tlCfg->req_cfg->default_testsuite_name = 
-+\"通过需求创建测试套件 - 自动\";)</i>. 标题和范围被复制给这些测试用例。</p>
++\"通过需求创建测试套件 - 自动\";)</i>. 标题和范围被复制到这些测试用例。</p>
  ";
  
  
- // planAddTC_m1.tpl
+-// planAddTC_m1.tpl
 -$TLS_hlp_planAddTC = "<h2>Regarding 'Save Custom Fields'</h2>
 -If you have defined and assigned to Test Project,<br /> 
 -Custom Fields with:<br />
 - 'Display on test plan design=true' and <br />
 - 'Enable on test plan design=true'<br />
 -you will see these in this page ONLY for Test Cases linked to Test Plan.
++// planAddTC_m1.tpl //已校对
 +$TLS_hlp_planAddTC = "<h2>关于'保存自定义字段'</h2>
-+如果你已经定义而且指派了测试项目，<br /> 
++如果你已经定义而且指派了关键字到测试项目中，<br /> 
 +自定义字段具有：<br />
 + '在测试计划设计里显示=true' 和 <br />
 + '启用测试计划设计=true'<br />
-+你将只能在已经与测试计划建立关联的测试用例页面看到这些。
++你将只能在已经与测试计划建立关联的测试用例页面看到这些关键字。
  ";
  
  // xxx.html
@@ -704,7 +731,7 @@ index 811937a..ac1f233 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index a16c224..c74c062 100644
+index a16c224..b4ef20b 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
 @@ -1,7 +1,7 @@
@@ -832,8 +859,8 @@ index a16c224..c74c062 100644
 -
 +$TLS_testproject = "测试产品";
 +$TLS_test_report = "详细测试报告";
-+$TLS_test_suite = "测试集";
-+$TLS_testsuite_created = "测试集创建成功";
++$TLS_test_suite = "测试套件";
++$TLS_testsuite_created = "测试套件创建成功";
 +$TLS_title = "标题";
 +$TLS_total = "总计";
 +$TLS_Unknown = "未知";
@@ -1173,7 +1200,7 @@ index a16c224..c74c062 100644
 +$TLS_title_nav_results = "报告和进度";
 +$TLS_report_tplan_has_no_build = "还没有为测试计划定义构建, <br />".
 +                               "不存在可执行数据 => 报告不能创建";
-+$TLS_report_tplan_has_no_tcases = "还没有任何测试用例集关联到该计划, <br />".
++$TLS_report_tplan_has_no_tcases = "还没有任何测试套件关联到该计划, <br />".
 +                                "没有数据可以显示,没有报告可以产生";
  
  // ----- tcEdit.php -----
@@ -1188,7 +1215,7 @@ index a16c224..c74c062 100644
 -$TLS_assign_requirements = "Assign Requirements";
 +$TLS_copy_keyword_assignments = "复制关联的关键字";
 +$TLS_copy_requirement_assignments = "复制关联的需求";
-+$TLS_tc_copied = "测试用例 %s 成功复制到 <br> 测试集 %s";
++$TLS_tc_copied = "测试用例 %s 成功复制到 <br> 套件 %s";
 +$TLS_tc_created = "测试用例 %s 成功创建";
 +$TLS_tc_deleted = "测试用例 %s 成功删除";
 +$TLS_tc_new_version = "测试用例版本 %s 成功创建";
@@ -1250,10 +1277,10 @@ index a16c224..c74c062 100644
 -$TLS_tc_keywords = "Keywords";
 -$TLS_title_create = "Create";
 -$TLS_warning_empty_testsuite_name = "Please give a name to Test Suite";
-+$TLS_btn_create_testsuite = "创建测试集";
++$TLS_btn_create_testsuite = "创建测试套件";
 +$TLS_tc_keywords = "关键字";
 +$TLS_title_create = "创建";
-+$TLS_warning_empty_testsuite_name = "请指定一个测试集的名称";
++$TLS_warning_empty_testsuite_name = "请指定一个测试套件的名称";
  
  
  
@@ -1331,7 +1358,7 @@ index a16c224..c74c062 100644
 +$TLS_no_nodes_to_reorder = "对不起，没有东西需要重新排序！";
 +$TLS_node = "名称";
 +$TLS_th_id = "标识";
-+$TLS_th_node_type = "测试用例 / 测试集";
++$TLS_th_node_type = "测试用例 / 测试套件";
 +$TLS_th_order = "顺序";
 +$TLS_title_change_node_order = "更改子项序号";
  $TLS_node_type_dbtable_testsuites = $TLS_test_suite;
@@ -1361,18 +1388,18 @@ index a16c224..c74c062 100644
 +$TLS_alt_del_testsuite = "删除这个测试套件包括所有的子内容(测试套件和测试用例)";
 +$TLS_alt_edit_testsuite = "修改这个测试套件的数据和标题";
 +$TLS_alt_move_cp_testsuite = "移动或复制这个测试套件到另一个测试项目";
-+$TLS_alt_move_cp_testcases = "移动/复制测试用例集";
-+$TLS_btn_del_testsuite = "删除用例集";
++$TLS_alt_move_cp_testcases = "移动/复制测试套件";
++$TLS_btn_del_testsuite = "删除套件";
 +$TLS_btn_edit_testsuite = $TLS_btn_edit;
 +$TLS_btn_execute_automatic_testcases = "执行所有的自动化测试用例";
-+$TLS_btn_export_all_testsuites = "导出全部测试集";
++$TLS_btn_export_all_testsuites = "导出全部测试套件";
 +$TLS_btn_export_tc = "导出测试用例";
-+$TLS_btn_export_testsuite = "导出测试集";
++$TLS_btn_export_testsuite = "导出测试套件";
 +$TLS_btn_import_tc = "导入测试用例";
-+$TLS_btn_import_testsuite = "导入测试集";
++$TLS_btn_import_testsuite = "导入测试套件";
 +$TLS_btn_move_cp_testsuite = "删除/复制";
-+$TLS_btn_move_cp_testcases = "删除/复制测试用例集";
-+$TLS_btn_new_testsuite = "新建用例集";
++$TLS_btn_move_cp_testcases = "删除/复制测试套件";
++$TLS_btn_new_testsuite = "新建测试套件";
 +$TLS_btn_new_tc = "创建测试用例";
 +$TLS_btn_reorder = "重新排序子内容";
  $TLS_container_title_testproject = $TLS_testproject;
@@ -1800,7 +1827,7 @@ index a16c224..c74c062 100644
 -$TLS_btn_update_testsuite = "Update Test Suite";
 -$TLS_title_edit_level = "Edit";
 +// ----- gui/templates/containerEdit.tpl -----
-+$TLS_btn_update_testsuite = "更新测试集";
++$TLS_btn_update_testsuite = "更新测试套件";
 +$TLS_title_edit_level = "编辑";
  
  
@@ -1857,7 +1884,7 @@ index a16c224..c74c062 100644
 -$TLS_trep_not_run = $TLS_test_status_not_run;
 -$TLS_trep_passed = $TLS_test_status_passed;
 -$TLS_trep_total = "Total";
-+$TLS_title_res_by_top_level_suites = "上级测试集的测试结果";
++$TLS_title_res_by_top_level_suites = "上级测试套件的测试结果";
 +$TLS_trep_blocked = "锁定";
 +$TLS_trep_comp = "组件";
 +$TLS_trep_comp_perc = "已完成 [%]";
@@ -1910,10 +1937,10 @@ index a16c224..c74c062 100644
 -$TLS_trep_imp = "Importance";
 -$TLS_trep_risk = "Risk";
 -$TLS_trep_ts = "Test Suite";
-+$TLS_title_res_by_ts = "结果（按测试集）";
++$TLS_title_res_by_ts = "结果（按测试套件）";
 +$TLS_trep_imp = "重要性";
 +$TLS_trep_risk = "风险";
-+$TLS_trep_ts = "测试集";
++$TLS_trep_ts = "测试套件";
  
  
  
@@ -2285,9 +2312,9 @@ index a16c224..c74c062 100644
 +$TLS_as_last_testcase = "目标位置底部";
 +$TLS_btn_mv = "移动";
 +$TLS_choose_container = "选择分类";
-+$TLS_inst_copy = "复制测试用例到测试集。";
++$TLS_inst_copy = "复制测试用例到测试套件。";
 +$TLS_inst_move = "将这个测试用例移动到另一个分类下（同一组件内）";
-+$TLS_inst_copy_move_warning = "注意：你只能选择属于这个测试项目的测试用例集.";
++$TLS_inst_copy_move_warning = "注意：你只能选择属于这个测试项目的测试套件.";
 +$TLS_title_mv_cp_tc = "移动/复制测试用例";
 +
 +
@@ -2569,7 +2596,7 @@ index a16c224..c74c062 100644
 +
 +// ----- gui/templates/planAddTC_m1.tpl -----
 +$TLS_add_tc = "添加";
-+$TLS_add_remove_selected_tc_hint = "操作将被应用到全部的测试集上";
++$TLS_add_remove_selected_tc_hint = "操作将被应用到全部的测试套件上";
 +$TLS_btn_add_remove_selected_tc = "添加 / 删除选择的";
 +$TLS_btn_add_selected_tc = "增加选择的测试用例";
 +$TLS_btn_save_exec_order = "保存顺序";
@@ -2779,7 +2806,7 @@ index a16c224..c74c062 100644
 +$TLS_th_imp = "重要性";
 +$TLS_th_owner = "拥有者";
 +$TLS_th_risk = "风险";
-+$TLS_th_test_suite = "测试集";
++$TLS_th_test_suite = "测试套件";
 +$TLS_title_plan_ownership = "测试计划所有权";
  
 -// gui/templates/tcView_viewer.tpl
@@ -2826,7 +2853,7 @@ index a16c224..c74c062 100644
  
  
 +// ----- gui/templates/keywordsAssign.tpl -----
-+$TLS_keyword_assignment_empty_tsuite = "测试集中没有测试用例 => 无法设置关键字";
++$TLS_keyword_assignment_empty_tsuite = "测试套件中没有测试用例 => 无法设置关键字";
 +$TLS_menu_assign_kw_to_tc = "指派到测试用例";
 +$TLS_menu_manage_keywords = "关键字管理";
 +$TLS_title_keywords = "关键字";
@@ -2865,7 +2892,7 @@ index a16c224..c74c062 100644
 +$TLS_th_reason = "更新原因";
 +$TLS_th_spec_version = "规约版本";
 +$TLS_th_status = "状态";
-+$TLS_th_suite_version = "测试集版本";
++$TLS_th_suite_version = "测试套件版本";
 +$TLS_th_update = "更新";
 +$TLS_title_upd_mod_tc = "更新已修改的测试用例→测试计划";
  
@@ -3062,7 +3089,7 @@ index a16c224..c74c062 100644
 +$TLS_th_last_result = "最后结果";
 +$TLS_th_report_format = "报告类型";
 +$TLS_th_test_plan = "测试计划";
-+$TLS_th_test_suites = "测试集";
++$TLS_th_test_suites = "测试套件";
 +$TLS_th_tester_id = "测试人";
  $TLS_th_total_block = "#" . $TLS_test_status_blocked;
 -$TLS_th_total_cases = "#Test Cases";
@@ -3081,13 +3108,13 @@ index a16c224..c74c062 100644
 +$TLS_th_search_notes_string = "搜索字符串";
 +$TLS_true = "真";
 +$TLS_false = "假";
-+$TLS_display_suite_summaries = "显示测试集摘要";
++$TLS_display_suite_summaries = "显示测试套件摘要";
  $TLS_display_query_params  = "显示查询参数";
 -$TLS_display_totals = "显示总计";
 -$TLS_display_test_cases = "Test Cases";
 -$TLS_report_display_options = "Report display options";
 +$TLS_display_totals = "显示合计";
-+$TLS_display_test_cases = "测试用例集";
++$TLS_display_test_cases = "测试套件";
 +$TLS_report_display_options = "报告显示选项";
  
 -// gui/templates/resultsReqs.tpl
@@ -3577,7 +3604,7 @@ index a16c224..c74c062 100644
 +$TLS_href_upd_mod_tc = "更新修改过的测试用例";
 +$TLS_msg_no_rights_for_tp = "- 无效的(你没有权限访问测试计划)";
 +$TLS_testplan_role = "测试计划角色";
-+$TLS_title_test_case_suite = "测试用例集";
++$TLS_title_test_case_suite = "测试套件";
 +$TLS_title_test_execution = "测试执行";
 +$TLS_title_test_plan_mgmt = "测试计划管理";
  
@@ -3656,7 +3683,7 @@ index a16c224..c74c062 100644
 +$TLS_trep_failing = "失败";
 +$TLS_trep_passing = "通过";
 +$TLS_trep_status_for_build = "构建状态";
-+$TLS_trep_status_for_ts = "测试集状态";
++$TLS_trep_status_for_ts = "测试套件状态";
  $TLS_unassigned = "未指派";
  
  
@@ -3846,7 +3873,7 @@ index a16c224..c74c062 100644
 -$TLS_the_format_tc_xml_import = "";
 +// ----- lib/functions/testsuite.class.php -----
 +$TLS_component_name_already_exists = "组件名称已经存在";
-+$TLS_testsuite = "测试集";
++$TLS_testsuite = "测试套件";
  
  
 -// lib/functions/info.inc.php
@@ -4102,7 +4129,7 @@ index a16c224..c74c062 100644
  
 +// ----- lib/results/printDocOptions.php -----
 +$TLS_opt_show_toc = "显示内容列表";
-+$TLS_opt_show_suite_txt 	= "测试集描述";
++$TLS_opt_show_suite_txt 	= "测试套件描述";
 +$TLS_opt_show_tplan_txt 	= "测试计划描述";
 +$TLS_opt_show_tc_body = "显示测试用例内容";
 +$TLS_opt_show_tc_summary = "显示测试用例摘要";
@@ -4175,11 +4202,11 @@ index a16c224..c74c062 100644
 +$TLS_overall_metrics = "全面度量";
 +$TLS_results_by_keyword = "按关键字显示";
 +$TLS_results_by_tester = "按测试者显示";
-+$TLS_results_top_level_suites = "顶层测试集结果";
++$TLS_results_top_level_suites = "顶层测试套件结果";
 +$TLS_chart_report = "报告";
 +$TLS_chart_assigned_testers = "所有者";
 +$TLS_chart_keywords = "关键字";
-+$TLS_chart_testsuites = "测试用例集";
++$TLS_chart_testsuites = "测试套件";
  
  
 -// lib/req/reqImport.php
@@ -4345,9 +4372,9 @@ index a16c224..c74c062 100644
 +$TLS_already_exists_updated = "已经存在，最后版本的数据已经被更新。";
 +$TLS_please_choose_file_to_import = "请选择需要导入的文件";
 +$TLS_title_tc_import_to = "导入测试用例";
-+$TLS_title_tsuite_import_to = "导入测试集";
++$TLS_title_tsuite_import_to = "导入测试套件";
 +$TLS_wrong_xml_tcase_file = "错误的测试用例xml文件";
-+$TLS_wrong_xml_tsuite_file = "错误的测试集xml文件";
++$TLS_wrong_xml_tsuite_file = "错误的测试套件xml文件";
 +$TLS_cf_value_not_imported_missing_cf_on_testproject = "自定义字段 '%s' 的值".
 +    "无法被导入因为在此测试项目上无此名称的自定义字段并可用于 %s ";
 +$TLS_req_not_in_req_spec_on_tcimport = "需求 DOCID=%s 无法被链接到测试用例，" .
@@ -4364,14 +4391,14 @@ index a16c224..c74c062 100644
 +
 +// ----- lib/testcases/tcexport.php -----
 +$TLS_no_testcases_to_export = "没有测试用例可以被导出";
-+$TLS_no_testsuites_to_export = "没有测试集可以被导出";
++$TLS_no_testsuites_to_export = "没有测试套件可以被导出";
  $TLS_title_tc_export = "导出测试用例";
 -$TLS_title_tc_export_all = "导出所有测试用例";
 -$TLS_title_tsuite_export = "导出分类";
 -$TLS_title_tsuite_export_all = "导出所有分类";
 +$TLS_title_tc_export_all = "导出全部测试用例";
-+$TLS_title_tsuite_export = "导出测试集";
-+$TLS_title_tsuite_export_all = "导出全部测试集";
++$TLS_title_tsuite_export = "导出测试套件";
++$TLS_title_tsuite_export_all = "导出全部测试套件";
  
  
  
@@ -4928,10 +4955,10 @@ index a16c224..c74c062 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/texts.php b/locale/zh_CN/texts.php
-index 773333c..9006b02 100644
+index 773333c..84a5abe 100644
 --- a/locale/zh_CN/texts.php
 +++ b/locale/zh_CN/texts.php
-@@ -26,374 +26,298 @@
+@@ -26,374 +26,292 @@
   * ------------------------------------------------------------------------------------ */
  
  
@@ -4944,12 +4971,11 @@ index 773333c..9006b02 100644
 -analyse serves as input for the next planning.</p>
 -
 -<h2>Get Started:</h2>
-+$TLS_htmltext_title['assignReqs']	= "分配需求给测试用例";
++$TLS_htmltext_title['assignReqs']	= "分配需求给测试用例"; //已校对
 +$TLS_htmltext['assignReqs'] 		= "<h2>目的:</h2>
-+<p>用户可以设置测试用例集和需求规约之间的关系. 设计者可以把此处的测试用例集和需求规约一一关联
-+.例如:一个测试用例可以被关联到零个、一个、多个测试用例集,反之亦然.
-+这些可追踪的模型帮助我们去研究测试用例对需求的覆盖情况已经测试用例是否通过的情况.
-+这些分析为下次的计划充当输入</p>
++<p>用户可以设置测试套件和需求规约之间的关系. 设计者可以把此处的测试套件和需求规约一一关联
++.例如:一个测试用例可以被关联到零个、一个、多个测试套件,反之亦然.
++这些可追踪的模型帮助我们去研究测试用例对需求的覆盖情况,并且找出测试用例是否通过的情况.这些分析用来验证测试的覆盖程度是否达到预期的结果。</p>
 +
 +<h2>开始:</h2>
  <ol>
@@ -4963,13 +4989,13 @@ index 773333c..9006b02 100644
 -	to the current test case. A designer could mark requirements which are covered by this
 -	test case and then click the button 'Assign'. These new assigned test case are shown in
 -	the middle block 'Assigned Requirements'.</li>
-+	<li>在左边的树状图中选择一个测试用例.工作区的上方列出了所有需求规约的复选框.</li>
++	<li>在左边的树状图中选择一个测试用例.工作区的上方列出了所有需求规约的选择框.</li>
 +	<li>如果有多个需求规约文档的话，从中选择一个.
-+        TestLink会自动加载当前页面.</li>
++        然后TestLink会自动加载关于该需求的页面.</li>
 +	<li>工作区中间会列出所有测试需求(对应于选择的需求规约),这些测试需求会关联到相应的测试用例.
-+        底部的'Available Requirements'列出了所有尚未关联到当前测试用例的需求.
-+	    测试设计者可以点击'Assign'按钮把需求和测试用例管理起来.这些新关联的
-+        测试用例会在'Assigned Requirements'中显示.</li>
++        底部的'有效的需求'列出了所有尚未关联到当前测试用例的需求.
++	    测试设计者可以点击'指派'按钮把需求指派到测试用例.这些新关联的
++        测试用例会在工作区中间的'已指派的需求'中显示.</li>
  </ol>";
  
  
@@ -4982,12 +5008,12 @@ index 773333c..9006b02 100644
 -		"of the previous versions are available and can be viewed and managed here.</p>
 -
 -<h2>Getting Started:</h2>
-+$TLS_htmltext_title['editTc']	= "测试规范";
++$TLS_htmltext_title['editTc']	= "测试规范"; //已校对
 +$TLS_htmltext['editTc'] 		= "<h2>目的:</h2>
 +<h2>目的:</h2>
 +<p> <i>测试规范</i> 允许用户查看和编辑所有现有的" .
-+		"<i>测试套件</i> 和 <i>测试用例</i>. 同一个测试案例可以保留多个版本.".
-+		"所有以前的历史版本都将被保留,并且可以在这里进行查看和管理.</p>
++		"<i>测试套件</i> 和 <i>测试用例</i>. 测试用例默认使用当前版本.".
++		"所有以前的历史版本都是可用的,并且可以在这里进行查看和管理.</p>
 +
 +<h2>开始:</h2>
  <ol>
@@ -5012,37 +5038,38 @@ index 773333c..9006b02 100644
 -	<li>Navigate via the tree view on the left side and edit data. Test cases stores own history.</li>
 -	<li>Assign your created Test Specification to <span class=\"help\" onclick=
 -	\"javascript:open_help_window('glosary','$locale');\">Test Plan</span> when your Test cases are ready.</li>
-+	<li>从左边的导航树(顶级树)中找出你的测试项目. <i>注意: " .
++	<li>从右上角的下拉菜单中选择你的测试项目. <i>注意: " .
 +	"你永远可以从右上角的下拉菜单选择改变当前的测试项目." .
 +	".</i></li>
-+	<li>点击 <b>新测试案例子集</b>将创建一个新的测试案例子集. " .
-+	"测试案例子集可以为你的测试文档归类 归类可以是按照你的需要来(功能/非功能, 测试案例, 产品部件, 产品功能, 更改需求, 等等)." .
-+	"测试案例子集积聚了一类相关的测试, 他们用在同一个功能范围, 具有相同的系统配置信息等 他们还可能共同和其他一些文档资料, 测试局限性, 或者其他信息. 通常这些信息是该测试案例子集所共同具有的. 他们组成了一个测试案例的文件夹的概念 测试案例子集是可以扩充的文件夹. 用户可以在同一个测试计划里移动或者复制它们.同时, 他们可以作为一个整体(包括其中的测试案例)输出或者输入到其他格式." .".</li>
-+	<li>在导航树中选择一个刚创建的新的测试子集" .
-+	"然后点击<b>创建测使用例</b>. 就可以在这个子集里创建一个新的案例." .
-+	"一个测试案例定义了一个单一的测试过程 它包括测试的环境, 步骤, 期望的结果, 已经可以自定义的栏目 在测试计划里(参见用户手册), 还可以给测试案例增添一个" .
++    <li>点击\"测试规范\",然后从中选择一个测试套件</li>
++	<li>点击 <b>新建测试套件</b>将创建一个新的测试套件的子集. " .
++	"测试套件子集可以为你的测试文档归类,归类可以是按照你的需要来进行(功能/非功能,  产品部件, 产品功能, 需求更改, 等等)." .
++	"测试套件子集的描述中中包含了相关的测试用例的作用域,默认的系统配置信息等,他们还可能包含和其他一些文档资料链接, 测试局限性, 或者其他信息.通常这些注释是测试套件子集所共同具有的. 他们构成了一个测试套件的文件夹的概念,测试套件子集是可以扩充的文件夹. 用户可以在同一个测试计划里移动或者复制它们.同时, 他们可以作为一个整体(包括其中的测试用例)输出或者输入到其他格式." .".</li>
++	<li>在导航树中选择一个刚创建的新的测试套件" .
++	"然后点击<b>创建测试用例</b>. 就可以在这个测试套件子集里创建一个新的测试用例." .
++	"一个测试用例定义了一个特有的测试过程,它包括测试的环境, 步骤, 期望的结果, 测试项目中的自定义字段(参见用户手册), 还可以给测试用例指派一个" .
 +	"<b>关键字</b> 以方便跟踪查询.</li>
-+	<li>从左边的导航树里选择和编辑数据. 测试案例本身可以保存多个版本和修改历史.</li>
-+	<li>测试案例编写完毕后, 你可以给把它的上级测试规范关联到 <span class=\"help\" onclick=
-+	\"javascript:open_help_window('glosary','$locale');\">Test Plan</span> .</li>
++	<li>从左边的导航树里选择和编辑数据来实现导航功能. 测试用例可以保存自己的所有历史.</li>
++	<li>测试用例编写完毕后, 你可以把它的测试规范关联到 <span class=\"help\" onclick=
++	\"javascript:open_help_window('glosary','$locale');\">测试计划</span> .</li>
  </ol>
  
 -<p>With TestLink you organize test cases into test suites." .
 -"Test suites can be nested within other test suites, enabling you to create hierarchies of test suites.
 - You can then print this information together with the test cases.</p>";
-+    <p>TL测试管理系统帮你整理测试案例, 分类成为不同的测试案例子集. 测试案例子集还可以包含更下级的测试案例子集. 
-+       你因此可以组织成一个树状体系. 最后可以打印成册." ."</p>";
++    <p>TestLink可以帮你整理测试套件,可以把测试套件分类成为不同的测试套件子集. 测试套件子集还可以包含更下级的测试案例子集. 
++       因此你可以把这些所有的信息打印成册." ."</p>";
  
  
  // ------------------------------------------------------------------------------------------
 -$TLS_htmltext_title['searchTc']	= "Test Case Search Page";
 -$TLS_htmltext['searchTc'] 		= "<h2>Purpose:</h2>
-+$TLS_htmltext_title['searchTc']	= "测试用例搜索页";
++$TLS_htmltext_title['searchTc']	= "测试用例搜索页"; //已校对
 +$TLS_htmltext['searchTc'] 		= "<h2>目的:</h2>
  
 -<p>Navigation according to keywords and/or searched strings. The search is not
 -case sensitive. Result include just test cases from actual Test Project.</p>
-+<p>按照关键字和搜索字符串来导航. 英文搜索是不区分大小写. 结果只包括当前测试项目中已有的测试用例.</p>
++<p>按照关键字和搜索字符串来进行搜索. 英文搜索是不区分大小写. 结果只包括当前测试项目中已有的测试用例.</p>
  
 -<h2>To search:</h2>
 +<h2>搜索:</h2>
@@ -5052,10 +5079,10 @@ index 773333c..9006b02 100644
 -	<li>Choose required keyword or left value 'Not applied'.</li>
 -	<li>Click the Search button.</li>
 -	<li>All fulfilled test cases are shown. You can modify test cases via 'Title' link.</li>
-+	<li>在搜索栏中输入搜索字符串.不关心的栏目留空.</li>
-+	<li>选择必须的关键字或者让该栏目留空为'Not applied'.</li>
++	<li>在搜索栏中输入搜索字符串.不用的搜索框留空.</li>
++	<li>选择必须的关键字或者让该栏目留空为'不使用'.</li>
 +	<li>点击“查找”.</li>
-+	<li>所有符合搜索条件的测试案例均在此. 你可以点'标题(Title)'链接开始编辑修改.</li>
++	<li>所有符合搜索条件的测试用例就会显示出来. 你可以点击'标题'链接开始对测试用例进行其它操作.</li>
  </ol>";
  
  
@@ -5065,9 +5092,9 @@ index 773333c..9006b02 100644
 -<p>From here you can print a single test case, all the test cases within a test suite,
 -or all the test cases in a test project or plan.</p>
 -<h2>Get Started:</h2>
-+$TLS_htmltext_title['printTestSpec']	= "打印需求规约"; //printTC.html
++$TLS_htmltext_title['printTestSpec']	= "打印需求规约"; //printTC.html //已校对
 +$TLS_htmltext['printTestSpec'] 			= "<h2>目的:</h2>
-+<p>在这里你可以打印单个测试用例，测试套件中的所有测试用例或者测试项目或计划中的所有测试用例.</p>
++<p>在这里你可以打印单个测试用例，测试套件中的所有测试用例或者测试项目或测试计划中的所有测试用例.</p>
 +<h2>开始:</h2>
  <ol>
  <li>
@@ -5079,19 +5106,19 @@ index 773333c..9006b02 100644
 -<li><p>Use the \"Show As\" drop-box in the navigation pane to specify whether you want the information displayed as HTML or in a
 -Microsoft Word document. See <span class=\"help\" onclick=\"javascript:open_help_window('printFilter',
 -'{$locale}');\">help</span> for more information.</p>
-+<li><p>使用导航栏下拉框中的\"Show As\" 来决定把信息显示成HTML或者Word文档. 更多信息请查看:<span class=\"help\" onclick=\"javascript:open_help_window('printFilter','{$locale}');\">help</span> .</p>
++<li><p>使用导航栏下拉框中的\"Show As\" 来决定把信息显示成HTML、OpenOffice或者Word文档. 更多信息请查看:<span class=\"help\" onclick=\"javascript:open_help_window('printFilter','{$locale}');\">帮助</span> .</p>
  </li>
 -<li><p>Use your browser's print functionality to actually print the information.<br />
 - <i>Note: Make sure to only print the right-hand frame.</i></p></li>
 +<li><p>使用浏览器的打印功能来输出信息.<br />
-+ <i>注意:保证之打印右边的框架.</i></p></li>
++ <i>注意:保证只打印右边的框架.</i></p></li>
  </ol>";
  
  
  // ------------------------------------------------------------------------------------------
 -$TLS_htmltext_title['reqSpecMgmt']	= "Requirements Specification Design"; //printTC.html
 -$TLS_htmltext['reqSpecMgmt'] 			= "<p>You can manage Requirement Specification documents.</p>
-+$TLS_htmltext_title['reqSpecMgmt']	= "需求规约设计"; //printTC.html
++$TLS_htmltext_title['reqSpecMgmt']	= "需求规约设计"; //printTC.html //已校对
 +$TLS_htmltext['reqSpecMgmt'] 			= "<p>你可以管理需求规约文档.</p>
  
 -<h2>Requirements Specification</h2>
@@ -5103,9 +5130,9 @@ index 773333c..9006b02 100644
 -a Specification <b>Title</b>.
 -An user can add simple description or notes to <b>Scope</b> field.</p>
 +<p>需求是由<b>需求规约文档</b>来约定的,然后关联到测试项目.
-+<br /> TestLink(当前版本)暂时还不支持需求规约版本中包括了需求本身的情况. 
-+所以，文档的版本必须在需求规约之后创建 <b>标题</b>.
-+用户可以添加简单描述到 <b>Scope</b> 区域.</p>
++<br /> TestLink(当前版本)暂时还不支持需求规约版本中包含了需求本身的情况. 
++所以，文档的版本必须在需求规约之后创建<b>标题</b>.
++用户可以添加简单描述到 <b>范围</b> 区域.</p>
  
 -<p><b><a name='total_count'>Overwritten count of REQs</a></b> serves for
 -evaluation Req. coverage in case that not all requirements are added to TestLink.
@@ -5113,11 +5140,9 @@ index 773333c..9006b02 100644
 -for metrics.</p>
 -<p><i>E.g. SRS includes 200 requirements but only 50 are added in TestLink. Test
 -coverage is 25% (if all these added requirements will be tested).</i></p>
-+<p><b><a name='total_count'>写在需求数量之前</a></b> 
-+为统计Req. coverage如果不把所有的需求添加到TestLink提供的服务
-+值 <b>0</b>意味着当前结果分析中需求的数量 .</p>
-+<p><i>例如: SRS包括200个需求,但是只有50个需求被TestLink管理起来.那么测试覆盖率就是25% 
-+ (如果所有的测试需求被测试的情况下).</i></p>
++<p><b><a name='total_count'>需求覆盖数目</a></b> 
++是为了统计需求覆盖率而使用的,如果不把所有的需求提交到TestLink管理，<b>0</b>那么当前结果分析中需求的数量以TestLink管理起来的需求为依据.</p>
++<p><i>例如: SRS项目中包括200个需求,但是只有50个需求被TestLink管理起来.那么测试覆盖率就是25%(如果所有的测试需求被测试的情况下).</i></p>
  
 -<h2><a name='req'>Requirements</a></h2>
 +<h2><a name='req'>需求</a></h2>
@@ -5127,18 +5152,14 @@ index 773333c..9006b02 100644
 -Status should be 'Normal' or 'Not testable'. Not testable requirements are not counted
 -to metrics. This parameter should be used for both unimplemented features and
 -wrong designed requirements.</p>
-+<p>点击已创建的需求规约，如果项目中还不存在需求规约先创建一个.
-+   每个需求包括标题，作用域和当前状态.需求规约的状态可以是'Normal'或者'Not testable'.
-+   不能被测试的需求在结果分析时不被列出来。这个参数可以被用来那些不可用的动能特点或者
-+   错误的需求.</p>
++<p>点击已创建的需求规约，如果项目中还不存在需求规约先创建一个.然后你就可以为这个需求规约创建具体的需求。每个需求包括标题，范围和当前状态.需求的状态可以是'有效的'或者'不可测试的'.不可测试的需求在结果分析时不被计入统计数据。这个参数可以被用来设置那些不可实施的功能特点或者错误的需求.</p>
  
 -<p>You can create new test cases for requirements by using multi action with checked
 -requirements within the specification screen. These Test Cases are created into Test Suite
 -with name defined in configuration <i>(default is: \$tlCfg->req_cfg->default_testsuite_name =
 -'Test suite created by Requirement - Auto';)</i>. Title and Scope are copied to these Test cases.</p>";
-+<p>用户可以在需求界面中使用已创建的需求自动创建测试用例.这些测试用例被创建在名字定义
-+在配置文件<i>(default is: \$tlCfg->req_cfg->default_testsuite_name ='Test suite created by Requirement - Auto';)</i>
-+中的测试用例. 标题和作用域被服知道测试用例中.</p>";
++<p>用户可以在需求界面中使用已创建的需求自动创建测试用例.这些测试用例被创建到名字定义在配置文件<i>(default is: \$tlCfg->req_cfg->default_testsuite_name ='Test suite created by Requirement - Auto';)</i>
++中的测试套件中. 标题和范围被复制到测试用例中.</p>";
  
  
  // ------------------------------------------------------------------------------------------
@@ -5146,9 +5167,9 @@ index 773333c..9006b02 100644
 -$TLS_htmltext['keywordsAssign'] 			= "<h2>Purpose:</h2>
 -<p>The Keyword Assignment page is the place where users can batch
 -assign keywords to the existing Test Suite or Test Case</p>
-+$TLS_htmltext_title['keywordsAssign']	= "指派关键字";
++$TLS_htmltext_title['keywordsAssign']	= "指派关键字"; //已校对
 +$TLS_htmltext['keywordsAssign'] 			= "<h2>目的:</h2>
-+<p>用户可以使用批量地把关键字设置到现有的测试用例和测试套件中
++<p>在该功能中用户可以批量地把关键字设置到现有的测试用例和测试套件中
 +</p>
  
 -<h2>To Assign Keywords:</h2>
@@ -5161,9 +5182,9 @@ index 773333c..9006b02 100644
 -		case.</li>
 -	<li>The selections below allow you to assign cases at a more
 -		granular level.</li>
-+	<li>在左边的视图中选择一个测试用例或者用例套件.</li>
++	<li>在左边的视图中选择一个测试用例或者测试套件.</li>
 +	<li>页面右上角中的设置可以让你把可用的关键字指派到每一个单独的测试用例上.</li>
-+	<li>下面的选项可以让你更细微地对测试用例进行指派.</li>
++	<li>下面的选项可以让你更详细地对测试用例进行指派.</li>
  </ol>
  
 -<h2>Important Information Regarding Keyword Assignments in Test Plans:</h2>
@@ -5179,23 +5200,23 @@ index 773333c..9006b02 100644
 +<h2>有关测试计划中显示的关键字的重要提示:</h2>
 +<p>当且仅当测试计划中包含最新版本的测试用例时，你指派的关键字才能影响到你的测试用例上.
 +如果你的测试计划中包含的是旧版本的测试用例，你设置的关键字将不会被看到</p>
-+<p>TestLink会使用这种要求，以至于你对当前版本中指派的关键字对测试计划中的就版本没什么影响. 
-+如果你希望测试计划中的关键字随之更新，首先使用'Update Modified Test Cases'来验证是否是最新版本
++<p>TestLink会使用这种要求，以至于你对最新版本的测试用例指派的关键字对测试计划中的旧版本没什么影响. 
++如果你希望测试计划中的关键字及时更新，首先使用'更新修改的测试用例'来验证是否是最新版本
 +在指派关键字之前.</p>";
  
  
  // ------------------------------------------------------------------------------------------
 -$TLS_htmltext_title['executeTest']	= "Test Case Execution";
 -$TLS_htmltext['executeTest'] 		= "<h2>Purpose:</h2>
-+$TLS_htmltext_title['executeTest']	= "测试用例执行";
++$TLS_htmltext_title['executeTest']	= "测试用例执行"; //已校对
 +$TLS_htmltext['executeTest'] 		= "<h2>目的:</h2>
  
 -<p>Allows user to execute Test cases. User can assign Test result
 -to Test Case for Build. See help for more information about filter and settings " .
 -		"(click on the question mark icon).</p>
-+<p>允许用户执行测试用例.用户为了构建可以把测试结果指派到测试用例.
++<p>允许用户执行测试用例.用户为了构建的需要可以把测试结果和相关测试用例关联起来.
 + 查看关于过滤器和设置的更多帮助 " .
-+		"(点击问题按钮).</p>
++		"(点击?按钮).</p>
  
 -<h2>Get started:</h2>
 +<h2>开始:</h2>
@@ -5209,7 +5230,7 @@ index 773333c..9006b02 100644
 +	<li>用户必须为测试计划定义一个构建.</l>
 +	<li>从下拉框中选择一个构建，然后点击导航栏中的应用按钮.</li>
 +	<li>点击菜单树中的测试用例.</li>
-+	<li>完善测试用例的结果和任何适用的标记或问题报告.</li>
++	<li>完善测试用例的结果和任何合适的记录或问题报告.</li>
 +	<li>保存结果.</li>
  </ol>
 -<p><i>Note: TestLink must be configurated to collaborate with your Bug tracker 
@@ -5221,18 +5242,20 @@ index 773333c..9006b02 100644
 -$TLS_htmltext['showMetrics'] 		= "<p>Reports are related to a Test Plan " .
 -		"(defined in top of navigator). This Test Plan could differs from the
 -current Test Plan for execution. You can also select Report format:</p>
-+$TLS_htmltext_title['showMetrics']	= "测试报告和统计数据";
-+$TLS_htmltext['showMetrics'] 		= "<p>一个测试计划的报告" .
-+		"(在导航条里定义了). 这个测试计划可能个当前执行的测试计划不同. 可以选择的格式有:</p>
++$TLS_htmltext_title['showMetrics']	= "测试报告和统计数据"; //已校对
++$TLS_htmltext['showMetrics'] 		= "<p>关于测试计划的报告" .
++		"(在导航条里定义了). 这个测试计划可能与当前执行的测试计划不同. 可以选择的格式有:</p>
  <ul>
 -<li><b>Normal</b> - report is displayed in web page</li>
 -<li><b>MS Excel</b> - report exported to Microsoft Excel</li>
 -<li><b>HTML Email</b> - report is emailed to user's email address</li>
 -<li><b>Charts</b> - report include graphs (flash technology)</li>
-+<li><b>正常</b> - 报告显示为网页格式</li>
++<li><b>HTML</b> - 报告显示为网页格式</li>
 +<li><b>MS Excel</b> - 报告输出为 Microsoft Excel</li>
-+<li><b>HTML Email</b> -报告以邮件形式发送到用户的信箱 </li>
-+<li><b>图表</b> - 报告以图表形式显示(flash 技术)</li>
++<li><b>OpenOffice Writer</b> - 报告输出为OpenOffice Writer</li>
++<li><b>OpenOffice Calc</b> - 报告输出为OpenOffice Calc</li>
++<li><b>HTML Email</b> - 报告以邮件形式发送到用户的信箱 </li>
++<li><b>Charts</b> - 报告以图表形式显示(flash 技术)</li>
  </ul>
  
 -<p>The print button activate print of a report only (without navigation).</p>
@@ -5245,8 +5268,8 @@ index 773333c..9006b02 100644
 -The most 'current status' is determined by the most recent build test cases were executed on.  For
 -instance, if a test case was executed over multiple builds, only the latest result is taken into account.</p>
 +<h3>通用测试统计报告</h3>
-+<p>该页只显示测试计划中的测试套件,所有者, 关键字的最新状态.
-+'当前状态' 是指最近的测试版本的测试执行状态.例如. 一个测试用例在多个构建版本上执行过. 这里只显示最新版本的结果.</p>
++<p>该页只显示当前测试计划中的测试套件,所有者, 关键字的最新状态.
++'当前状态' 是指最新构建测试版本的执行状态.例如. 一个测试用例在多个构建版本上执行过. 这里只显示最新版本的结果.</p>
  
 -<p>'Last Test Result' is a concept used in many reports, and is determined as follows:</p>
 +<p>'最终测试结果'是许多报告里用的一个概念. 它是这样定义的:</p>
@@ -5260,7 +5283,7 @@ index 773333c..9006b02 100644
 -<li>Test cases listed as 'not run' against a build are not taken into account. For example, if you mark
 -a case as 'pass' in build 1, and don't execute it in build 2, it's last result will be considered as
 -'pass'.</li>
-+<li>构建版本加入到测试计划里的先后顺序决定了哪个构建版本是最新的. 最新版本的测试结果比旧版本的测试结果优先. 例如, 如果你在版本1里记录了一个测试用例的测试结果是’失败’. 你在版本2里记录同一个测试用例的测试结果是'通过',则最终的测试结果是 '通过'.</li>
++<li>构建版本加入到测试计划里的先后顺序决定了哪个构建版本是最新的. 最新构建版本中的测试结果比旧版本的测试结果优先. 例如, 如果你在版本1里记录了一个测试用例的测试结果是’失败’. 你在版本2里记录同一个测试用例的测试结果是'通过',则最终的测试结果是 '通过'.</li>
 +<li>如果同一个测试用例在同一个构建版本上执行了多次. 那么最后一次执行的结果优先. 例如. 如果版本 3 发布了. 你的团队里的 tester 1 在 2:00pm 报告结果为'通过',而 tester 2 在 3:00pm 报告结果为'失败'- 则最终结果显示为'失败'.</li>
 +<li>在某个版本里显示为'未执行'的测试用例不会覆盖上一次的测试结果. 例如, 如果你在版本 1 中测试结束后记录为'通过', 在版本2里还没有执行, 则显示的最终结果是'通过'.
 +</li>
@@ -5281,17 +5304,17 @@ index 773333c..9006b02 100644
 +	<li><b>按顶级测试套件</b>
 +	表中列出顶级的测试套件. 总的测试用例数目, 通过数目, 失败数目, 受阻数目, 未执行数目, 顶级测试套件的子集及下级子集的百分比.</li>
 +	<li><b>按关键字</b>
-+	表中列出当前测试计划里所有测试用例里的关键词, 以及对应的测试结果.</li>
++	表中列出当前测试计划中所有测试用例里的关键字, 以及对应的测试结果.</li>
 +	<li><b>按测试者</b>
-+	列出当前测试计划里分派给各用户的测试用例. 未分配给用户的归类到 'unassigned(未分派)' 栏里.</li>
++	列出当前测试计划里分派给各用户的测试用例. 未分配给用户的测试用例归类到 '未分派' 栏里.</li>
  </ul>
  
 -<h3>The Overall Build Status</h3>
 -<p>Lists the execution results for every build. For each build, the total test cases, total pass,
 -% pass, total fail, % fail, blocked, % blocked, not run, %not run.  If a test case has been executed
 -twice on the same build, the most recent execution will be taken into account.</p>
-+<h3>总体版本状态</h3>
-+<p>列出各个版本的执行结果. 对于每一个版本, 有总测试用例数, 总通过数, 通过的比例, 总失败数, 失败的比例, 总受阻数, 受阻的比例, 未执行的总数, 未执行的比例. 如果一个测试用例在同一构建版本上执行了多次, 则最近一次的结果才计入统计结果.</p>
++<h3>总体构建状态</h3>
++<p>列出各个构建的执行结果. 对于每一个构建, 有总测试用例数, 总通过数, 通过的比例, 总失败数, 失败的比例, 总受阻数, 受阻的比例, 未执行的总数, 未执行的比例. 如果一个测试用例在同一构建版本上执行了多次, 则最近一次的结果才计入统计结果.</p>
  
 -<h3>Query Metrics</h3>
 -<p>This report consists of a query form page, and a query results page which contains the queried data.
@@ -5300,7 +5323,7 @@ index 773333c..9006b02 100644
 -allows the user to filter the results and generate specific reports for specific owner, keyword, suite,
 -and build combinations.</p>
 +<h3>查询统计</h3>
-+<p>该报表包括一个查询输入表, 一个查询结果页. 查询输入表有四个按钮. 每个按钮的缺省值设置为查询可以包括的最大范围. 用户可以更改按钮以缩小查询范围. 可以按分派人, 关键字, 子类, 版本等组合过滤.</p>
++<p>该报表包括一个查询输入表单, 一个查询结果表单. 查询输入表单有四个按钮. 每个按钮的缺省值设置为查询可以包括的最大范围. 用户可以更改按钮以缩小查询范围. 可以按执行人, 关键字, 子类, 构建等组合过滤.</p>
  
  <ul>
 -<li><b>keyword</b> 0->1 keywords can be selected. By default - no keyword is selected. If a keyword is not
@@ -5325,17 +5348,17 @@ index 773333c..9006b02 100644
 -considered. The '# of Test Cases' totals you will see on the report will be influenced by these 3 controls.
 -Build selections will influence if a case is considered 'pass', 'fail', 'blocked', or 'not run'.  Please
 -refer to 'Last Test Result' rules as they appear above.</li>
-+<li><b>关键字</b>可以选择 0->1 个关键字. 系统缺省的设置是不选. 如果该关键字不被选中, 则测试规范里和关键字管理页不管有没有分配该关键字的所有测试案例都包括. 一个关键词进入一个测试案例后, 将传播到该测试案例所属于的所有的 测试计划, 以及该案例的所有版本. 如果你只关心有特定的关键词的测试结果, 你要改变控制按钮的值. </li>
-+<li><b>所有者</b> 可以选择 0->1 个主人. 系统缺省的设置是不选. 如果不选. 则所有案例都选择,不管测试任务分派给谁了. 目前还没有搜索'未指派'执行人的测试案例的功能. 主人是通过 '指派测试任务(Assign Test Case execution)'页来实现的, 而且是每个测试计划都要单独做的. 如果你关心工作是谁做的, 你要修改这个按钮的值.</li>
++<li><b>关键字</b>可以选择 0->1 个关键字. 系统缺省的设置是不选. 如果该关键字不被选中, 则不管测试规范里和关键字管理页中有没有分配该关键字,所有测试用例都被认为忽略了关键字的关联. 一个关键字指派到一个测试用例后, 将传播到该测试用例所属于的所有的测试计划, 以及该测试用例的所有版本. 如果你只关心包含特定的关键字的测试结果, 你需要修改控制按钮的值. </li>
++<li><b>所有者</b> 可以选择 0->1 个所有者. 系统缺省的设置是不选. 如果不选. 则所有测试用例都将被选择,不管测试任务分派给谁. 目前还没有搜索'未指派'执行人的测试用例的功能. 所有权的问题是通过 '指派测试任务'页来实现的, 而且是每个测试计划都要单独做的. 如果你关心工作是谁做的,你要修改这个按钮的值.</li>
 +<li><b>顶级子集</b>可以选择 0->n 级测试子集. 缺省状态是所有子集.
 +    只有被选取的子集才出现在查询结果中.如果你只关心某个子集,你可以修改这项控制.</li>
-+<li><b>版本</b> 可以选择 1->n 个版本. 缺省状态是选择所有子集. 在做统计的时候只把你选取的版本同时是执行过的测试结果计算在内. 例如, 如果你只想看到在过去的三个版本上做过多少次测试, 你可以修改这个按钮. 关键词, 所有者, 顶级子集的三项过滤决定了计入统计数据中的案例数目. 例如, 如果你选择了 主人 = '张三', 关键词 = '优先 1', 以及所有的子集- 那末只有分派给张三的优先级为 1 的测试案例被计算在内. 报表中看到的测试案例的总数目会随着这三个过滤过滤按钮给出的条件的不同而不同. 版本过滤只对'通过', '失败', '受阻', 或者'未执行' 的案例有过滤作用. 参见上面关于最后测试结果的说明.</li>
++<li><b>构建</b> 可以选择 1->n 个构建. 缺省状态是选择所有构建.统计报告只显示你选取的构建中已执行过的测试结果. 例如, 如果你只想看到在过去的三个构建上做过多少次测试, 你可以修改这个按钮. 关键字, 所有者, 顶级子集的这三项的选择决定了计入统计数据中的测试用例数目. 例如, 如果你选择了执行者= '张三', 关键字 = '优先 1', 以及所有的子集- 那么只有分派给张三的优先级为 1 的测试用例被计算在内. 报表中看到的测试用例的总数目会随着这三个过滤按钮给出的条件的不同而不同. 构建过滤只对'通过', '失败', '受阻', 或者'未执行' 的测试用例有作用. 参见上面关于最后测试结果的说明.</li>
  </ul>
 -<p>Press the 'submit' button to proceed with the query and display the output page.</p>
 +<p>点击\"提交\"按钮启动查询和输出显示的文件</p>
  
 -<p>Query Report Page will display: </p>
-+<p>查询报表页将显示: </p>
++<p>查询报告页将显示: </p>
  <ol>
 -<li>the query parameters used to create report</li>
 -<li>totals for the entire test plan</li>
@@ -5343,9 +5366,9 @@ index 773333c..9006b02 100644
 -on that suite.  If a test case has been executed more than once on multiple builds - all executions will be
 -displayed that were recorded against the selected builds. However, the summary for that suite will only
 -include the 'Last Test Result' for the selected builds.</li>
-+<li>用于创建报表的查询参数</li>
++<li>用于创建报告的查询参数</li>
 +<li>测试计划的全部参数</li>
-+<li>显示了一个子集里所有执行的结果和按(总和/通过/失败/受阻/未执行)分类的结果. 如果一个测试用例在多个版本上执行过多次, 各次执行的结果都会显示出来. 然而在该子集的总结里, 只有选定版本的测试结果才会被显示出来.</li>
++<li>显示了一个测试套件里所有执行的结果和按(总和/通过/失败/受阻/未执行)的分类结果. 如果一个测试用例在多个版本上执行过多次, 各次执行的结果都会显示出来. 然而在该测试套件的总结里, 只有选定版本的测试结果才会被显示出来.</li>
  </ol>
  
 -<h3>Blocked, Failed, and  Not Run Test Case Reports</h3>
@@ -5366,16 +5389,15 @@ index 773333c..9006b02 100644
 -<li>Bar chart of Results by Keyword</li>
 -<li>Bar chart of Results By Owner</li>
 -<li>Bar chart of Results By Top Level Suite</li>
-+<h3>受阻, 失败, 未执行的测试用例报表</h3>
-+<p>这些报表显示当前受阻, 失败或者未执行的测试用例. 使用的数据是'最终测试结果' (见前面通用测试统计段落). 如果系统整和了错误跟踪系统, 那些受阻和失败的测试案例报告还将显示错误编号.</p>
++<h3>受阻, 失败, 未执行的测试用例报告</h3>
++<p>这些报告显示当前受阻, 失败或者未执行的测试用例. 使用的数据是'最终测试结果' (见前面通用测试统计段落). 如果系统整和了错误跟踪系统, 那些受阻和失败的测试案例报告还将显示出错误编号.</p>
 +
 +<h3>测试报告</h3>
-+<p>阅读各个版本的每个测试案例的结果. 如果一个测使用例被执行过多次, 只显示最近的结果. 如果数据很多, 建议输出到excel表格中来阅读.
++<p>阅读各个构建上的每个测试用例的状态. 如果一个测试用例在某一构建上被执行过多次, 只显示最近一次的结果. 如果数据很多, 建议输出到excel表格中来阅读.
 +</p>
 +
 +<h3>图表 - 通用测试计划图表</h3>
-+<p>
-+所有四个图表都使用'最终测试结果'. 图表有动画显示, 方便查看当前测试计划的统计结果.四个报表提供了:
++<p>所有四个图表都使用'最终测试结果'. 图表有图片显示, 方便查看当前测试计划的统计结果.四个报表提供了:
 +</p>
 +<ul><li>通过/失败/受阻/未执行的测试用例的分布饼图</li>
 +<li>按关键词显示的图表</li>
@@ -5388,7 +5410,6 @@ index 773333c..9006b02 100644
 -results in a graphical format.</i></p>
 +<p>图表中的方块都有颜色标记, 方便用户识别出通过,失败, 受阻, 未执行的测使用例的大概数目.
 +</p>
-+<p><i>该报告中的图表显示需要你安装一个插件(by http://www.maani.us).</i></p>
  
 -<h3>Total Bugs For Each Test Case</h3>
 -<p>This report shows each test case with all of the bugs filed against it for the entire project.
@@ -5401,9 +5422,9 @@ index 773333c..9006b02 100644
 -$TLS_htmltext_title['planAddTC']	= "Add / Remove Test cases to Test Plan"; // testSetAdd
 -$TLS_htmltext['planAddTC'] 			= "<h2>Purpose:</h2>
 -<p>Allows user (with lead level permissions) to add or remove test cases into a Test plan.</p>
-+$TLS_htmltext_title['planAddTC']	= "添加/删除测试用例到测试计划"; // testSetAdd
++$TLS_htmltext_title['planAddTC']	= "添加/删除测试用例到测试计划"; // testSetAdd //已校对
 +$TLS_htmltext['planAddTC'] 			= "<h2>目的:</h2>
-+<p>用户可以从测试计划中添加或者删除测试用例(至少项目经理).</p>
++<p>用户可以从测试计划中添加或者删除测试用例(用户的级别至少为项目经理).</p>
  
 -<h2>To add or remove Test cases:</h2>
 +<h2>添加／删除测试用例的步骤:</h2>
@@ -5420,9 +5441,9 @@ index 773333c..9006b02 100644
 -$TLS_htmltext_title['tc_exec_assignment']	= "Assign Testers to test execution";
 -$TLS_htmltext['tc_exec_assignment'] 		= "<h2>Purpose</h2>
 -<p>This page allows test leaders to assign users to particular tests within the Test Plan.</p>
-+$TLS_htmltext_title['tc_exec_assignment']	= "给测试员分配执行任务";
++$TLS_htmltext_title['tc_exec_assignment']	= "给测试员分配测试任务"; //已校对
 +$TLS_htmltext['tc_exec_assignment'] 		= "<h2>目的</h2>
-+<p>管理者通过该页面来对测试人员分配具体工作.</p>
++<p>管理者通过该页面来对测试人员分配具体测试任务.</p>
  
 -<h2>Get Started</h2>
 +<h2>开始</h2>
@@ -5433,8 +5454,8 @@ index 773333c..9006b02 100644
 -	<li>Open execution page to verify assignment. You can set-up a filter for users.</li>
 +	<li>选择要测试的测试用例或者测试套件.</li>
 +	<li>选择该项目的测试员.</li>
-+	<li>点击按钮提交.</li>
-+	<li>打开测试员的页面验证关联的情况.可以为使用者设置过滤器.</li>
++	<li>点击'保存'按钮提交.</li>
++	<li>打开测试员的执行页面验证关联的情况.可以为使用者设置过滤器.</li>
  </ol>";
  
  
@@ -5447,10 +5468,10 @@ index 773333c..9006b02 100644
 -		" plan holds original version to be sure, that results refer to the correct text of a Test case.</p>
 -
 -<h2>Get Started</h2>
-+$TLS_htmltext_title['planUpdateTC']	= "更新测试计划中的测试用例";
++$TLS_htmltext_title['planUpdateTC']	= "更新测试计划中的测试用例"; //已校对
 +$TLS_htmltext['planUpdateTC'] 		= "<h2>目的</h2>
 +<p>如果需求规约版本改变了，可以通过该页面对测试用例进行更新.
-+        经常发生一些功能尚未被告知的情况在测试过程中." .
++        在测试过程中经常发生添加新的需求的情况." .
 +		" 例如:用户更改了测试规约，但是这个改变需要传达到测试计划中. " .
 +		" 否则测试计划继续使用着旧版本的需求规约,测试结果还在关联测试用例中的字段.</p>
 +
@@ -5462,8 +5483,8 @@ index 773333c..9006b02 100644
 -	<li>To verify: Open execution page to view text of the test case(s).</li>
 +	<li>选择要测试的测试用例或者测试套件.</li>
 +	<li>从复选框中为指定的测试用例选择新版本.</li>
-+	<li>点击'Update Test plan'来提交改变.</li>
-+	<li>验证方法: 查看执行页面中的测试用例(集).</li>
++	<li>点击'更新测试计划'来提交改变.</li>
++	<li>验证方法:查看执行页面中的测试用例(集).</li>
  </ol>";
  
  
@@ -5481,7 +5502,7 @@ index 773333c..9006b02 100644
 +$TLS_htmltext['test_urgency'] 		= "<h2>目的</h2>
 +<p>TestLink允许设置测试套件的紧急程度来影响测试用例执行的优先级. 
 +	测试的优先级取决于测试用例的重要程度和定义在测试计划中的紧急程度两个方面.
-+    项目领导者可以设置一套测试用例先被执行. 使用这个功能来确保在时间允许的情
++    项目领导者可以设置哪一套测试用例先被执行. 使用这个功能来确保在时间允许的情
 +    况下覆盖最重要的测试用例.</p>
 +
 +<h2>开始</h2>
@@ -5492,14 +5513,14 @@ index 773333c..9006b02 100644
 -	decrease priority for untouched parts of product and increase for components with
 -	significant changes.</li>
 -	<li>Press the button 'Save' to submit changes.</li>
-+	<li>在左上角的窗口中选择一个测试用例集来设置product/component的严重程度.</li>
-+	<li>设置严重程度(包括high,medium和low).默认是medium. 你可以改变一个尚未
++	<li>在左上角的窗口中选择一个测试套件来设置产品/组件的严重程度.</li>
++	<li>设置测试用例的紧急程度(包括高,中和低).默认是中. 你可以改变一个尚未
 +    执行的产品的严重程度.</li>
-+	<li>点击'Save'来提交改变.</li>
++	<li>点击'保存'来提交改变.</li>
  </ol>
 -<p><i>For example, a Test case with a High importance in a Test suite with Low urgency " .
 -		"will be Medium priority.</i>";
-+<p><i>例如:一个High重要程度的测试套件中的low紧急程度的测试用例在执行时是medium级别 " ."</i>";
++<p><i>例如:一个'高'紧急程度的测试套件中的'低'紧急程度的测试用例在执行时是'中'级别 " ."</i>";
  
  
  // ------------------------------------------------------------------------------------------
