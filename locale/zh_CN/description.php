@@ -4,6 +4,8 @@
  * 
  * Filename $RCSfile: description.php,v $
  * @version $Revision: 1.1 $
+ * @modified $Date: 2009/12/16 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
+ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Wang Sheng <wangsheng AT ossxp.com> $
  * @modified $Date: 2009/02/02 22:30:53 $ $Author: havlat $
  * @author Martin Havlat
  *

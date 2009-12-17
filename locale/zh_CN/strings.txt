@@ -1,12 +1,14 @@
 <?php
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * Chinese Simplified translation- leiww@ossxp.com 
+ * Chinese Simplified translation- leiww@ossxp.com
  *
  * Filename $RCSfile: strings.txt,v $
  *
  * @version $Revision: 1.17 $
- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
+ * @modified $Date: 2009/12/17 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
+ * @modified $Date: 2009/12/12 --:--:-- $ $Author: Cui Rui <cuirui AT ossxp.com> $
+ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Jiang Xin <jiangxin AT ossxp.com> $
  * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
  *
  * N.B.:
@@ -16,8 +18,12 @@
  *
  * @author Francisco Mancardi
  *
- * 20070818 - franciscom
- * 20070705 - franciscom -
+ * 20091217 - www.ossxp.com - Add strings for demo login feature.
+ *            See: http://redmine.ossxp.com/redmine/issues/show/81
+ *                 http://git.ossxp.com/gitweb/pub/testlink-1.8.x.git
+ * 20071102 - franciscom - tcexecute strings
+ * 20071101 - franciscom - view_file_format_doc
+ * 20070930 - franciscom - show_tcase_spec
  * 20070520 - franciscom - milestones
  * 20070206 - franciscom - BUGID 618 - \n on JS messages
  *
@@ -2407,6 +2413,10 @@ $TLS_link_time_charts		= "时间表";
 $TLS_time_charts_metrics 	= "时间表度量";
 $TLS_time_charts_title 		= "时间表";
 
+// ----- login.php -----
+$TLS_sso_login_url_text = "点击这里完成登录...";
+$TLS_demo_login_title = "TestLink 演示";
+$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
 
 // ----- END ------------------------------------------------------------------
 ?>
