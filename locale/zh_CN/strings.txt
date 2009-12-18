@@ -2414,7 +2414,7 @@ $TLS_time_charts_metrics 	= "时间表度量";
 $TLS_time_charts_title 		= "时间表";
 
 // ----- login.php -----
-$TLS_sso_login_url_text = "点击这里完成登录...";
+$TLS_sso_login_url_text = "点击这里，使用已有帐号登录";
 $TLS_demo_login_title = "TestLink 演示";
 $TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
 
