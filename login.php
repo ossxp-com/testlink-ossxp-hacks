@@ -99,7 +99,7 @@ if (@$tlCfg->authentication['demo_users'])
 {
 	if (strtolower($tlCfg->authentication['method']) == 'cosign')
 	{
-		$link_login = "<p><div align=\"center\" ".
+		$link_login = "<p><div align=\"center\"> ".
                   "<a href=\"" .
 		              $_SERVER["PHP_SELF"] .
 		              "?sso\" class=\"urlbtn\">" .
