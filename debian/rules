@@ -34,9 +34,7 @@ debian/control::
 
 debian/patches/: debian/patches
 debian/patches:
-	git checkout t/all
-	tg update
-	tg export --quilt debian/patches.new
+	tg export --all --quilt debian/patches.new
 	cp -a debian/patches.new/* debian/patches && rm -rf debian/patches.new
 	cd debian && git status
 
