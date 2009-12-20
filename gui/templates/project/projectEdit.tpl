@@ -27,7 +27,7 @@ rev:
 
 {lang_get var="labels" s='show_event_history,th_active,cancel,info_failed_loc_prod,
                           invalid_query,
-                          caption_edit_tproject,caption_new_tproject,name,tcase_id_prefix,
+                          caption_edit_tproject,caption_new_tproject,name,tcase_id_prefix,bts_project_id,
                           title_testproject_management,notes,color,enable_priority, enable_automation,
                           enable_requirements,btn_upd,btn_inactivate,btn_activate,btn_del,th_id'}
 
@@ -126,6 +126,15 @@ function validateForm(f)
 	  		           maxlength="{#TESTCASE_PREFIX_MAXLEN#}"
 				           value="{$tcasePrefix|escape}"/>
 				  				{include file="error_icon.tpl" field="tcasePrefix"}
+				</td>
+			</tr>
+
+			<tr>
+				<th style="background:none;">{$labels.bts_project_id}</th>
+				<td><input type="text" name="btsProjectId"
+  			           size="{#BTS_PROJECT_ID_SIZE#}"
+	  		           maxlength="{#BTS_PROJECT_ID_MAXLEN#}"
+				           value="{$btsProjectId|escape}"/>
 				</td>
 			</tr>
 

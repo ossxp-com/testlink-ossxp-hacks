@@ -252,6 +252,7 @@ CREATE TABLE "testprojects" (
   "option_automation" INT2 NOT NULL DEFAULT '0',
   "prefix" varchar(16) NOT NULL,
   "tc_counter" int NOT NULL default '0',
+  "bts_project_id" varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY ("id"),
   UNIQUE ("prefix")
 ); 

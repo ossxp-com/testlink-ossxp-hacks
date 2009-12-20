@@ -338,6 +338,7 @@ CREATE TABLE `testprojects` (
   `option_automation` tinyint(1) NOT NULL default '0',  
   `prefix` varchar(16) NOT NULL,
   `tc_counter` int(10) unsigned NOT NULL default '0',
+  `bts_project_id` varchar(100) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `id_active` (`id`,`active`),
   UNIQUE KEY `prefix` (`prefix`)

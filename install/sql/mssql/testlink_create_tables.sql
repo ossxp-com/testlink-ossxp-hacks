@@ -540,6 +540,7 @@ CREATE TABLE [testprojects](
   [option_automation] [tinyint] NOT NULL CONSTRAINT [DF_testprojects_option_automation]  DEFAULT ((0)),
 	[prefix] [varchar](16) NOT NULL,
   [tc_counter] [int] NOT NULL CONSTRAINT [DF_testprojects_tc_counter]  DEFAULT ((0)),
+	[bts_project_id] [varchar](100) NOT NULL,
   CONSTRAINT [PK_testprojects] PRIMARY KEY CLUSTERED 
   (
 	 [id] ASC

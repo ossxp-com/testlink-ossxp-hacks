@@ -130,6 +130,7 @@ switch($args->doAction)
         $smarty->assign('optPriority', $args->optPriority);
         $smarty->assign('optAutomation', $args->optAutomation);
         $smarty->assign('tcasePrefix', $args->tcasePrefix);
+        $smarty->assign('btsProjectId', $args->btsProjectId);
         $smarty->assign('notes', $of->CreateHTML());
         $smarty->assign('found', $found);
         $smarty->display($templateCfg->template_dir . $template);
@@ -156,7 +157,7 @@ function init_args($tprojectMgr,$request_hash, $session_tproject_id)
 {
   $args = new stdClass();
 	$request_hash = strings_stripSlashes($request_hash);
-	$nullable_keys = array('tprojectName','color','notes','doAction','tcasePrefix');
+	$nullable_keys = array('tprojectName','color','notes','doAction','tcasePrefix','btsProjectId');
 	foreach ($nullable_keys as $value)
 	{
 		$args->$value = isset($request_hash[$value]) ? trim($request_hash[$value]) : null;
@@ -232,7 +233,7 @@ function doCreate($argsObj,&$tprojectMgr)
 	    $options->automated_execution = $argsObj->optAutomation;
 	    	    
 	  	$new_id = $tprojectMgr->create($argsObj->tprojectName,$argsObj->color,$options,
-	  	                               $argsObj->notes,$argsObj->active,$argsObj->tcasePrefix);
+	  	                               $argsObj->notes,$argsObj->active,$argsObj->tcasePrefix,$argsObj->btsProjectId);
 	  								                 
 	  	if (!$new_id)
 	  	{
@@ -292,7 +293,7 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
 	 {
 			if( $tprojectMgr->update($argsObj->tprojectID,trim($argsObj->tprojectName),$argsObj->color,
 									             $argsObj->optReq, $argsObj->optPriority, $argsObj->optAutomation,
-									             $argsObj->notes, $argsObj->active,$argsObj->tcasePrefix) )
+									             $argsObj->notes, $argsObj->active,$argsObj->tcasePrefix,$argsObj->btsProjectId) )
 			{
 				$op->msg = '';
 				$tprojectMgr->activateTestProject($argsObj->tprojectID,$argsObj->active);
@@ -339,6 +340,7 @@ function edit(&$argsObj,&$tprojectMgr)
 	$argsObj->optAutomation = $tprojectInfo['option_automation'];
 	$argsObj->active = $tprojectInfo['active'];
 	$argsObj->tcasePrefix = $tprojectInfo['prefix'];
+	$argsObj->btsProjectId = $tprojectInfo['bts_project_id'];
 
 	$ui = new stdClass();
 	$ui->main_descr=lang_get('title_testproject_management');

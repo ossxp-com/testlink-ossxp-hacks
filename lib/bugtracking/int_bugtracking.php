@@ -55,6 +55,9 @@ class bugtrackingInterface
 	var $dbConnection = null;	
 	var $bConnected = false;
 
+	//bts hosts multiple projects
+	var $bts_project_id = "";
+
 	/*
 	* 
 	* FUNCTIONS NOT CALLED BY TestLink (helpers):
@@ -178,6 +181,40 @@ class bugtrackingInterface
 	 * @author Andreas Morsing 
 	 * @since 22.04.2005, 21:05:25
 	 **/
+	function init_pid_from_execute($db, $exec_id)
+	{
+		if(!is_null($exec_id) && strlen($exec_id))
+		{
+			$sql = "SELECT testprojects.bts_project_id ".
+						 "FROM testprojects ".
+						 "JOIN testplans ON testprojects.id=testplans.testproject_id ".
+						 "JOIN executions ON testplans.id=executions.testplan_id ".
+						 "WHERE executions.id = {$exec_id}";
+		}
+		$result = $db->exec_query($sql);
+		if ($result)
+		{
+			$myrow = $db->fetch_array($result);
+			if ($myrow)
+				$this->bts_project_id = $myrow['bts_project_id'];
+		}
+		return $this->bts_project_id;
+	}
+
+	/**
+	 * overload this to return the URL to the bugtracking page for viewing 
+	 * the bug with the given id. This function is not directly called by 
+	 * TestLink at the moment
+	 *
+	 * @param int id the bug id
+	 * 
+	 * @return string returns a complete URL to view the given bug, or false if the bug 
+	 * 			wasnt found
+	 *
+	 * @version 1.0
+	 * @author Andreas Morsing 
+	 * @since 22.04.2005, 21:05:25
+	 **/
 	function buildViewBugURL($id)
 	{
 		return false;		
@@ -252,7 +289,10 @@ class bugtrackingInterface
 	 **/
 	function getEnterBugURL()
 	{
-		return $this->enterBugURL;
+		if ($this->bts_project_id)
+			return sprintf($this->enterBugURL, $this->bts_project_id);
+		else
+			return $this->enterBugURL;
 	}
 	
 	/**
