@@ -55,6 +55,13 @@ index 331a77a..0480918 100644
  
  /** 
   * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
+@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
+ $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
+ $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
+ // ----- END OF FILE --------------------------------------------------------------------
+-?>
+\ No newline at end of file
++?>
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
 index f9b9203..367c9b7 100644
 --- a/custom_config.inc.php.example

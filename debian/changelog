@@ -1,3 +1,10 @@
+ossxp-testlink (1.8.5-13) unstable; urgency=low
+
+  * Integration with redmine.
+    Remember: update table by hands.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sun, 20 Dec 2009 19:08:36 +0800
+
 ossxp-testlink (1.8.5-12) unstable; urgency=low
 
   * New feature: demo login.

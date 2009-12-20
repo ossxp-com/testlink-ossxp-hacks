@@ -6,13 +6,20 @@ Subject: [PATCH] t/bugtrac_integration
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- cfg/redmine.cfg.php                 |   10 +++++-----
- config.inc.php                      |    1 +
- lib/bugtracking/int_bugtracking.php |    9 ++++++++-
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ cfg/redmine.cfg.php                             |   14 ++---
+ config.inc.php                                  |    1 +
+ gui/templates/project/projectEdit.tpl           |   13 +++++-
+ install/sql/mssql/testlink_create_tables.sql    |    1 +
+ install/sql/mysql/testlink_create_tables.sql    |    1 +
+ install/sql/postgres/testlink_create_tables.sql |    1 +
+ lib/bugtracking/int_bugtracking.php             |   60 ++++++++++++++++++++++-
+ lib/execute/bugAdd.php                          |    1 +
+ lib/functions/testproject.class.php             |   16 +++++--
+ lib/project/projectEdit.php                     |   16 +++++-
+ 10 files changed, 106 insertions(+), 18 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
-index a87ea2f..a709581 100644
+index a87ea2f..3dbdd21 100644
 --- a/cfg/redmine.cfg.php
 +++ b/cfg/redmine.cfg.php
 @@ -13,10 +13,10 @@
@@ -28,7 +35,7 @@ index a87ea2f..a709581 100644
  define('BUG_TRACK_DB_NAME', '[CONFIGURE_BUG_TRACK_DB_NAME]');
  
  /** The DB type being used by redMine
-@@ -44,9 +44,9 @@ define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
+@@ -44,16 +44,14 @@ define('BUG_TRACK_DB_PASS', '[CONFIGURE_BUG_TRACK_DB_USER_PASS]');
   *     password: xxxxxxxx
   * ----------------------
   */
@@ -40,12 +47,15 @@ index a87ea2f..a709581 100644
  
  
  /* link of the web server for redmine */
-@@ -56,4 +56,4 @@ define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
+ define('BUG_TRACK_HREF', "http://localhost/redmine/issues/show/");
+-// define('BUG_TRACK_HREF', "http://localhost:3000/issues/show/");
+ 
  /** link to the bugtracking system, for entering new bugs */
- define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
- // define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
+-define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");
+-// define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost:3000/");
 -?>
 \ No newline at end of file
++define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/projects/%s/issues/new");
 +?>
 diff --git a/config.inc.php b/config.inc.php
 index 331a77a..9ce2505 100644
@@ -59,11 +69,150 @@ index 331a77a..9ce2505 100644
   * 'GFORGE'    : edit configuration in TL_ABS_PATH/cfg/gforge.cfg.php
   * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
   * ]
+diff --git a/gui/templates/project/projectEdit.tpl b/gui/templates/project/projectEdit.tpl
+index 97fb4ad..f6e153f 100644
+--- a/gui/templates/project/projectEdit.tpl
++++ b/gui/templates/project/projectEdit.tpl
+@@ -27,7 +27,7 @@ rev:
+ 
+ {lang_get var="labels" s='show_event_history,th_active,cancel,info_failed_loc_prod,
+                           invalid_query,
+-                          caption_edit_tproject,caption_new_tproject,name,tcase_id_prefix,
++                          caption_edit_tproject,caption_new_tproject,name,tcase_id_prefix,bts_project_id,
+                           title_testproject_management,notes,color,enable_priority, enable_automation,
+                           enable_requirements,btn_upd,btn_inactivate,btn_activate,btn_del,th_id'}
+ 
+@@ -129,6 +129,17 @@ function validateForm(f)
+ 				</td>
+ 			</tr>
+ 
++			{if $bts_project_name_wanted}
++			<tr>
++				<th style="background:none;">{$labels.bts_project_id}</th>
++				<td><input type="text" name="btsProjectId"
++  			           size="{#BTS_PROJECT_ID_SIZE#}"
++	  		           maxlength="{#BTS_PROJECT_ID_MAXLEN#}"
++				           value="{$btsProjectId|escape}"/>
++				</td>
++			</tr>
++			{/if}
++
+ 			<tr>
+ 				<th style="background:none;">{$labels.enable_requirements}</th>
+ 				<td>
+diff --git a/install/sql/mssql/testlink_create_tables.sql b/install/sql/mssql/testlink_create_tables.sql
+index d2ece4b..25de21a 100644
+--- a/install/sql/mssql/testlink_create_tables.sql
++++ b/install/sql/mssql/testlink_create_tables.sql
+@@ -540,6 +540,7 @@ CREATE TABLE [testprojects](
+   [option_automation] [tinyint] NOT NULL CONSTRAINT [DF_testprojects_option_automation]  DEFAULT ((0)),
+ 	[prefix] [varchar](16) NOT NULL,
+   [tc_counter] [int] NOT NULL CONSTRAINT [DF_testprojects_tc_counter]  DEFAULT ((0)),
++	[bts_project_id] [varchar](100) NOT NULL,
+   CONSTRAINT [PK_testprojects] PRIMARY KEY CLUSTERED 
+   (
+ 	 [id] ASC
+diff --git a/install/sql/mysql/testlink_create_tables.sql b/install/sql/mysql/testlink_create_tables.sql
+index 056cd40..233a19d 100644
+--- a/install/sql/mysql/testlink_create_tables.sql
++++ b/install/sql/mysql/testlink_create_tables.sql
+@@ -338,6 +338,7 @@ CREATE TABLE `testprojects` (
+   `option_automation` tinyint(1) NOT NULL default '0',  
+   `prefix` varchar(16) NOT NULL,
+   `tc_counter` int(10) unsigned NOT NULL default '0',
++  `bts_project_id` varchar(100) NOT NULL default '',
+   PRIMARY KEY  (`id`),
+   KEY `id_active` (`id`,`active`),
+   UNIQUE KEY `prefix` (`prefix`)
+diff --git a/install/sql/postgres/testlink_create_tables.sql b/install/sql/postgres/testlink_create_tables.sql
+index 0c4c522..218f16b 100644
+--- a/install/sql/postgres/testlink_create_tables.sql
++++ b/install/sql/postgres/testlink_create_tables.sql
+@@ -252,6 +252,7 @@ CREATE TABLE "testprojects" (
+   "option_automation" INT2 NOT NULL DEFAULT '0',
+   "prefix" varchar(16) NOT NULL,
+   "tc_counter" int NOT NULL default '0',
++  "bts_project_id" varchar(100) NOT NULL DEFAULT '',
+   PRIMARY KEY ("id"),
+   UNIQUE ("prefix")
+ ); 
 diff --git a/lib/bugtracking/int_bugtracking.php b/lib/bugtracking/int_bugtracking.php
-index e166e92..961f0c8 100644
+index e166e92..d161c04 100644
 --- a/lib/bugtracking/int_bugtracking.php
 +++ b/lib/bugtracking/int_bugtracking.php
-@@ -329,7 +329,14 @@ if (isset($bts[$g_interface_bugs]))
+@@ -55,6 +55,9 @@ class bugtrackingInterface
+ 	var $dbConnection = null;	
+ 	var $bConnected = false;
+ 
++	//bts hosts multiple projects
++	var $bts_project_id = "";
++
+ 	/*
+ 	* 
+ 	* FUNCTIONS NOT CALLED BY TestLink (helpers):
+@@ -165,6 +168,49 @@ class bugtrackingInterface
+ 	}
+ 	
+ 	/**
++	 * return true if the BTS has multiple project support.
++	 */
++	function project_name_wanted()
++	{
++		return strstr($this->enterBugURL, "%s")? true : false;
++	}
++
++	/**
++	 * Init bts_project_id from execute_id.
++	 *
++	 * @param class db    the databae instance
++	 * @param int exec_id the execute id
++	 * 
++	 * @return string returns bts_project_id
++	 *
++	 * @author Jiang Xin
++	 * @since 2009/12/20, 18:12:16 CST
++	 **/
++	function init_pid_from_execute($db, $exec_id)
++	{
++		//search bts_project_id if needed.
++		if ($this->project_name_wanted())
++		{
++			if(!is_null($exec_id) && strlen($exec_id))
++			{
++				$sql = "SELECT testprojects.bts_project_id ".
++							 "FROM testprojects ".
++							 "JOIN testplans ON testprojects.id=testplans.testproject_id ".
++							 "JOIN executions ON testplans.id=executions.testplan_id ".
++							 "WHERE executions.id = {$exec_id}";
++			}
++			$result = $db->exec_query($sql);
++			if ($result)
++			{
++				$myrow = $db->fetch_array($result);
++				if ($myrow)
++					$this->bts_project_id = $myrow['bts_project_id'];
++			}
++		}
++		return $this->bts_project_id;
++	}
++
++	/**
+ 	 * overload this to return the URL to the bugtracking page for viewing 
+ 	 * the bug with the given id. This function is not directly called by 
+ 	 * TestLink at the moment
+@@ -252,7 +298,10 @@ class bugtrackingInterface
+ 	 **/
+ 	function getEnterBugURL()
+ 	{
+-		return $this->enterBugURL;
++		if ($this->bts_project_id)
++			return sprintf($this->enterBugURL, $this->bts_project_id);
++		else
++			return $this->enterBugURL;
+ 	}
+ 	
+ 	/**
+@@ -329,7 +378,14 @@ if (isset($bts[$g_interface_bugs]))
  	$configPHP = $btsname . '.cfg.php';
  	$interfacePHP = 'int_' . $btsname . '.php';  
  
@@ -79,5 +228,147 @@ index e166e92..961f0c8 100644
  	require_once(TL_ABS_PATH . 'lib/bugtracking/'. $interfacePHP);
  	
  	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
+diff --git a/lib/execute/bugAdd.php b/lib/execute/bugAdd.php
+index b3d9217..9e3235a 100644
+--- a/lib/execute/bugAdd.php
++++ b/lib/execute/bugAdd.php
+@@ -39,6 +39,7 @@ if(!is_null($bug_id) && strlen($bug_id))
+ }
+ 
+ $smarty = new TLSmarty();
++$g_bugInterface->init_pid_from_execute($db, $exec_id);
+ $smarty->assign('bts_url',$g_bugInterface->getEnterBugURL());
+ $smarty->assign('exec_id',$exec_id);
+ $smarty->assign('msg',$msg);
+diff --git a/lib/functions/testproject.class.php b/lib/functions/testproject.class.php
+index 46a55ad..bb8a838 100644
+--- a/lib/functions/testproject.class.php
++++ b/lib/functions/testproject.class.php
+@@ -112,22 +112,25 @@ class testproject extends tlObjectWithAttachments
+  *                         added new optional argument active
+  *
+  */
+-function create($name,$color,$options,$notes,$active=1,$tcasePrefix='')
++function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$btsProjectId='')
+ {
+   
+ 	// Create Node and get the id
+ 	$root_node_id = $this->tree_manager->new_root_node($name);
+ 	$tcprefix=$this->formatTcPrefix($tcasePrefix);
++	if(is_null($btsProjectId))
++		$btsProjectId = "";
+ 
+ 	$sql = " INSERT INTO {$this->object_table} (id,color,option_reqs,option_priority," .
+-	       "option_automation,notes,active,prefix) VALUES (" . $root_node_id . ", '" .
++	       "option_automation,notes,active,prefix,bts_project_id) VALUES (" . $root_node_id . ", '" .
+ 	                     $this->db->prepare_string($color) . "'," .
+ 	                     $options->requirement_mgmt . "," .
+ 	                     $options->priority_mgmt . "," .
+ 	                     $options->automated_execution . ",'" .
+ 		                 $this->db->prepare_string($notes) . "'," .
+ 		                 $active . ",'" .
+-		                 $this->db->prepare_string($tcprefix) . "')";
++		                 $this->db->prepare_string($tcprefix) . "','" .
++		                 $this->db->prepare_string($btsProjectId) . "')";
+ 
+ 	$result = $this->db->exec_query($sql);
+ 	if ($result)
+@@ -155,7 +158,7 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='')
+  *	20060312 - franciscom - name is setted on nodes_hierarchy table
+  *
+  **/
+-function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null)
++function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null,$btsProjectId=null)
+ {
+   $status_ok=1;
+ 
+@@ -175,6 +178,11 @@ function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $not
+ 	    $add_upd .=",prefix='" . $this->db->prepare_string($tcprefix) . "'" ;
+ 	}
+ 
++	if( !is_null($btsProjectId) )
++	{
++	    $add_upd .=",bts_project_id='" . $this->db->prepare_string($btsProjectId) . "'" ;
++	}
++
+ 	$sql = " UPDATE {$this->object_table} SET color='" . $this->db->prepare_string($color) . "', ".
+ 			" option_reqs=" .  $opt_req . ", " .
+ 			" option_priority=" .  $optPriority . ", " .
+diff --git a/lib/project/projectEdit.php b/lib/project/projectEdit.php
+index 4e50b79..07e50b4 100644
+--- a/lib/project/projectEdit.php
++++ b/lib/project/projectEdit.php
+@@ -28,6 +28,7 @@ testlinkInitPage($db,true,false,"checkRights");
+ 
+ $gui_cfg = config_get('gui');
+ $templateCfg = templateConfiguration();
++$bts_project_name_wanted = $g_bugInterface->project_name_wanted();
+ 
+ $session_tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
+ 
+@@ -95,6 +96,7 @@ $smarty->assign('gui_cfg',$gui_cfg);
+ $smarty->assign('editorType',$editorCfg['type']);
+ $smarty->assign('canManage', has_rights($db,"mgt_modify_product"));
+ $smarty->assign('mgt_view_events',$_SESSION['currentUser']->hasRight($db,"mgt_view_events"));
++$smarty->assign('bts_project_name_wanted', $bts_project_name_wanted);
+ 
+ if(!$status_ok)
+    $args->doAction = "ErrorOnAction";
+@@ -130,6 +132,8 @@ switch($args->doAction)
+         $smarty->assign('optPriority', $args->optPriority);
+         $smarty->assign('optAutomation', $args->optAutomation);
+         $smarty->assign('tcasePrefix', $args->tcasePrefix);
++        if($bts_project_name_wanted)
++            $smarty->assign('btsProjectId', $args->btsProjectId);
+         $smarty->assign('notes', $of->CreateHTML());
+         $smarty->assign('found', $found);
+         $smarty->display($templateCfg->template_dir . $template);
+@@ -156,7 +160,7 @@ function init_args($tprojectMgr,$request_hash, $session_tproject_id)
+ {
+   $args = new stdClass();
+ 	$request_hash = strings_stripSlashes($request_hash);
+-	$nullable_keys = array('tprojectName','color','notes','doAction','tcasePrefix');
++	$nullable_keys = array('tprojectName','color','notes','doAction','tcasePrefix','btsProjectId');
+ 	foreach ($nullable_keys as $value)
+ 	{
+ 		$args->$value = isset($request_hash[$value]) ? trim($request_hash[$value]) : null;
+@@ -232,7 +236,7 @@ function doCreate($argsObj,&$tprojectMgr)
+ 	    $options->automated_execution = $argsObj->optAutomation;
+ 	    	    
+ 	  	$new_id = $tprojectMgr->create($argsObj->tprojectName,$argsObj->color,$options,
+-	  	                               $argsObj->notes,$argsObj->active,$argsObj->tcasePrefix);
++	  	                               $argsObj->notes,$argsObj->active,$argsObj->tcasePrefix,$argsObj->btsProjectId);
+ 	  								                 
+ 	  	if (!$new_id)
+ 	  	{
+@@ -292,7 +296,7 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
+ 	 {
+ 			if( $tprojectMgr->update($argsObj->tprojectID,trim($argsObj->tprojectName),$argsObj->color,
+ 									             $argsObj->optReq, $argsObj->optPriority, $argsObj->optAutomation,
+-									             $argsObj->notes, $argsObj->active,$argsObj->tcasePrefix) )
++									             $argsObj->notes, $argsObj->active,$argsObj->tcasePrefix,$argsObj->btsProjectId) )
+ 			{
+ 				$op->msg = '';
+ 				$tprojectMgr->activateTestProject($argsObj->tprojectID,$argsObj->active);
+@@ -329,6 +333,8 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
+ */
+ function edit(&$argsObj,&$tprojectMgr)
+ {
++	global $bts_project_name_wanted;
++
+ 	$tprojectInfo = $tprojectMgr->get_by_id($argsObj->tprojectID);
+ 
+ 	$argsObj->tprojectName = $tprojectInfo['name'];
+@@ -339,6 +345,10 @@ function edit(&$argsObj,&$tprojectMgr)
+ 	$argsObj->optAutomation = $tprojectInfo['option_automation'];
+ 	$argsObj->active = $tprojectInfo['active'];
+ 	$argsObj->tcasePrefix = $tprojectInfo['prefix'];
++	if($bts_project_name_wanted)
++		$argsObj->btsProjectId = $tprojectInfo['bts_project_id'];
++	else
++		$argsObj->btsProjectId = NULL;
+ 
+ 	$ui = new stdClass();
+ 	$ui->main_descr=lang_get('title_testproject_management');
 -- 
 tg: (ee4073d..) t/bugtrac_integration (depends on: master)
