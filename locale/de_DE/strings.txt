@@ -1130,6 +1130,7 @@ $TLS_btn_inactivate = "Deaktivieren";
 $TLS_caption_edit_tproject = "Projektdaten ändern";
 $TLS_caption_new_tproject = "Neues Projekt erstellen";
 $TLS_color = "Hintergrundfarbe";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "Anforderungen verwenden?";
 $TLS_enable_priority = "Prioritäten?";
 $TLS_enable_automation = "Testautomatisierung?";

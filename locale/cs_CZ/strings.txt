@@ -1149,6 +1149,7 @@ $TLS_btn_inactivate = "Neaktivní";
 $TLS_caption_edit_tproject = "Upravit %s";
 $TLS_caption_new_tproject = "Vytvořit nový testovací projekt";
 $TLS_color = "Barva";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "Povolit funkčnost pro požadavky";
 $TLS_enable_priority = "Správa priorit";
 $TLS_enable_automation = "Automatizace testů";

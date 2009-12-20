@@ -1149,6 +1149,7 @@ $TLS_btn_inactivate = "Desativar";
 $TLS_caption_edit_tproject = "Editar %s";
 $TLS_caption_new_tproject = "Criar novo Projeto de Teste";
 $TLS_color = "Cor";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "Gerenciar Requisitos";
 $TLS_enable_priority = "Gerenciar prioridade";
 $TLS_enable_automation = "Teste Automático";

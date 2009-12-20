@@ -1128,6 +1128,7 @@ $TLS_btn_inactivate = "Сделать неактивным";
 $TLS_caption_edit_tproject = "Edit %s";
 $TLS_caption_new_tproject = "Create new Test Project";
 $TLS_color = "Выбрать цвет фона";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "Использовать требования к продукту";
 $TLS_enable_priority = "Priority Management";
 $TLS_enable_automation = "Test Automation";
