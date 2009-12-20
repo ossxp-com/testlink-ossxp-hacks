@@ -28,7 +28,7 @@ testlinkInitPage($db,true,false,"checkRights");
 
 $gui_cfg = config_get('gui');
 $templateCfg = templateConfiguration();
-$bts_project_name_wanted = $g_bugInterface->project_name_wanted();
+$bts_project_name_wanted = $g_bugInterface ? $g_bugInterface->project_name_wanted(): false;
 
 $session_tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 

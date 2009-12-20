@@ -39,7 +39,10 @@ if(!is_null($bug_id) && strlen($bug_id))
 }
 
 $smarty = new TLSmarty();
-$g_bugInterface->init_pid_from_execute($db, $exec_id);
+if($g_bugInterface)
+{
+	$g_bugInterface->init_pid_from_execute($db, $exec_id);
+}
 $smarty->assign('bts_url',$g_bugInterface->getEnterBugURL());
 $smarty->assign('exec_id',$exec_id);
 $smarty->assign('msg',$msg);
