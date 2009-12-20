@@ -118,6 +118,8 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$btsProje
 	// Create Node and get the id
 	$root_node_id = $this->tree_manager->new_root_node($name);
 	$tcprefix=$this->formatTcPrefix($tcasePrefix);
+	if(is_null($btsProjectId))
+		$btsProjectId = "";
 
 	$sql = " INSERT INTO {$this->object_table} (id,color,option_reqs,option_priority," .
 	       "option_automation,notes,active,prefix,bts_project_id) VALUES (" . $root_node_id . ", '" .
@@ -156,7 +158,7 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$btsProje
  *	20060312 - franciscom - name is setted on nodes_hierarchy table
  *
  **/
-function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null,$btsProjectId="")
+function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null,$btsProjectId=null)
 {
   $status_ok=1;
 
@@ -176,11 +178,15 @@ function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $not
 	    $add_upd .=",prefix='" . $this->db->prepare_string($tcprefix) . "'" ;
 	}
 
+	if( !is_null($btsProjectId) )
+	{
+	    $add_upd .=",bts_project_id='" . $this->db->prepare_string($btsProjectId) . "'" ;
+	}
+
 	$sql = " UPDATE {$this->object_table} SET color='" . $this->db->prepare_string($color) . "', ".
 			" option_reqs=" .  $opt_req . ", " .
 			" option_priority=" .  $optPriority . ", " .
 			" option_automation=" .  $optAutomation . ", " .
-			" bts_project_id='" .  $this->db->prepare_string($btsProjectId) . "', " .
 			" notes='" . $this->db->prepare_string($notes) . "' {$add_upd} " .
 			" WHERE id=" . $id;
 

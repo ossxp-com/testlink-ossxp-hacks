@@ -168,35 +168,44 @@ class bugtrackingInterface
 	}
 	
 	/**
-	 * overload this to return the URL to the bugtracking page for viewing 
-	 * the bug with the given id. This function is not directly called by 
-	 * TestLink at the moment
+	 * return true if the BTS has multiple project support.
+	 */
+	function project_name_wanted()
+	{
+		return strstr($this->enterBugURL, "%s")? true : false;
+	}
+
+	/**
+	 * Init bts_project_id from execute_id.
 	 *
-	 * @param int id the bug id
+	 * @param class db    the databae instance
+	 * @param int exec_id the execute id
 	 * 
-	 * @return string returns a complete URL to view the given bug, or false if the bug 
-	 * 			wasnt found
+	 * @return string returns bts_project_id
 	 *
-	 * @version 1.0
-	 * @author Andreas Morsing 
-	 * @since 22.04.2005, 21:05:25
+	 * @author Jiang Xin
+	 * @since 2009/12/20, 18:12:16 CST
 	 **/
 	function init_pid_from_execute($db, $exec_id)
 	{
-		if(!is_null($exec_id) && strlen($exec_id))
+		//search bts_project_id if needed.
+		if ($this->project_name_wanted())
 		{
-			$sql = "SELECT testprojects.bts_project_id ".
-						 "FROM testprojects ".
-						 "JOIN testplans ON testprojects.id=testplans.testproject_id ".
-						 "JOIN executions ON testplans.id=executions.testplan_id ".
-						 "WHERE executions.id = {$exec_id}";
-		}
-		$result = $db->exec_query($sql);
-		if ($result)
-		{
-			$myrow = $db->fetch_array($result);
-			if ($myrow)
-				$this->bts_project_id = $myrow['bts_project_id'];
+			if(!is_null($exec_id) && strlen($exec_id))
+			{
+				$sql = "SELECT testprojects.bts_project_id ".
+							 "FROM testprojects ".
+							 "JOIN testplans ON testprojects.id=testplans.testproject_id ".
+							 "JOIN executions ON testplans.id=executions.testplan_id ".
+							 "WHERE executions.id = {$exec_id}";
+			}
+			$result = $db->exec_query($sql);
+			if ($result)
+			{
+				$myrow = $db->fetch_array($result);
+				if ($myrow)
+					$this->bts_project_id = $myrow['bts_project_id'];
+			}
 		}
 		return $this->bts_project_id;
 	}

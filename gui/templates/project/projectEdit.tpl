@@ -129,6 +129,7 @@ function validateForm(f)
 				</td>
 			</tr>
 
+			{if $bts_project_name_wanted}
 			<tr>
 				<th style="background:none;">{$labels.bts_project_id}</th>
 				<td><input type="text" name="btsProjectId"
@@ -137,6 +138,7 @@ function validateForm(f)
 				           value="{$btsProjectId|escape}"/>
 				</td>
 			</tr>
+			{/if}
 
 			<tr>
 				<th style="background:none;">{$labels.enable_requirements}</th>

@@ -28,6 +28,7 @@ testlinkInitPage($db,true,false,"checkRights");
 
 $gui_cfg = config_get('gui');
 $templateCfg = templateConfiguration();
+$bts_project_name_wanted = $g_bugInterface->project_name_wanted();
 
 $session_tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 
@@ -95,6 +96,7 @@ $smarty->assign('gui_cfg',$gui_cfg);
 $smarty->assign('editorType',$editorCfg['type']);
 $smarty->assign('canManage', has_rights($db,"mgt_modify_product"));
 $smarty->assign('mgt_view_events',$_SESSION['currentUser']->hasRight($db,"mgt_view_events"));
+$smarty->assign('bts_project_name_wanted', $bts_project_name_wanted);
 
 if(!$status_ok)
    $args->doAction = "ErrorOnAction";
@@ -130,7 +132,8 @@ switch($args->doAction)
         $smarty->assign('optPriority', $args->optPriority);
         $smarty->assign('optAutomation', $args->optAutomation);
         $smarty->assign('tcasePrefix', $args->tcasePrefix);
-        $smarty->assign('btsProjectId', $args->btsProjectId);
+        if($bts_project_name_wanted)
+            $smarty->assign('btsProjectId', $args->btsProjectId);
         $smarty->assign('notes', $of->CreateHTML());
         $smarty->assign('found', $found);
         $smarty->display($templateCfg->template_dir . $template);
@@ -330,6 +333,8 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
 */
 function edit(&$argsObj,&$tprojectMgr)
 {
+	global $bts_project_name_wanted;
+
 	$tprojectInfo = $tprojectMgr->get_by_id($argsObj->tprojectID);
 
 	$argsObj->tprojectName = $tprojectInfo['name'];
@@ -340,7 +345,10 @@ function edit(&$argsObj,&$tprojectMgr)
 	$argsObj->optAutomation = $tprojectInfo['option_automation'];
 	$argsObj->active = $tprojectInfo['active'];
 	$argsObj->tcasePrefix = $tprojectInfo['prefix'];
-	$argsObj->btsProjectId = $tprojectInfo['bts_project_id'];
+	if($bts_project_name_wanted)
+		$argsObj->btsProjectId = $tprojectInfo['bts_project_id'];
+	else
+		$argsObj->btsProjectId = NULL;
 
 	$ui = new stdClass();
 	$ui->main_descr=lang_get('title_testproject_management');
