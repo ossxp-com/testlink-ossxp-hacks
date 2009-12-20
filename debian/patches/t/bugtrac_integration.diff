@@ -13,10 +13,10 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  install/sql/mysql/testlink_create_tables.sql    |    1 +
  install/sql/postgres/testlink_create_tables.sql |    1 +
  lib/bugtracking/int_bugtracking.php             |   60 ++++++++++++++++++++++-
- lib/execute/bugAdd.php                          |    1 +
+ lib/execute/bugAdd.php                          |    6 ++-
  lib/functions/testproject.class.php             |   16 +++++--
  lib/project/projectEdit.php                     |   16 +++++-
- 10 files changed, 106 insertions(+), 18 deletions(-)
+ 10 files changed, 110 insertions(+), 19 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
 index a87ea2f..3dbdd21 100644
@@ -229,17 +229,27 @@ index e166e92..d161c04 100644
  	
  	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
 diff --git a/lib/execute/bugAdd.php b/lib/execute/bugAdd.php
-index b3d9217..9e3235a 100644
+index b3d9217..be0c951 100644
 --- a/lib/execute/bugAdd.php
 +++ b/lib/execute/bugAdd.php
-@@ -39,6 +39,7 @@ if(!is_null($bug_id) && strlen($bug_id))
+@@ -39,6 +39,10 @@ if(!is_null($bug_id) && strlen($bug_id))
  }
  
  $smarty = new TLSmarty();
-+$g_bugInterface->init_pid_from_execute($db, $exec_id);
++if($g_bugInterface)
++{
++	$g_bugInterface->init_pid_from_execute($db, $exec_id);
++}
  $smarty->assign('bts_url',$g_bugInterface->getEnterBugURL());
  $smarty->assign('exec_id',$exec_id);
  $smarty->assign('msg',$msg);
+@@ -48,4 +52,4 @@ function checkRights(&$db,&$user)
+ {
+ 	return $user->hasRight($db,"testplan_execute");
+ }
+-?>
+\ No newline at end of file
++?>
 diff --git a/lib/functions/testproject.class.php b/lib/functions/testproject.class.php
 index 46a55ad..bb8a838 100644
 --- a/lib/functions/testproject.class.php
@@ -295,14 +305,14 @@ index 46a55ad..bb8a838 100644
  			" option_reqs=" .  $opt_req . ", " .
  			" option_priority=" .  $optPriority . ", " .
 diff --git a/lib/project/projectEdit.php b/lib/project/projectEdit.php
-index 4e50b79..07e50b4 100644
+index 4e50b79..76d1b1c 100644
 --- a/lib/project/projectEdit.php
 +++ b/lib/project/projectEdit.php
 @@ -28,6 +28,7 @@ testlinkInitPage($db,true,false,"checkRights");
  
  $gui_cfg = config_get('gui');
  $templateCfg = templateConfiguration();
-+$bts_project_name_wanted = $g_bugInterface->project_name_wanted();
++$bts_project_name_wanted = $g_bugInterface ? $g_bugInterface->project_name_wanted(): false;
  
  $session_tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
  

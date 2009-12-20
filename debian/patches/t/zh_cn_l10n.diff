@@ -6,7 +6,7 @@ Subject: [PATCH] t/zh_cn_l10n
 Signed-off-by: leiww <leiww@bj.ossxp.com>
 
 ---
- config.inc.php                  |   10 +-
+ config.inc.php                  |    8 +-
  lib/results/resultsByStatus.php |    2 +-
  locale/Makefile                 |    5 +
  locale/cs_CZ/strings.txt        | 4823 ++++++++++++++++++++-------------------
@@ -29,10 +29,10 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
  locale/zh_CN/description.php    |  353 ++--
  locale/zh_CN/strings.txt        | 3732 ++++++++++++++++---------------
  locale/zh_CN/texts.php          |  469 ++---
- 23 files changed, 14068 insertions(+), 13461 deletions(-)
+ 23 files changed, 14067 insertions(+), 13460 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 331a77a..d717b34 100644
+index 331a77a..24b4d01 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -703,10 +703,10 @@ $tlCfg->req_cfg->reqdoc_id->is_system_wide = FALSE;
@@ -50,13 +50,6 @@ index 331a77a..d717b34 100644
  
  
  // ENABLED: allow N level depth tree 
-@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
- $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
- $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
- // ----- END OF FILE --------------------------------------------------------------------
--?>
-\ No newline at end of file
-+?>
 diff --git a/lib/results/resultsByStatus.php b/lib/results/resultsByStatus.php
 index 9883f03..0825305 100644
 --- a/lib/results/resultsByStatus.php
