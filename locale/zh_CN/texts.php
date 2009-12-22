@@ -5,9 +5,11 @@
  *
  * Filename $RCSfile: texts.php,v $
  * @version $Revision: 1.2 $
- * @modified $Date: 2009/12/15 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
  * @modified $Date: 2009/03/05 18:38:50 $ by $Author: schlundus $
  * @author Martin Havlat and reviewers from TestLink Community
+ *
+ * Translation:
+ *   * 2009/12/15, Lei Weiwei <leiww AT ossxp.com>
  *
  * --------------------------------------------------------------------------------------
  *

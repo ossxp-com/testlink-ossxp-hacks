@@ -6,9 +6,6 @@
  * Filename $RCSfile: strings.txt,v $
  *
  * @version $Revision: 1.17 $
- * @modified $Date: 2009/12/17 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
- * @modified $Date: 2009/12/12 --:--:-- $ $Author: Cui Rui <cuirui AT ossxp.com> $
- * @modified $Date: 2009/12/11 --:--:-- $ $Author: Jiang Xin <jiangxin AT ossxp.com> $
  * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
  *
  * N.B.:
@@ -21,6 +18,9 @@
  * 20091217 - www.ossxp.com - Add strings for demo login feature.
  *            See: http://redmine.ossxp.com/redmine/issues/show/81
  *                 http://git.ossxp.com/gitweb/pub/testlink-1.8.x.git
+ * 20091217 - Lei Weiwei <leiww AT ossxp.com>
+ * 20091212 - Cui Rui <cuirui AT ossxp.com>
+ * 20091211 - Jiang Xin <jiangxin AT ossxp.com> 
  * 20071102 - franciscom - tcexecute strings
  * 20071101 - franciscom - view_file_format_doc
  * 20070930 - franciscom - show_tcase_spec
