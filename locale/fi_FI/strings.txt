@@ -1157,6 +1157,7 @@ $TLS_btn_inactivate = "Inactivate";
 $TLS_caption_edit_tproject = "Muokkaa %s";
 $TLS_caption_new_tproject = "Luo uusi testausprojekti";
 $TLS_color = "Väri";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "Requirements Management";
 $TLS_enable_priority = "Priority Management";
 $TLS_enable_automation = "Testausautomaatio";

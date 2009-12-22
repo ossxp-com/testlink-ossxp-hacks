@@ -1188,6 +1188,7 @@ $TLS_btn_inactivate = "無効";
 $TLS_caption_edit_tproject = "テストプロジェクト編集";
 $TLS_caption_new_tproject = "テストプロジェクト新規作成";
 $TLS_color = "色";
+$TLS_bts_project_id = "BTS Project ID";
 $TLS_enable_requirements = "要件管理機能";
 $TLS_enable_priority = "テスト優先度機能";
 $TLS_enable_automation = "自動テスト機能";

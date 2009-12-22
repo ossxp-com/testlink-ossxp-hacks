@@ -1150,6 +1150,7 @@ $TLS_btn_inactivate = "禁用";
 $TLS_caption_edit_tproject = "编辑 %s";
 $TLS_caption_new_tproject = "创建新的测试项目";
 $TLS_color = "颜色";
+$TLS_bts_project_id = "缺陷跟踪系统项目ID";
 $TLS_enable_requirements = "启用需求功能";
 $TLS_enable_priority = "权限管理";
 $TLS_enable_automation = "测试自动化";
