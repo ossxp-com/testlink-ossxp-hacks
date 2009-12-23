@@ -262,17 +262,23 @@ $g_smtp_password    = '';  # password
 /** 
  * Login authentication method:
  * 		'MD5' => use password stored on db
- *    'LDAP' => use password from LDAP Server
+ * 		'LDAP' => use password from LDAP Server
+ * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
  */ 
 $tlCfg->authentication['method'] = 'MD5';
+$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 
 /** LDAP authentication credentials */
 $tlCfg->authentication['ldap_server']		= 'localhost';
 $tlCfg->authentication['ldap_port']			= '389';
 $tlCfg->authentication['ldap_version']		= '3'; // could be '2' in some cases
 $tlCfg->authentication['ldap_root_dn']		= 'dc=mycompany,dc=com';
-$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(organizationname=*Traffic)'
+$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(authorizedService=testlink)'
 $tlCfg->authentication['ldap_uid_field']	= 'uid'; // Use 'sAMAccountName' for Active Directory
+$tlCfg->authentication['ldap_firstname_field']	= 'givenName';
+$tlCfg->authentication['ldap_lastname_field']	= 'sn';
+$tlCfg->authentication['ldap_fullname_field']	= 'cn';
+$tlCfg->authentication['ldap_email_field']	    = 'mail';
 $tlCfg->authentication['ldap_bind_dn']		= ''; // Left empty for anonymous LDAP binding 
 $tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
 

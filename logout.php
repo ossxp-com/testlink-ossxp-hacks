@@ -21,6 +21,21 @@ if ($userID)
 session_unset();
 session_destroy();
 
+if (strtolower($tlCfg->authentication['method']) == "cosign")
+{
+	$authCfg = config_get('authentication');
+	$logout_url = $authCfg['logout_url'];
+
+	if (@$_SERVER['COSIGN_SERVICE'] || @$_SERVER['REDIRECT_COSIGN_SERVICE'])
+	{
+		$cookie_name = @$_SERVER["COSIGN_SERVICE"] ? @$_SERVER["COSIGN_SERVICE"] : @$_SERVER["REDIRECT_COSIGN_SERVICE"];
+		setcookie( $cookie_name, "null", time()-1, '/', "", 0 );
+		setcookie( $cookie_name, "null", time()-1 );
+	}
+	redirect($logout_url);
+	exit();
+}
+
 redirect("login.php");
 exit();
 ?>

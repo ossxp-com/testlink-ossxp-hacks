@@ -19,25 +19,53 @@
  * *********************************************************************************** */
 require_once("users.inc.php");
 require_once("roles.inc.php");
+require_once('config.inc.php');
+require_once('common.php');
 
 /** authorization function verifies login & password and set user session data */
-function doAuthorize(&$db,$login,$pwd,&$msg)
+function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
 {
     $result = tl::ERROR;
 	$_SESSION['locale'] = TL_DEFAULT_LOCALE; 
-	if (!is_null($pwd) && !is_null($login))
+
+	if (!is_null($pwd) && !is_null($login) || $sso && !is_null($login))
 	{
 		$user = new tlUser();
 		$user->login = $login;
 		$login_exists = ($user->readFromDB($db,tlUser::USER_O_SEARCH_BYLOGIN) >= tl::OK); 
+		if ($sso)
+		{
+			$user->updateFromLDAP(true);
+			if (!$login_exists || $user->ldap_update)
+			{
+				if (!$login_exists)
+				{
+					$user->globalRoleID = config_get('default_roleid');
+					$user->locale = config_get('default_language');
+					$user->bActive = 1;
+					$login_exists = 1;
+				}
+				$user->writeToDB($db);
+				$user->ldap_update = false;
+			}
+		}
 		if ($login_exists)
-	    {
-			$password_check = auth_does_password_match($user,$pwd);
+		{
+			if ($sso)
+			{
+				$password_check = new stdClass();
+				$password_check->status_ok = true;
+				$password_check->msg = 'ok';
+			}
+			else
+			{
+				$password_check = auth_does_password_match($user,$pwd);
+			}
 			if ($password_check->status_ok && $user->bActive)
 			{
 				// 20051007 MHT Solved  0000024 Session confusion 
 				// Disallow two sessions within one browser
-				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']))
+				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']) && !$sso)
 				{
 					$msg = lang_get('login_msg_session_exists1') . ' <a style="color:white;" href="logout.php">' . 
 							lang_get('logout_link') . '</a>' . lang_get('login_msg_session_exists2');

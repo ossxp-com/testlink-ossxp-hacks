@@ -134,4 +134,50 @@
     	return $t_authenticated;
 	}
 
+// ----------------------------------------------------------------------------
+	// Read user attributes from the LDAP directory
+	function ldap_fetch_account( $login_name ) 
+	{
+		$account = array();
+
+		$authCfg 			= config_get('authentication');
+		$t_ldap_organization = $authCfg['ldap_organization'];
+		$t_ldap_root_dn		= $authCfg['ldap_root_dn'];
+		$t_ldap_uid_field	= strtolower( $authCfg['ldap_uid_field'] );	// 'uid' by default
+		$t_ldap_firstname_field = strtolower( $authCfg['ldap_firstname_field'] );	// 'givenName' by default
+		$t_ldap_lastname_field  = strtolower( $authCfg['ldap_lastname_field'] );	// 'sn' by default
+		$t_ldap_fullname_field  = strtolower( $authCfg['ldap_fullname_field'] );	// 'cn' by default
+		$t_ldap_email_field     = strtolower( $authCfg['ldap_email_field'] );	// 'mail' by default
+
+		$t_username      	= $login_name;
+		$t_search_filter 	= "(&$t_ldap_organization($t_ldap_uid_field=$t_username))";
+		$t_search_attrs  	= array( 'dn',
+									$t_ldap_firstname_field,
+									$t_ldap_lastname_field,
+									$t_ldap_fullname_field,
+									$t_ldap_email_field );
+		$t_connect          = ldap_connect_bind();
+
+		if( !is_null($t_connect->handler) )
+		{
+			$t_ds = $t_connect->handler;
+
+			# Search for the user id
+			$t_sr = ldap_search( $t_ds, $t_ldap_root_dn, $t_search_filter, $t_search_attrs );
+			$t_info = ldap_get_entries( $t_ds, $t_sr );
+
+			if ( $t_info ) {
+				# Try to authenticate to each until we get a match
+				$account['firstName'] = in_array($t_ldap_firstname_field, $t_info[0]) ? $t_info[0][$t_ldap_firstname_field][0] : '';
+				$account['lastName'] = in_array($t_ldap_lastname_field, $t_info[0]) ? $t_info[0][$t_ldap_lastname_field][0] : '';
+				$account['emailAddress'] = in_array($t_ldap_email_field, $t_info[0]) ? $t_info[0][$t_ldap_email_field][0] : '';
+			}
+
+			ldap_free_result( $t_sr );
+			ldap_unbind( $t_ds );
+		}
+
+		return $account;
+	}
+
 ?>
