@@ -93,13 +93,13 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign' &&
 	sso_redirect();
 }
 
-$link_demo_users = "";
-$link_login = "";
+$demo_login_contents = "";
+$login_form_contents = "";
 if (@$tlCfg->authentication['demo_users'])
 {
 	if (strtolower($tlCfg->authentication['method']) == 'cosign')
 	{
-		$link_login = "<p><div align=\"center\"> ".
+		$login_form_contents = "<p><div align=\"center\"> ".
                   "<a href=\"" .
 		              $_SERVER["PHP_SELF"] .
 		              "?sso\" class=\"urlbtn\">" .
@@ -107,19 +107,19 @@ if (@$tlCfg->authentication['demo_users'])
 	                "</a></div><p>";
 	}
 
-  $link_demo_users =  "<p>" .
+  $demo_login_contents =  "<p>" .
                       lang_get('demo_login_text') .
                       "<p>";
 	foreach ($tlCfg->authentication['demo_users'] as $role => $text)
 	{
-		$link_demo_users .= "<a href=\"" .
+		$demo_login_contents .= "<a href=\"" .
 		                    $_SERVER["PHP_SELF"] .
 	                      "?demo=$role\" class=\"rlbtn\">" .
 		                    "&#187;". $text .
 	                      "</a>, ";
 	}
-	$link_demo_users = "<div align=\"center\" width=\"80%\">" .
-                     rtrim($link_demo_users," ,") . "<div>" ;
+	$demo_login_contents = "<div align=\"center\" width=\"80%\">" .
+                     rtrim($demo_login_contents," ,") . "<div>" ;
 }
 
 
@@ -128,9 +128,10 @@ $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
 
 $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
+$smarty->assign('login_title', lang_get('please_login'));
 $smarty->assign('demo_login_title', lang_get('demo_login_title'));
-$smarty->assign('link_demo_users', $link_demo_users);
-$smarty->assign('link_login', $link_login);
+$smarty->assign('demo_login_contents', $demo_login_contents);
+$smarty->assign('login_form_contents', $login_form_contents);
 $smarty->display('login.tpl');
 
 /**
@@ -217,7 +218,7 @@ function init_gui(&$db,$args)
     		break;
     		
     	default:
-    		$gui->note = lang_get('please_login');
+    		$gui->note = '';
     		break;
     }
 	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
