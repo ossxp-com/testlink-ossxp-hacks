@@ -130,6 +130,8 @@ $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
 $smarty->assign('login_title', lang_get('please_login'));
 $smarty->assign('demo_login_title', lang_get('demo_login_title'));
+$smarty->assign('description_title', config_get('login_page_msg_title')? config_get('login_page_msg_title'): lang_get('alt_notes'));
+$smarty->assign('description_contents', config_get('login_page_msg'));
 $smarty->assign('demo_login_contents', $demo_login_contents);
 $smarty->assign('login_form_contents', $login_form_contents);
 $smarty->display('login.tpl');
@@ -193,7 +195,6 @@ function init_gui(&$db,$args)
 	$gui->external_password_mgmt = (strtolower($authCfg['method']) == 'cosign' || strtolower($authCfg['method']) == 'ldap') ? 1 : 0;
 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
 	$gui->user_self_signup = config_get('user_self_signup');
-	$gui->login_page_msg = config_get('login_page_msg');
 
 	switch($args->note)
     {

@@ -28,6 +28,11 @@ window.onload=function()
 		display_demo_users_block();
 	}
 
+	if( typeof display_description_block != 'undefined')
+	{
+		display_description_block();
+	}
+
 	if( typeof display_footer_block != 'undefined')
 	{
 		display_footer_block();
@@ -76,6 +81,24 @@ window.onload=function()
 			                       width:'100%'
 			                       {rdelim});
 		{rdelim}
+		{/if}
+
+		{if $description_contents}
+		function display_description_block()
+		{ldelim}
+			var p3 = new Ext.Panel({ldelim}
+			                       title: '<center>{$description_title}</center>',
+			                       collapsible:false,
+			                       collapsed: false,
+			                       draggable: false,
+			                       contentEl: 'description_content',
+			                       baseCls: 'x-tl-panel',
+			                       bodyStyle: "background:#c8dce8;padding:3px;",
+			                       renderTo: 'menu_description_block',
+			                       width:'100%'
+			                       {rdelim});
+		{rdelim}
+		{/if}
 
 		function display_footer_block()
 		{ldelim}
@@ -96,6 +119,7 @@ window.onload=function()
 		<br />
 		<div id="menu_login_block"></div><br />
 		<div id="menu_demo_users_block"></div><br />
+		<div id="menu_description_block"></div><br />
 		<div id="menu_footer_block"></div><br />
 
 		<div id='login_content'>
@@ -141,11 +165,11 @@ window.onload=function()
 			{include file="inc_copyrightnotice.tpl"}
 		</div>
 	</div>
-	
+
 	{if $gui->securityNotes}
     	{include file="inc_msg_from_array.tpl" array_of_msg=$gui->securityNotes arg_css_class="messages"}
 	{/if}
-	
+
 	{if $tlCfg->login_info != ""}
 		<div>{$tlCfg->login_info}</div>
 	{/if}
