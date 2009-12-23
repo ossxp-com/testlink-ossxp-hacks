@@ -6,45 +6,177 @@ See #81: 在登录页面提供演示帐号。如果用户尚未注册帐号，�
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- gui/templates/login.tpl             |   16 +++++++++-
- gui/themes/default/css/testlink.css |   24 +++++++++++++++
- login.php                           |   54 +++++++++++++++++++++++++++++++++-
- 3 files changed, 91 insertions(+), 3 deletions(-)
+ gui/templates/login.tpl             |  139 ++++++++++++++++++++++++++++-------
+ gui/themes/default/css/testlink.css |   24 ++++++
+ login.php                           |   57 ++++++++++++++-
+ 3 files changed, 189 insertions(+), 31 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
-index 77bdd48..035a91f 100644
+index 77bdd48..28a9a14 100644
 --- a/gui/templates/login.tpl
 +++ b/gui/templates/login.tpl
-@@ -28,6 +28,7 @@ window.onload=function()
+@@ -7,6 +7,8 @@ Purpose: smarty template - login page
+ {config_load file="input_dimensions.conf" section="login"}
+ {include file="inc_head.tpl" title="TestLink - Login" openHead='yes'}
  
- <div class="forms" id="login_div">
- 
-+{if !$link_login}
- 	<form method="post" name="login_form" action="login.php">
-     {if $gui->login_disabled eq 0}		
-   	  <div class="messages" style="text-align:center;">{$gui->note}</div>
-@@ -41,7 +42,20 @@ window.onload=function()
- 		<input type="submit" name="login_submit" value="{$labels.btn_login}" />
- 		{/if}
- 	</form>
-+{else}
-+  <div>
-+  	<div class="messages" style="text-align:center;">{$gui->note}</div>
-+	  {$link_login}
-+	</div>
-+{/if}
- 	
-+{if $link_demo_users}
-+	<div>
-+  	<div class="messages" style="text-align:center;">{$demo_login_title}</div>
-+		{$link_demo_users}
-+	</div>
-+{/if}
++{include file="inc_ext_js.tpl"}
 +
- 	<p>
- 	{if $gui->user_self_signup}
- 		<a href="firstLogin.php">{$labels.new_user_q}</a><br />
-@@ -66,4 +80,4 @@ window.onload=function()
+ <script language="JavaScript" src="{$basehref}gui/niftycube/niftycube.js" 
+ 		type="text/javascript"></script>
+ {literal}
+@@ -15,6 +17,21 @@ window.onload=function()
+ {
+ 	Nifty("div#login_div","big");
+ 	Nifty("div.messages","normal");
++
++	if( typeof display_login_block != 'undefined')
++	{
++		display_login_block();
++	}
++
++	if( typeof display_demo_users_block != 'undefined')
++	{
++		display_demo_users_block();
++	}
++
++	if( typeof display_footer_block != 'undefined')
++	{
++		display_footer_block();
++	}
+  
+ 	// set focus on login text box
+ 	focusInputField('login');
+@@ -26,36 +43,102 @@ window.onload=function()
+ <body>
+ {include file="inc_login_title.tpl"}
+ 
+-<div class="forms" id="login_div">
+-
+-	<form method="post" name="login_form" action="login.php">
+-    {if $gui->login_disabled eq 0}		
+-  	  <div class="messages" style="text-align:center;">{$gui->note}</div>
+-		  <input type="hidden" name="reqURI" value="{$gui->reqURI|escape:'url'}"/>
+-  		<p class="label">{$labels.login_name}<br />
+-			<input type="text" name="tl_login" id="login" size="{#LOGIN_SIZE#}" maxlength="{#LOGIN_MAXLEN#}" />
+-		</p>
+-  		<p class="label">{$labels.password}<br />
+-			<input type="password" name="tl_password" size="{#PASSWD_SIZE#}" maxlength="{#PASSWD_SIZE#}" />
+-		</p>
+-		<input type="submit" name="login_submit" value="{$labels.btn_login}" />
++<div id="login_div" style="text-align:left; margin:20%; margin-top:5px; padding:5px; border:1px;">
++
++	<script type="text/javascript">
++		function display_login_block()
++		{ldelim}
++			var p1 = new Ext.Panel({ldelim}
++			                       title: '<center>{$login_title}</center>',
++			                       collapsible:false,
++			                       collapsed: false,
++			                       draggable: false,
++			                       contentEl: 'login_content',
++			                       baseCls: 'x-tl-panel',
++			                       bodyStyle: "background:#c8dce8;padding:3px;",
++			                       renderTo: 'menu_login_block',
++			                       width:'100%'
++			                       {rdelim});
++		{rdelim}
++
++		{if $demo_login_contents}
++		function display_demo_users_block()
++		{ldelim}
++			var p2 = new Ext.Panel({ldelim}
++			                       title: '<center>{$demo_login_title}</center>',
++			                       collapsible:false,
++			                       collapsed: false,
++			                       draggable: false,
++			                       contentEl: 'demo_users_content',
++			                       baseCls: 'x-tl-panel',
++			                       bodyStyle: "background:#c8dce8;padding:3px;",
++			                       renderTo: 'menu_demo_users_block',
++			                       width:'100%'
++			                       {rdelim});
++		{rdelim}
+ 		{/if}
+-	</form>
+-	
+-	<p>
+-	{if $gui->user_self_signup}
+-		<a href="firstLogin.php">{$labels.new_user_q}</a><br />
+-	{/if}
+-	
+-	{* the configured authentication method don't allow users to reset his/her password *}		
+-	{if $gui->external_password_mgmt eq 0}
+-		<a href="lostPassword.php">{$labels.lost_password_q}</a>
+-	</p>
+-	{/if}
+ 
+-	
+-	{include file="inc_copyrightnotice.tpl"}
++		function display_footer_block()
++		{ldelim}
++			var p4 = new Ext.Panel({ldelim}
++			                       collapsible:false,
++			                       collapsed: false,
++			                       draggable: false,
++			                       contentEl: 'footer_content',
++			                       baseCls: 'x-tl-panel',
++			                       bodyStyle: "background:#c8dce8;padding:3px;",
++			                       renderTo: 'menu_footer_block',
++			                       width:'100%'
++			                       {rdelim});
++		{rdelim}
++	</script>
++
++	<div class="vertical_menu" style="float: left; width: 80%; margin:10px">
++		<br />
++		<div id="menu_login_block"></div><br />
++		<div id="menu_demo_users_block"></div><br />
++		<div id="menu_footer_block"></div><br />
++
++		<div id='login_content'>
++			<div style="text-align:center;color:red;">{$gui->note}</div>
++			{if !$login_form_contents}
++				<form method="post" name="login_form" action="login.php">
++					{if $gui->login_disabled eq 0}
++						<input type="hidden" name="reqURI" value="{$gui->reqURI|escape:'url'}"/>
++						<p class="label">{$labels.login_name}<br />
++						<input type="text" name="tl_login" id="login" size="{#LOGIN_SIZE#}" maxlength="{#LOGIN_MAXLEN#}" />
++					</p>
++						<p class="label">{$labels.password}<br />
++						<input type="password" name="tl_password" size="{#PASSWD_SIZE#}" maxlength="{#PASSWD_SIZE#}" />
++					</p>
++					<input type="submit" name="login_submit" value="{$labels.btn_login}" />
++					{/if}
++				</form>
++			{else}
++				<div>
++					{$login_form_contents}
++				</div>
++			{/if}
+ 
++			{if $gui->user_self_signup}
++				<div align="center"><a href="firstLogin.php">{$labels.new_user_q}</a></div><br />
++			{/if}
++
++			{* the configured authentication method don't allow users to reset his/her password *}
++			{if $gui->external_password_mgmt eq 0}
++				<div align="center"><a href="lostPassword.php">{$labels.lost_password_q}</a></div>
++			{/if}
++		</div>
++
++		<div id='demo_users_content'>
++			{$demo_login_contents}
++		</div>
++
++		<div id='footer_content'>
++			{include file="inc_copyrightnotice.tpl"}
++		</div>
++	</div>
++	
+ 	{if $gui->securityNotes}
+     	{include file="inc_msg_from_array.tpl" array_of_msg=$gui->securityNotes arg_css_class="messages"}
+ 	{/if}
+@@ -66,4 +149,4 @@ window.onload=function()
  
  </div>
  </body>
@@ -85,7 +217,7 @@ index a945f26..8463cb1 100644
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
-index 9606dc6..78b4780 100644
+index 9606dc6..2e9358a 100644
 --- a/login.php
 +++ b/login.php
 @@ -47,12 +47,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign')
@@ -115,7 +247,7 @@ index 9606dc6..78b4780 100644
  	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
  	{
  		if (!$msg)
-@@ -73,17 +86,51 @@ if(!is_null($args->login) || $cosign_loggedin)
+@@ -73,17 +86,52 @@ if(!is_null($args->login) || $cosign_loggedin)
  	}
  }
  
@@ -127,13 +259,13 @@ index 9606dc6..78b4780 100644
  	sso_redirect();
  }
  
-+$link_demo_users = "";
-+$link_login = "";
++$demo_login_contents = "";
++$login_form_contents = "";
 +if (@$tlCfg->authentication['demo_users'])
 +{
 +	if (strtolower($tlCfg->authentication['method']) == 'cosign')
 +	{
-+		$link_login = "<p><div align=\"center\"> ".
++		$login_form_contents = "<p><div align=\"center\"> ".
 +                  "<a href=\"" .
 +		              $_SERVER["PHP_SELF"] .
 +		              "?sso\" class=\"urlbtn\">" .
@@ -141,19 +273,19 @@ index 9606dc6..78b4780 100644
 +	                "</a></div><p>";
 +	}
 +
-+  $link_demo_users =  "<p>" .
++  $demo_login_contents =  "<p>" .
 +                      lang_get('demo_login_text') .
 +                      "<p>";
 +	foreach ($tlCfg->authentication['demo_users'] as $role => $text)
 +	{
-+		$link_demo_users .= "<a href=\"" .
++		$demo_login_contents .= "<a href=\"" .
 +		                    $_SERVER["PHP_SELF"] .
 +	                      "?demo=$role\" class=\"rlbtn\">" .
 +		                    "&#187;". $text .
 +	                      "</a>, ";
 +	}
-+	$link_demo_users = "<div align=\"center\" width=\"80%\">" .
-+                     rtrim($link_demo_users," ,") . "<div>" ;
++	$demo_login_contents = "<div align=\"center\" width=\"80%\">" .
++                     rtrim($demo_login_contents," ,") . "<div>" ;
 +}
 +
 +
@@ -162,13 +294,14 @@ index 9606dc6..78b4780 100644
  
  $smarty = new TLSmarty();
  $smarty->assign('gui', $gui);
++$smarty->assign('login_title', lang_get('please_login'));
 +$smarty->assign('demo_login_title', lang_get('demo_login_title'));
-+$smarty->assign('link_demo_users', $link_demo_users);
-+$smarty->assign('link_login', $link_login);
++$smarty->assign('demo_login_contents', $demo_login_contents);
++$smarty->assign('login_form_contents', $login_form_contents);
  $smarty->display('login.tpl');
  
  /**
-@@ -130,6 +177,9 @@ function init_args()
+@@ -130,6 +178,9 @@ function init_args()
      $args->reqURI = isset($_REQUEST['req']) ? urlencode($_REQUEST['req']) : null;
      $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? urlencode($_REQUEST['reqURI']) : null;
    
@@ -178,5 +311,14 @@ index 9606dc6..78b4780 100644
      return $args;
  }
  
+@@ -167,7 +218,7 @@ function init_gui(&$db,$args)
+     		break;
+     		
+     	default:
+-    		$gui->note = lang_get('please_login');
++    		$gui->note = '';
+     		break;
+     }
+ 	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
 -- 
 tg: (17a5379..) t/demo_login (depends on: t/single_signon)

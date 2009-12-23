@@ -7,38 +7,92 @@ See #82: 登录页面提供可定制的显示信息:
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- gui/templates/login.tpl |    6 ++++++
- login.php               |    1 +
- 2 files changed, 7 insertions(+), 0 deletions(-)
+ gui/templates/login.tpl |   31 +++++++++++++++++++++++++++++--
+ login.php               |    2 ++
+ 2 files changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
-index 77bdd48..9382a4d 100644
+index 28a9a14..49744e0 100644
 --- a/gui/templates/login.tpl
 +++ b/gui/templates/login.tpl
-@@ -53,6 +53,12 @@ window.onload=function()
- 	</p>
- 	{/if}
+@@ -28,6 +28,11 @@ window.onload=function()
+ 		display_demo_users_block();
+ 	}
  
-+	{if $gui->login_page_msg}
-+		<p>
-+		<div class="login_page_msg">
-+			{$gui->login_page_msg}
++	if( typeof display_description_block != 'undefined')
++	{
++		display_description_block();
++	}
++
+ 	if( typeof display_footer_block != 'undefined')
+ 	{
+ 		display_footer_block();
+@@ -78,6 +83,23 @@ window.onload=function()
+ 		{rdelim}
+ 		{/if}
+ 
++		{if $description_contents}
++		function display_description_block()
++		{ldelim}
++			var p3 = new Ext.Panel({ldelim}
++			                       title: '<center>{$description_title}</center>',
++			                       collapsible:false,
++			                       collapsed: false,
++			                       draggable: false,
++			                       contentEl: 'description_content',
++			                       baseCls: 'x-tl-panel',
++			                       bodyStyle: "background:#c8dce8;padding:3px;",
++			                       renderTo: 'menu_description_block',
++			                       width:'100%'
++			                       {rdelim});
++		{rdelim}
++		{/if}
++
+ 		function display_footer_block()
+ 		{ldelim}
+ 			var p4 = new Ext.Panel({ldelim}
+@@ -97,6 +119,7 @@ window.onload=function()
+ 		<br />
+ 		<div id="menu_login_block"></div><br />
+ 		<div id="menu_demo_users_block"></div><br />
++		<div id="menu_description_block"></div><br />
+ 		<div id="menu_footer_block"></div><br />
+ 
+ 		<div id='login_content'>
+@@ -134,15 +157,19 @@ window.onload=function()
+ 			{$demo_login_contents}
+ 		</div>
+ 
++		<div id='description_content'>
++			{$description_contents}
 +		</div>
-+	{/if}
- 	
- 	{include file="inc_copyrightnotice.tpl"}
- 
++
+ 		<div id='footer_content'>
+ 			{include file="inc_copyrightnotice.tpl"}
+ 		</div>
+ 	</div>
+-	
++
+ 	{if $gui->securityNotes}
+     	{include file="inc_msg_from_array.tpl" array_of_msg=$gui->securityNotes arg_css_class="messages"}
+ 	{/if}
+-	
++
+ 	{if $tlCfg->login_info != ""}
+ 		<div>{$tlCfg->login_info}</div>
+ 	{/if}
 diff --git a/login.php b/login.php
-index 1ef2a62..0f5b497 100644
+index 2e9358a..b1fb187 100644
 --- a/login.php
 +++ b/login.php
-@@ -97,6 +97,7 @@ function init_gui(&$db,$args)
- 	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
- 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
- 	$gui->user_self_signup = config_get('user_self_signup');
-+	$gui->login_page_msg = config_get('login_page_msg');
- 
- 	switch($args->note)
-     {
+@@ -130,6 +130,8 @@ $smarty = new TLSmarty();
+ $smarty->assign('gui', $gui);
+ $smarty->assign('login_title', lang_get('please_login'));
+ $smarty->assign('demo_login_title', lang_get('demo_login_title'));
++$smarty->assign('description_title', config_get('login_page_msg_title')? config_get('login_page_msg_title'): lang_get('alt_notes'));
++$smarty->assign('description_contents', config_get('login_page_msg'));
+ $smarty->assign('demo_login_contents', $demo_login_contents);
+ $smarty->assign('login_form_contents', $login_form_contents);
+ $smarty->display('login.tpl');
 -- 
-tg: (ee4073d..) t/login_page_msg (depends on: master)
+tg: (7f26eaa..) t/login_page_msg (depends on: master t/demo_login)

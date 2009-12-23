@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5-17) unstable; urgency=low
+
+  * Rewrite login page using ExtJS.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Wed, 23 Dec 2009 18:29:34 +0800
+
 ossxp-testlink (1.8.5-16) unstable; urgency=low
 
   * Fixed #84, #85: redirect loop when enable both SSO and DEMO login.
