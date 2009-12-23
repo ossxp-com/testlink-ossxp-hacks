@@ -65,7 +65,7 @@ function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
 			{
 				// 20051007 MHT Solved  0000024 Session confusion 
 				// Disallow two sessions within one browser
-				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']))
+				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']) && !$sso)
 				{
 					$msg = lang_get('login_msg_session_exists1') . ' <a style="color:white;" href="logout.php">' . 
 							lang_get('logout_link') . '</a>' . lang_get('login_msg_session_exists2');
