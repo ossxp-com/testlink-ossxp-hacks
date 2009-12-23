@@ -26,10 +26,10 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
  locale/pt_BR/strings.txt        | 4806 ++++++++++++++++++++-------------------
  locale/ru_RU/strings.txt        |  583 +++--
  locale/tl_lang_parser.rb        |  263 +++
- locale/zh_CN/description.php    |  353 ++--
+ locale/zh_CN/description.php    |  357 ++--
  locale/zh_CN/strings.txt        | 3732 ++++++++++++++++---------------
- locale/zh_CN/texts.php          |  469 ++---
- 23 files changed, 14067 insertions(+), 13460 deletions(-)
+ locale/zh_CN/texts.php          |  471 ++---
+ 23 files changed, 14073 insertions(+), 13460 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
 index 331a77a..24b4d01 100644
@@ -34241,19 +34241,23 @@ index 0000000..6b123b9
 +main
 +
 diff --git a/locale/zh_CN/description.php b/locale/zh_CN/description.php
-index 811937a..f94defa 100644
+index 811937a..718306c 100644
 --- a/locale/zh_CN/description.php
 +++ b/locale/zh_CN/description.php
-@@ -4,6 +4,8 @@
-  * 
-  * Filename $RCSfile: description.php,v $
-  * @version $Revision: 1.1 $
-+ * @modified $Date: 2009/12/16 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
-+ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Wang Sheng <wangsheng AT ossxp.com> $
+@@ -7,6 +7,12 @@
   * @modified $Date: 2009/02/02 22:30:53 $ $Author: havlat $
   * @author Martin Havlat
   *
-@@ -25,230 +27,197 @@
++ * Translation:
++ *   * 2009/12/16, Lei Weiwei <leiww AT ossxp.com>
++ *   * 2009/12/11, Wang Sheng <wangsheng AT ossxp.com>
++ *
++ * --------------------------------------------------------------------------------------
++ *
+  * LOCALIZATION:
+  * === English (en_GB) strings === - default development localization (World-wide English)
+  *
+@@ -25,230 +31,197 @@
   *
   * ----------------------------------------------------------------------------------- */
  
@@ -34645,10 +34649,10 @@ index 811937a..f94defa 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index a16c224..9d1cafe 100644
+index a16c224..98fe341 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -1,12 +1,14 @@
+@@ -1,13 +1,12 @@
  <?php
  /**
 - * TestLink Open Source Project - http://testlink.sourceforge.net/ 
@@ -34659,14 +34663,12 @@ index a16c224..9d1cafe 100644
   * Filename $RCSfile: strings.txt,v $
   *
   * @version $Revision: 1.17 $
-- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
-+ * @modified $Date: 2009/12/17 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
-+ * @modified $Date: 2009/12/12 --:--:-- $ $Author: Cui Rui <cuirui AT ossxp.com> $
-+ * @modified $Date: 2009/12/11 --:--:-- $ $Author: Jiang Xin <jiangxin AT ossxp.com> $
   * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
+- * @modified $Date: 2009/02/14 09:42:01 $ $Author: schlundus $
   *
   * N.B.:
-@@ -16,480 +18,537 @@
+  * Here we are defining GLOBAL variables.
+@@ -16,480 +15,540 @@
   *
   * @author Francisco Mancardi
   *
@@ -34675,6 +34677,9 @@ index a16c224..9d1cafe 100644
 + * 20091217 - www.ossxp.com - Add strings for demo login feature.
 + *            See: http://redmine.ossxp.com/redmine/issues/show/81
 + *                 http://git.ossxp.com/gitweb/pub/testlink-1.8.x.git
++ * 20091217 - Lei Weiwei <leiww AT ossxp.com>
++ * 20091212 - Cui Rui <cuirui AT ossxp.com>
++ * 20091211 - Jiang Xin <jiangxin AT ossxp.com> 
 + * 20071102 - franciscom - tcexecute strings
 + * 20071101 - franciscom - view_file_format_doc
 + * 20070930 - franciscom - show_tcase_spec
@@ -38884,7 +38889,7 @@ index a16c224..9d1cafe 100644
 +$TLS_time_charts_title 		= "时间表";
 +
 +// ----- login.php -----
-+$TLS_sso_login_url_text = "点击这里完成登录...";
++$TLS_sso_login_url_text = "点击这里，使用已有帐号登录";
 +$TLS_demo_login_title = "TestLink 演示";
 +$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
  
@@ -38893,18 +38898,20 @@ index a16c224..9d1cafe 100644
 \ No newline at end of file
 +?>
 diff --git a/locale/zh_CN/texts.php b/locale/zh_CN/texts.php
-index 773333c..de251a8 100644
+index 773333c..697283c 100644
 --- a/locale/zh_CN/texts.php
 +++ b/locale/zh_CN/texts.php
-@@ -5,6 +5,7 @@
-  *
-  * Filename $RCSfile: texts.php,v $
-  * @version $Revision: 1.2 $
-+ * @modified $Date: 2009/12/15 --:--:-- $ $Author: Lei Weiwei <leiww AT ossxp.com> $
+@@ -8,6 +8,9 @@
   * @modified $Date: 2009/03/05 18:38:50 $ by $Author: schlundus $
   * @author Martin Havlat and reviewers from TestLink Community
   *
-@@ -26,374 +27,292 @@
++ * Translation:
++ *   * 2009/12/15, Lei Weiwei <leiww AT ossxp.com>
++ *
+  * --------------------------------------------------------------------------------------
+  *
+  * Scope:
+@@ -26,374 +29,292 @@
   * ------------------------------------------------------------------------------------ */
  
  

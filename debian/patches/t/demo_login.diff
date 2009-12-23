@@ -85,7 +85,7 @@ index a945f26..8463cb1 100644
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
-index 9606dc6..6982c13 100644
+index 9606dc6..78b4780 100644
 --- a/login.php
 +++ b/login.php
 @@ -47,12 +47,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign')
@@ -133,7 +133,7 @@ index 9606dc6..6982c13 100644
 +{
 +	if (strtolower($tlCfg->authentication['method']) == 'cosign')
 +	{
-+		$link_login = "<p><div align=\"center\" ".
++		$link_login = "<p><div align=\"center\"> ".
 +                  "<a href=\"" .
 +		              $_SERVER["PHP_SELF"] .
 +		              "?sso\" class=\"urlbtn\">" .

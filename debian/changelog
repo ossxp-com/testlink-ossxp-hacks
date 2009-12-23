@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5-15) unstable; urgency=low
+
+  * bugfix: <div> tag incomplete cause IE can not see login link.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 22 Dec 2009 17:28:10 +0800
+
 ossxp-testlink (1.8.5-14) unstable; urgency=low
 
   * Integration with redmine.
