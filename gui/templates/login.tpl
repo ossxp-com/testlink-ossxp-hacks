@@ -76,6 +76,7 @@ window.onload=function()
 			                       width:'100%'
 			                       {rdelim});
 		{rdelim}
+		{/if}
 
 		function display_footer_block()
 		{ldelim}
