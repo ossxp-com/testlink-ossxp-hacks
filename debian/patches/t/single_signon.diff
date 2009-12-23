@@ -8,12 +8,12 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  config.inc.php                |   10 ++++++-
  index.php                     |   12 +++++++-
- lib/functions/doAuthorize.php |   36 ++++++++++++++++++++++++---
+ lib/functions/doAuthorize.php |   38 +++++++++++++++++++++++++----
  lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++
  lib/functions/user.class.php  |   24 +++++++++++++++++-
  login.php                     |   53 +++++++++++++++++++++++++++++++++++++---
  logout.php                    |   17 ++++++++++++-
- 7 files changed, 184 insertions(+), 14 deletions(-)
+ 7 files changed, 185 insertions(+), 15 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
 index 331a77a..d4b5db7 100644
@@ -74,10 +74,10 @@ index e1526b3..46d57b7 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index 5f4e32e..a8cb5e2 100644
+index 5f4e32e..f2bc055 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
-@@ -19,20 +19,48 @@
+@@ -19,25 +19,53 @@
   * *********************************************************************************** */
  require_once("users.inc.php");
  require_once("roles.inc.php");
@@ -130,6 +130,12 @@ index 5f4e32e..a8cb5e2 100644
  			if ($password_check->status_ok && $user->bActive)
  			{
  				// 20051007 MHT Solved  0000024 Session confusion 
+ 				// Disallow two sessions within one browser
+-				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']))
++				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']) && !$sso)
+ 				{
+ 					$msg = lang_get('login_msg_session_exists1') . ' <a style="color:white;" href="logout.php">' . 
+ 							lang_get('logout_link') . '</a>' . lang_get('login_msg_session_exists2');
 diff --git a/lib/functions/ldap_api.php b/lib/functions/ldap_api.php
 index 6145c2e..1a04588 100644
 --- a/lib/functions/ldap_api.php

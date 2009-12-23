@@ -179,4 +179,4 @@ index 9606dc6..78b4780 100644
  }
  
 -- 
-tg: (dc6818c..) t/demo_login (depends on: t/single_signon)
+tg: (17a5379..) t/demo_login (depends on: t/single_signon)

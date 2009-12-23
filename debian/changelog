@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5-16) unstable; urgency=low
+
+  * Fixed #84, #85: redirect loop when enable both SSO and DEMO login.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 22 Dec 2009 17:28:10 +0800
+
 ossxp-testlink (1.8.5-15) unstable; urgency=low
 
   * bugfix: <div> tag incomplete cause IE can not see login link.
