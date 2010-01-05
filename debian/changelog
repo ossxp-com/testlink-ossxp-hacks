@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5-17+) unstable; urgency=low
+
+  * New css style for urlbtn.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 29 Dec 2009 11:11:39 +0800
+
 ossxp-testlink (1.8.5-17) unstable; urgency=low
 
   * Rewrite login page using ExtJS.

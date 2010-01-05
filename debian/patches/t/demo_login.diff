@@ -7,9 +7,9 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
  gui/templates/login.tpl             |  139 ++++++++++++++++++++++++++++-------
- gui/themes/default/css/testlink.css |   24 ++++++
+ gui/themes/default/css/testlink.css |    5 +
  login.php                           |   57 ++++++++++++++-
- 3 files changed, 189 insertions(+), 31 deletions(-)
+ 3 files changed, 170 insertions(+), 31 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
 index 77bdd48..28a9a14 100644
@@ -184,36 +184,17 @@ index 77bdd48..28a9a14 100644
 \ No newline at end of file
 +</html>
 diff --git a/gui/themes/default/css/testlink.css b/gui/themes/default/css/testlink.css
-index a945f26..8463cb1 100644
+index a945f26..1d22f8d 100644
 --- a/gui/themes/default/css/testlink.css
 +++ b/gui/themes/default/css/testlink.css
-@@ -761,4 +761,28 @@ th.testlink, td.testlink, tr.testlink td {
+@@ -761,4 +761,9 @@ th.testlink, td.testlink, tr.testlink td {
  .x-tl-panel-body{overflow:hidden;}
  .x-tl-panel-collapsed .x-resizable-handle{display:none;}
  
-+
-+a.urlbtn,a.urlbtn:link,a.urlbtn:visited
-+{
-+  display:block;
-+  color:#FFFFFF;
-+  background-color:#98bf21;
-+  font-weight:bold;
-+  font-size:11px;
-+  text-align:center;
-+  width: 80%;
-+  padding:0;
-+  padding-top:3px;
-+  padding-bottom:4px;
-+  border:1px solid #ffffff;
-+  outline:1px solid #98bf21;
-+  text-decoration:none;
-+  margin-left:1px;
-+}
-+
-+a.urlbtn:hover,a.urlbtn:active
-+{
-+  background-color:#7A991A;
-+}
++.urlbtn{text-decoration:none;font-size:14px!important;line-height:16px;padding:6px 12px;cursor:pointer;border:1px solid #bbb;color:#464646;-moz-border-radius:15px;-khtml-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;-khtml-box-sizing:content-box;box-sizing:content-box;}
++.urlbtn:hover{color:#000;border-color:#666;}
++.urlbtn{background:#f2f2f2 url(../images/white-grad.png) repeat-x scroll left top;}
++.urlbtn:active{background:#eee url(../images/white-grad-active.png) repeat-x scroll left top;}
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
