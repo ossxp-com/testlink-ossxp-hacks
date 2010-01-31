@@ -1,6 +1,7 @@
-ossxp-testlink (1.8.5-17+) unstable; urgency=low
+ossxp-testlink (1.8.5-17+2) unstable; urgency=low
 
   * New css style for urlbtn.
+  * New mysql backup directive.
 
  -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 29 Dec 2009 11:11:39 +0800
 
