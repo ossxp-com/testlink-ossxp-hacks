@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5-17+4) unstable; urgency=low
+
+  * Backup /opt/testlink/web/cfg/
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 02 Mar 2010 21:54:13 +0800
+
 ossxp-testlink (1.8.5-17+3) unstable; urgency=low
 
   * New css style for urlbtn.
