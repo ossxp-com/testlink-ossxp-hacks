@@ -95,4 +95,4 @@ index 2e9358a..b1fb187 100644
  $smarty->assign('login_form_contents', $login_form_contents);
  $smarty->display('login.tpl');
 -- 
-tg: (2b19bb9..) t/login_page_msg (depends on: master t/demo_login)
+tg: (fdc5d24..) t/login_page_msg (depends on: master t/demo_login)

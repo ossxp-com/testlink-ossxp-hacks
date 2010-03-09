@@ -226,4 +226,4 @@ index fd0b246..345cf1f 100644
  # Assignment types
  INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
 -- 
-tg: (ee4073d..) t/custom_config (depends on: master)
+tg: (f865ee3..) t/custom_config (depends on: master)

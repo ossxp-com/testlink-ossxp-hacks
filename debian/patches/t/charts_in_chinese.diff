@@ -31,4 +31,4 @@ index 367c9b7..59f3877 100644
   *  How to warning user when security weak points exists.
   *
 -- 
-tg: (97cec20..) t/charts_in_chinese (depends on: t/custom_config)
+tg: (eb3a5b5..) t/charts_in_chinese (depends on: t/custom_config)

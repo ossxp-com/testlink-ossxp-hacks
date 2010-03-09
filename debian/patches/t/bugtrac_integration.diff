@@ -381,4 +381,4 @@ index 4e50b79..76d1b1c 100644
  	$ui = new stdClass();
  	$ui->main_descr=lang_get('title_testproject_management');
 -- 
-tg: (ee4073d..) t/bugtrac_integration (depends on: master)
+tg: (f865ee3..) t/bugtrac_integration (depends on: master)
