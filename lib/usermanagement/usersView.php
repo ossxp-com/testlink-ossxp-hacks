@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: usersView.php,v $
  *
- * @version $Revision: 1.25 $
- * @modified $Date: 2008/12/30 13:34:49 $ -  $Author: franciscom $
+ * @version $Revision: 1.25.2.1 $
+ * @modified $Date: 2010/01/20 22:04:57 $ -  $Author: havlat $
  *
  * shows all users
  *
@@ -154,7 +154,13 @@ function init_args()
     {
         $args->order_by_dir[$key]=isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
     }
-    $args->user_id = isset($_REQUEST['user']) ? $_REQUEST['user'] : 0;
+    $args->user_id = isset($_REQUEST['user']) ? intval($_REQUEST['user']) : 0;
+
+	// trim alien values
+	$args->operation = substr($args->operation,0,20);
+	$args->user_order_by = substr($args->user_order_by,0,20);
+	$args->order_by_role_dir = substr($args->order_by_role_dir,0,4);
+	$args->order_by_login_dir = substr($args->order_by_login_dir,0,4);
 
     return $args;
 }
