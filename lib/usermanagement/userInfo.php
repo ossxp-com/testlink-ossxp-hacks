@@ -5,8 +5,8 @@
 *
 * Filename $RCSfile: userInfo.php,v $
 *
-* @version $Revision: 1.26 $
-* @modified $Date: 2008/11/20 21:10:45 $
+* @version $Revision: 1.26.2.1 $
+* @modified $Date: 2010/01/20 22:04:57 $
 *
 * Displays the users' information and allows users to change
 * their passwords and user info.
@@ -101,7 +101,8 @@ function init_args()
     $args->id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 
     $args->user = new stdClass();
-    $key2loop = array('firstName','lastName','emailAddress','locale');
+	$args->user->locale = isset($_REQUEST['id']) ? substr($args->operation,0,10) : 'en_GB';
+    $key2loop = array('firstName','lastName','emailAddress');
 	foreach($key2loop as $key)
     {
        $args->user->$key = isset($_REQUEST[$key]) ? trim($_REQUEST[$key]) : null;
@@ -121,6 +122,7 @@ function init_args()
        }
     }
     $args->userID = isset($_SESSION['currentUser']) ? $_SESSION['currentUser']->dbID : 0;
+
 
     return $args;
 }
