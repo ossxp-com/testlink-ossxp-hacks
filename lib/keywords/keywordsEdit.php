@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: keywordsEdit.php,v $
  *
- * @version $Revision: 1.28 $
- * @modified $Date: 2009/01/26 19:16:42 $ by $Author: schlundus $
+ * @version $Revision: 1.28.2.1 $
+ * @modified $Date: 2010/01/20 20:54:10 $ by $Author: havlat $
  *
  * allows users to manage keywords. 
  *
@@ -81,7 +81,7 @@ function init_args()
 
 	$args = new stdClass();
 	$args->doAction = isset($_REQUEST['doAction']) ? $_REQUEST['doAction'] : null;
-	$args->keyword_id = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
+	$args->keyword_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
 	$args->keyword = isset($_REQUEST['keyword']) ? $_REQUEST['keyword'] : null;
 	$args->notes = isset($_REQUEST['notes']) ? $_REQUEST['notes'] : null;
 	$args->testproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
