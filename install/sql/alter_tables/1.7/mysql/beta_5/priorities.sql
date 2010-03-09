@@ -2,7 +2,7 @@
 $Revision: 1.1.4.1 $
 $Date: 2009/05/25 18:39:04 $
 $Author: schlundus $
-$Name: testlink_1_8_5 $
+$Name: testlink_1_8_5b $
 */
 
 ALTER TABLE priorities ADD COLUMN `risk` CHAR(1) NOT NULL DEFAULT '2' AFTER `priority`;
