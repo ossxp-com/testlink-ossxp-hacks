@@ -25,7 +25,9 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
 //verify the session during a work
 if (!isset($_SESSION['currentUser']))
 {
-	if (strtolower($tlCfg->authentication['method']) == 'cosign')
+	// cosign v2 or cosign v3
+	if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
+	    strtolower($tlCfg->authentication['method']) == 'cosign3')
 	{
 		// If redirect to ?note=expired, account a deadly loop in some instance.
 		redirect(TL_BASE_HREF ."login.php");

@@ -21,7 +21,9 @@ if ($userID)
 session_unset();
 session_destroy();
 
-if (strtolower($tlCfg->authentication['method']) == "cosign")
+// cosign v2 or v3
+if (strtolower($tlCfg->authentication['method']) == "cosign" ||
+    strtolower($tlCfg->authentication['method']) == "cosign3")
 {
 	$authCfg = config_get('authentication');
 	$logout_url = $authCfg['logout_url'];
