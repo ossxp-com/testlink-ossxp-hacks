@@ -82,10 +82,10 @@ index 28a9a14..49744e0 100644
  		<div>{$tlCfg->login_info}</div>
  	{/if}
 diff --git a/login.php b/login.php
-index 2e9358a..b1fb187 100644
+index cb86164..e7538fc 100644
 --- a/login.php
 +++ b/login.php
-@@ -130,6 +130,8 @@ $smarty = new TLSmarty();
+@@ -141,6 +141,8 @@ $smarty = new TLSmarty();
  $smarty->assign('gui', $gui);
  $smarty->assign('login_title', lang_get('please_login'));
  $smarty->assign('demo_login_title', lang_get('demo_login_title'));
@@ -95,4 +95,4 @@ index 2e9358a..b1fb187 100644
  $smarty->assign('login_form_contents', $login_form_contents);
  $smarty->display('login.tpl');
 -- 
-tg: (fdc5d24..) t/login_page_msg (depends on: master t/demo_login)
+tg: (92fc1c3..) t/login_page_msg (depends on: master t/demo_login t/typos_no_last_eol)

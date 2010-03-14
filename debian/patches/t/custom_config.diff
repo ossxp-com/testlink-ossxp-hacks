@@ -7,10 +7,10 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
  cfg/const.inc.php                                  |   14 +-
- config.inc.php                                     |    4 +-
+ config.inc.php                                     |    2 +-
  custom_config.inc.php.example                      |  127 ++++++++++++--------
  install/sql/mysql/testlink_create_default_data.sql |    2 +-
- 4 files changed, 85 insertions(+), 62 deletions(-)
+ 4 files changed, 85 insertions(+), 60 deletions(-)
 
 diff --git a/cfg/const.inc.php b/cfg/const.inc.php
 index 837fee0..27160f9 100644
@@ -43,7 +43,7 @@ index 837fee0..27160f9 100644
 \ No newline at end of file
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 331a77a..0480918 100644
+index 4f20a54..0480918 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -112,7 +112,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
@@ -55,15 +55,8 @@ index 331a77a..0480918 100644
  
  /** 
   * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
-@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
- $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
- $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
- // ----- END OF FILE --------------------------------------------------------------------
--?>
-\ No newline at end of file
-+?>
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index f9b9203..367c9b7 100644
+index 698ec68..b505480 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
 @@ -40,55 +40,6 @@
@@ -131,12 +124,10 @@ index f9b9203..367c9b7 100644
  // $tlCfg->gui->custom_fields->types = array(100 => 'radio head');
  // $tlCfg->gui->custom_fields->possible_values_cfg = array('radio head' => 1);
  
-@@ -140,4 +89,78 @@
+@@ -140,4 +89,80 @@
  // ); 
  // 
  // $tlCfg->results['default_status'] = "not_run"; 
--?>
-\ No newline at end of file
 +
 +// ----------------------------------------------------------------------------
 +/** [User Authentication] */                 
@@ -145,12 +136,14 @@ index f9b9203..367c9b7 100644
 + * Login authentication method:
 + * 		'MD5' => use password stored on db
 + * 		'LDAP' => use password from LDAP Server
-+ * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
++ * 		'COSIGN' => Cosign Single Sign-on v2 (with the ldap backends)
++ * 		'COSIGN3' => Cosign Single Sign-on v3 (with the ldap backends)
 + */ 
 +/** Before enable COSIGN login, add your self as administrator */
 +//$tlCfg->authentication['method'] = 'MD5';  # Default
 +//$tlCfg->authentication['method'] = 'LDAP';
-+//$tlCfg->authentication['method'] = 'COSIGN';
++//$tlCfg->authentication['method'] = 'COSIGN3';
++$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 +$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 +
 +/** LDAP authentication credentials */
@@ -211,7 +204,7 @@ index f9b9203..367c9b7 100644
 + */
 +//$tlCfg->config_check_warning_mode = "SILENT";
 +
-+?>
+ ?>
 diff --git a/install/sql/mysql/testlink_create_default_data.sql b/install/sql/mysql/testlink_create_default_data.sql
 index fd0b246..345cf1f 100644
 --- a/install/sql/mysql/testlink_create_default_data.sql
@@ -226,4 +219,4 @@ index fd0b246..345cf1f 100644
  # Assignment types
  INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
 -- 
-tg: (f865ee3..) t/custom_config (depends on: master)
+tg: (4a1bc5f..) t/custom_config (depends on: master t/typos_no_last_eol)

@@ -6,28 +6,30 @@ TestLink 单点登录支持
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- config.inc.php                |   10 ++++++-
- index.php                     |   12 +++++++-
- lib/functions/doAuthorize.php |   38 +++++++++++++++++++++++++----
- lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++++++++++
- lib/functions/user.class.php  |   24 +++++++++++++++++-
- login.php                     |   53 +++++++++++++++++++++++++++++++++++++---
- logout.php                    |   17 ++++++++++++-
- 7 files changed, 185 insertions(+), 15 deletions(-)
+ config.inc.php                |   12 ++++++-
+ index.php                     |   12 ++++++-
+ lib/functions/doAuthorize.php |   38 ++++++++++++++++++++---
+ lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++
+ lib/functions/user.class.php  |   24 ++++++++++++++-
+ login.php                     |   68 ++++++++++++++++++++++++++++++++++++++--
+ logout.php                    |   17 ++++++++++
+ 7 files changed, 204 insertions(+), 13 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 331a77a..d4b5db7 100644
+index 4f20a54..8aead0d 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -262,17 +262,23 @@ $g_smtp_password    = '';  # password
+@@ -262,17 +262,25 @@ $g_smtp_password    = '';  # password
  /** 
   * Login authentication method:
   * 		'MD5' => use password stored on db
 - *    'LDAP' => use password from LDAP Server
 + * 		'LDAP' => use password from LDAP Server
-+ * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
++ * 		'COSIGN' => Cosign Single Sign-on V2 (with the ldap backends)
++ * 		'COSIGN3' => Cosign Single Sign-on V3 (with the ldap backends)
   */ 
  $tlCfg->authentication['method'] = 'MD5';
++$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 +$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
  
  /** LDAP authentication credentials */
@@ -46,15 +48,17 @@ index 331a77a..d4b5db7 100644
  $tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
  
 diff --git a/index.php b/index.php
-index e1526b3..46d57b7 100644
+index 0ed55ba..2777aab 100644
 --- a/index.php
 +++ b/index.php
-@@ -25,7 +25,15 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
+@@ -25,7 +25,17 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
  //verify the session during a work
  if (!isset($_SESSION['currentUser']))
  {
 -	redirect(TL_BASE_HREF ."login.php?note=expired");
-+	if (strtolower($tlCfg->authentication['method']) == 'cosign')
++	// cosign v2 or cosign v3
++	if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
++	    strtolower($tlCfg->authentication['method']) == 'cosign3')
 +	{
 +		// If redirect to ?note=expired, account a deadly loop in some instance.
 +		redirect(TL_BASE_HREF ."login.php");
@@ -66,13 +70,6 @@ index e1526b3..46d57b7 100644
  	exit;
  }
  $smarty = new TLSmarty();
-@@ -33,4 +41,4 @@ $smarty->assign('title', lang_get('main_page_title'));
- $smarty->assign('titleframe', 'lib/general/navBar.php');
- $smarty->assign('mainframe', $reqURI);
- $smarty->display('main.tpl');
--?>
-\ No newline at end of file
-+?>
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
 index 5f4e32e..f2bc055 100644
 --- a/lib/functions/doAuthorize.php
@@ -253,16 +250,18 @@ index 84bd6b0..7084b70 100644
 \ No newline at end of file
 +?>
 diff --git a/login.php b/login.php
-index 1ef2a62..9606dc6 100644
+index 1ef2a62..153b9e4 100644
 --- a/login.php
 +++ b/login.php
-@@ -37,13 +37,23 @@ if (!$op['status'])
+@@ -37,13 +37,25 @@ if (!$op['status'])
  $args = init_args();
  $gui = init_gui($db,$args);
  
 -if(!is_null($args->login))
 +$cosign_loggedin = 0;
-+if (strtolower($tlCfg->authentication['method']) == 'cosign')
++// cosign v2 or cosign v3
++if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
++    strtolower($tlCfg->authentication['method']) == 'cosign3')
 +{
 +	if (@$_SERVER["REMOTE_USER"] || @$_SERVER["REDIRECT_REMOTE_USER"])
 +	{
@@ -283,26 +282,33 @@ index 1ef2a62..9606dc6 100644
  	{
  		if (!$msg)
  		{
-@@ -63,6 +73,12 @@ if(!is_null($args->login))
+@@ -63,6 +75,19 @@ if(!is_null($args->login))
  	}
  }
  
++// cosign v2
 +if (strtolower($tlCfg->authentication['method']) == 'cosign')
 +{
 +	// Redirect to cosign login page.
-+	sso_redirect();
++	sso_redirect(2);
++}
++// cosign v3
++elseif (strtolower($tlCfg->authentication['method']) == 'cosign3')
++{
++	// Redirect to cosign login page.
++	sso_redirect(3);
 +}
 +
  $logPeriodToDelete = config_get('removeEventsOlderThan');
  $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
  
-@@ -71,6 +87,35 @@ $smarty->assign('gui', $gui);
+@@ -71,6 +96,41 @@ $smarty->assign('gui', $gui);
  $smarty->display('login.tpl');
  
  /**
 + * Single Sign-on redirect
 + */
-+function sso_redirect()
++function sso_redirect($protocol=2)
 +{
 +	global $tlCfg;
 +
@@ -312,18 +318,24 @@ index 1ef2a62..9606dc6 100644
 +	$cosign_service_name = $tlCfg->authentication['sso_service_name'] ?
 +												 $tlCfg->authentication['sso_service_name'] :
 +												 "testlink";
-+
-+	$service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
-+	$sample_string =
-+	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-+
 +	$cookie_name = "cosign-" . $cosign_service_name;
-+	$cookie_data = '';
-+	for ($i=0;$i<125;$i++) {
-+					$cookie_data .= $sample_string[mt_rand(0,61)];
++	$service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
++	if ($protocol == 3)
++	{
++		$dest_url = $cosign_login_url . "?" . $cookie_name . "&" .  $service_url;
 +	}
-+	setcookie( $cookie_name, $cookie_data );
-+	$dest_url = $cosign_login_url . "?" . $cookie_name . "=" . $cookie_data . ";&" .  $service_url;
++	else
++	{
++		$sample_string =
++		"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
++
++		$cookie_data = '';
++		for ($i=0;$i<125;$i++) {
++						$cookie_data .= $sample_string[mt_rand(0,61)];
++		}
++		setcookie( $cookie_name, $cookie_data );
++		$dest_url = $cosign_login_url . "?" . $cookie_name . "=" . $cookie_data . ";&" .  $service_url;
++	}
 +	header( "Location: $dest_url" );
 +	exit;
 +}
@@ -332,24 +344,26 @@ index 1ef2a62..9606dc6 100644
   * Initialize input parameters
   */
  function init_args()
-@@ -94,7 +139,7 @@ function init_gui(&$db,$args)
+@@ -94,7 +154,7 @@ function init_gui(&$db,$args)
  	
  	$authCfg = config_get('authentication');
  	$gui->securityNotes = getSecurityNotes($db);
 -	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
-+	$gui->external_password_mgmt = (strtolower($authCfg['method']) == 'cosign' || strtolower($authCfg['method']) == 'ldap') ? 1 : 0;
++	$gui->external_password_mgmt = strtolower($authCfg['method']) != 'md5' ? 1 : 0;
  	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
  	$gui->user_self_signup = config_get('user_self_signup');
  
 diff --git a/logout.php b/logout.php
-index 5e4d739..ed55309 100644
+index 7477012..9928b80 100644
 --- a/logout.php
 +++ b/logout.php
-@@ -21,6 +21,21 @@ if ($userID)
+@@ -21,6 +21,23 @@ if ($userID)
  session_unset();
  session_destroy();
  
-+if (strtolower($tlCfg->authentication['method']) == "cosign")
++// cosign v2 or v3
++if (strtolower($tlCfg->authentication['method']) == "cosign" ||
++    strtolower($tlCfg->authentication['method']) == "cosign3")
 +{
 +	$authCfg = config_get('authentication');
 +	$logout_url = $authCfg['logout_url'];
@@ -366,8 +380,6 @@ index 5e4d739..ed55309 100644
 +
  redirect("login.php");
  exit();
--?>
-\ No newline at end of file
-+?>
+ ?>
 -- 
-tg: (f865ee3..) t/single_signon (depends on: master)
+tg: (4a1bc5f..) t/single_signon (depends on: master t/typos_no_last_eol)

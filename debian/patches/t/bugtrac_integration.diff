@@ -58,7 +58,7 @@ index a87ea2f..3dbdd21 100644
 +define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/projects/%s/issues/new");
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 331a77a..9ce2505 100644
+index 4f20a54..1fe8938 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -220,6 +220,7 @@ $g_removeEventsOlderThan = 30;
@@ -381,4 +381,4 @@ index 4e50b79..76d1b1c 100644
  	$ui = new stdClass();
  	$ui->main_descr=lang_get('title_testproject_management');
 -- 
-tg: (f865ee3..) t/bugtrac_integration (depends on: master)
+tg: (4a1bc5f..) t/bugtrac_integration (depends on: master t/typos_no_last_eol)

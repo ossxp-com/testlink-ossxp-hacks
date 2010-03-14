@@ -1,0 +1,317 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/php5_deprecated
+
+replace php5 deprecated functions.
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
+
+---
+ lib/bugtracking/int_eventum.php                    |    4 ++--
+ lib/bugtracking/int_fogbugz.php                    |    6 +++---
+ lib/bugtracking/int_jira.php                       |    4 ++--
+ lib/bugtracking/int_mantis.php                     |    4 ++--
+ lib/bugtracking/int_redmine.php                    |    6 +++---
+ lib/functions/common.php                           |    2 +-
+ lib/functions/email_api.php                        |    4 ++--
+ lib/functions/lang_api.php                         |    2 +-
+ lib/functions/string_api.php                       |   10 +++++-----
+ lib/results/resultsImport.php                      |    2 +-
+ lib/results/resultsMoreBuilds_buildReport.php      |    2 +-
+ .../phplayersmenu/dumps/sqlite.demo_data.dump.php5 |    2 +-
+ .../phplayersmenu/dumps/sqlite.start.dump.php5     |    4 ++--
+ .../phplayersmenu/lib/layersmenu-common.inc.php    |    8 ++++----
+ third_party/smarty/libs/plugins/function.fetch.php |    4 ++--
+ 15 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/lib/bugtracking/int_eventum.php b/lib/bugtracking/int_eventum.php
+index 5ee83e9..091dd8e 100644
+--- a/lib/bugtracking/int_eventum.php
++++ b/lib/bugtracking/int_eventum.php
+@@ -135,8 +135,8 @@ class eventumInterface extends bugtrackingInterface
+ 	function checkBugID($id)
+ 	{
+ 	  $status_ok=1;	
+-	  $ereg_forbidden_chars='[a-zA-Z,$-+]';
+- 		if (eregi($ereg_forbidden_chars, $id))
++	  $ereg_forbidden_chars='/[a-zA-Z,$-+]/';
++ 		if (preg_match($ereg_forbidden_chars, $id))
+ 		{
+ 			$status_ok=0;	
+ 		} 	
+diff --git a/lib/bugtracking/int_fogbugz.php b/lib/bugtracking/int_fogbugz.php
+index 7327c9c..a44efae 100644
+--- a/lib/bugtracking/int_fogbugz.php
++++ b/lib/bugtracking/int_fogbugz.php
+@@ -163,8 +163,8 @@ class fogbugzInterface extends bugtrackingInterface
+ 	function checkBugID($id)
+ 	{
+ 	  $status_ok=1;	
+-	  $ereg_forbidden_chars='[a-zA-Z,$-+]';
+- 		if (eregi($ereg_forbidden_chars, $id))
++	  $ereg_forbidden_chars='/[a-zA-Z,$-+]/';
++ 		if (preg_match($ereg_forbidden_chars, $id))
+ 		{
+ 			$status_ok=0;	
+ 		} 	
+@@ -192,4 +192,4 @@ class fogbugzInterface extends bugtrackingInterface
+ 		return $status_ok;
+ 	}	
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/bugtracking/int_jira.php b/lib/bugtracking/int_jira.php
+index 8667677..b40c0cd 100644
+--- a/lib/bugtracking/int_jira.php
++++ b/lib/bugtracking/int_jira.php
+@@ -165,9 +165,9 @@ class jiraInterface extends bugtrackingInterface
+ 	  
+ 	  if( $status_ok )
+ 	  {
+-	    $ereg_forbidden_chars='[!|£%&/()=?]';
++	    $ereg_forbidden_chars='/[!|£%&/()=?]/';
+ 
+- 		  if (eregi($ereg_forbidden_chars, $id))
++ 		  if (preg_match($ereg_forbidden_chars, $id))
+ 		  {
+ 			  $status_ok=0;	
+ 		  } 	
+diff --git a/lib/bugtracking/int_mantis.php b/lib/bugtracking/int_mantis.php
+index a5460a6..4842c76 100644
+--- a/lib/bugtracking/int_mantis.php
++++ b/lib/bugtracking/int_mantis.php
+@@ -180,8 +180,8 @@ class mantisInterface extends bugtrackingInterface
+ 	function checkBugID($id)
+ 	{
+ 	  $status_ok=1;	
+-	  $ereg_forbidden_chars='[a-zA-Z,$-+]';
+- 		if (eregi($ereg_forbidden_chars, $id))
++	  $ereg_forbidden_chars='/[a-zA-Z,$-+]/';
++ 		if (preg_match($ereg_forbidden_chars, $id))
+ 		{
+ 			$status_ok=0;	
+ 		} 	
+diff --git a/lib/bugtracking/int_redmine.php b/lib/bugtracking/int_redmine.php
+index 05f824c..41a07b9 100644
+--- a/lib/bugtracking/int_redmine.php
++++ b/lib/bugtracking/int_redmine.php
+@@ -149,8 +149,8 @@ class redmineInterface extends bugtrackingInterface
+ 	function checkBugID($id)
+ 	{
+ 		$status_ok=1;	
+-		$ereg_forbidden_chars='[a-zA-Z,$-+]';
+- 		if (eregi($ereg_forbidden_chars, $id))
++		$ereg_forbidden_chars='/[a-zA-Z,$-+]/';
++ 		if (preg_match($ereg_forbidden_chars, $id))
+ 		{
+ 			$status_ok=0;	
+ 		} 	
+@@ -178,4 +178,4 @@ class redmineInterface extends bugtrackingInterface
+ 		return $status_ok;
+ 	}	
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/functions/common.php b/lib/functions/common.php
+index a619bd3..cee43b4 100644
+--- a/lib/functions/common.php
++++ b/lib/functions/common.php
+@@ -558,7 +558,7 @@ function check_string($str2check, $ereg_forbidden_chars)
+ 
+ 	if( $ereg_forbidden_chars != '' && !is_null($ereg_forbidden_chars))
+ 	{
+-		if (eregi($ereg_forbidden_chars, $str2check))
++		if (preg_match("/".$ereg_forbidden_chars."/i", $str2check))
+ 		{
+ 			$status_ok=0;
+ 		}
+diff --git a/lib/functions/email_api.php b/lib/functions/email_api.php
+index bcc393c..4b398fe 100644
+--- a/lib/functions/email_api.php
++++ b/lib/functions/email_api.php
+@@ -148,7 +148,7 @@ function email_send( $p_from, $p_recipient, $p_subject, $p_message, $p_cc='',
+ 
+ 	$t_debug_to = '';
+ 	# add to the Recipient list
+-	$t_recipient_list = split(',', $t_recipient);
++	$t_recipient_list = explode(',', $t_recipient);
+ 
+ 	while ( list( , $t_recipient ) = each( $t_recipient_list ) ) {
+ 		if ( !is_blank( $t_recipient ) ) {
+@@ -157,7 +157,7 @@ function email_send( $p_from, $p_recipient, $p_subject, $p_message, $p_cc='',
+ 	}
+ 
+   // 20051106 - fm
+-  $t_cc_list = split(',', $p_cc);
++  $t_cc_list = explode(',', $p_cc);
+ 	while(list(, $t_cc) = each($t_cc_list)) {
+ 		if ( !is_blank( $t_cc ) ) {
+ 				$mail->AddCC( $t_cc, '' );
+diff --git a/lib/functions/lang_api.php b/lib/functions/lang_api.php
+index bfc4092..6d3ac74 100644
+--- a/lib/functions/lang_api.php
++++ b/lib/functions/lang_api.php
+@@ -170,7 +170,7 @@ function lang_load( $p_lang ) {
+ 
+ 	$t_vars = get_defined_vars();
+ 	foreach ( array_keys( $t_vars ) as $t_var ) {
+-		$t_lang_var = ereg_replace( '^TLS_', '', $t_var );
++		$t_lang_var = preg_replace( '/^TLS_/', '', $t_var );
+ 		if ( $t_lang_var != $t_var) {
+ 			$g_lang_strings[ $p_lang ][ $t_lang_var ] = $$t_var;
+ 		}
+diff --git a/lib/functions/string_api.php b/lib/functions/string_api.php
+index 43e917b..adcf39d 100644
+--- a/lib/functions/string_api.php
++++ b/lib/functions/string_api.php
+@@ -210,7 +210,7 @@ function string_textarea( $p_string )
+ 		
+ 		// split and encode parameters
+ 		if ( strpos( $t_url, '?' ) !== FALSE ) {
+-			list( $t_path, $t_param ) = split( '\?', $t_url, 2 );
++			list( $t_path, $t_param ) = explode( '?', $t_url, 2 );
+ 			if ( $t_param !== "" ) {
+ 				$t_vals = array();
+ 				parse_str( $t_param, $t_vals );
+@@ -324,9 +324,9 @@ function string_restore_valid_html_tags( $p_string, $p_multiline = true )
+     }
+     $tags = implode( '|', $tags);
+ 
+-	$p_string = eregi_replace( '&lt;(' . $tags . ')[[:space:]]*&gt;', '<\\1>', $p_string );
+-	$p_string = eregi_replace( '&lt;\/(' .$tags . ')[[:space:]]*&gt;', '</\\1>', $p_string );
+-	$p_string = eregi_replace( '&lt;(' . $tags . ')[[:space:]]*\/&gt;', '<\\1 />', $p_string );
++	$p_string = preg_replace( '/&lt;(' . $tags . ')[[:space:]]*&gt;/i', '<\\1>', $p_string );
++	$p_string = preg_replace( '/&lt;\/(' .$tags . ')[[:space:]]*&gt;/i', '</\\1>', $p_string );
++	$p_string = preg_replace( '/&lt;(' . $tags . ')[[:space:]]*\/&gt;/i', '<\\1 />', $p_string );
+ 
+ 	return $p_string;
+ }
+@@ -438,4 +438,4 @@ function string_restore_valid_html_tags( $p_string, $p_multiline = true )
+ 
+ 		return false;
+ 	}
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/results/resultsImport.php b/lib/results/resultsImport.php
+index e88d738..15d4e28 100644
+--- a/lib/results/resultsImport.php
++++ b/lib/results/resultsImport.php
+@@ -30,7 +30,7 @@ $template_dir='results/';
+ $args=init_args();
+ 
+ $ref=$_SERVER['HTTP_REFERER'];
+-$url_array=split('[?=&]',$ref);
++$url_array=preg_split('/[?=&]/',$ref);
+ if( in_array('build_id',$url_array) ) 
+ {
+ 	$buildIdIndex=array_search('build_id',$url_array) + 1;
+diff --git a/lib/results/resultsMoreBuilds_buildReport.php b/lib/results/resultsMoreBuilds_buildReport.php
+index a58591e..c70fdc9 100644
+--- a/lib/results/resultsMoreBuilds_buildReport.php
++++ b/lib/results/resultsMoreBuilds_buildReport.php
+@@ -123,7 +123,7 @@ function initializeGui(&$dbHandler,&$argsObj)
+     $tsuites_qty=sizeOf($argsObj->testsuitesSelected);
+     for ($id = 0; $id < $tsuites_qty ; $id++)
+     {
+-    	list($suiteId, $suiteName) = split("\,", $argsObj->testsuitesSelected[$id], 2);
++    	list($suiteId, $suiteName) = explode(",", $argsObj->testsuitesSelected[$id], 2);
+     	$testsuiteIds[$id] = $suiteId;
+     	$testsuiteNames[$id] = $suiteName;	
+     }
+diff --git a/third_party/phplayersmenu/dumps/sqlite.demo_data.dump.php5 b/third_party/phplayersmenu/dumps/sqlite.demo_data.dump.php5
+index d94ef38..4f26ccf 100644
+--- a/third_party/phplayersmenu/dumps/sqlite.demo_data.dump.php5
++++ b/third_party/phplayersmenu/dumps/sqlite.demo_data.dump.php5
+@@ -20,7 +20,7 @@ while ($buffer = fgets($fd, 4096)) {
+ 	if (strlen($buffer) < 5) {	// it's surely an empty line
+ 		continue;
+ 	}
+-	$buffer = ereg_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
++	$buffer = str_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
+ 	$dbresult = $db->query($buffer);
+ 	if (DB::isError($dbresult)) {
+ 		die('Error executing query: ' . $dbresult->getMessage());
+diff --git a/third_party/phplayersmenu/dumps/sqlite.start.dump.php5 b/third_party/phplayersmenu/dumps/sqlite.start.dump.php5
+index fe2a5ec..0471ebb 100644
+--- a/third_party/phplayersmenu/dumps/sqlite.start.dump.php5
++++ b/third_party/phplayersmenu/dumps/sqlite.start.dump.php5
+@@ -19,14 +19,14 @@ $dbresult = $db->query('BEGIN TRANSACTION');
+ for ($i=0; $i<2; $i++) {
+ 	print "Creating table '" . $table_name[$i] . "'...\n";
+ 	while ($buffer = fgets($fd, 4096)) {
+-		$buffer = ereg_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
++		$buffer = str_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
+ 		if (strlen($buffer) > 1) {	// skip empty lines
+ 			break;
+ 		}
+ 	}
+ 	$query = $buffer;
+ 	while ($buffer = fgets($fd, 4096)) {
+-		$buffer = ereg_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
++		$buffer = str_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
+ 		if (strlen($buffer) > 1) {	// if it is an empty line, then the 'CREATE TABLE' command has ended
+ 			$query .= $buffer;
+ 		} else {
+diff --git a/third_party/phplayersmenu/lib/layersmenu-common.inc.php b/third_party/phplayersmenu/lib/layersmenu-common.inc.php
+index 28e93f3..1b89ebb 100644
+--- a/third_party/phplayersmenu/lib/layersmenu-common.inc.php
++++ b/third_party/phplayersmenu/lib/layersmenu-common.inc.php
+@@ -467,7 +467,7 @@ function setMenuStructureFile($tree_file)
+ 	}
+ 	$this->menuStructure = '';
+ 	while ($buffer = fgets($fd, 4096)) {
+-		$buffer = ereg_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
++		$buffer = str_replace(chr(13), '', $buffer);	// Microsoft Stupidity Suppression
+ 		$this->menuStructure .= $buffer;
+ 	}
+ 	fclose($fd);
+@@ -486,7 +486,7 @@ function setMenuStructureFile($tree_file)
+ */
+ function setMenuStructureString($tree_string)
+ {
+-	$this->menuStructure = ereg_replace(chr(13), '', $tree_string);	// Microsoft Stupidity Suppression
++	$this->menuStructure = preg_replace(chr(13), '', $tree_string);	// Microsoft Stupidity Suppression
+ 	if ($this->menuStructure == '') {
+ 		$this->error('setMenuStructureString: empty string.');
+ 		return false;
+@@ -792,7 +792,7 @@ function _postParse(
+ 	for ($cnt=$this->_firstItem[$menu_name]; $cnt<=$this->_lastItem[$menu_name]; $cnt++) {	// this counter scans all nodes of the new menu
+ 		$this->tree[$cnt]['child_of_root_node'] = ($this->tree[$cnt]['level'] == 1);
+ 		$this->tree[$cnt]['parsed_text'] = stripslashes($this->tree[$cnt]['text']);
+-		$this->tree[$cnt]['parsed_href'] = (ereg_replace(' ', '', $this->tree[$cnt]['href']) == '') ? '#' : $this->prependedUrl . $this->tree[$cnt]['href'];
++		$this->tree[$cnt]['parsed_href'] = (preg_replace(' ', '', $this->tree[$cnt]['href']) == '') ? '#' : $this->prependedUrl . $this->tree[$cnt]['href'];
+ 		$this->tree[$cnt]['parsed_title'] = ($this->tree[$cnt]['title'] == '') ? '' : ' title="' . stripslashes($this->tree[$cnt]['title']) . '"';
+ 		$fooimg = $this->icondir . $this->tree[$cnt]['icon'];
+ 		if ($this->tree[$cnt]['icon'] != '' && (substr($this->tree[$cnt]['icon'], 0, 7) == 'http://' || substr($this->tree[$cnt]['icon'], 0, 8) == 'https://')) {
+@@ -931,7 +931,7 @@ function setSelectedItemByUrl($menu_name, $url)
+ function setSelectedItemByUrlEregi($menu_name, $url_eregi)
+ {
+ 	for ($cnt=$this->_firstItem[$menu_name]; $cnt<=$this->_lastItem[$menu_name]; $cnt++) {  // this counter scans all nodes of the new menu
+-		if (eregi($url_eregi, $this->tree[$cnt]['parsed_href'])) {
++		if (preg_match("/".$url_eregi."/i", $this->tree[$cnt]['parsed_href'])) {
+ 			$this->tree[$cnt]['selected'] = true;
+ 			break;
+ 		}
+diff --git a/third_party/smarty/libs/plugins/function.fetch.php b/third_party/smarty/libs/plugins/function.fetch.php
+index 81b1bfc..8b36ce3 100644
+--- a/third_party/smarty/libs/plugins/function.fetch.php
++++ b/third_party/smarty/libs/plugins/function.fetch.php
+@@ -181,12 +181,12 @@ function smarty_function_fetch($params, &$smarty)
+                         $content .= fgets($fp,4096);
+                     }
+                     fclose($fp);
+-                    $csplit = split("\r\n\r\n",$content,2);
++                    $csplit = explode("\r\n\r\n",$content,2);
+ 
+                     $content = $csplit[1];
+ 
+                     if(!empty($params['assign_headers'])) {
+-                        $smarty->assign($params['assign_headers'],split("\r\n",$csplit[0]));
++                        $smarty->assign($params['assign_headers'],explode("\r\n",$csplit[0]));
+                     }
+                 }
+             } else {
+-- 
+tg: (c8ba6cb..) t/php5_deprecated (depends on: master t/php5_thirdparty_smarty t/php5_thirdparty_xmlrpc t/php5_thirdparty_adodb)

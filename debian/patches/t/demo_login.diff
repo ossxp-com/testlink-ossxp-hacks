@@ -8,8 +8,8 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  gui/templates/login.tpl             |  139 ++++++++++++++++++++++++++++-------
  gui/themes/default/css/testlink.css |    5 +
- login.php                           |   57 ++++++++++++++-
- 3 files changed, 170 insertions(+), 31 deletions(-)
+ login.php                           |   61 ++++++++++++++-
+ 3 files changed, 173 insertions(+), 32 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
 index 77bdd48..28a9a14 100644
@@ -198,10 +198,10 @@ index a945f26..1d22f8d 100644
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
-index 9606dc6..2e9358a 100644
+index 153b9e4..cb86164 100644
 --- a/login.php
 +++ b/login.php
-@@ -47,12 +47,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign')
+@@ -49,12 +49,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
  	}
  }
  
@@ -228,23 +228,32 @@ index 9606dc6..2e9358a 100644
  	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
  	{
  		if (!$msg)
-@@ -73,17 +86,52 @@ if(!is_null($args->login) || $cosign_loggedin)
- 	}
+@@ -76,23 +89,60 @@ if(!is_null($args->login) || $cosign_loggedin)
  }
  
+ // cosign v2
 -if (strtolower($tlCfg->authentication['method']) == 'cosign')
 +if (strtolower($tlCfg->authentication['method']) == 'cosign' &&
-+		($args->sso || !@$tlCfg->authentication['demo_users']))
++    ($args->sso || !@$tlCfg->authentication['demo_users']))
  {
  	// Redirect to cosign login page.
- 	sso_redirect();
+ 	sso_redirect(2);
+ }
+ // cosign v3
+-elseif (strtolower($tlCfg->authentication['method']) == 'cosign3')
++elseif (strtolower($tlCfg->authentication['method']) == 'cosign3' &&
++        ($args->sso || !@$tlCfg->authentication['demo_users']))
+ {
+ 	// Redirect to cosign login page.
+ 	sso_redirect(3);
  }
  
 +$demo_login_contents = "";
 +$login_form_contents = "";
 +if (@$tlCfg->authentication['demo_users'])
 +{
-+	if (strtolower($tlCfg->authentication['method']) == 'cosign')
++	if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
++	    strtolower($tlCfg->authentication['method']) == 'cosign3')
 +	{
 +		$login_form_contents = "<p><div align=\"center\"> ".
 +                  "<a href=\"" .
@@ -282,7 +291,7 @@ index 9606dc6..2e9358a 100644
  $smarty->display('login.tpl');
  
  /**
-@@ -130,6 +178,9 @@ function init_args()
+@@ -145,6 +195,9 @@ function init_args()
      $args->reqURI = isset($_REQUEST['req']) ? urlencode($_REQUEST['req']) : null;
      $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? urlencode($_REQUEST['reqURI']) : null;
    
@@ -292,7 +301,7 @@ index 9606dc6..2e9358a 100644
      return $args;
  }
  
-@@ -167,7 +218,7 @@ function init_gui(&$db,$args)
+@@ -182,7 +235,7 @@ function init_gui(&$db,$args)
      		break;
      		
      	default:
@@ -302,4 +311,4 @@ index 9606dc6..2e9358a 100644
      }
  	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
 -- 
-tg: (8ad6a63..) t/demo_login (depends on: t/single_signon)
+tg: (fe388a1..) t/demo_login (depends on: t/single_signon t/typos_no_last_eol)

@@ -1,3 +1,9 @@
+ossxp-testlink (1.8.5b-18) unstable; urgency=low
+
+  * Add CoSign v3 support.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sun, 14 Mar 2010 18:11:12 +0800
+
 ossxp-testlink (1.8.5b-17+4) unstable; urgency=low
 
   * Upstream security hotfix.
