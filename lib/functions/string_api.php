@@ -239,7 +239,7 @@ function string_sanitize_url( $p_url ) {
 	
 	// split and encode parameters
 	if ( strpos( $t_url, '?' ) !== FALSE ) {
-		list( $t_path, $t_param ) = split( '\?', $t_url, 2 );
+		list( $t_path, $t_param ) = explode( '?', $t_url, 2 );
 		if ( $t_param !== "" ) {
 			$t_vals = array();
 			parse_str( $t_param, $t_vals );
