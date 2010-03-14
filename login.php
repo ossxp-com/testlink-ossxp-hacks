@@ -158,7 +158,7 @@ function sso_redirect($protocol=2)
 	$cosign_service_name = $tlCfg->authentication['sso_service_name'] ?
 												 $tlCfg->authentication['sso_service_name'] :
 												 "testlink";
-
+	$cookie_name = "cosign-" . $cosign_service_name;
 	$service_url  = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
 	if ($protocol == 3)
 	{
@@ -169,7 +169,6 @@ function sso_redirect($protocol=2)
 		$sample_string =
 		"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-		$cookie_name = "cosign-" . $cosign_service_name;
 		$cookie_data = '';
 		for ($i=0;$i<125;$i++) {
 						$cookie_data .= $sample_string[mt_rand(0,61)];
