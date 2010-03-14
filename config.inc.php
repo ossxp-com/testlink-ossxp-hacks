@@ -263,9 +263,11 @@ $g_smtp_password    = '';  # password
  * Login authentication method:
  * 		'MD5' => use password stored on db
  * 		'LDAP' => use password from LDAP Server
- * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
+ * 		'COSIGN' => Cosign Single Sign-on V2 (with the ldap backends)
+ * 		'COSIGN3' => Cosign Single Sign-on V3 (with the ldap backends)
  */ 
 $tlCfg->authentication['method'] = 'MD5';
+$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 $tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 
 /** LDAP authentication credentials */
