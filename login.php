@@ -107,7 +107,8 @@ $demo_login_contents = "";
 $login_form_contents = "";
 if (@$tlCfg->authentication['demo_users'])
 {
-	if (strtolower($tlCfg->authentication['method']) == 'cosign')
+	if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
+	    strtolower($tlCfg->authentication['method']) == 'cosign3')
 	{
 		$login_form_contents = "<p><div align=\"center\"> ".
                   "<a href=\"" .
