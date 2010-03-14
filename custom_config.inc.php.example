@@ -97,12 +97,14 @@
  * Login authentication method:
  * 		'MD5' => use password stored on db
  * 		'LDAP' => use password from LDAP Server
- * 		'COSIGN' => Cosign Single Sign-on (with the ldap backends)
+ * 		'COSIGN' => Cosign Single Sign-on v2 (with the ldap backends)
+ * 		'COSIGN3' => Cosign Single Sign-on v3 (with the ldap backends)
  */ 
 /** Before enable COSIGN login, add your self as administrator */
 //$tlCfg->authentication['method'] = 'MD5';  # Default
 //$tlCfg->authentication['method'] = 'LDAP';
-//$tlCfg->authentication['method'] = 'COSIGN';
+//$tlCfg->authentication['method'] = 'COSIGN3';
+$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 $tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 
 /** LDAP authentication credentials */
