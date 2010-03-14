@@ -1,0 +1,6 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/php5_thirdparty_upgrade
+
+Upgrade thirdparty libs, such as adodb5.
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
