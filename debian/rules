@@ -34,8 +34,8 @@ debian/control::
 
 debian/patches/: debian/patches
 debian/patches:
-	tg export --all --quilt debian/patches.new
-	cp -a debian/patches.new/* debian/patches && rm -rf debian/patches.new
+	rm -rf debian/patches
+	tg export --all --quilt debian/patches
 	cd debian && git status
 
 .PHONY: debian/patches debian/control

@@ -311,4 +311,4 @@ index 153b9e4..cb86164 100644
      }
  	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
 -- 
-tg: (fe388a1..) t/demo_login (depends on: t/single_signon t/typos_no_last_eol)
+tg: (7096636..) t/demo_login (depends on: t/single_signon t/typos_no_last_eol)
