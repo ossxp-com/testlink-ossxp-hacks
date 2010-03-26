@@ -101,7 +101,7 @@ function init_args()
     $args->id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 
     $args->user = new stdClass();
-	$args->user->locale = isset($_REQUEST['id']) ? substr($args->operation,0,10) : 'en_GB';
+	$args->user->locale = isset($_REQUEST['id']) && isset($_REQUEST['locale']) ? substr(trim($_REQUEST['locale']),0,10) : 'en_GB';
     $key2loop = array('firstName','lastName','emailAddress');
 	foreach($key2loop as $key)
     {

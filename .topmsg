@@ -1,0 +1,7 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/bugfix_loale_cannot_save
+
+Testlink 1.8.5b introduces a new bug: if user change profile,
+locale setting will lost, and can not restore any more.
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
