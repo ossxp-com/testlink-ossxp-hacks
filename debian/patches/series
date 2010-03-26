@@ -1,3 +1,4 @@
+t/bugfix_loale_cannot_save.diff -p1
 t/typos_no_last_eol.diff -p1
 t/bugtrac_integration.diff -p1
 t/custom_config.diff -p1
