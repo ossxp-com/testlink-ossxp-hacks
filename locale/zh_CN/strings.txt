@@ -925,7 +925,7 @@ $TLS_password_reset = "重置密码";
 
 
 // ----- gui/templates/tcView.tpl -----
-$TLS_no_records_found = "目前还没有分配给您测试用例";
+$TLS_no_records_found = "没有查到任何记录";
 $TLS_other_versions = '其它版本';
 $TLS_match_count = "匹配的数目";
 
@@ -1432,7 +1432,7 @@ $TLS_testsuite_is_empty = '测试套件中没有测试用例。不执行任何�
 
 // ----- gui/templates/printDocOptions.tpl -----
 $TLS_doc_opt_title = '文档选项';
-$TLS_doc_opt_guide = '从以下选项选择要打印的测试用例所包含的内容。在测试套件树状目录中选择要打印哪些测试套件和测试用例';
+$TLS_doc_opt_guide = '从以下选项选择要打印的测试用例所包含的内容。在测试套件树状目录中选择要打印哪些测试套件和测试用例。';
 $TLS_tr_td_show_as = "格式";
 
 
