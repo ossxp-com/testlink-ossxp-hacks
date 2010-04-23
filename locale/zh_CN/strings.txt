@@ -59,7 +59,7 @@ $TLS_Milestone = "里程碑";
 $TLS_months	= "月份";
 $TLS_name = "名称";
 $TLS_not_aplicable = "否/是";
-$TLS_nobody = "无人";
+$TLS_nobody = "未指派";
 $TLS_not_imported = "未导入";
 $TLS_none = "无";
 $TLS_ok = "确定";
@@ -67,7 +67,7 @@ $TLS_priority	= "优先级";
 $TLS_project = "项目";
 $TLS_requirement = "需求";
 $TLS_reqs = "需求";
-$TLS_req_spec = "需求规约文档";
+$TLS_req_spec = "需求规格说明书";
 $TLS_req_spec_short = "需求规约";
 $TLS_srs = "SRS";
 $TLS_Role = "角色";
@@ -432,7 +432,7 @@ $TLS_th_product_name = "测试项目名称";
 
 // ----- gui/templates/cfields/cfieldsEdit.tpl -----
 $TLS_assigned_to_testprojects = "关联到测试项目";
-$TLS_available_on = "有效";
+$TLS_available_on = "用于";
 $TLS_custom_field = "自定义字段";
 $TLS_enable_on_design = "启用在<br>测试规约阶段";
 $TLS_enable_on_exec = "启用在<br>测试执行阶段";
@@ -452,8 +452,8 @@ $TLS_warning_empty_cfield_name = "请输入自定义字段的名称。";
 $TLS_warning_is_in_use = "您不可以删除，也不可以修改类型 <br /> " .
                          "因为已经有用户在测试规约或者执行中给该自定义字段指定了一个值";
 
-$TLS_warning_no_type_change = "您不可以修改自定义字段类型<br /> " .
-                              "因为已经有用户在测试规约或者执行中给该自定义字段指定了一个值";
+$TLS_warning_no_type_change = "您不可以修改自定义字段类型，" .
+                              "因为已经有用户在测试规约或者执行中给该自定义字段赋了值";
 
 
 // ----- gui/templates/inc_update.tpl -----
@@ -592,7 +592,7 @@ $TLS_coverage = "覆盖度";
 $TLS_popup_delete_req = "你确定要删除这个需求吗？";
 $TLS_req_edit = "编辑需求";
 $TLS_req_msg_notestcase = "没有关联的测试用例";
-$TLS_requirement_spec = "需求说明书文档";
+$TLS_requirement_spec = "需求规格说明书";
 $TLS_test_case_id = "编号";
 $TLS_title_created = "创建日期:";
 $TLS_title_last_mod = "最后修改日期:";
