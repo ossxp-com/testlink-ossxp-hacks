@@ -1,0 +1,134 @@
+ossxp-testlink (1:1.8.5b-1) unstable; urgency=low
+
+  * modify some Chinese translation in texts.php file.
+
+ -- Wang Sheng <wangsheng@bj.ossxp.com>  Tue, 27 Apr 2010 16:39:25 +0800
+
+ossxp-testlink (1.8.5b-20) unstable; urgency=low
+
+  * modify some Chinese translation in string.txt file.
+  * modify some Chinese translation in description.txt file.
+
+ -- Wang Sheng <wangsheng@bj.ossxp.com>  Fri, 23 Apr 2010 13:47:27 +0800
+
+ossxp-testlink (1.8.5b-19) unstable; urgency=low
+
+  * Testlink 1.8.5b introduces a new bug: if user change profile,
+    locale setting will lost, and can not restore any more.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Fri, 26 Mar 2010 10:28:53 +0800
+
+ossxp-testlink (1.8.5b-18) unstable; urgency=low
+
+  * Add CoSign v3 support.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sun, 14 Mar 2010 18:11:12 +0800
+
+ossxp-testlink (1.8.5b-17+4) unstable; urgency=low
+
+  * Upstream security hotfix.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 09 Mar 2010 16:43:04 +0800
+
+ossxp-testlink (1.8.5-17+4) unstable; urgency=low
+
+  * Backup /opt/testlink/web/cfg/
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 02 Mar 2010 21:54:13 +0800
+
+ossxp-testlink (1.8.5-17+3) unstable; urgency=low
+
+  * New css style for urlbtn.
+  * New mysql backup directive.
+  * Add regex for login_url for package info.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 29 Dec 2009 11:11:39 +0800
+
+ossxp-testlink (1.8.5-17) unstable; urgency=low
+
+  * Rewrite login page using ExtJS.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Wed, 23 Dec 2009 18:29:34 +0800
+
+ossxp-testlink (1.8.5-16) unstable; urgency=low
+
+  * Fixed #84, #85: redirect loop when enable both SSO and DEMO login.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 22 Dec 2009 17:28:10 +0800
+
+ossxp-testlink (1.8.5-15) unstable; urgency=low
+
+  * bugfix: <div> tag incomplete cause IE can not see login link.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Tue, 22 Dec 2009 17:28:10 +0800
+
+ossxp-testlink (1.8.5-14) unstable; urgency=low
+
+  * Integration with redmine.
+    Remember: update table by hands.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sun, 20 Dec 2009 19:08:36 +0800
+
+ossxp-testlink (1.8.5-12) unstable; urgency=low
+
+  * New feature: demo login.
+  * New feature: login page message.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Thu, 17 Dec 2009 21:08:10 +0800
+
+ossxp-testlink (1.8.5-11) unstable; urgency=low
+
+  * zh_CN l10n fix.
+  * Fix reportFatal in database.class.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Mon, 14 Dec 2009 22:14:18 +0800
+
+ossxp-testlink (1.8.5-10) unstable; urgency=low
+
+  * Upstream upgrade to 1.8.5
+  * Enable fckeditor
+  * More translation.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Mon, 14 Dec 2009 22:14:18 +0800
+
+ossxp-testlink (1.8.4-9) unstable; urgency=low
+
+  * Source code branch refector;
+  * Translation for chinese is OK;
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Mon, 14 Dec 2009 12:02:10 +0800
+
+ossxp-testlink (1.8.4-7) unstable; urgency=low
+
+  * More zh_ch translation.
+  * Characters in Chinses can display in chart.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Thu, 19 Nov 2009 10:19:05 +0800
+
+ossxp-testlink (1.8.4-6) unstable; urgency=low
+
+  * Install custom_config.inc.php as conffiles.
+  * Set locale for admin or new users to zh_CN.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Sat, 14 Nov 2009 09:49:04 +0800
+
+ossxp-testlink (1.8.4-4) unstable; urgency=low
+
+  * Add new authorize method: COSIGN.
+  * Not initial new user's roleid, cause bad sql insert clause.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Fri, 13 Nov 2009 16:07:01 +0800
+
+ossxp-testlink (1.8.4-2) unstable; urgency=low
+
+  * Testlink virtual host for apache automatically enabled on firest
+    install.
+  * Backup /opt/testlink/upload directory.
+
+ -- Lei Weiwei <leiww@bj.ossxp.com>  Wed, 11 Nov 2009 16:07:16 +0800
+
+ossxp-testlink (1.8.4-1) unstable; urgency=low
+
+  * Package initialized.
+
+ -- Jiang Xin <jiangxin@bj.ossxp.com>  Wed, 11 Nov 2009 11:38:21 +0800
