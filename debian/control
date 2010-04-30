@@ -24,3 +24,12 @@ Priority: optional
 Depends: ossxp-testlink
 Description: Document for TestLink
  Online manual for testlink.
+
+Package: ossxp-testlink-doc
+Architecture: all
+Section: ossxp
+Priority: optional
+Depends:
+Description: Ossxp Document for TestLink
+ This package provides user and admin guide for TestLink.
+ All documents are in REst format and built with ossxp docbones utility.

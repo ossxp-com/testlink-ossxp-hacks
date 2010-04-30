@@ -1,0 +1,669 @@
+===================
+TestLink 管理员手册
+===================
+
+---------------------
+基于TestLink 1.8 版本
+---------------------
+
+:作者: 王 胜
+:公司: 北京群英汇信息技术有限公司
+:联系: http://www.ossxp.com/
+:版本: 1.0
+:日期: |date|
+
+.. contents:: 目录
+.. sectnum::
+.. header:: TestLink 管理员手册
+.. footer:: 北京群英汇信息技术有限公司
+.. |date| date:: %Y-%m-%d %H:%M
+
+说明
+====
+
+**关于手册中方框标记部分的说明**
+
+* **Note** 是需要注意的部分。
+* **Hint** 是群英汇为TestLink扩展的部分。
+
+
+测试项目管理
+============
+
+TestLink 支持多项目，而且各个测试项目之间是独立的，不能分享数据。
+通常情况下，一个测试项目对应于一个待测试产品。
+
+例如::
+
+  如果一个产品有两个测试团队：系统测试和集成测试，而且这两个团队需要分享一些测试用例。你应该给该产品创建一个测试项目。
+  
+  这两个团队可以分别根据不同的测试需求规格创建不同的测试计划，从而得到不同的测试结果。
+
+
+系统管理员可以创建、编辑和删除测试项目。
+
+新建一个测试项目
+-----------------
+
+点击主页上 "测试项目管理" 的链接，进入测试项目管理页面。
+
+.. image:: images/list_projects.png
+   :width: 600
+   :height: 180
+
+
+点击 **创建** 按钮，进入新建测试项目的界面。
+
+.. image:: images/create_project.png
+   :width: 600
+   :height: 330
+
+
+测试项目有以下属性：
+
+* 名称 
+
+  每个测试项目的名称必须唯一。
+* 备注
+* 测试用例标识符
+
+  该标识符将作为测试用例的前缀。
+* 启用需求管理
+
+  是否启用需求管理。如果选中，该测试项目的主页将会显示 **需求** 区域（包括需求规约和指派需求的链接）。
+* 启用优先级管理
+
+  选中后在主页的测试套件区域中会多一个"设置测试用例的紧急程度"链接。
+* 启用自动化测试
+
+  是否启用自动化测试功能。如果选中，在创建测试用例时，会出现 **测试方式** 下拉选择框，
+  包括 *手工* 和 *自动的* 两个选项；如果不选，则不会出现该下拉选择框，所有的测试用例都是手工执行类型。
+* 活动的
+
+  该测试项目是否是活动的。非管理员用户只能在首页右上角的 **测试项目** 下拉选择框中看到活动的项目。
+  对于非活动的测试项目，管理员会在首页右上角的 **测试项目** 下拉选择框中看到它们前面多了一个 * 号标识。
+
+.. hint::
+  为了使TestLink与Redmine的整合更加完善，群英汇对TestLink与Redmine的整合部分作了扩展。
+
+  TestLink与Redmine整合的配置文件(cfg/redmine.cfg.php)中是这样配置的
+
+  *define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/");*
+
+  很显然那个链接到Redmine的URL是固定的，所以当测试多个项目，就不能保证准确跳转到对应的被测试项目中。
+
+  因此我们在创建测试项目的页面多了一个属性： **缺陷跟踪系统项目ID** 。
+
+  该属性指定被测项目在Redmine中的项目标识符，用于替换URL中的%号。
+
+  *define('BUG_TRACK_ENTER_BUG_HREF',"http://foo.bar/redmine/projects/%s/issues/new");*
+
+编辑/删除测试项目
+-----------------
+
+如果删除一个测试项目，那么和它相关的数据也会从数据库中删除，且该操作不可恢复。
+所以强烈建议使用禁用操作（将测试项目的状态改为非活动状态）代替删除操作。
+
+用户管理
+========
+
+用户账号设置
+-------------
+
+用户可以在登录界面点击 "新用户注册" 链接
+
+.. figure:: images/login.png
+   :width: 600
+   :height: 280
+
+   登录界面
+
+进入注册页面，创建TestLink账号。
+
+.. figure:: images/register.png
+   :width: 600
+   :height: 520
+
+   注册界面
+
+每个用户都可以通过点击首页右上角的 "个人账号" 链接来修改自己的账号信息。
+
+管理员可以创建、编辑和删除用户账号。
+
+.. figure:: images/user_manage.png
+   :width: 600
+   :height: 170
+
+   用户管理界面
+
+角色和权限
+-----------
+
+用户可以在首页的左上方看到自己的角色。
+
+系统管理员在主页上点击 "权限管理" 链接，进入权限管理界面。
+
+TestLink中用户的角色分为以下两大类：
+
+* TestLink系统角色
+
+  这是访问TestLink系统需要的。也只有TestLink系统管理员才能管理用户和测试项目。
+* 用户在测试项目中的角色
+
+  用户在测试项目中的角色缺省情况下是继承于系统角色，管理员可以根据具体情况修改用户在测试项目中的角色。
+  同一用户在不同的测试项目中可以拥有不同的角色。例如：张三在测试项目1中是guest角色，在测试项目2中是leader角色，在测试项目3中是admin角色。
+
+.. note::
+  这里的 admin 角色不同于 TestLink 系统中 admin 角色。
+  只有TestLink系统管理员才有管理用户和测试项目的权限，而测试项目中的 admin 只有管理该测试项目中测试活动的权限。
+
+TestLink 内置了6个缺省的角色：
+
+* **游客(Guest)**
+
+.. figure:: images/guest_role.png
+   :width: 600
+   :height: 320
+   
+   游客的默认权限  
+
+* **测试执行人员(Test Executor/tester)**
+
+.. figure:: images/tester_role.png
+   :width: 600
+   :height: 320
+   
+   测试执行人员的默认权限  
+
+* **测试设计人员(Test Designer)**
+
+.. figure:: images/designer_role.png
+   :width: 600
+   :height: 320
+   
+   测试设计人员的默认权限  
+
+* **测试分析人员(Test Analyst/senior tester)**
+
+.. figure:: images/analyst_role.png
+   :width: 600
+   :height: 320
+   
+   测试分析人员的默认权限  
+  
+* **测试负责人(Test Leader)**
+
+.. figure:: images/leader_role.png
+   :width: 600
+   :height: 320
+   
+   测试负责人的默认权限  
+  
+* **管理员(Admin)**
+  
+.. figure:: images/admin_role.png
+   :width: 600
+   :height: 320
+   
+   管理员的默认权限  
+
+给测试项目指派角色
+------------------
+
+根据实际情况设置用户在测试项目中的角色。默认情况下，用户在测试项目中的角色继承于用户在TestLink系统中的角色。
+
+.. figure:: images/define_testproject_role.png
+   :width: 600
+   :height: 270
+   
+   设置用户在测试项目中的角色
+
+给测试计划指派角色
+------------------
+
+根据实际情况设置用户在测试计划中的角色。默认情况下，用户在测试计划中的角色继承于用户在TestLink系统中的角色。
+
+.. figure:: images/define_plan_role.png
+   :width: 600
+   :height: 270
+   
+   设置用户在测试计划中的角色
+
+自定义字段管理
+==============
+
+项目管理员可以为TestLink中的重要对象（测试套件、测试用例和测试套件等）添加自定义字段。同时也可以设置新建的自定义字段用于测试项目中哪一对象上。因此每一个测试项目都有一套自己的自定义字段集合。
+
+新建自定义字段
+--------------
+
+点击主页上的 "自定义字段管理" 链接，进入自定义字段管理页面。
+
+.. image:: images/custom_field_list.png
+   :width: 600
+   :height: 150
+
+这里列出了TestLink系统中已经创建的自定义字段。点击 **创建** 按钮，将跳转到新建自定义字段页面。
+
+.. image:: images/custom_field_create.png
+   :width: 600
+   :height: 200
+
+自定义字段的定义中包括以下属性：
+
+* 名称
+* 标签
+* 字段类型
+  
+  * string
+  * numeric
+  * float
+  * email
+  * checkbox
+  * list
+  * multiselection list
+  * date
+  * radio
+  * datetime
+  * textarea
+  * script
+  * server
+  
+  对于 checkbox, list, multiselection list和radio类型的字段，需要输入取值列表，多个值之间用('|')隔开。
+
+* 启用阶段：测试执行，测试规约设计，测试计划设计。
+
+  * 测试执行：在测试用例执行时用户可以对其进行修改。
+  * 测试规约设计：当设计测试用例规约时，用户可以对其值进行修改。
+  * 测试计划设计：当设计测试计划(向测试计划中添加测试用例时),用户可以对其进行修改。
+
+* 是否在测试用例执行中显示
+
+  用于: 指定该自定义字段用于哪些测试活动中。
+  
+  可用的选项有：
+
+  * 测试套件
+  * 测试计划
+  * 测试用例
+  * 需求说明书
+  * 需求
+
+指派自定义字段
+--------------
+
+只有那些已经指派的自定义字段才能用于测试项目中。
+
+点击主页上的 "指派自定义字段" 链接，进入指派自定义字段页面。
+
+.. image:: images/assign_custom_field.png
+   :width: 600
+   :height: 280
+
+该页面上班部分列出了已指派的自定义字段，下半部分列出了可用的自定义字段。
+通过点击 **指派** 按钮，可以经所选的可用的自定义字段转换为已指派的自定义字段。
+
+数据导入和导出
+==============
+
+TestLink 支持若干种数据共享的方法。
+
++-----------+---------------+--------+-------+----------------------------------------+
+| 选项      | 文件格式      | 导入   | 导出  |          说明                          |
++===========+===============+========+=======+========================================+
+| 测试项目  | XML           | 支持   | 支持  | 所有的测试套件和测试用例。             |
+|           |               |        |       | 关键字导出是可选选项。                 |
++-----------+---------------+--------+-------+----------------------------------------+
+| 测试套件  | XML           | 支持   | 支持  | 测试套件及其所包含的所有子套件和测试用 |
+|           |               |        |       | 例。关键字导出是可选选项。             |
++-----------+---------------+--------+-------+----------------------------------------+
+| 测试用例  | XML           | 支持   | 支持  | 这里有两种导出类型：仅导出一个测试用例;|
+|           |               |        |       | 导出某一测试套件里的所有测试用例。     |
+|           |               |        |       | 自定义字段和已指派的需求会一起被导出。 |
+|           |               |        |       | 关键字导出是可选选项。                 |
+|           +---------------+--------+-------+----------------------------------------+
+|           | XLS(Excel)    | 支持   |       | 不支持关键字导入                       |
++-----------+---------------+--------+-------+----------------------------------------+
+| 关键字    | CSV,XML       | 支持   | 支持  | 当前测试项目中所有的关键字             |
++-----------+---------------+--------+-------+----------------------------------------+
+| 需求      | XML           | 支持   | 支持  |                                        |
+|           +---------------+--------+-------+----------------------------------------+
+|           | CSV,CSV DOORS,|支持    |       |                                        |
+|           | DocBook       |        |       |                                        |
++-----------+---------------+--------+-------+----------------------------------------+
+| 结果      | XML           | 支持   |       |                                        |
++-----------+---------------+--------+-------+----------------------------------------+
+
+.. note:: 
+  **当出现导入操作没反应现象时**
+
+  * 检查导入文件的大小。因为TestLink以及web服务器限制导入文件的大小。
+  * 检查web服务器是否已经加载了DOM模组。
+
+  **关于内部和外部ID的解释**
+
+  * 每一个对象都有它自己的内部ID，即数据库表中ID字段的值。
+  * 测试用例比较特殊，因为它们有内部和外部ID。
+
+导出/导入测试项目
+-----------------
+
+用户可以导入/导出测试项目以及有关测试项目的描述信息、测试规约和关键字。
+
+点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择顶级结点，右侧将显示出 **导入测试套件** **导出测试套件** 的按钮，点击相应的按钮，即可导入/导出测试项目。
+
+.. note:: 
+  **这不是导入/导出测试套件吗，哪是导入/导出测试项目？**
+
+  TestLink 将整个测试项目用测试套件的结构组织起来，因此所有的测试套件集合就是整个测试项目的内容了。
+
+导入/导出测试套件
+-----------------
+
+点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择某一测试套件结点，右侧将显示出 **导入测>试套件** **导出测试套件** 的按钮，点击相应的按钮，即可导入/导出测试套件。
+
+仅导出一个测试用例
+------------------
+
+点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择某一测试用例结点，右侧将显示出 **导出** 按钮，点击导出按钮，即可导出该测试用例。
+
+导出测试套件里的所有测试用例
+----------------------------
+
+点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择某一测试套件(包含若干个测试用例)结点，右侧将显示出 **导出测试用例** 的按钮，点击该按钮，即可导出该测试套件所包含的所有测试用例。
+
+导入测试用例
+------------
+
+TestLink 支持两种测试用例导入格式：XML和XLS(Excel)。
+
+点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择某一测试套件结点，右侧将显示出 **导入测试用例** 的按钮，点击该按钮，即可为该测试套件导入该测试用例。在导入界面你可以选择导入文件的格式(XML、Excel)。
+
+.. figure:: images/TC_Excel.png
+   :width: 600
+   :height: 320
+
+   测试用例EXCEL导入格式示例
+
+导入/导出关键字
+---------------
+
+点击主页上 "关键字管理" 的链接，进入关键字管理页面。下方有 **导入** **导出** 按钮，点击对应的按钮，即可导入/导出关键字。
+
+导入/导出软件需求
+------------------
+
+点击主页上 "需求规约" 的链接，进入需求规约管理页面。选择某一需求规约，右侧将显示 **导入** **导出需求** 的按钮，点击对应的按钮，即可导/导出需求。
+
+导入结果
+---------
+
+TestLink 从 1.7 版本开始支持结果导入功能。
+
+点击主页上 "执行测试" 的链接，进入测试执行的页面。选择某一测试用例，右侧将显示 **导入XML结果** 的按钮，点击该按钮，即可导入测试结果。
+
+
+配置 FCKEditor
+===================
+
+开启图片上传功能
+-----------------------
+
+打开 third_party/fckeditor/editor/filemanager/connectors/php/config.php
+
+设置::
+
+  $Config['Enabled'] = true ;
+
+确保指定的'UserFilesPath'目录存在服务器上，并且有写的权限::
+
+  $Config['UserFilesPath'] = '/userfiles/' ;
+
+推荐指定的目录: <TL_HOME>/upload_area/fckeditor_upload_area/
+
+将 $Config['UserFilesAbsolutePath'] = '' ; 注释掉。
+
+改变FCKEditor的皮肤
+--------------------
+
+默认情况下FCKEditor使用的皮肤是：third_party/fckeditor/editor/skins/default。
+改变默认皮肤很简单，只需修改SkinPath的值，让它指向你需要的皮肤的路径。
+
+可用的皮肤有：
+
+* default
+* office2003
+* silver
+
+皮肤配置
+
+打开 third_party/fckeditor/fckconfig.js
+
+找到：FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/default/' ;
+
+编辑目录，例如：
+
+office2003
+FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/office2003/' ;
+
+silver
+FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/silver/' ;
+
+自定义工具栏
+------------
+
+* 工具栏可见的按钮列表:
+
+  +-----------------+---------------+------------------+-----------------+
+  | Source          | DocProps      | Save             | NewPage         |
+  +-----------------+---------------+------------------+-----------------+
+  | Preview         | Cut           | Copy             | Paste           |
+  +-----------------+---------------+------------------+-----------------+
+  | PasteText       | PasteWord     | Print            | SpellCheck      |
+  +-----------------+---------------+------------------+-----------------+
+  | Undo            | Redo          | Find             | Replace         |
+  +-----------------+---------------+------------------+-----------------+
+  | SelectAll       | RemoveFormat  | Form             | Checkbox        |
+  +-----------------+---------------+------------------+-----------------+
+  | Radio           | TextField     | Textarea         | Select          |
+  +-----------------+---------------+------------------+-----------------+
+  | Button          | ImageButton   | HiddenField      | Bold            |
+  +-----------------+---------------+------------------+-----------------+
+  | Italic          | Underline     | StrikeThrough    | Subscript       |
+  +-----------------+---------------+------------------+-----------------+
+  | Superscript     | OrderedList   | UnorderedList    | Outdent         |
+  +-----------------+---------------+------------------+-----------------+
+  | Indent          | Blockquote    | CreateDiv        | JustifyLeft     |
+  +-----------------+---------------+------------------+-----------------+
+  | JustifyCenter   | JustifyRight  | JustifyFull      | Link            |
+  +-----------------+---------------+------------------+-----------------+
+  | Unlink          | Anchor        | Image            | Flash           |
+  +-----------------+---------------+------------------+-----------------+
+  | Table           | Rule          | Smiley           | SpecialChar     |
+  +-----------------+---------------+------------------+-----------------+
+  | Style           | FontFormat    | FontName         | PageBreak       |
+  +-----------------+---------------+------------------+-----------------+
+  | FontSize        | TextColor     | BGColor          | FitWindow       |
+  +-----------------+---------------+------------------+-----------------+
+  | ShowBlocks      | About         |                  |                 |
+  +-----------------+---------------+------------------+-----------------+
+
+* 定义自定义工具栏
+
+  打开 cfg/tl_fckeditor_config.js 在该文件中可添加自己想要的工具栏按钮。
+
+  特殊字符：
+
+  * '-'创建一个工具栏分隔符
+  * '/'创建一个新的"toolbarline"
+
+* 在TestLink中使用自定义工具栏
+
+  打开 custom_config.inc.php，配置每个地方的 text_editor选项。
+
+拼写检查功能
+------------
+
+* 开启拼写检查功能
+
+  打开 third_party/fckeditor/fckconfig.js
+
+  将
+  FCKConfig.SpellChecker      = 'WSC' ;
+  改为
+  FCKConfig.SpellChecker      = 'SpellerPages' ;
+
+* Windows上的拼写检查器
+
+  下载并安装install
+  下载地址 http://aspell.net/win32/
+
+  打开 third_party/fckeditor/editor/dialog/fck_spellerpages/spellerpages/server-scripts/spellchecker.php
+
+  指定aspell路径
+  $aspell_prog  = '"C:\Program Files\Aspell\bin\aspell.exe"';
+  根据你安装aspell的路径写入正确路径。
+
+  指定语言
+  $lang     = 'en_US';
+
+* Linux上拼写检查器
+
+  通过包管理器下载并安装aspell
+
+  打开 third_party/fckeditor/editor/dialog/fck_spellerpages/spellerpages/server-scripts/spellchecker.php
+
+  将 
+  //$aspell_prog  = 'aspell'; 
+  改为
+  //$aspell_prog  = '/usr/bin/aspell';
+
+  并将
+  $aspell_prog  = '"C:\Program Files\Aspell\bin\aspell.exe"';
+  改为
+  //$aspell_prog  = '"C:\Program Files\Aspell\bin\aspell.exe"';
+
+  设置语言
+  $lang     = 'en_US';
+
+定义模板
+---------
+
+打开 third_party/fckeditor/fcktemplates.xml
+
+用XML-格式创建模板::
+
+  <Template title="title' image="image.gif">
+      <Description>description</Description>
+      <Html>
+          <![[CDATA[
+              html-code
+          ]]>>
+      </Html>
+  </Template>
+
+* xml中的特殊字符
+
+  为了正确显示，那些特殊字符必须用xml-format。在模板的标题和描述中，可供使用的特殊字符
+
+  +---------+----------------+
+  | \&      | &amp;          |
+  +---------+----------------+
+  | \'      | &apos;         |
+  +---------+----------------+
+  | \<      | &lt;           |
+  +---------+----------------+
+  | \>      | &gt;           |
+  +---------+----------------+
+  | \"      | &quot;         |
+  +---------+----------------+
+  | Ä       | &#196;         |
+  +---------+----------------+
+  | Ö       | &#214;         |
+  +---------+----------------+
+  | Ü       | &#220;         |
+  +---------+----------------+
+  | ä       | &228;          |
+  +---------+----------------+
+  | ö       | &246;          |
+  +---------+----------------+
+  | ü       | &252;          |
+  +---------+----------------+
+  | ß       | &#223;         |
+  +---------+----------------+
+
+* 图片预览模板
+
+  third_party/fckeditor/editor/dialog/fck_template/images 目录存放模板。在fcktemplates.xml中指明使用哪张图片。
+
+开启 CKFinder，替换FCKEditor内置的文件管理器
+---------------------------------------------
+
+* CKFinder 是什么？
+
+  CKFinder 是一个功能强大的易于使用的基于Web浏览器的Ajax文件管理器。简洁的界面是它直观、易于掌握使用。
+
+* 特征
+
+  * 提供基于目录树的导航
+  * 高分辨率的图片所略图
+  * 自动检测客户端语言，提供多语言支持
+  * 提供文件和目录的敏感内容菜单
+  * 完全的用户控制：创建，重命名和删除文件及目录
+  * 完全的开发者控制：所有的特征可通过强大的ACL和用户权限系统提供精确的配置
+  * 轻量级接口
+  * 无须页面刷新：快速相应
+  * 文件上传安全：所有上传的文件都会根据开发者设置的规则进行核查
+  * 完全开放源代码，包括服务器端集成
+  * 与FCKeditor和CKEditor快速集成
+
+* 下载 CKFinder
+
+  下载地址 http://download.cksource.com/CKFinder/CKFinder%20for%20PHP/1.4.1.1/ckfinder_php_1.4.1.1.zip
+
+* 安装 CKFinder
+
+  将解压后的目录复制到 <TL_HOME>/third_part 目录下
+
+* 开启 CKFinder
+
+  打开 third_party/fckeditor/fckconfig.js
+
+  添加以下内容::
+  
+    FCKConfig.LinkBrowserURL = '../../../ckfinder/ckfinder.html' ;
+    FCKConfig.ImageBrowserURL = '../../../ckfinder/ckfinder.html?type=Images' ;
+    FCKConfig.FlashBrowserURL = '../../../ckfinder/ckfinder.html?type=Flash' ;
+    FCKConfig.LinkUploadURL = '../../../ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files' ;
+    FCKConfig.ImageUploadURL = '../../../ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' ;
+    FCKConfig.FlashUploadURL = '../../../ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash' ;
+
+  注释掉以下内容::
+
+    //FCKConfig.LinkBrowserURL = FCKConfig.BasePath +
+    'filemanager/browser/default/browser.html?Connector=' +
+    encodeURIComponent( FCKConfig.BasePath + 'filemanager/connectors/' +
+    _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ) ;
+    //FCKConfig.ImageBrowserURL = FCKConfig.BasePath +
+    'filemanager/browser/default/browser.html?Type=Image&Connector=' +
+    encodeURIComponent( FCKConfig.BasePath + 'filemanager/connectors/' +
+    _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ) ;
+    //FCKConfig.FlashBrowserURL = FCKConfig.BasePath +
+    'filemanager/browser/default/browser.html?Type=Flash&Connector=' +
+    encodeURIComponent( FCKConfig.BasePath + 'filemanager/connectors/' +
+    _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ) ;
+    //FCKConfig.LinkUploadURL = FCKConfig.BasePath +
+    'filemanager/connectors/' + _QuickUploadLanguage + '/upload.' +
+    _QuickUploadExtension ;
+    //FCKConfig.ImageUploadURL = FCKConfig.BasePath +
+    'filemanager/connectors/' + _QuickUploadLanguage + '/upload.' +
+    _QuickUploadExtension + '?Type=Image' ;
+    //FCKConfig.FlashUploadURL = FCKConfig.BasePath +
+    'filemanager/connectors/' + _QuickUploadLanguage + '/upload.' +
+    _QuickUploadExtension + '?Type=Flash' ;
+
+* 认证检查
+
+  打开 third_party/ckfinder/config.php
+
+  在 CheckAuthentication()中，你必须实现一些session验证。

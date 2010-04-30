@@ -1,0 +1,13 @@
+
+require 'docbones'
+source_suffix = '.rst'
+::Docbones.setup source_suffix
+
+PROJ.root= "."
+PROJ.name = "user_guide"
+PROJ.index = "user_guide"
+PROJ.output = "../output/user_guide"
+PROJ.images = "images"
+PROJ.pdf_font = "simhei.ttf"
+
+task:default 

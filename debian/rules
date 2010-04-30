@@ -30,6 +30,9 @@ binary-fixup/ossxp-testlink::
 	chown -R www-data.www-data debian/ossxp-testlink/opt/testlink/upload
 	chown www-data.www-data debian/ossxp-testlink/opt/testlink/web
 
+build/ossxp-testlink-doc::
+	make -C debian/doc build
+
 debian/control::
 
 debian/patches/: debian/patches
