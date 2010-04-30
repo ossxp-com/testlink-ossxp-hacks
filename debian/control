@@ -17,7 +17,7 @@ Description: TestLink is a open source Test Management and execution system
  cases and track test results dynamically, generate reports, trace software
  requirements, prioritize and assign tasks.
 
-Package: ossxp-testlink-doc
+Package: ossxp-testlink-manual
 Architecture: all
 Section: ossxp
 Priority: optional
