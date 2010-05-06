@@ -759,7 +759,7 @@ $TLS_req_list_docs = "文档列表";
 
 // ----- gui/templates/tcEdit_New_viewer.tpl -----
 $TLS_alt_add_tc_name = "输入测试用例名称。这是必填项。";
-$TLS_expected_results = "预望结果";
+$TLS_expected_results = "预期结果";
 $TLS_steps = "步骤";
 $TLS_summary= "摘要";
 $TLS_tc_title = "测试用例标题";
