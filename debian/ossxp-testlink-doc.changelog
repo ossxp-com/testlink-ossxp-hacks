@@ -1,3 +1,9 @@
+ossxp-testlink (1:1.8.5b-2) unstable; urgency=low
+
+  * Add lightbox support for html documents.
+
+ -- Wang Sheng <wangsheng@ossxp.com>  Wed, 12 May 2010 13:14:07 +0800
+
 ossxp-testlink (1:1.8.5b-1) unstable; urgency=low
 
   * Initial ossxp-testlink-doc.
