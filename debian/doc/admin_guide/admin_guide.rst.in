@@ -6,17 +6,18 @@ TestLink 管理员手册
 基于TestLink 1.8 版本
 ---------------------
 
-:作者: 王 胜
-:公司: 北京群英汇信息技术有限公司
-:联系: http://www.ossxp.com/
-:版本: 1.0
-:日期: |date|
+:作者: 北京群英汇信息技术有限公司
+:网址: http://www.ossxp.com/
+:版本: |doc_rev|
+:日期: |doc_date|
+:版权信息: Creative Commons
 
 .. contents:: 目录
 .. sectnum::
 .. header:: TestLink 管理员手册
 .. footer:: 北京群英汇信息技术有限公司
-.. |date| date:: %Y-%m-%d %H:%M
+.. |doc_rev| replace:: ENV(DOC_REV)
+.. |doc_date| replace:: ENV(DOC_DATE)
 
 说明
 ====
@@ -48,13 +49,13 @@ TestLink 支持多项目，而且各个测试项目之间是独立的，不能�
 点击主页上 "测试项目管理" 的链接，进入测试项目管理页面。
 
 .. image:: images/list_projects.png
-   :scale: 50
+   :scale: 70
 
 
 点击 **创建** 按钮，进入新建测试项目的界面。
 
 .. image:: images/create_project.png
-   :scale: 50
+   :scale: 70
 
 
 测试项目有以下属性：
@@ -111,14 +112,14 @@ TestLink 支持多项目，而且各个测试项目之间是独立的，不能�
 用户可以在登录界面点击 "新用户注册" 链接
 
 .. figure:: images/login.png
-   :scale: 50
+   :scale: 70
 
    登录界面
 
 进入注册页面，创建TestLink账号。
 
 .. figure:: images/register.png
-   :scale: 50
+   :scale: 70
 
    注册界面
 
@@ -127,7 +128,7 @@ TestLink 支持多项目，而且各个测试项目之间是独立的，不能�
 管理员可以创建、编辑和删除用户账号。
 
 .. figure:: images/user_manage.png
-   :scale: 50
+   :scale: 70
 
    用户管理界面
 
@@ -157,42 +158,42 @@ TestLink 内置了6个缺省的角色：
 * **游客(Guest)**
 
 .. figure:: images/guest_role.png
-   :scale: 50
+   :scale: 70
    
    游客的默认权限  
 
 * **测试执行人员(Test Executor/tester)**
 
 .. figure:: images/tester_role.png
-   :scale: 50
+   :scale: 70
    
    测试执行人员的默认权限  
 
 * **测试设计人员(Test Designer)**
 
 .. figure:: images/designer_role.png
-   :scale: 50
+   :scale: 70
    
    测试设计人员的默认权限  
 
 * **测试分析人员(Test Analyst/senior tester)**
 
 .. figure:: images/analyst_role.png
-   :scale: 50
+   :scale: 70
    
    测试分析人员的默认权限  
   
 * **测试负责人(Test Leader)**
 
 .. figure:: images/leader_role.png
-   :scale: 50
+   :scale: 70
    
    测试负责人的默认权限  
   
 * **管理员(Admin)**
   
 .. figure:: images/admin_role.png
-   :scale: 50
+   :scale: 70
    
    管理员的默认权限  
 
@@ -202,7 +203,7 @@ TestLink 内置了6个缺省的角色：
 根据实际情况设置用户在测试项目中的角色。默认情况下，用户在测试项目中的角色继承于用户在TestLink系统中的角色。
 
 .. figure:: images/define_testproject_role.png
-   :scale: 50
+   :scale: 70
    
    设置用户在测试项目中的角色
 
@@ -212,7 +213,7 @@ TestLink 内置了6个缺省的角色：
 根据实际情况设置用户在测试计划中的角色。默认情况下，用户在测试计划中的角色继承于用户在TestLink系统中的角色。
 
 .. figure:: images/define_plan_role.png
-   :scale: 50
+   :scale: 70
    
    设置用户在测试计划中的角色
 
@@ -227,12 +228,12 @@ TestLink 内置了6个缺省的角色：
 点击主页上的 "自定义字段管理" 链接，进入自定义字段管理页面。
 
 .. image:: images/custom_field_list.png
-   :scale: 50
+   :scale: 70
 
 这里列出了TestLink系统中已经创建的自定义字段。点击 **创建** 按钮，将跳转到新建自定义字段页面。
 
 .. image:: images/custom_field_create.png
-   :scale: 50
+   :scale: 70
 
 自定义字段的定义中包括以下属性：
 
@@ -282,7 +283,7 @@ TestLink 内置了6个缺省的角色：
 点击主页上的 "指派自定义字段" 链接，进入指派自定义字段页面。
 
 .. image:: images/assign_custom_field.png
-   :scale: 50
+   :scale: 70
 
 该页面上班部分列出了已指派的自定义字段，下半部分列出了可用的自定义字段。
 通过点击 **指派** 按钮，可以经所选的可用的自定义字段转换为已指派的自定义字段。
@@ -364,7 +365,7 @@ TestLink 支持两种测试用例导入格式：XML和XLS(Excel)。
 点击主页上 "编辑测试用例" 的链接，进入测试规约页面。选择某一测试套件结点，右侧将显示出 **导入测试用例** 的按钮，点击该按钮，即可为该测试套件导入该测试用例。在导入界面你可以选择导入文件的格式(XML、Excel)。
 
 .. figure:: images/TC_Excel.png
-   :scale: 50
+   :scale: 70
 
    测试用例EXCEL导入格式示例
 
