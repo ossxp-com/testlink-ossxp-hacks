@@ -11687,7 +11687,18 @@ index a5b4d05..0000000
 diff --git a/third_party/smarty/misc/smarty_icon.gif b/third_party/smarty/misc/smarty_icon.gif
 deleted file mode 100644
 index 5d51969..0000000
-Binary files a/third_party/smarty/misc/smarty_icon.gif and /dev/null differ
+--- a/third_party/smarty/misc/smarty_icon.gif
++++ /dev/null
+@@ -1,8 +0,0 @@
+-GIF89aX  Ä  õòæ¤¡™÷ÍXYY^ûÖnôØŠ ”Vûè¬ï½8¥’å×±ûèğÁ;Áµ•ØÇ™[Kùà™ÏĞÓ¶¦fÊ¢6º¬áÏ ~~‡y5»º·886ñÃK H›A   ğÀ@!ù     ,    X   ÿ 'dihª®ìú½p,Ïtmßx^‹zïÿ@œhCHÙp–D±DrÚq)KABº!ˆ_ã4,h¨İã<şš§Ç%``û¥;hj`cU‘bR‰‰ef	—gnV‘c•f"¢–•ZDªe` Na¼¿y™Ç¾OÂ¿Ä"ÅÃÄŞ6C‰ŒŒ
+-`Í òõı
+-Èp%€>z  ¡¡¾æÑ ¡aC	ı4'HWT`@RÀ	a¼ÿ¡MD  U@ğ@¢¼m V’€(±À	#
+-d BÇA/MP@²iƒÌ0åA€ş^RÕ0´h†– <§A‚N²±Ìo[Z¢U¯:Z‡Ú„‘MIÒÂ…€ªÀ=Àl•ë!,Õ™$˜W_K´‹à¢"¡(Fzè¾°‹7oºC®ÆXlğaÂYÕVË¤J63Ö¥6è6 †`i^ØZ@B† XOõ-šçiù5Fğš€ìSÖ§Š 
+-ş Px1„È"š"=˜& À<ÃÎ™o•pÚ¯ÁíOÅ6 —›•Ê;	@P À€ãÉÿ"=€$UpÀ¹¨4B?.Ğ’PTy@ßvf¡ €U-Ğ@py › ¤ˆÖâA cŒ”§ŠçXÜp°xĞvÜhèOfyœ?\µ5‘‘‰V0´MPvˆJ|`ÔãÅ @à #b4@€,´éÀŠdpÌ›y“V/¿ğ€›Æôr'T~ ›4`Ì€¥–/`À(0¨	Ğ ¡ô„m,	'˜Ñi"‘˜‰$¡‚ê ™†úeÁ™@Œ3~WcGQ˜Ä?™D(m<òAvüÁ(À
+-ëÇ½JeŸu\Xàw	Òƒ]
+-@ËSd»ô]A*€|Wxä	òÊ¹è¦«îºì¶ë.º¬œË‘¶ôÖøæ«ï¾üöëï¿ ,°¿"t`°Ä°ÁÃp0Ã	p°Â
+-Cl1ÅG,±Ã7ì0ÃCÜñÂ¼ñÃ&gLòÊ_,òÉ#güBÃ-wrÉ%ÏñÎ›üñÊ?×¬1Ê0wl4Ï:ƒìË*Ó|2Î2CÍ²Ğ,}4ÉV×|³Ê£üòÓ)OœtÍ]=3ÇD½5Õl·íöÛp¿İÂÜt×m÷Ü!  ;
+\ No newline at end of file
 diff --git a/third_party/smarty/news b/third_party/smarty/news
 deleted file mode 100644
 index 419ca09..0000000
