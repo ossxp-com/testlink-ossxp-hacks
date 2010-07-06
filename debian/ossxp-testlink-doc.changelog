@@ -1,3 +1,9 @@
+ossxp-testlink (1:1.8.5b-4) unstable; urgency=low
+
+  * modify Creative Commons description
+
+ -- Wang Sheng <wangsheng@ossxp.com>  Tue, 06 Jul 2010 18:34:35 +0800
+
 ossxp-testlink (1:1.8.5b-3) unstable; urgency=low
 
   * use new pdf generation tool for rest document
