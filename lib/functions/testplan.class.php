@@ -9,11 +9,30 @@
  * @package 	TestLink
  * @author 		franciscom
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: testplan.class.php,v 1.172 2010/02/17 15:57:27 asimon83 Exp $
+ * @version    	CVS: $Id: testplan.class.php,v 1.197 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  *
  * @internal Revisions:
+ *	20100614 - eloff - refactor getStatusTotalsByPriority() to same style as the other getStatusTotals...()
+ *	20100610 - eloff - BUGID 3515 - getStatusTotals() now takes platforms into account
+ *	20100602 - franciscom - copy_as() - force Platforms Link copy when user choose Test Case Copy
+ *  20100527 - Julian - BUGID 3492 - Added execution notes to sql statement of get_linked_tcversions
+ *  20100525 - Julian - changed default for steps_info option on get_linked_tcversions() to false
+ *  					-> performance improvement because not all steps are loaded per default
+ *	20100520 - franciscom - getTestCaseSiblings() join bug
+ *	20100520 - franciscom - new option on get_linked_tcversions()
+ *	20100518 - franciscom - BUGID 3473
+ *	20100516 - franciscom - BUGID 3465: Delete Test Project - User Execution Assignment is not deleted
+ *	20100506 - franciscom - new method - get_linked_items_id(), that has perfomance advantages
+ *							over get_linked_tcversions() when only info needed is test case id.
+ *
+ *	20100505 - franciscom - BUGID 3434 - get_keywords_map() - refactoring trying to improve performance
+ *	20100505 - franciscom - BUGID 3430 - copy_milestones() - need to check if start date is NOT NULL
+ *	20100425 - franciscom - BUGID 2463 - changes in getStatusTotalsByAssignedTesterPlatform()
+ * 	20100417 - franciscom - get_linked_tcversions() added importance on output data
+ *                          BUGID 3356: Failed Test Cases" report is not updated when a test case 
+ *                                      has been changed from "Failed" to "Passed"		 
  *
  *  20100217 - asimon - added parameters open and active to getNumberOfBuilds()
  *  20100214 - franciscom - BUGID 2455, BUGID 3026 - Contribution by julian,asimon
@@ -110,6 +129,9 @@ class testplan extends tlObjectWithAttachments
 
 	/** message to show on GUI */
 	var $user_feedback_message = '';
+
+	var $node_types_descr_id;
+	var $node_types_id_descr;
 	
 	/**
 	 * testplan class constructor
@@ -120,6 +142,8 @@ class testplan extends tlObjectWithAttachments
 	{
 	    $this->db = &$db;
 	    $this->tree_manager = New tree($this->db);
+		$this->node_types_descr_id=$this->tree_manager->get_available_node_types();
+		$this->node_types_id_descr=array_flip($this->node_types_descr_id);
       
 	    $this->assignment_mgr = new assignment_mgr($this->db);
 	    $this->assignment_types = $this->assignment_mgr->get_available_types();
@@ -535,6 +559,21 @@ class testplan extends tlObjectWithAttachments
 	
 
 	/*
+	
+	*/
+	function get_linked_items_id($id)
+	{
+		$sql = " /* $debugMsg */ ". 
+			   " SELECT DISTINCT parent_id FROM {$this->tables['nodes_hierarchy']} NHTC " .
+			   " JOIN {$this->tables['testplan_tcversions']} TPTCV ON TPTCV.tcversion_id = NHTC.id " .
+			   " WHERE TPTCV.testplan_id = {$id} ";
+			   
+		$linked_items = $this->db->fetchRowsIntoMap($sql,'parent_id');			     
+		return $linked_items;
+	}
+
+
+	/*
   	function: get_linked_tcversions
             get information about testcases linked to a testplan.
 
@@ -566,7 +605,7 @@ class testplan extends tlObjectWithAttachments
 		 	[tsuites_id]: default null.
 		 	              If present only tcversions that are children of this testsuites
 		 	              will be included
-		 	[exec_type] default null -> all types
+		 	[exec_type] default null -> all types. 
 		 	[platform_id]              
 		     		
          [options]: map with following keys
@@ -609,6 +648,9 @@ class testplan extends tlObjectWithAttachments
          	           default 'simple'
          	           'full': add summary, steps and expected_results, and test suite name
          	           'summary': add summary 
+		 	[steps_info]: controls if step info has to be added on output    
+         	           default true
+		 	    
 		 	    
 	  returns: changes according options['output'] (see above)
 
@@ -618,6 +660,12 @@ class testplan extends tlObjectWithAttachments
                            - tcversion_id if has executions.
 
 	rev :
+		 20100520 - franciscom - added option steps_info, to try to solve perfomance problems
+		 						 allowing caller to ask for NO INFO ABOUT STEPS	
+		 20100417 - franciscom - added importance on output data
+		 		  				 BUGID 3356: "Failed Test Cases" report is not updated when a test case 
+		 		  				 			  has been changed from "Failed" to "Passed"		 
+		 		  				 			  
          20090814 - franciscom - interface changes due to platform feature
 	*/
 	public function get_linked_tcversions($id,$filters=null,$options=null)
@@ -640,23 +688,39 @@ class testplan extends tlObjectWithAttachments
                                'platform_id' => null, 'exec_type' => null);
                                
         $my['options'] = array('only_executed' => false, 'include_unassigned' => false,
-                               'output' => 'map', 'details' => 'simple', 
+                               'output' => 'map', 'details' => 'simple', 'steps_info' => false, 
                                'execution_details' => null, 'last_execution' => false);
 
  		// Cast to array to handle $options = null
 		$my['filters'] = array_merge($my['filters'], (array)$filters);
 		$my['options'] = array_merge($my['options'], (array)$options);
+
+		// new dBug($my['filters']);
+		// new dBug($my['options']);
         
 		$groupByPlatform=($my['options']['output']=='mapOfMap') ? ',platform_id' : '';
         $groupByBuild=($my['options']['execution_details'] == 'add_build') ? ',build_id' : '';
         
         // @TODO - 20091004 - franciscom
         // Think that this subquery in not good when we add execution filter
+		// $last_exec_subquery = " AND E.id IN ( SELECT MAX(id) " .
+		// 	 		             "               FROM  {$this->tables['executions']} executions " .
+		// 			             "               WHERE testplan_id={$id} %EXECSTATUSFILTER%" .
+		// 			             " GROUP BY tcversion_id,testplan_id {$groupByPlatform} {$groupByBuild} )";
+
+		// I've had confirmation of BAD query;
+		// BUGID 3356: "Failed Test Cases" report is not updated when a test case 
+		// 		  				 			  has been changed from "Failed" to "Passed"		 
+		//
+        // SUBQUERY CAN NOT HAVE ANY KIND OF FILTERING other that test plan.
+        // Adding exec status, means that we will get last exec WITH THIS STATUS, and not THE LATEST EXEC   
 		$last_exec_subquery = " AND E.id IN ( SELECT MAX(id) " .
 			 		          "               FROM  {$this->tables['executions']} executions " .
-					          "               WHERE testplan_id={$id} %EXECSTATUSFILTER%" .
+					          "               WHERE testplan_id={$id} " .
 					          " GROUP BY tcversion_id,testplan_id {$groupByPlatform} {$groupByBuild} )";
-
+           
+           
+           
 		$resultsCfg = config_get('results');
 		$status_not_run=$resultsCfg['status_code']['not_run'];
 		$sql_subquery='';
@@ -668,7 +732,8 @@ class testplan extends tlObjectWithAttachments
 		if( $my['options']['last_execution'] )
 		{
 			$executions['filter'] = " {$last_exec_subquery} ";
-			$executions['filter'] = str_ireplace("%EXECSTATUSFILTER%", "", $executions['filter']);
+			// 20100417 - franciscom - BUGID 3356
+			// $executions['filter'] = str_ireplace("%EXECSTATUSFILTER%", "", $executions['filter']);
 		}
 		
 		if( !is_null($my['filters']['platform_id']) )
@@ -676,6 +741,7 @@ class testplan extends tlObjectWithAttachments
 			$platforms['filter'] = " AND T.platform_id = {$my['filters']['platform_id']} ";
 	    }
 		
+		// 20100417- Why to use a list ? - must be checked if is on
 		if( !is_null($my['filters']['exec_type']) )
 		{
 			$tcversion_exec_type['filter'] = "AND TCV.execution_type IN (" . 
@@ -735,11 +801,18 @@ class testplan extends tlObjectWithAttachments
 			if(count($my['filters']['exec_status']) > 0)
 			{
 				$otherexec['filter']=" E.status IN ('" . implode("','",$my['filters']['exec_status']) . "') ";
-				$status_filter=str_ireplace("E.", "executions.", $otherexec['filter']);
-			    $sql_subquery = str_ireplace("%EXECSTATUSFILTER%", "AND {$status_filter}", $last_exec_subquery);
+				
+				// 20100417 - franciscom - BUGID 3356
+				// $status_filter=str_ireplace("E.", "executions.", $otherexec['filter']);
+			    // $sql_subquery = str_ireplace("%EXECSTATUSFILTER%", "AND {$status_filter}", $last_exec_subquery);
+
+				// code commented before BUGID 3356
 			    // $sql_subquery = str_ireplace("E.", "executions.", $sql_subquery);
 				// $sql_subquery = $last_exec_subquery;
-				$executions['filter'] = " ( {$otherexec['filter']} {$sql_subquery} ) ";  
+				
+				// 20100417 - franciscom - BUGID 3356
+				// $executions['filter'] = " ( {$otherexec['filter']} {$sql_subquery} ) ";  
+				$executions['filter'] = " ( {$otherexec['filter']} {$last_exec_subquery} ) ";  
 			}
 			if( !is_null($notrun['filter']) )
 			{
@@ -798,6 +871,8 @@ class testplan extends tlObjectWithAttachments
 			$builds['join']=" LEFT OUTER JOIN {$this->tables['builds']} B ON B.id=E.build_id ";
 	    }
 		
+	    // BUGID 3492 - Added execution notes to sql statement of get_linked_tcversions
+		// 20100417 - added TCV.importance
 		// 20090719 - added SQL comment on query text to make debug simpler.
 		$sql = "/* $debugMsg */ " .
 		       " SELECT NHB.parent_id AS testsuite_id, {$more_tcase_fields} {$more_parent_fields}" .
@@ -805,11 +880,11 @@ class testplan extends tlObjectWithAttachments
 			   " T.platform_id, PLAT.name as platform_name ,T.id AS feature_id, T.tcversion_id AS tcversion_id,  " .
 			   " T.node_order AS execution_order, T.creation_ts AS linked_ts, T.author_id AS linked_by," .
 			   " TCV.version AS version, TCV.active," .
-			   " TCV.tc_external_id AS external_id, TCV.execution_type," .
+			   " TCV.tc_external_id AS external_id, TCV.execution_type,TCV.importance," .
 			   " E.id AS exec_id, E.tcversion_number," .
 			   " E.tcversion_id AS executed, E.testplan_id AS exec_on_tplan, {$more_exec_fields}" .
 			   " E.execution_type AS execution_run_type, E.testplan_id AS exec_on_tplan, " .
-			   " E.execution_ts, E.tester_id,".
+			   " E.execution_ts, E.tester_id, E.notes as execution_notes, ".
 			   " UA.user_id,UA.type,UA.status,UA.assigner_id,T.urgency, " .
 			   " COALESCE(E.status,'" . $status_not_run . "') AS exec_status, ".
 			   " (urgency * importance) AS priority " .
@@ -891,7 +966,8 @@ class testplan extends tlObjectWithAttachments
 		
 		// BUGID 989 - added NHB.node_order (test case order)
 		$sql .= " ORDER BY testsuite_id,NHB.node_order,tc_id,platform_id,E.id ASC";
-		switch($my['options']['output'])
+
+ 		switch($my['options']['output'])
 		{ 
 			case 'array':
 			$recordset = $this->db->get_recordset($sql);
@@ -924,9 +1000,10 @@ class testplan extends tlObjectWithAttachments
 			}
 			break;
 		}
-
+		
         // Multiple Test Case Steps Feature
-        if( !is_null($recordset) )
+        // added after Julian mail regarding perf problems building exec tree
+        if( !is_null($recordset) && $my['options']['steps_info'])
         {
 		    $itemSet = array_keys($recordset);
 			switch($my['options']['output'])
@@ -1144,7 +1221,8 @@ class testplan extends tlObjectWithAttachments
 
 	/**
 	 * 
-	 *
+	 * @internal revisions
+	 * 20100505 - franciscom - BUGID 3434
 	 */
 	function get_keywords_map($id,$order_by_clause='')
 	{
@@ -1153,17 +1231,30 @@ class testplan extends tlObjectWithAttachments
 		
 		// keywords are associated to testcase id, then first
 		// we need to get the list of testcases linked to the testplan
-		$linked_items = $this->get_linked_tcversions($id);
+		// 
+		// 20100505 - according to user report (BUGID 3434) seems that 
+		// $linked_items = $this->get_linked_tcversions($id);
+		// has performance problems.
+		// Then make a choice do simple query here.
+		//
+		$sql = " /* $debugMsg */ ". 
+			   " SELECT DISTINCT parent_id FROM {$this->tables['nodes_hierarchy']} NHTC " .
+			   " JOIN {$this->tables['testplan_tcversions']} TPTCV ON TPTCV.tcversion_id = NHTC.id " .
+			   " WHERE TPTCV.testplan_id = {$id} ";
+			   
+		$linked_items = $this->db->fetchRowsIntoMap($sql,'parent_id');			     
+		
 		if( !is_null($linked_items) )
 		{
 			$tc_id_list = implode(",",array_keys($linked_items));
 			
-			$sql = "SELECT DISTINCT keyword_id,keywords.keyword
-				FROM {$this->tables['testcase_keywords']} testcase_keywords,
-				{$this->tables['keywords']} keywords
-				WHERE keyword_id = keywords.id
-				AND testcase_id IN ( {$tc_id_list} )
-				{$order_by_clause}";
+			$sql = " /* $debugMsg */ " .
+				   " SELECT DISTINCT TCKW.keyword_id,KW.keyword " .
+				   " FROM {$this->tables['testcase_keywords']} TCKW, " .
+				   " {$this->tables['keywords']} KW " .
+				   " WHERE TCKW.keyword_id = KW.id " .
+				   " AND TCKW.testcase_id IN ( {$tc_id_list} ) " .
+				   " {$order_by_clause} ";
 			$map_keywords = $this->db->fetchColumnsIntoMap($sql,'keyword_id','keyword');
 		}
 		return ($map_keywords);
@@ -1183,7 +1274,7 @@ class testplan extends tlObjectWithAttachments
 		
 		// keywords are associated to testcase id, then first
 		// we need to get the list of testcases linked to the testplan
-		$linked_items = $this->get_linked_tcversions($id);
+		$linked_items = $this->get_linked_items_id($id);
 		if( !is_null($linked_items) )
 		{
 			$keyword_filter= '' ;
@@ -1246,9 +1337,11 @@ class testplan extends tlObjectWithAttachments
 
 				   copy_assigned_to:
 				   tcversion_type: 
-				                  null -> use same version present on source testplan
+				                  null/'current' -> use same version present on source testplan
                                   'lastest' -> for every testcase linked to source testplan
                                                use lastest available version
+                                               
+       [mappings]: need to be documented                                        
   	returns: N/A
 	*/
 	function copy_as($id,$new_tplan_id,$tplan_name=null,$tproject_id=null,$user_id=null,
@@ -1293,9 +1386,16 @@ class testplan extends tlObjectWithAttachments
 		}
 		
 		
+		// Important Notice:
+		// Since the addition of Platforms, test case versions are linked to Test Plan AND Platforms
+		// this means, that not matter user choice, we will force Platforms COPY.
+		// This is a lazy approach, instead of complex one that requires understand what Platforms
+		// have been used on SOURCE Test Plan.
+		//
 		// copy test cases is an special copy
 		if( $my['options']['items2copy']['copy_tcases'] )
 		{
+			$my['options']['items2copy']['copy_platforms_links'] = 1;
 			$this->copy_linked_tcversions($id,$new_tplan_id,$user_id,$my['options'],$mappings);
 		}
 		
@@ -1355,14 +1455,13 @@ class testplan extends tlObjectWithAttachments
                                       use lastest available version
         	[copy_assigned_to]: 1 -> copy execution assignments without role control                              
 
+		[$mappings] useful when this method is called due to a Test Project COPY AS (yes PROJECT no PLAN)
+					
   	returns:
   
  	 Note: test urgency is set to default in the new Test plan (not copied)
 	*/
-	// private function copy_linked_tcversions($id,$new_tplan_id,$tcversion_type=null,
-	//                                         $copy_assigned_to=0,$user_id=-1)
-	private function copy_linked_tcversions($id,$new_tplan_id,$user_id=-1,
-	                                        $options=null,$mappings=null)
+	private function copy_linked_tcversions($id,$new_tplan_id,$user_id=-1, $options=null,$mappings=null)
 	
 	{
 		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
@@ -1428,6 +1527,9 @@ class testplan extends tlObjectWithAttachments
 					   " (testplan_id,tcversion_id,platform_id,node_order,urgency) " .
 					   " VALUES({$new_tplan_id},{$tcversion_id},{$platform_id}," .
 					   " {$elem['node_order']},{$elem['urgency']})";
+					   
+ 				 echo "<br>debug - <b><i>" . __FUNCTION__ . "</i></b><br><b>" . $sql . "</b><br>";
+	   
 				$this->db->exec_query($sql);
 				$new_feature_id = $this->db->insert_id($this->tables['testplan_tcversions']);
 				
@@ -1470,11 +1572,20 @@ class testplan extends tlObjectWithAttachments
 		{
 			foreach($rs as $mstone)
 			{
-				$sql="INSERT INTO {$this->tables['milestones']} (name,a,b,c,target_date,start_date,testplan_id) " .
-					 "VALUES ('" . $this->db->prepare_string($mstone['name']) ."'," .
-					 $mstone['high_percentage'] . "," . $mstone['medium_percentage'] . "," . 
-					 $mstone['low_percentage'] . ",'" . $mstone['target_date'] . "','" . $mstone['start_date'] .
-					 "',{$new_tplan_id})";
+				// BUGID 3430 - need to check if start date is NOT NULL
+				$add2fields = '';
+				$add2values = '';
+				$use_start_date = strlen(trim($mstone['start_date'])) > 0;
+				if( $use_start_date )
+				{
+					$add2fields = 'start_date,';
+					$add2values = "'" . $mstone['start_date'] . "',";
+				}
+
+				$sql = "INSERT INTO {$this->tables['milestones']} (name,a,b,c,target_date,{$add2fields} testplan_id)";				
+                $sql .= " VALUES ('" . $this->db->prepare_string($mstone['name']) ."'," .
+					    $mstone['high_percentage'] . "," . $mstone['medium_percentage'] . "," . 
+					    $mstone['low_percentage'] . ",'" . $mstone['target_date'] . "', {$add2values}{$new_tplan_id})";
 				$this->db->exec_query($sql);
 			}
 		}
@@ -1612,22 +1723,29 @@ class testplan extends tlObjectWithAttachments
 		$main_sql=array();
 		
 		$this->deleteUserRoles($id);
+		$getFeaturesSQL = " SELECT id FROM {$this->tables['testplan_tcversions']} WHERE testplan_id={$id} "; 
 		$the_sql[]="DELETE FROM {$this->tables['milestones']} WHERE testplan_id={$id}";
 		
 		// CF used on testplan_design are linked by testplan_tcversions.id
 		$the_sql[]="DELETE FROM {$this->tables['cfield_testplan_design_values']} WHERE link_id ".
-			       "IN (SELECT id FROM {$this->tables['testplan_tcversions']} WHERE testplan_id={$id})";
+			       "IN ({$getFeaturesSQL})";
+
+		// BUGID 3465: Delete Test Project - User Execution Assignment is not deleted
+		$the_sql[]="DELETE FROM {$this->tables['user_assignments']} WHERE feature_id ".
+			       "IN ({$getFeaturesSQL})";
 		
-		// missing delete - 20100201
+		$the_sql[]="DELETE FROM {$this->tables['risk_assignments']} WHERE testplan_id={$id}";
 		$the_sql[]="DELETE FROM {$this->tables['testplan_platforms']} WHERE testplan_id={$id}";
 
 		$the_sql[]="DELETE FROM {$this->tables['testplan_tcversions']} WHERE testplan_id={$id}";
 		$the_sql[]="DELETE FROM {$this->tables['builds']} WHERE testplan_id={$id}";
 		$the_sql[]="DELETE FROM {$this->tables['cfield_execution_values']} WHERE testplan_id={$id}";
+		$the_sql[]="DELETE FROM {$this->tables['user_testplan_roles']} WHERE testplan_id={$id}";
+		
 		
 		// When deleting from executions, we need to clean related tables
 		$the_sql[]="DELETE FROM {$this->tables['execution_bugs']} WHERE execution_id ".
-			"IN (SELECT id FROM {$this->tables['executions']} WHERE testplan_id={$id})";
+				   "IN (SELECT id FROM {$this->tables['executions']} WHERE testplan_id={$id})";
 		$the_sql[]="DELETE FROM {$this->tables['executions']} WHERE testplan_id={$id}";
 		
 		
@@ -1749,28 +1867,28 @@ class testplan extends tlObjectWithAttachments
 		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
 
 		// BUGID 0002776
-		$sql = "SELECT nhgrandparent.name, nhgrandparent.id " . 
-			"FROM {$this->tables['testplan_tcversions']}  tptcv, {$this->tables['nodes_hierarchy']}  nh, " .
-			" {$this->tables['nodes_hierarchy']} nhparent, {$this->tables['nodes_hierarchy']} nhgrandparent " . 
-			"WHERE tptcv.tcversion_id = nh.id " .
-			"AND nh.parent_id = nhparent.id " .
-			"AND nhparent.parent_id = nhgrandparent.id " .
-			"AND tptcv.testplan_id = " . $id . " " .
-			"GROUP BY nhgrandparent.name,nhgrandparent.id " .
-			"ORDER BY nhgrandparent.name" ;
+		$sql = " SELECT NHTSUITE.name, NHTSUITE.id, NHTSUITE.parent_id" . 
+			   " FROM {$this->tables['testplan_tcversions']}  TPTCV, {$this->tables['nodes_hierarchy']}  NHTCV, " .
+			   " {$this->tables['nodes_hierarchy']} NHTCASE, {$this->tables['nodes_hierarchy']} NHTSUITE " . 
+			   " WHERE TPTCV.tcversion_id = NHTCV.id " .
+			   " AND NHTCV.parent_id = NHTCASE.id " .
+			   " AND NHTCASE.parent_id = NHTSUITE.id " .
+			   " AND TPTCV.testplan_id = " . $id . " " .
+			   " GROUP BY NHTSUITE.name,NHTSUITE.id,NHTSUITE.parent_id " .
+			   " ORDER BY NHTSUITE.name" ;
 		
 		$recordset = $this->db->get_recordset($sql);
 		
-		//Now the recordset contains testsuites that have child test cases... 
-		//However there could potentially be testsuites that only have grandchildren/greatgrandchildren
-		//this will iterate through found test suites and check for 
+		// Now the recordset contains testsuites that have child test cases.
+		// However there could potentially be testsuites that only have grandchildren/greatgrandchildren
+		// this will iterate through found test suites and check for 
 		$superset = $recordset;
 		foreach($recordset as $value)
 		{
 			$superset = array_merge($superset, $this->get_parenttestsuites($value['id']));
 		}    
 		
-		//At this point there may be duplicates
+		// At this point there may be duplicates
 		$dup_track = array();
 		foreach($superset as $value)
 		{
@@ -1781,7 +1899,7 @@ class testplan extends tlObjectWithAttachments
 			}        
 		}    
 		
-		//Needs to be alphabetical based upon name attribute 
+		// Needs to be alphabetical based upon name attribute 
 		usort($finalset, array("testplan", "compare_name"));
 		return $finalset;
 	}
@@ -1821,17 +1939,17 @@ class testplan extends tlObjectWithAttachments
 		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
 
 	    $sql = "SELECT name, id, parent_id " .
-		    "FROM {$this->tables['nodes_hierarchy']}  nh " .
-		    "WHERE nh.node_type_id <> 1 " .
-		    "AND nh.id = " . $id;
+		       "FROM {$this->tables['nodes_hierarchy']}  NH " .
+		       "WHERE NH.node_type_id <> {$this->node_types_descr_id['testproject']} " .
+		       "AND NH.id = " . $id;
 		    
 	    $recordset = $this->db->get_recordset($sql);
-	    
 	    $myarray = array();
 	    if (count($recordset) > 0)
 	    {        
-		    //Don't want parentid in final result so just adding in attributes we want.
-		    $myarray = array(array('name'=>$recordset[0]['name'], 'id'=>$recordset[0]['id']));
+		    // 20100611 - franciscom
+		    // $myarray = array(array('name'=>$recordset[0]['name'], 'id'=>$recordset[0]['id']));
+		    $myarray = array($recordset[0]);
 		    $myarray = array_merge($myarray, $this->get_parenttestsuites($recordset[0]['parent_id'])); 
 	    }
 	    
@@ -2434,7 +2552,10 @@ class testplan extends tlObjectWithAttachments
 			if( is_null($tcase_set) )
 			{
 				// we will compute time for ALL linked test cases
-				$linked_testcases=$this->get_linked_tcversions($id);  
+				// $linked_testcases=$this->get_linked_tcversions($id);  
+				// Test done due to BUGID 3434 has shown that:
+				// get_linked_items_id($id) has better performance than get_linked_tcversions($id);
+				$linked_testcases=$this->get_linked_items_id($id);  
 				if( ($status_ok=!is_null($linked_testcases)) )
 				{
 					$tcase_ids=array_keys($linked_testcases);
@@ -2914,29 +3035,35 @@ class testplan extends tlObjectWithAttachments
 
     /**
      *
-	 * @param id: test plan id
+	 * @param tplan_id: test plan id
 	 * @return map: 
+	 *
+	 * @internal revisions
+	 * 20100610 - eloff - BUGID 3515 - take platforms into account
  	 */
-	public function getStatusTotals($id)
+	public function getStatusTotals($tplan_id)
 	{
 		$code_verbose = $this->getStatusForReports();
 	
 		$filters=null;
-		$options=array('output' => 'map');
-    	$execResults = $this->get_linked_tcversions($id,$filters,$options);
+		$options=array('output' => 'mapOfMap');
+		$execResults = $this->get_linked_tcversions($tplan_id,$filters,$options);
 	
 		$totals = array('total' => 0,'not_run' => 0);
 		foreach($code_verbose as $status_code => $status_verbose)
 		{
 			$totals[$status_verbose]=0;
 		}
-		foreach($execResults as $key => $elem)
+		foreach($execResults as $key => $testcases)
 		{
-			$totals['total']++;
-			$totals[$code_verbose[$elem['exec_status']]]++;			
+			foreach($testcases as $testcase)
+			{
+				$totals['total']++;
+				$totals[$code_verbose[$testcase['exec_status']]]++;
+			}
 		}
-        return $totals;
-    }
+		return $totals;
+	}
 
 
     /**
@@ -2945,102 +3072,70 @@ class testplan extends tlObjectWithAttachments
  	 */
 	public function getStatusForReports()
 	{
-    	// This will be used to create dynamically counters if user add new status
+		// This will be used to create dynamically counters if user add new status
 		$resultsCfg = config_get('results');
-    	foreach( $resultsCfg['status_label_for_exec_ui'] as $tc_status_verbose => $label)
-    	{
-        	$code_verbose[$resultsCfg['status_code'][$tc_status_verbose]] = $tc_status_verbose;
-    	}
-    	if( !isset($resultsCfg['status_label_for_exec_ui']['not_run']) )
-    	{
-        	$code_verbose[$resultsCfg['status_code']['not_run']] = 'not_run';  
-    	}
-    	return $code_verbose;
-   }
+		foreach( $resultsCfg['status_label_for_exec_ui'] as $tc_status_verbose => $label)
+		{
+			$code_verbose[$resultsCfg['status_code'][$tc_status_verbose]] = $tc_status_verbose;
+		}
+		if( !isset($resultsCfg['status_label_for_exec_ui']['not_run']) )
+		{
+			$code_verbose[$resultsCfg['status_code']['not_run']] = 'not_run';
+		}
+		return $code_verbose;
+	}
 
     /**
      *
-	 * @param id: test plan id
-	 * @return map: 
+	 * @param tplan_id: test plan id
+	 * @return map:
 	 *
 	 *	'type' => 'platform'
 	 *	'total_tc => ZZ
 	 *	'details' => array ( 'passed' => array( 'qty' => X)
-	 *	                     'failed' => array( 'qty' => Y) 	
-	 *	                     'blocked' => array( 'qty' => U) 	 	
+	 *	                     'failed' => array( 'qty' => Y)
+	 *	                     'blocked' => array( 'qty' => U)
 	 *                       ....)
 	 *
 	 * @internal revision
+	 * 20100610 - eloff - BUGID 3515 - rewrite inspired by getStatusTotals()
 	 * 20100201 - franciscom - BUGID 3121
 	 */
-	public function getStatusTotalsByPlatform($id)
+	public function getStatusTotalsByPlatform($tplan_id)
 	{
-		$id = is_null($id) ? 2 : $id;
 		$code_verbose = $this->getStatusForReports();
-        $platformSet = $this->getPlatforms($id,array('outputFormat' => 'map'));
-        $totals = null;
-        $platformIDSet = is_null($platformSet) ? array(0) : array_keys($platformSet);
-        
-        foreach($platformIDSet as $platformID)
-        {
-        	$totals[$platformID]=array('type' => 'platform', 
-        	                           'name' => $platformSet[$platformID],
-        	                           'total_tc' => 0, 
-        	                           'details' => null);
+
+		$filters=null;
+		$options=array('output' => 'mapOfMap');
+		$execResults = $this->get_linked_tcversions($tplan_id,$filters,$options);
+
+		$code_verbose = $this->getStatusForReports();
+		$platformSet = $this->getPlatforms($tplan_id, array('outputFormat' => 'map'));
+		$totals = null;
+		$platformIDSet = is_null($platformSet) ? array(0) : array_keys($platformSet);
+
+		foreach($platformIDSet as $platformID)
+		{
+			$totals[$platformID]=array(
+				'type' => 'platform',
+				'name' => $platformSet[$platformID],
+				'total_tc' => 0,
+				'details' => array());
 			foreach($code_verbose as $status_code => $status_verbose)
 			{
-				$totals[$platformID]['details'][$status_verbose]['qty']=0;
+				$totals[$platformID]['details'][$status_verbose]['qty'] = 0;
 			}
-        }
-        new dBug($totals);
-        
-		// First step - get not run
-		$filters=null;
-        $options=array('group_by_platform_tcversion' => true);
-        $notRunResults = $this->getNotExecutedLinkedTCVersionsDetailed($id,$filters,$options);
-        
-        new dBug($notRunResults);
-        
-        
-        $loop2do = count($notRunResults);
-        for($idx=0; $idx < $loop2do ; $idx++)
-        {
-        	$totals[$notRunResults[$idx]['platform_id']]['total_tc']++;
-        	$totals[$notRunResults[$idx]['platform_id']]['details']['not_run']['qty']++;
-        }
-
-        // 20100214 - franciscom
-        // I've found this situation
-        // 1. start test plan WITHOUT platforms
-        // 2. run only a couple of tests
-        // 3. create platforms
-        // 4. assign platforms
-        //
-        // In this situation we will have a problem with ALL NOT RUNNED TEST CASES
-        // because not run do not get platform ID from executions file
-        // NEED TO BE FIXED
-        //
-
-        new dBug($totals);
-                	
-		// Second step - get other results
-		$filters = null;
-	    $options=array('output' => 'array' , 'last_execution' => true, 'only_executed' => true);
-	    $execResults = $this->get_linked_tcversions($id,$filters,$options);
-        $loop2do = count($execResults);
-        for($idx=0; $idx < $loop2do ; $idx++)
-        {
-        	$key=$code_verbose[$execResults[$idx]['exec_status']];
-        	$totals[$execResults[$idx]['platform_id']]['total_tc']++;
-        	
-        	if( !isset($totals[$execResults[$idx]['platform_id']]['details'][$key]['qty']) )
-        	{
-        		$totals[$execResults[$idx]['platform_id']]['details'][$key]['qty']=0;
-        	}
-        	$totals[$execResults[$idx]['platform_id']]['details'][$key]['qty']++;
-        }
-        return $totals;
-    }
+		}
+		foreach($execResults as $key => $testcases)
+		{
+			foreach($testcases as $platform_id => $testcase)
+			{
+				$totals[$platform_id]['total_tc']++;
+				$totals[$platform_id]['details'][$code_verbose[$testcase['exec_status']]]['qty']++;
+			}
+		}
+		return $totals;
+	}
 
 	/**
 	 * @param int $tplan_id test plan id
@@ -3053,6 +3148,7 @@ class testplan extends tlObjectWithAttachments
 	 *	                      ....)
 	 *
 	 * @internal revision
+	 * 20100614 - eloff - refactor to same style as the other getStatusTotals...()
 	 * 20100206 - eloff - BUGID 3060
 	 */
 	public function getStatusTotalsByPriority($tplan_id)
@@ -3076,88 +3172,72 @@ class testplan extends tlObjectWithAttachments
 				$totals[$prioCode]['details'][$status_verbose]['qty']=0;
 			}
 		}
-
-		// First step - get not run
-		$filters=null;
-		$options=array();
-		$notRunResults = $this->getNotExecutedLinkedTCVersionsDetailed($tplan_id,$filters,$options);
-
-		foreach ($notRunResults as $result)
-		{
-			$prio_level = $this->urgencyImportanceToPriorityLevel($result['priority']);
-			$totals[$prio_level]['total_tc']++;
-			$totals[$prio_level]['details']['not_run']['qty']++;
-		}
-
-		// Second step - get other results
 		$filters = null;
-		$options=array('output' => 'array' , 'last_execution' => true, 'only_executed' => true);
+		$options=array('output' => 'mapOfMap');
 		$execResults = $this->get_linked_tcversions($tplan_id,$filters,$options);
-		foreach ($execResults as $result)
-		{
-			$prio_level = $this->urgencyImportanceToPriorityLevel($result['priority']);
-			$key=$code_verbose[$result['exec_status']];
-			$totals[$prio_level]['total_tc']++;
 
-			if (!isset($totals[$prio_level]['details'][$key]['qty']))
+		foreach($execResults as $testcases)
+		{
+			foreach($testcases as $testcase)
 			{
-				$totals[$prio_level]['details'][$key]['qty']=0;
+				$prio_level = $this->urgencyImportanceToPriorityLevel($testcase['priority']);
+				$totals[$prio_level]['total_tc']++;
+				$totals[$prio_level]['details'][$code_verbose[$testcase['exec_status']]]['qty']++;
 			}
-			$totals[$prio_level]['details'][$key]['qty']++;
 		}
 		return $totals;
-    }
+	}
 
-    /**
-     * get last execution status analised by keyword, used to build reports.
-     * 
-	 * @param id: test plan id
+	/**
+	 * get last execution status analised by keyword, used to build reports.
+	 *
+	 * @param tplan_id: test plan id
 	 * @return map: key: keyword id
 	 *              value: map with following structure
 	 *
-	 *             
+	 *
  	 */
-	public function getStatusTotalsByKeyword($id)
+	public function getStatusTotalsByKeyword($tplan_id)
 	{
 		$code_verbose = $this->getStatusForReports();
 		$totals = null;
 		$filters=null;
 		$options=array('output' => 'map');
-    	$execResults = $this->get_linked_tcversions($id,$filters,$options);
-	 
-	    if( !is_null($execResults) )
-	    {
-	    	$tcaseSet = array_keys($execResults);
-            $kw=$this->tcase_mgr->getKeywords($tcaseSet,null,'keyword_id',' ORDER BY keyword ASC ');
-            if( !is_null($kw) )
-            {
-            	$keywordSet = array_keys($kw);
-            	foreach($keywordSet as $keywordID)
-            	{
-            		$totals[$keywordID]['type'] = 'keyword';                                                                     
-            		$totals[$keywordID]['name']=$kw[$keywordID][0]['keyword'];
-            		$totals[$keywordID]['notes']=$kw[$keywordID][0]['notes'];
-            		$totals[$keywordID]['total_tc'] = 0;                                                                     
+		$execResults = $this->get_linked_tcversions($tplan_id,$filters,$options);
+
+		if( !is_null($execResults) )
+		{
+			$tcaseSet = array_keys($execResults);
+			$kw=$this->tcase_mgr->getKeywords($tcaseSet,null,'keyword_id',' ORDER BY keyword ASC ');
+			if( !is_null($kw) )
+			{
+				$keywordSet = array_keys($kw);
+				foreach($keywordSet as $keywordID)
+				{
+					$totals[$keywordID]['type'] = 'keyword';
+					$totals[$keywordID]['name']=$kw[$keywordID][0]['keyword'];
+					$totals[$keywordID]['notes']=$kw[$keywordID][0]['notes'];
+					$totals[$keywordID]['total_tc'] = 0;
 					foreach($code_verbose as $status_code => $status_verbose)
 					{
 						$totals[$keywordID]['details'][$status_verbose]['qty']=0;
 					}
-            	} 
-            	
-            	foreach($keywordSet as $keywordID)
-            	{
-            		foreach($kw[$keywordID] as $kw_tcase)
-            		{
-            			$status = $execResults[$kw_tcase['testcase_id']]['exec_status'];
-            			$totals[$keywordID]['total_tc']++;
-            			$totals[$keywordID]['details'][$code_verbose[$status]]['qty']++;
-            		}
-            	}
-            }
-	    }
-	    
-        return $totals;
-    }
+				}
+
+				foreach($keywordSet as $keywordID)
+				{
+					foreach($kw[$keywordID] as $kw_tcase)
+					{
+						$status = $execResults[$kw_tcase['testcase_id']]['exec_status'];
+						$totals[$keywordID]['total_tc']++;
+						$totals[$keywordID]['details'][$code_verbose[$status]]['qty']++;
+					}
+				}
+			}
+		}
+
+		return $totals;
+	}
 
     /**
      * 
@@ -3176,6 +3256,7 @@ class testplan extends tlObjectWithAttachments
 		$user_platform = null;
 		$options = array('output' => 'mapOfMap');
     	$execResults = $this->get_linked_tcversions($id,$filters,$options);
+    	
 	    if( !is_null($execResults) )
 	    {
 	    	$tcaseSet = array_keys($execResults);
@@ -3185,28 +3266,46 @@ class testplan extends tlObjectWithAttachments
             	$platformIDSet = array_keys($execResults[$tcaseID]);
             	foreach($platformIDSet as $platformID)
             	{
+            		
+            		$testedBy = $testcaseInfo[$platformID]['tester_id'];
             		$assignedTo = $testcaseInfo[$platformID]['user_id'];
             		$assignedTo = !is_null($assignedTo) && $assignedTo > 0 ? $assignedTo : TL_USER_NOBODY;
             		$execStatus = $testcaseInfo[$platformID]['exec_status'];
-            		
+					
             		// to avoid errors due to bad or missing config
             		$verboseStatus = isset($code_verbose[$execStatus]) ? $code_verbose[$execStatus] : $execStatus;
             		
-            		if( !isset($user_platform[$assignedTo][$platformID]) )
+            		// 20100425 - francisco.mancardi@gruppotesi.com
+            		if( $assignedTo != TL_USER_NOBODY )
             		{
-            			$user_platform[$assignedTo][$platformID]['total']=0;
+            			if( !isset($user_platform[$assignedTo][$platformID]) )
+            			{
+            				$user_platform[$assignedTo][$platformID]['total']=0;
+            			}
+            			
+            			if( !isset($user_platform[$assignedTo][$platformID][$verboseStatus]) )
+            			{
+            				$user_platform[$assignedTo][$platformID][$verboseStatus]=0;
+            			}
+            		}   
+            		
+            		$testerBoy = is_null($testedBy) ? $assignedTo : $testedBy; 
+            		if( !isset($user_platform[$testerBoy][$platformID]) )
+            		{
+            			$user_platform[$testerBoy][$platformID]['total']=0;
             		}
             		
-            		if( !isset($user_platform[$assignedTo][$platformID][$verboseStatus]) )
+            		if( !isset($user_platform[$testerBoy][$platformID][$verboseStatus]) )
             		{
-            			$user_platform[$assignedTo][$platformID][$verboseStatus]=0;
+            			$user_platform[$testerBoy][$platformID][$verboseStatus]=0;
             		}   
-            		$user_platform[$assignedTo][$platformID]['total']++;
-            		$user_platform[$assignedTo][$platformID][$verboseStatus]++;
+                    
+            		$user_platform[$testerBoy][$platformID]['total']++;
+            		$user_platform[$testerBoy][$platformID][$verboseStatus]++;
+                   
 				}
             } 
         }
-	    
         return $user_platform;
     }
 
@@ -3334,21 +3433,23 @@ class testplan extends tlObjectWithAttachments
 	/**
 	 * getTestCaseSiblings()
 	 *
+	 * @internal revisions
+	 * 20100520 - franciscom - missed platform_id piece on join
 	 */
 	function getTestCaseSiblings($id,$tcversion_id,$platform_id)
 	{
 		$sql = 	" SELECT NHTSET.name as testcase_name,NHTSET.id AS testcase_id , NHTCVSET.id AS tcversion_id," .
         		" NHTC.parent_id AS testsuite_id, " .
-        		// " TPTCVMAIN.tcversion_id AS target_tcversion_id, " .
-        		// " NHTCV.parent_id  " .
         		" TPTCVX.id AS feature_id, TPTCVX.node_order " .
 				" from {$this->tables['testplan_tcversions']} TPTCVMAIN " .
 				" JOIN {$this->tables['nodes_hierarchy']} NHTCV ON NHTCV.id = TPTCVMAIN.tcversion_id " . 
 				" JOIN {$this->tables['nodes_hierarchy']} NHTC ON NHTC.id = NHTCV.parent_id " . 
 				" JOIN {$this->tables['nodes_hierarchy']} NHTSET ON NHTSET.parent_id = NHTC.parent_id " .
 				" JOIN {$this->tables['nodes_hierarchy']} NHTCVSET ON NHTCVSET.parent_id = NHTSET.id " .
-				" JOIN {$this->tables['testplan_tcversions']} TPTCVX ON TPTCVX.tcversion_id = NHTCVSET.id " .
+				" JOIN {$this->tables['testplan_tcversions']} TPTCVX " . 
+				" ON TPTCVX.tcversion_id = NHTCVSET.id " .
 				" AND TPTCVX.testplan_id = TPTCVMAIN.testplan_id " .
+				" AND TPTCVX.platform_id = TPTCVMAIN.platform_id " .
 				" WHERE TPTCVMAIN.testplan_id = {$id} AND TPTCVMAIN.tcversion_id = {$tcversion_id} " .
 				" AND TPTCVMAIN.platform_id = {$platform_id} " .
 				" ORDER BY node_order,testcase_name ";
@@ -3411,6 +3512,119 @@ class testplan extends tlObjectWithAttachments
             return LOW;
         }
     }
+
+
+	// -------------------
+    /**
+     * 
+	 * @param id: test plan id
+	 * @return map: 
+ 	 *             key: user id
+ 	 *             value: map with key=platform id
+ 	 *                             value: map with keys: 'total' and verbose status
+ 	 *                                             values: test case count.
+ 	 *                              
+ 	 */
+	public function getStatusTotalsByTesterPlatform($id)
+	{
+		$code_verbose = $this->getStatusForReports();
+		$filters = null;
+		$user_platform = null;
+		$options = array('output' => 'mapOfMap');
+    	$execResults = $this->get_linked_tcversions($id,$filters,$options);
+    	
+	    if( !is_null($execResults) )
+	    {
+	    	$tcaseSet = array_keys($execResults);
+            foreach($tcaseSet as $tcaseID)
+            {
+            	$testcaseInfo=$execResults[$tcaseID];
+            	$platformIDSet = array_keys($execResults[$tcaseID]);
+            	foreach($platformIDSet as $platformID)
+            	{
+            		$testedBy = $testcaseInfo[$platformID]['tester_id'];
+            		$testedBy = !is_null($testedBy) && $testedBy > 0 ? $testedBy : TL_USER_NOBODY;
+            		$execStatus = $testcaseInfo[$platformID]['exec_status'];
+            		
+            		// to avoid errors due to bad or missing config
+            		$verboseStatus = isset($code_verbose[$execStatus]) ? $code_verbose[$execStatus] : $execStatus;
+            		
+            		if( !isset($user_platform[$testedBy][$platformID]) )
+            		{
+            			$user_platform[$testedBy][$platformID]['total']=0;
+            		}
+            		
+            		if( !isset($user_platform[$testedBy][$platformID][$verboseStatus]) )
+            		{
+            			$user_platform[$testedBy][$platformID][$verboseStatus]=0;
+            		}   
+            		$user_platform[$testedBy][$platformID]['total']++;
+            		$user_platform[$testedBy][$platformID][$verboseStatus]++;
+				}
+            } 
+        }
+	    
+        return $user_platform;
+    }
+
+    /**
+     * 
+	 * @param id: test plan id
+	 * @return map: 
+ 	 *             key: user id
+ 	 *             value: map with key=platform id
+ 	 *                             value: map with keys: 'total' and verbose status
+ 	 *                                             values: test case count.
+ 	 *                              
+ 	 */
+	public function getStatusTotalsByTester($id)
+	{
+		$unassigned = lang_get('unassigned');
+		$data_set = $this->getStatusTotalsByAssignedTesterPlatform($id);
+	    if( !is_null($data_set) )
+	    {
+			$code_verbose = $this->getStatusForReports();
+
+	    	$userSet = array_keys($data_set);
+	    	// need to find a better way (with less overhead and data movement) to do this
+            $userCol=tlUser::getByIDs($this->db,$userSet,tlUser::TLOBJ_O_GET_DETAIL_MINIMUM);
+            foreach($userSet as $testedBy)
+            {
+            	$user_platform[$testedBy]['type'] = 'tester';
+            	$user_platform[$testedBy]['name'] = $unassigned; 
+            	if( $testedBy > 0 )
+            	{
+            		$user_platform[$testedBy]['name'] = $userCol[$testedBy]->getDisplayName();;
+            	}
+            	$user_platform[$testedBy]['total_tc'] = 0;
+            	
+   				foreach($code_verbose as $status_code => $status_verbose)
+			    {
+					$user_platform[$testedBy]['details'][$status_verbose]['qty']=0;
+			    }
+            	
+            	// this will be removed from final result
+            	$user_platform[$testedBy]['details']['total']['qty'] = 0;
+            	
+            	$platformIDSet = array_keys($data_set[$assignedTo]);
+            	foreach($platformIDSet as $platformID)
+            	{
+            		foreach( $data_set[$testedBy][$platformID] as $verboseStatus => $counter)
+            		{
+            			if( !isset($user_platform[$testedBy]['details'][$verboseStatus]) )
+            			{
+            				$user_platform[$testedBy]['details'][$verboseStatus]['qty']=0;
+            			}   
+            		    $user_platform[$testedBy]['details'][$verboseStatus]['qty'] += $counter;
+            		}
+				}
+				$user_platform[$testedBy]['total_tc']=$user_platform[$testedBy]['details']['total']['qty'];
+				unset($user_platform[$testedBy]['details']['total']);
+            } 
+        }
+        return $user_platform;
+    }
+
 
 
 
@@ -3834,6 +4048,7 @@ class milestone_mgr extends tlObject
 		$rs=$this->db->get_recordset($sql);
 		return $rs;
 	}
+
 
 } // end class milestone_mgr
 ?>

@@ -1,6 +1,6 @@
 <?php
 /** 
- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+ * ♔ TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later. 
  * 
  * Localization: English (en_GB) texts - default development localization (World-wide English)
@@ -20,9 +20,11 @@
  * @package 	TestLink
  * @author 		Martin Havlat
  * @copyright 	2003-2009, TestLink community 
- * @version    	CVS: $Id: description.php,v 1.10 2010/02/23 12:45:45 asimon83 Exp $
+ * @version    	CVS: $Id: description.php,v 1.14 2010/06/24 17:25:56 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
+ * @internal Revisions:
+ * 20100409 - eloff - BUGID 3050 - Update execution help text
  **/
 
 
@@ -151,22 +153,29 @@ After closing the add bug page, you will see relevant bug data on the execute pa
 </p>";
 
 // execFilter.html
-$TLS_hlp_executeFilter = "<h2>Filter & Settings</h2>
+$TLS_hlp_executeFilter = "<h2>Settings</h2>
 
-<p>Filter & Settings provide the opportunity to influence the set of shown test cases " .
-"before the execution. You can choose the test plan and the build you wish to execute " .
-"the test cases for and reduce the set of shown test cases by specifying other filters. <br />" .
-"Filters are applied to test case tree after clicking the \"Apply\" button. " .
-"Advanced Filters will allow you to specify a set of values for applicable filters by " .
-"using CTRL-Click inside the Multi-Select ListBox</p>
+<p>Settings allows you to select the test plan, build and platform (if available) to
+be executed.</p>
 
 <h3>Test Plan</h3>
-<p>You can choose the required test plan. According to the chosen test plan the appropriate " .
-"builds will be shown. After choosing a test plan filters will be reset and tree will be " .
-"updated without clicking the \"Apply\" button.</p>
+<p>You can choose the required test plan. According to the chosen test plan the appropriate
+builds will be shown. After choosing a test plan filters will be reset.</p>
+
+<h3>Platform</h3>
+<p>If the platforms feature is used, you must select the appropriate platform before execution.</p>
 
 <h3>Build to execute</h3>
 <p>You can choose the build you whish to execute the test cases for.</p>
+
+<h2>Filters</h2>
+<p>Filters provide the opportunity to further influence the set of shown test cases
+before the execution. You can reduce the set of shown test cases by specifying filters
+and click the \"Apply\" button.</p>
+
+<p> Advanced Filters will allow you to specify a set of values for applicable filters by
+using CTRL-Click inside the Multi-Select ListBox</p>
+
 
 <h3>Keyword Filter</h3>
 <p>You can filter test cases by the keywords that have been assigned. You can choose " .
@@ -228,6 +237,12 @@ wrong designed requirements.</p>
 requirements within the specification screen. These Test Cases are created into Test Suite
 with name defined in configuration <i>(default is: &#36;tlCfg->req_cfg->default_testsuite_name = 
 \"Test suite created by Requirement - Auto\";)</i>. Title and Scope are copied to these Test cases.</p>
+";
+
+$TLS_hlp_req_coverage_table = "<h3>Coverage:</h3>
+A value of e.g. \"40% (8/20)\" means that 20 Test Cases have to be created for this Requirement 
+to test it completely. 8 of those have already been created and linked to this Requirement, which 
+makes a coverage of 40 percent.
 ";
 
 

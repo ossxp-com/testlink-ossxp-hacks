@@ -6,11 +6,15 @@
  * @package 	TestLink
  * @author 		franciscom
  * @copyright 	2005-2009, TestLink community 
- * @version    	CVS: $Id: testsuite.class.php,v 1.90 2010/02/27 18:58:05 franciscom Exp $
+ * @version    	CVS: $Id: testsuite.class.php,v 1.97 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  * @internal Revisions:
  *
+ * 20100602 - franciscom - BUGID 3498 - get_by_name() - missing JOIN
+ * 20100328 - franciscom - get_by_id() interface and return set changes
+ *						   get_children() - new method - contribution - BUGID 2645
+ * 20100315 - amitkhullar - Added options for CFields for Export.
  * 20100227 - franciscom - BUGID 0003233: After test suite edit, display of Test suite do not 
  *                         have upload button enabled for attachment
  * 20100210	- franciscom - keywords XML export refactored
@@ -329,13 +333,16 @@ class testsuite extends tlObjectWithAttachments
 	           details
 	           name: testsuite name
 	
+	  @internal Revisions
+	  20100602 - BUGID 3498	
 	*/
 	function get_by_name($name)
 	{
-		$sql = " SELECT testsuites.*, nodes_hierarchy.name " .
-			   " FROM {$this->tables['testsuites']} testsuites, " .
-			   " {$this->tables['nodes_hierarchy']} nodes_hierarchy " .
-			   " WHERE nodes_hierarchy.name = '" . $this->db->prepare_string($name) . "'";
+		$sql = " SELECT TS.*, NH.name, NH.parent_id " .
+			   " FROM {$this->tables['testsuites']} TS " .
+			   " JOIN {$this->tables['nodes_hierarchy']} NH " .
+			   " ON NH.id = TS.id " .
+			   " WHERE NH.name = '" . $this->db->prepare_string($name) . "'";
 		
 		$recordset = $this->db->get_recordset($sql);
 		return $recordset;
@@ -343,29 +350,39 @@ class testsuite extends tlObjectWithAttachments
 	
 	/*
 	  function: get_by_id
-	            get info for one test suite
+	            get info for one (or several) test suite(s)
 	
 	  args : id: testsuite id
 	  
 	  returns: map with following keys:
 	           
-	           id: 	testsuite id (node id)
+	           id: 	testsuite id (node id) (can be an array)
 	           details
 	           name: testsuite name
 	  
 	  
 	  rev :
+	  		20100328 - BUGID 2645 - contribution - added parent_id
 	        20070324 - added node_order in result set
 	
 	*/
-	function get_by_id($id)
+	function get_by_id($id, $order_by = '')
 	{
-		$sql = " SELECT testsuites.*, NH.name, NH.node_type_id, NH.node_order " .
-		       "  FROM {$this->tables['testsuites']} testsuites, " .
-		       " {$this->tables['nodes_hierarchy']}  NH " .
-		       "  WHERE testsuites.id = NH.id  AND testsuites.id = {$id}";
-	    $recordset = $this->db->get_recordset($sql);
-	    return($recordset ? $recordset[0] : null);
+		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
+		$sql = "/* $debugMsg */ SELECT TS.*, NH.name, NH.node_type_id, NH.node_order, NH.parent_id " .
+		       "  FROM {$this->tables['testsuites']} TS, " .
+		       " {$this->tables['nodes_hierarchy']} NH   WHERE TS.id = NH.id AND TS.id "; 
+
+		$sql .= is_array($id) ? " IN (" . implode(',',$id) . ")" : " = {$id} ";
+		$sql .= $order_by;
+		
+		
+	    $rs = $this->db->fetchRowsIntoMap($sql,'id');
+		if( !is_null($rs) )
+	    {
+	    	$rs = count($rs) == 1 ? current($rs) : $rs;
+	    }
+	    return $rs;
 	}
 	
 	
@@ -410,6 +427,8 @@ class testsuite extends tlObjectWithAttachments
 		$gui->cf = '';
 	    $gui->sqlResult = '';
 		$gui->sqlAction = '';
+		// 20100314 - franciscom 
+		$gui->refreshTree = property_exists($gui,'refreshTree') ? $gui->refreshTree : false;
 
         // BUGID 0003233: After test suite edit, display of Test suite do not 
         //                have upload button enabled for attachment
@@ -439,7 +458,6 @@ class testsuite extends tlObjectWithAttachments
 		$gui->cf = $this->html_table_of_custom_field_values($id);
 		$gui->keywords_map = $this->get_keywords_map($id,' ORDER BY keyword ASC ');
 		$gui->attachmentInfos = getAttachmentInfosFrom($this,$id);
-		$gui->refreshTree = false;
 		$gui->id = $id;
 	 	$gui->idpage_title = lang_get('testsuite');
 		$gui->level = 'testsuite';
@@ -792,25 +810,25 @@ class testsuite extends tlObjectWithAttachments
 	    $testcases=null;
 	    $only_id=($details=='only_id') ? true : false;             				
 	    $subtree=$this->tree_manager->get_children($id,array('testsuite' => 'exclude_me'));
-		  $doit=!is_null($subtree);
-		  if($doit)
-		  {
-		    $tsuite=$this->get_by_id($id);
-		    $tsuiteName=$tsuite['name'];
-		  	$testcases = array();
-		  	foreach ($subtree as $the_key => $elem)
-		  	{
-		  		if ($only_id)
-		  		{
-		  			$testcases[] = $elem['id'];
-		  		}
-		  		else
-		  		{
-		  			$testcases[]= $elem;
-		  		}	
-		  	}
-		  	$doit = count($testcases) > 0;
-		  }
+		$doit=!is_null($subtree);
+		if($doit)
+		{
+		  $tsuite=$this->get_by_id($id);
+		  $tsuiteName=$tsuite['name'];
+			$testcases = array();
+			foreach ($subtree as $the_key => $elem)
+			{
+				if ($only_id)
+				{
+					$testcases[] = $elem['id'];
+				}
+				else
+				{
+					$testcases[]= $elem;
+				}	
+			}
+			$doit = count($testcases) > 0;
+		}
 	    
 	    if($doit && $details=='full')
 	    {
@@ -1048,18 +1066,19 @@ class testsuite extends tlObjectWithAttachments
 					$kwXML = "<keywords>" . $keywordMgr->toXMLString($kwMap,true) . "</keywords>";
 				}	
 			}
-			
-			// 20090106 - franciscom - custom fields
-	        $cfMap=$this->get_linked_cfields_at_design($container_id,null,null,$tproject_id);
-			if( !is_null($cfMap) && count($cfMap) > 0 )
+			if ($optExport['CFIELDS'])
 		    {
-	            $cfRootElem = "<custom_fields>{{XMLCODE}}</custom_fields>";
-		        $cfElemTemplate = "\t" . '<custom_field><name><![CDATA[' . "\n||NAME||\n]]>" . "</name>" .
-		      	                         '<value><![CDATA['."\n||VALUE||\n]]>".'</value></custom_field>'."\n";
-		        $cfDecode = array ("||NAME||" => "name","||VALUE||" => "value");
-		        $cfXML = exportDataToXML($cfMap,$cfRootElem,$cfElemTemplate,$cfDecode,true);
-		    } 
-	
+				// 20090106 - franciscom - custom fields
+	        	$cfMap=$this->get_linked_cfields_at_design($container_id,null,null,$tproject_id);
+				if( !is_null($cfMap) && count($cfMap) > 0 )
+		    	{
+	        	    $cfRootElem = "<custom_fields>{{XMLCODE}}</custom_fields>";
+		    	    $cfElemTemplate = "\t" . '<custom_field><name><![CDATA[' . "\n||NAME||\n]]>" . "</name>" .
+		    	  	                         '<value><![CDATA['."\n||VALUE||\n]]>".'</value></custom_field>'."\n";
+		    	    $cfDecode = array ("||NAME||" => "name","||VALUE||" => "value");
+		    	    $cfXML = exportDataToXML($cfMap,$cfRootElem,$cfElemTemplate,$cfDecode,true);
+		    	} 
+		    }
 	        $xmlTC = "<testsuite name=\"" . htmlspecialchars($tsuiteData['name']). '" >' .
 	                 "\n<node_order><![CDATA[{$tsuiteData['node_order']}]]></node_order>\n" .
 		             "<details><![CDATA[{$tsuiteData['details']}]]> \n{$kwXML}{$cfXML}</details>";
@@ -1341,6 +1360,26 @@ class testsuite extends tlObjectWithAttachments
 		}
     }
 
+
+	/**
+	 * get_children
+	 * get test suites with parent = testsuite with given id
+	 *
+	 */
+	function get_children($id)
+	{
+	    $itemSet = null;
+	    $subtree = $this->tree_manager->get_children($id, array('testcase' => 'exclude_me'));
+	    if(!is_null($subtree))
+	    {
+			foreach( $subtree as $the_key => $elem)
+			{
+	    		$itemKeys[] = $elem['id'];
+			}
+	    	$itemSet = $this->get_by_id($itemKeys, 'ORDER BY node_order');
+	    }
+	    return $itemSet;
+	}
 
 } // end class
 

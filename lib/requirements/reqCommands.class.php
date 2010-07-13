@@ -4,12 +4,16 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *  
  * @filesource $RCSfile: reqCommands.class.php,v $
- * @version $Revision: 1.32 $
- * @modified $Date: 2010/02/09 22:19:24 $ by $Author: franciscom $
+ * @version $Revision: 1.39 $
+ * @modified $Date: 2010/05/09 07:38:12 $ by $Author: franciscom $
  * @author Francisco Mancardi
  * 
  * web command experiment
  * @internal revision
+ * 
+ * 	20100323 - asimon - BUGID 3312 - fixed audit log message when freezing a req version
+ *  20100319 - asimon - BUGID 3307 - set coverage to 0 if null, to avoid database errors with null value
+ *                      BUGID 1748 - added doAddRelation() and doDeleteRelation() for req relations
  *  20100205 - asimon - added doFreezeVersion()
  *	20091217 - franciscom - added reqTypeDomain
  *	20091216 - franciscom - create_tc_from_requirement() interface changes 
@@ -32,10 +36,12 @@ class reqCommands
 	    $this->reqSpecMgr = new requirement_spec_mgr($db);
 	    $this->reqMgr = new requirement_mgr($db);
 	    
-	    $this->reqStatusDomain = init_labels(config_get('req_status'));
-	    $this->reqTypeDomain = init_labels(config_get('req_cfg')->type_labels);
+	    $reqCfg = config_get('req_cfg');
+	    $this->reqStatusDomain = init_labels($reqCfg->status_labels);
+	    $this->reqTypeDomain = init_labels($reqCfg->type_labels);
+	    $this->reqRelationTypeDescr = init_labels($reqCfg->rel_type_description);
 	    
-	    $type_ec = config_get('req_cfg')->type_expected_coverage;
+	    $type_ec = $reqCfg->type_expected_coverage;
 	    $this->attrCfg = array();
 	    $this->attrCfg['expected_coverage'] = array();
 	    foreach($this->reqTypeDomain as $type_code => $dummy)
@@ -72,7 +78,8 @@ class reqCommands
 		$obj->req_spec_id = null;
 		$obj->req_id = null;
 		$obj->req = null;
-		$obj->expected_coverage = null;
+		// BUGID 3307 - set default to 0 instead of null to avoid DB errors
+		$obj->expected_coverage = 0;
  
         return $obj;
     }
@@ -100,7 +107,17 @@ class reqCommands
 		$obj->req_spec_id = $argsObj->req_spec_id;
 		$obj->req_id = null;
 		$obj->req = null;
-		$obj->expected_coverage = null;
+		
+		// BUGID 3307 - set default to number instead of null to avoid database error
+		$obj->expected_coverage = 1;
+		
+		// set a default value other than informational for type, 
+		// so the "expected coverage" field is showing for new req
+		$obj->preSelectedType = 0;
+		if (defined('TL_REQ_TYPE_USE_CASE') && isset($obj->reqTypeDomain[TL_REQ_TYPE_USE_CASE])) {
+			$obj->preSelectedType = TL_REQ_TYPE_USE_CASE;
+		}
+		
 		$obj->display_path = false;
  		return $obj;	
 	}
@@ -273,7 +290,9 @@ class reqCommands
         $req_version = $req_version[0];
 
 		$this->reqMgr->updateOpen($req_version['version_id'], false);
-		logAuditEvent(TLS("audit_req_version_frozen",$req_version['version_id'],
+		
+		// BUGID 3312
+		logAuditEvent(TLS("audit_req_version_frozen",$req_version['version'],
 		                  $req_version['req_doc_id'],$req_version['title']),
 		              "FREEZE",$argsObj->req_version_id,"req_version");
   
@@ -492,5 +511,113 @@ class reqCommands
 		$obj->result = 'ok';  // needed to enable refresh_tree logic
 		return $obj;
   	}
+  	
+  	
+	/**
+	 * Add a relation from one requirement to another.
+	 * 
+	 * @param stdClass $argsObj input parameters
+	 * @return stdClass $obj 
+	 */
+	public function doAddRelation($argsObj) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		// $ok_msg = '<div class="info">' . lang_get('new_rel_add_success') . '</div>';
+		$op = array('ok' => true, 'msg' => lang_get('new_rel_add_success'));
+		$own_id = $argsObj->relation_source_req_id;
+		$authorID = $argsObj->user_id;
+		$tproject_id = $argsObj->tproject_id;
+
+		if (isset($argsObj->relation_destination_testproject_id)) {
+			// relation destination belongs to another project
+			$tproject_id = $argsObj->relation_destination_testproject_id;
+		}
+		
+		$other_req = $this->reqMgr->getByDocID($argsObj->relation_destination_req_doc_id, $tproject_id);
+		if (count($other_req) < 1) {
+			// req doc ID was not ok
+			$op['ok'] = false;
+			$op['msg'] = lang_get('rel_add_error_dest_id');
+		}
+		
+		if ($op['ok']) {
+			// are all the IDs we have ok?
+			$other_req = current($other_req);
+			
+			$other_id = $other_req['id'];
+			$source_id = $own_id;
+			$destination_id = $other_id;
+			$relTypeID = (int)current((explode('_',$argsObj->relation_type)));
+			if( strpos($argsObj->relation_type, "_destination") ) 
+			{
+				$source_id = $other_id;
+				$destination_id = $own_id;
+			}			
+			
+			if (!is_numeric($authorID) || !is_numeric($source_id) || !is_numeric($destination_id)) {
+				$op['ok'] = false;
+				$op['msg'] = lang_get('rel_add_error');
+			}
+			
+			if ( $op['ok'] && ($source_id == $destination_id)) {
+				$op['ok'] = false;
+				$op['msg'] = lang_get('rel_add_error_self');
+			}
+		}
+			
+		if ($op['ok']) {
+			$exists = $this->reqMgr->check_if_relation_exists($source_id, $destination_id, $relTypeID);
+			if ($exists) {
+				$op['ok'] = false;
+				$op['msg'] = sprintf(lang_get('rel_add_error_exists_already'),$this->reqRelationTypeDescr[$relTypeID]);
+			}
+		}
+		
+		if ($op['ok']) {
+			$this->reqMgr->add_relation($source_id, $destination_id, $relTypeID, $authorID);
+		}
+		
+		$obj = $this->initGuiBean();		
+		$op['msg']  = ($op['ok'] ? '<div class="info">' : '<div class="error">') . $op['msg'] . '</div>';
+		$obj->template = "reqView.php?requirement_id={$own_id}&relation_add_result_msg=" . $op['msg'];
+		
+		return $obj;	
+	}
+	
+	
+	/**
+	 * delete a relation to another requirement
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param stcClass $argsObj user input data 
+	 * 
+	 * @return stdClass $object data for template to display
+	 */
+	public function doDeleteRelation($argsObj) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$ok_msg = '<div class="info">' . lang_get('delete_rel_success') . '</div>';
+		$op = array('ok' => true, 'msg' => $ok_msg);
+		
+		$relation_id = $argsObj->relation_id;
+		$requirement_id = $argsObj->requirement_id;
+		
+		if (is_null($relation_id) || !is_numeric($relation_id)
+			|| is_null($requirement_id) || !is_numeric($requirement_id)) {
+			$op['ok'] = false;
+			$op['msg'] = '<div class="error">' . lang_get('error_deleting_rel') . '</div>';
+		}
+		
+		if ($op['ok']) {
+			$this->reqMgr->delete_relation($relation_id);
+		}
+		
+		$obj = $this->initGuiBean();		
+		$obj->template = "reqView.php?requirement_id=$requirement_id&relation_add_result_msg=" . $op['msg'];
+		
+		return $obj;
+	}
 }
+
 ?>

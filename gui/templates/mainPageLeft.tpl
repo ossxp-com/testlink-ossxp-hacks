@@ -1,16 +1,18 @@
 {* 
  Testlink Open Source Project - http://testlink.sourceforge.net/ 
- $Id: mainPageLeft.tpl,v 1.23 2010/02/20 08:07:37 franciscom Exp $     
+ $Id: mainPageLeft.tpl,v 1.29 2010/06/24 17:25:52 asimon83 Exp $     
  Purpose: smarty template - main page / site map                 
                                                                  
- rev :                                                 
- 	  20100106 - asimon     - contribution for 2976 req/reqspec search                                    
-      20090808 - franciscom - grouping rights on gui->grants
-      20081228 - franciscom - new feature user can choose vertical order of link groups
-      20070523 - franciscom - test case search link enabled only if session testproject
-                              has test cases.
-      20070523 - franciscom - new config constant $smarty.const.TL_ITEM_BULLET_IMG
-      20070227 - franciscom - fixed minor presentation bug
+ rev :         
+    20100501 - franciscom - BUGID 3410: Smarty 3.0 compatibility
+ 	  20100309 - asimon - BUGID 3227, added link for req overview page
+ 	  20100106 - asimon - contribution for 2976 req/reqspec search                                    
+    20090808 - franciscom - grouping rights on gui->grants
+    20081228 - franciscom - new feature user can choose vertical order of link groups
+    20070523 - franciscom - test case search link enabled only if session testproject
+                            has test cases.
+    20070523 - franciscom - new config constant $smarty.const.TL_ITEM_BULLET_IMG
+    20070227 - franciscom - fixed minor presentation bug
 *}
 {lang_get var='labels' s='title_product_mgmt,href_tproject_management,href_admin_modules,
                           href_assign_user_roles,href_cfields_management,
@@ -21,7 +23,8 @@
                           title_test_spec,href_edit_tc,href_browse_tc,href_search_tc,
                           href_search_req, href_search_req_spec,href_inventory,
                           href_platform_management, href_inventory_management,
-                          href_print_tc,href_keywords_assign'}
+                          href_print_tc,href_keywords_assign, href_req_overview,
+                          href_print_req'}
 
 
 
@@ -33,7 +36,7 @@
 {assign var="display_left_block_5" value=true}
 {if $gui->testprojectID && 
 	    ($gui->grants.project_edit == "yes" || $gui->grants.tproject_user_role_assignment == "yes" ||
-       $gui->cfield_management == "yes" || $gui->grants.keywords_view == "yes")	}
+       $gui->grants.cfield_management == "yes" || $gui->grants.keywords_view == "yes")}
     {assign var="display_left_block_1" value=true}
 
     <script  type="text/javascript">
@@ -57,7 +60,7 @@
 {/if}
 
 
-{if $gui->grants.mgt_users == "yes" }
+{if $gui->grants.mgt_users == "yes"}
     {assign var="display_left_block_2" value=true}
 
     <script type="text/javascript">
@@ -154,7 +157,7 @@
   <div id="menu_left_block_4"></div><br />
   <div id="menu_left_block_5"></div><br />
   
-	{if $display_left_block_1 }
+	{if $display_left_block_1}
     <div id='testproject_topics'>
 	  {if $gui->grants.project_edit == "yes"}
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
@@ -211,7 +214,7 @@
 
 
   {* ------------------------------------------------- *}
-	{if $display_left_block_2 }
+	{if $display_left_block_2}
     <div id='usermanagement_topics'>
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
         <a href="lib/usermanagement/usersView.php">{$labels.href_user_management}</a>
@@ -224,11 +227,15 @@
 
 
   {* ---------------------------------------------------------------------------------------- *}
- 	{if $display_left_block_3 }
+ 	{if $display_left_block_3}
     <div id="requirements_topics" >
       {if $gui->grants.reqs_view == "yes"}
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
         <a href="{$gui->launcher}?feature=reqSpecMgmt">{$labels.href_req_spec}</a><br/>
+        
+        {* BUGID 3227 *}
+        <img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
+        <a href="lib/requirements/reqOverview.php">{$labels.href_req_overview}</a><br/>
         
         {* contribution for 2976 req/reqspec search *}
         <img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
@@ -237,18 +244,23 @@
         <a href="{$gui->launcher}?feature=searchReqSpec">{$labels.href_search_req_spec}</a>
         
 	   	{/if}
+	   	
 		{if $gui->grants.reqs_edit == "yes"}
 			<br />
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
        		<a href="lib/general/frmWorkArea.php?feature=assignReqs">{$labels.href_req_assign}</a>
-       	{/if}
+
+  	        <br />
+  		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
+          	<a href="{$gui->launcher}?feature=printReqSpec">{$labels.href_print_req}</a>
+  		 {/if}
     </div>
   {/if}
   {* ---------------------------------------------------------------------------------------- *}
 
 
   {* ---------------------------------------------------------------------------------------- *}
- 	{if $display_left_block_4 }
+ 	{if $display_left_block_4}
       <div id="testspecification_topics" >
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
   		<a href="{$gui->launcher}?feature=editTc">
@@ -263,12 +275,7 @@
   		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
           <a href="{$gui->launcher}?feature=searchTc">{$labels.href_search_tc}</a>
       {/if}    
-  		 {if $gui->grants.modify_tc eq "yes"}
-  	        <br />
-  		<img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
-          	<a href="{$gui->launcher}?feature=printTestSpec">{$labels.href_print_tc}</a>
-  		 {/if}
-
+  		
 	  {* --- keywords management ---  *}
 	  {if $gui->grants.keywords_view == "yes"}
 	    {if $gui->grants.keywords_edit == "yes"}
@@ -277,6 +284,14 @@
         	<a href="{$gui->launcher}?feature=keywordsAssign">{$labels.href_keywords_assign}</a>
 		  {/if}
 	  {/if}
+  		
+  	 {if $gui->grants.modify_tc eq "yes"}
+          <br />
+  		  <img src="{$smarty.const.TL_ITEM_BULLET_IMG}" />
+          <a href="{$gui->launcher}?feature=printTestSpec">{$labels.href_print_tc}</a>
+  	 {/if}
+
+	  
     </div>
   {/if}
 

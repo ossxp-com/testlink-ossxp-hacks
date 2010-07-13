@@ -1,14 +1,18 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: resultsByStatus.tpl,v 1.11 2009/10/16 16:52:57 franciscom Exp $
+$Id: resultsByStatus.tpl,v 1.16 2010/06/24 17:25:57 asimon83 Exp $
 Purpose: show Test Results and Metrics
 
-rev: 20091016 - franciscom - results showed in one table for all platform (if any)
+rev:
+	20100527 - BUGID 3492 - show only test case summary for not run test cases
+	                        else show exec notes
+	20100309 - asimon - added sort hint icon on some columns where it was missing before 
+	20091016 - franciscom - results showed in one table for all platform (if any)
 *}
 
 {lang_get var='labels' 
           s='th_test_suite,test_case,version,th_build,th_run_by,th_bugs_not_linked,
-          th_date,th_notes,th_bugs,info_test_results,summary,generated_by_TestLink_on,
+          th_date,title_execution_notes,th_bugs,info_test_results,summary,generated_by_TestLink_on,
           th_assigned_to,th_platform,platform'}
 
 {include file="inc_head.tpl"}
@@ -24,24 +28,24 @@ rev: 20091016 - franciscom - results showed in one table for all platform (if an
 {/if}
 <table class="simple sortable" style="width: 100%; text-align: left; margin-left: 0px;">
 <tr>
-	<th>{$sortHintIcon}{$labels.th_test_suite}</th>
-	<th>{$sortHintIcon}{$labels.test_case}</th>
-  <th>{$labels.version}</th>
-  {if $gui->type == $tlCfg->results.status_code.not_run} {* Add the Assigned To Column }
-    <th>{$sortHintIcon}{$labels.th_assigned_to}</th>	
-  {/if}
-  {if $gui->type != $tlCfg->results.status_code.not_run}
-	    <th>{$sortHintIcon}{$labels.th_build}</th>
-	    <th>{$sortHintIcon}{$labels.th_run_by}</th>
-	    <th>{$sortHintIcon}{$labels.th_date}</th>
-	    <th>{$labels.summary}</th>
-      {if $gui->bugInterfaceOn }	    
-        <th>{$labels.th_bugs}</th>
-      {/if}  
-	{else}
-	    <th>{$labels.summary}</th>
+	<th nowrap>{$sortHintIcon}{$labels.th_test_suite}</th>
+	<th nowrap>{$sortHintIcon}{$labels.test_case}</th>
+	<th nowrap>{$sortHintIcon}{$labels.version}</th>
+	{if $gui->type == $tlCfg->results.status_code.not_run} {* Add the Assigned To Column *}
+	<th nowrap>{$sortHintIcon}{$labels.th_assigned_to}</th>
 	{/if}
-</tr>
+	{if $gui->type != $tlCfg->results.status_code.not_run}
+	<th nowrap>{$sortHintIcon}{$labels.th_build}</th>
+	<th nowrap>{$sortHintIcon}{$labels.th_run_by}</th>
+	<th nowrap>{$sortHintIcon}{$labels.th_date}</th>
+	<th nowrap>{$sortHintIcon}{$labels.title_execution_notes}</th>
+	{if $gui->bugInterfaceOn}
+	<th nowrap>{$sortHintIcon}{$labels.th_bugs}</th>
+	{/if}
+	{else}
+	<th nowrap>{$sortHintIcon}{$labels.summary}</th>
+	{/if}
+</tr> 
 {foreach key=node_type item=row2show from=$dataSet}
   <tr>
   {foreach key=accessKey item=cell2show from=$row2show}
@@ -57,7 +61,7 @@ rev: 20091016 - franciscom - results showed in one table for all platform (if an
 {/foreach}
 <br />
 
-{if $gui->bugInterfaceOn }
+{if $gui->bugInterfaceOn}
   <h2 class="simple">{$labels.th_bugs_not_linked}{$gui->without_bugs_counter}</h2>
 {/if}
 <p class="italic">{$labels.info_test_results}</p>

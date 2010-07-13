@@ -1,9 +1,12 @@
 -- TestLink Open Source Project - http://testlink.sourceforge.net/
 -- This script is distributed under the GNU General Public License 2 or later.
--- $Id: testlink_create_tables.sql,v 1.59 2010/02/20 08:48:59 franciscom Exp $
+-- $Id: testlink_create_tables.sql,v 1.61 2010/03/14 08:54:28 franciscom Exp $
 --
 -- SQL script - create db tables for TL on Postgres   
 -- 
+-- IMPORTANT NOTE:
+-- each NEW TABLE added here NEED TO BE DEFINED in object.class.php getDBTables()
+--
 -- ATTENTION: do not use a different naming convention, that one already in use.
 -- 
 -- Naming convention for column regarding date/time of creation or change
@@ -21,6 +24,7 @@
 -- 
 --  Rev :
 -- 
+--  20100308 - franciscom - req_relations table added
 --  20100124 - franciscom - is_open,active added to req_versions table
 --  20100113 - franciscom - doc_id increased to 64 and setted NOT NULL
 --  20100106 - franciscom - Test Case Step feature
@@ -713,3 +717,12 @@ CREATE INDEX /*prefix*/inventory_idx1 ON /*prefix*/inventory (testproject_id);
 CREATE UNIQUE INDEX /*prefix*/inventory_uidx1 ON /*prefix*/inventory (name,testproject_id);
 
 
+CREATE TABLE /*prefix*/req_relations (
+	id BIGSERIAL NOT NULL,
+  source_id INTEGER NOT NULL DEFAULT '0' REFERENCES  /*prefix*/requirements (id),
+  destination_id  INTEGER NOT NULL DEFAULT '0' REFERENCES  /*prefix*/requirements (id),
+  relation_type INT2 NOT NULL DEFAULT '1',
+  author_id BIGINT NULL DEFAULT NULL REFERENCES  /*prefix*/users (id),
+	creation_ts TIMESTAMP NOT NULL DEFAULT now(),
+	PRIMARY KEY (id)
+);

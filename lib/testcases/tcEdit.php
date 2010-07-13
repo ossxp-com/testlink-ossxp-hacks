@@ -8,14 +8,20 @@
  * @package 	TestLink
  * @author 		TestLink community
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: tcEdit.php,v 1.144 2010/02/21 16:11:53 franciscom Exp $
+ * @version    	CVS: $Id: tcEdit.php,v 1.154 2010/06/28 16:19:37 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  *
  *	@internal revisions
- *  20100124 - franciscom - fixed bug on copy test cases - do not obey to top or bottom user choice
- *  20100106 - franciscom - Multiple Test Case Steps Feature
- *  20100104 - franciscom - fixed bug on create new version, now is created
+ *  20100628 - asimon - removal of constants from filter control class
+ *  20100625 - asimon - refactoring of filter feature
+ *  20100624 - asimon - CVS merge (experimental branch to HEAD)
+ *	20100621 - eloff - BUGID 3241 - Implement vertical layout
+ *	20100605 - franciscom - BUGID 3377
+ *	20100403 - franciscom - BUGID 3359: Copy Test Case Step
+ *	20100124 - franciscom - fixed bug on copy test cases - do not obey to top or bottom user choice
+ *	20100106 - franciscom - Multiple Test Case Steps Feature
+ *	20100104 - franciscom - fixed bug on create new version, now is created
  *                          from selected version and NOT FROM LATEST
  *	20100103 - franciscom - refactoring to use command class
  *	20090831 - franciscom - preconditions
@@ -27,10 +33,6 @@
  *  20080105 - franciscom - REQID 1248 - added logic to manage copy/move on top or bottom
  *  20071106 - BUGID 1165
  **/
-
-
-
-
 require_once("../../config.inc.php");
 require_once("common.php");
 require_once("opt_transfer.php");
@@ -42,12 +44,12 @@ require_once(require_web_editor($cfg->webEditorCfg['type']));
 testlinkInitPage($db);
 $optionTransferName = 'ot';
 $args = init_args($cfg->spec,$optionTransferName);
+
 $tcase_mgr = new testcase($db);
 $tproject_mgr = new testproject($db);
 $tree_mgr = new tree($db);
 $tsuite_mgr = new testsuite($db);
 
-// new dBug($args);
 $templateCfg = templateConfiguration('tcEdit');
 
 $commandMgr = new testcaseCommands($db);
@@ -80,7 +82,7 @@ switch($args->doAction)
 {
     case "doUpdate":
     case "doAdd2testplan":
-        $op=$commandMgr->$pfn($args,$_REQUEST);
+        $op = $commandMgr->$pfn($args,$_REQUEST);
     break;
 	
 	case "edit":  
@@ -96,10 +98,11 @@ switch($args->doAction)
     case "createStep":
     case "editStep":
     case "doCreateStep":
+    case "doCopyStep":
     case "doUpdateStep":
     case "doDeleteStep":
     case "doReorderSteps":
-        $op=$commandMgr->$pfn($args,$_REQUEST);
+        $op = $commandMgr->$pfn($args,$_REQUEST);
         $doRender = true;
     break;
 
@@ -107,7 +110,6 @@ switch($args->doAction)
 
 if( $doRender )
 {
-	// renderGui($args,$gui,$op,$templateCfg,$cfg->webEditorCfg);
 	renderGui($args,$gui,$op,$templateCfg,$cfg);
 	exit();
 }
@@ -145,7 +147,7 @@ if($args->delete_tc_version)
 	$gui->tcversion_id = $args->tcversion_id;
 	$gui->delete_message = $msg;
 	$gui->exec_status_quo = $sq;
-	$gui->refresh_tree = "no";
+	$gui->refreshTree = 0;
 
     $smarty->assign('gui',$gui);
     $templateCfg = templateConfiguration('tcDelete');
@@ -186,7 +188,7 @@ else if($args->do_move)
   	$tree_mgr->change_child_order($args->new_container_id,$args->tcase_id,
                                   $args->target_position,$cfg->exclude_node_types);
 
-    $gui->refreshTree = $args->do_refresh;
+    $gui->refreshTree = $args->refreshTree;
 	$tsuite_mgr->show($smarty,$gui,$templateCfg->template_dir,$args->old_container_id);
 }
 else if($args->do_copy)
@@ -218,9 +220,9 @@ else if($args->do_copy)
 		    $user_feedback = sprintf(lang_get('tc_copied'),$tc_info[0]['name'],$path);
     }
 
-	$gui->refreshTree = $args->do_refresh;
+	$gui->refreshTree = $args->refreshTree;
 	$viewer_args['action'] = $action_result;
-	$viewer_args['refresh_tree']=$args->do_refresh?"yes":"no";
+	$viewer_args['refreshTree']=$args->refreshTree? 1 : 0;
 	$viewer_args['msg_result'] = $msg;
 	$viewer_args['user_feedback'] = $user_feedback;
 	$tcase_mgr->show($smarty,$gui,$templateCfg->template_dir,$args->tcase_id,
@@ -241,17 +243,15 @@ else if($args->do_create_new_version)
 	}
 
 	$viewer_args['action'] = $action_result;
-	$viewer_args['refresh_tree'] = DONT_REFRESH;
+	$viewer_args['refreshTree'] = DONT_REFRESH;
 	$viewer_args['msg_result'] = $msg;
 	$viewer_args['user_feedback'] = $user_feedback;
 	
 	// used to implement go back ??
-	// $smarty->assign('loadOnCancelURL',
-	//                 $_SESSION['basehref'].'/lib/testcases/archiveData.php?edit=testcase&id='.$args->tcase_id);
-	
 	// 20090419 - BUGID - 
 	$gui->loadOnCancelURL = $_SESSION['basehref'] . 
-	                        '/lib/testcases/archiveData.php?edit=testcase&id=' . $args->tcase_id;
+	                        '/lib/testcases/archiveData.php?edit=testcase&id=' . $args->tcase_id .
+	                        "&show_mode={$args->show_mode}";
 	
 	$testcase_version = !is_null($args->show_mode) ? $args->tcversion_id : testcase::ALL_VERSIONS;
 	$tcase_mgr->show($smarty,$gui,$templateCfg->template_dir,$args->tcase_id,$testcase_version, 
@@ -260,11 +260,12 @@ else if($args->do_create_new_version)
 else if($args->do_activate_this || $args->do_deactivate_this)
 {
 	$gui->loadOnCancelURL = $_SESSION['basehref'] . 
-	                        '/lib/testcases/archiveData.php?edit=testcase&id=' . $args->tcase_id;
+	                        '/lib/testcases/archiveData.php?edit=testcase&id=' . $args->tcase_id .
+	                        "&show_mode={$args->show_mode}";
 
 	$tcase_mgr->update_active_status($args->tcase_id, $args->tcversion_id, $active_status);
 	$viewer_args['action'] = $action_result;
-	$viewer_args['refresh_tree']=DONT_REFRESH;
+	$viewer_args['refreshTree']=DONT_REFRESH;
 
 	$tcase_mgr->show($smarty,$gui,$templateCfg->template_dir,$args->tcase_id,
 	                 testcase::ALL_VERSIONS,$viewer_args,null, $args->show_mode);
@@ -285,12 +286,13 @@ if ($show_newTC_form)
   	    $cols = $oWebEditor->cfg[$key]['cols'];
   	    if( $init_inputs)
   	    {
-  	      $of->Value = getItemTemplateContents('testcase_template', $of->InstanceName, '');
+  	      	$of->Value = getItemTemplateContents('testcase_template', $of->InstanceName, '');
   	    }
   	    else
   	    {
   	  		$of->Value = $args->$key;
 		}
+		
 		$smarty->assign($key, $of->CreateHTML($rows,$cols));
   	} // foreach ($a_oWebEditor_cfg as $key)
 
@@ -302,9 +304,6 @@ if ($show_newTC_form)
 			$tcase_mgr->html_table_of_custom_field_inputs($args->tcase_id,$args->container_id,'design','',
 			                                              null,null,null,$locationFilter);
     }
-
-    // new dBug($cf_smarty);
-
 	$gui->cf = $cf_smarty;
 	$gui->tc = $tc_default;
 	$gui->containerID = $args->container_id;
@@ -331,8 +330,6 @@ function init_args($spec_cfg,$otName)
     $args = new stdClass();
     $_REQUEST = strings_stripSlashes($_REQUEST);
 
-    // new dBug($_REQUEST);
-
     $rightlist_html_name = $otName . "_newRight";
     $args->assigned_keywords_list = isset($_REQUEST[$rightlist_html_name])? $_REQUEST[$rightlist_html_name] : "";
     $args->container_id = isset($_REQUEST['containerID']) ? intval($_REQUEST['containerID']) : 0;
@@ -340,11 +337,13 @@ function init_args($spec_cfg,$otName)
     $args->tcversion_id = isset($_REQUEST['tcversion_id']) ? intval($_REQUEST['tcversion_id']) : 0;
     
     $args->name = isset($_REQUEST['testcase_name']) ? $_REQUEST['testcase_name'] : null;
+
+	// Normally Rich Web Editors	
     $args->summary = isset($_REQUEST['summary']) ? $_REQUEST['summary'] : null;
     $args->preconditions = isset($_REQUEST['preconditions']) ? $_REQUEST['preconditions'] : null;
     $args->steps = isset($_REQUEST['steps']) ? $_REQUEST['steps'] : null;
-    
     $args->expected_results = isset($_REQUEST['expected_results']) ? $_REQUEST['expected_results'] : null;
+
     $args->new_container_id = isset($_REQUEST['new_container']) ? intval($_REQUEST['new_container']) : 0;
     $args->old_container_id = isset($_REQUEST['old_container']) ? intval($_REQUEST['old_container']) : 0;
     $args->has_been_executed = isset($_REQUEST['has_been_executed']) ? intval($_REQUEST['has_been_executed']) : 0;
@@ -409,16 +408,30 @@ function init_args($spec_cfg,$otName)
 	$args->step_number = isset($_REQUEST['step_number']) ? intval($_REQUEST['step_number']) : 0;
 	$args->step_id = isset($_REQUEST['step_id']) ? intval($_REQUEST['step_id']) : 0;
 	$args->step_set = isset($_REQUEST['step_set']) ? $_REQUEST['step_set'] : null;
+	$args->tcaseSteps = isset($_REQUEST['tcaseSteps']) ? $_REQUEST['tcaseSteps'] : null;
 
         
     // from session
     $args->testproject_id = $_SESSION['testprojectID'];
     $args->user_id = $_SESSION['userID'];
-    $args->do_refresh = $spec_cfg->automatic_tree_refresh;
-    if(isset($_SESSION['tcspec_refresh_on_action']))
-    {
-    	$args->do_refresh=$_SESSION['tcspec_refresh_on_action'] == "yes" ? 1 : 0 ;
-    }
+//    $args->refreshTree = $spec_cfg->automatic_tree_refresh;
+//    if(isset($_SESSION['setting_refresh_tree_on_action']))
+//    {
+//    	$args->refreshTree=$_SESSION['setting_refresh_tree_on_action'] == "yes" ? 1 : 0 ;
+//    }
+
+    // BUGID 3516
+	// For more information about the data accessed in session here, see the comment
+	// in the file header of lib/functions/tlTestCaseFilterControl.class.php.
+	$form_token = isset($_REQUEST['form_token']) ? $_REQUEST['form_token'] : 0;
+	
+	$mode = 'plan_add_mode';
+	
+	$session_data = isset($_SESSION[$mode]) && isset($_SESSION[$mode][$form_token])
+	                ? $_SESSION[$mode][$form_token] : null;
+	
+	$args->refreshTree = isset($session_data['setting_refresh_tree_on_action']) ?
+                         $session_data['setting_refresh_tree_on_action'] : 0;
     
 	$args->opt_requirements = null;
 	if( isset($_SESSION['testprojectOptions']) )
@@ -427,6 +440,8 @@ function init_args($spec_cfg,$otName)
 	} 
 
 	$args->basehref = $_SESSION['basehref'];
+
+    $args->goback_url=isset($_REQUEST['goback_url']) ? $_REQUEST['goback_url'] : null;
     return $args;
 }
 
@@ -474,9 +489,9 @@ function createWebEditors($basehref,$editorCfg,$editorSet=null)
 {
     $specGUICfg=config_get('spec_cfg');
     $layout=$specGUICfg->steps_results_layout;
-    
-    $cols=array('steps' => array('horizontal' => 38, 'vertical' => null),
-                'expected_results' => array('horizontal' => 38, 'vertical' => null));
+
+    $cols=array('steps' => array('horizontal' => 38, 'vertical' => 44),
+                'expected_results' => array('horizontal' => 38, 'vertical' => 44));
         
     $owe = new stdClass();
     
@@ -554,10 +569,11 @@ function initializeGui(&$dbHandler,&$argsObj,$cfgObj,&$tcaseMgr)
     $guiObj->attachments = null;
 	$guiObj->parent_info = null;
 	$guiObj->user_feedback = '';
+	$guiObj->steps_results_layout = config_get('spec_cfg')->steps_results_layout;
 	
 	$guiObj->loadOnCancelURL = $_SESSION['basehref'] . 
-	                          '/lib/testcases/archiveData.php?edit=testcase&id=' . $argsObj->tcase_id;
-
+	                           "/lib/testcases/archiveData.php?edit=testcase&id=" . $argsObj->tcase_id .
+	                           "&show_mode={$argsObj->show_mode}";
 	
 	if($argsObj->container_id > 0)
 	{
@@ -576,6 +592,7 @@ function initializeGui(&$dbHandler,&$argsObj,$cfgObj,&$tcaseMgr)
 /**
  * manage GUI rendering
  *
+ * BUGID 3359
  */
 function renderGui(&$argsObj,$guiObj,$opObj,$templateCfg,$cfgObj)
 {
@@ -593,12 +610,17 @@ function renderGui(&$argsObj,$guiObj,$opObj,$templateCfg,$cfgObj)
     $actionOperation = array('create' => 'doCreate', 'doCreate' => 'doCreate',
                              'edit' => 'doUpdate','delete' => 'doDelete', 'doDelete' => '',
                              'createStep' => 'doCreateStep', 'doCreateStep' => 'doCreateStep',
+                             'doCopyStep' => 'doUpdateStep',
                              'editStep' => 'doUpdateStep', 'doUpdateStep' => 'doUpdateStep',  
                              'doDeleteStep' => '', 'doReorderSteps' => '');
 
-	$initWebEditorFromTemplate = $opObj->initWebEditorFromTemplate;                             
-    $oWebEditor = createWebEditors($argsObj->basehref,$cfgObj->webEditorCfg); 
+	
+	$key2work = 'initWebEditorFromTemplate';
+	$initWebEditorFromTemplate = property_exists($opObj,$key2work) ? $opObj->$key2work : false;                             
+  	$key2work = 'cleanUpWebEditor';
+	$cleanUpWebEditor = property_exists($opObj,$key2work) ? $opObj->$key2work : false;                             
 
+    $oWebEditor = createWebEditors($argsObj->basehref,$cfgObj->webEditorCfg); 
 	foreach ($oWebEditor->cfg as $key => $value)
   	{
   		$of = &$oWebEditor->editor[$key];
@@ -609,9 +631,15 @@ function renderGui(&$argsObj,$guiObj,$opObj,$templateCfg,$cfgObj)
     	    case "edit":
     	    case "delete":
     	    case "editStep":
+  				$initWebEditorFromTemplate = false;
+  				$of->Value = $argsObj->$key;
+  			break;
+
     	    case "doCreate":
     	    case "doDelete":
     	    case "doCreateStep":
+    	    case "doCopyStep":
+    	    case "doUpdateStep":
   				$initWebEditorFromTemplate = false;
   				$of->Value = $argsObj->$key;
   			break;
@@ -623,12 +651,15 @@ function renderGui(&$argsObj,$guiObj,$opObj,$templateCfg,$cfgObj)
   		}
         $guiObj->operation = $actionOperation[$argsObj->doAction];
 	
-  		if(	$initWebEditorFromTemplate)
+  		if(	$initWebEditorFromTemplate )
   		{
 			$of->Value = getItemTemplateContents('testcase_template', $of->InstanceName, '');	
-		}	
+		}
+		else if( $cleanUpWebEditor )
+		{
+			$of->Value = '';
+		}
 		$smartyObj->assign($key, $of->CreateHTML($rows,$cols));
-
 	}
       
     switch($argsObj->doAction)
@@ -644,13 +675,22 @@ function renderGui(&$argsObj,$guiObj,$opObj,$templateCfg,$cfgObj)
         case "doUpdateStep":
         case "doDeleteStep":
         case "doReorderSteps":
+        case "doCopyStep":
             $renderType = 'template';
             
             // Document !!!!
             $key2loop = get_object_vars($opObj);
             foreach($key2loop as $key => $value)
             {
-                $guiObj->$key = $value;
+            	$guiObj->$key = $value;
+            	// if( isset($guiObj->webEditor[$key]) )
+            	// {
+            	// 	$guiObj->webEditor[$key] = $value;
+            	// }
+            	// else
+            	// {
+                // 	$guiObj->$key = $value;
+                // }
             }
             $guiObj->operation = $actionOperation[$argsObj->doAction];
             

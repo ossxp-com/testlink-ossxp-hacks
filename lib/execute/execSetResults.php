@@ -4,10 +4,22 @@
  *
  * Filename $RCSfile: execSetResults.php,v $
  *
- * @version $Revision: 1.149 $
- * @modified $Date: 2010/02/14 14:25:25 $ $Author: franciscom $
+ * @version $Revision: 1.162 $
+ * @modified $Date: 2010/07/01 13:35:31 $ $Author: mx-julian $
  *
  * rev:
+ *  20100628 - asimon - removal of constants from filter control class
+ *  20100625 - asimon - added parameters $bugInterfaceOn, $bugInterface to exec_additional_info()
+ *                      to avoid warnings in event log,
+ *                      fixed a little bug in platform id initializing in init_args()
+ *                      (now number 0 instead of value null)
+ *  20100624 - asimon - CVS merge (experimental branch to HEAD)
+ *  20100624 - asimon - refactoring for new filters
+ *	20100527 - franciscom - BUGID 3479: Bulk Execution - Custom Fields Bulk Assignment
+ *  20100527 - Julian - platform description is now shown/hidden according to setting on config
+ *	20100520 - franciscom - BUGID 3478  Testcase ID not updated when using save and move next
+ *  20100428 - asimon - BUGID 3301 and related, added logic to refresh tree after tc execution
+ *  20100313 - franciscom - BUGID 3276
  *  20100204 - asimon - BUGID 2455 & 3026, little changes for filtering
  *  20100121 - franciscom - missing platform feature refactoring
  *	20091205 - franciscom - BUGID 0002469: CFG-Parameters to show notes/details on test-execution
@@ -42,17 +54,22 @@ require_once('exec.inc.php');
 require_once("attachments.inc.php");
 require_once("specview.php");
 require_once("web_editor.php");
-$cfg=getCfg();
 
+$cfg=getCfg();
+require_once(require_web_editor($cfg->editorCfg['type']));
+
+// BUGID 3276
+// CRITIC:
+// If call to testlinkInitPage() is done AFTER require_once for BTS
+// log to event viewer fails, but log to file works ok
+testlinkInitPage($db);
 if($cfg->bts_type != 'NO')
 {
   require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' . 
                DIRECTORY_SEPARATOR . 'int_bugtracking.php');
 }
 
-require_once(require_web_editor($cfg->editorCfg['type']));
 
-testlinkInitPage($db);
 $templateCfg = templateConfiguration();
 
 $tcversion_id = null;
@@ -135,12 +152,6 @@ if($args->doExec == 1)
 //
 
 // 20081221 - franciscom                              
-
-//$linked_tcversions = $tplan_mgr->get_linked_tcversions($args->tplan_id,$args->tc_id,$args->keyword_id,$get_mode,
-//                                                       $args->filter_assigned_to,
-//                                                       $args->filter_status,$args->build_id,
-//                                                       $args->cf_selected,$args->include_unassigned);
-
 $options = array('only_executed' => true, 'output' => 'mapOfArray',
                  'include_unassigned' => $args->include_unassigned);
 if(is_null($args->filter_status) || in_array($cfg->tc_status['not_run'],$args->filter_status))
@@ -164,7 +175,9 @@ if(!is_null($linked_tcversions))
 	$_SESSION['s_lastAttachmentInfos'] = null;
     if($args->level == 'testcase')
     {
-        list($tcase_id,$tcversion_id) = processTestCase($gui,$args,$cfg,$linked_tcversions,
+    	// Warning!!! - $gui is passed by reference to be updated inside function
+    	$tcase = null;
+        list($tcase_id,$tcversion_id) = processTestCase($tcase,$gui,$args,$cfg,$linked_tcversions,
                                                         $tree_mgr,$tcase_mgr,$attachmentRepository);
     }
     else
@@ -173,7 +186,7 @@ if(!is_null($linked_tcversions))
                                                          $tree_mgr,$tcase_mgr,$attachmentRepository);
     }
     // will create a record even if the testcase version has not been executed (GET_NO_EXEC)
-    $gui->map_last_exec=getLastExecution($db,$tcase_id,$tcversion_id,$gui,$args,$tcase_mgr);
+    $gui->map_last_exec = getLastExecution($db,$tcase_id,$tcversion_id,$gui,$args,$tcase_mgr);
     
     // --------------------------------------------------------------------------------------------
     // Results to DB
@@ -192,6 +205,8 @@ if(!is_null($linked_tcversions))
 			{
 				$tcase_id = $nextItem['tcase_id'];
 				$tcversion_id = $nextItem['tcversion_id'];
+				// BUGID 3478
+         		processTestCase($nextItem,$gui,$args,$cfg,$linked_tcversions,$tree_mgr,$tcase_mgr,$attachmentRepository);
 			}
 			
         }
@@ -244,7 +259,9 @@ if(!is_null($linked_tcversions))
 		      	}    	
 			  }
     	
-    	  $other_info=exec_additional_info($db,$attachmentRepository,$tcase_mgr,$gui->other_execs,$args->tplan_id,$args->tproject_id);
+		  // asimon - added $g_bugInterfaceOn, $g_bugInterface
+    	  $other_info=exec_additional_info($db,$attachmentRepository,$tcase_mgr,$gui->other_execs,
+    	  $args->tplan_id,$args->tproject_id, $g_bugInterfaceOn, $g_bugInterface);
     	  $gui->attachments=$other_info['attachment'];
     	  $gui->bugs=$other_info['bugs'];
     	  $gui->other_exec_cfields=$other_info['cfexec_values'];
@@ -281,10 +298,11 @@ if ($userid_array)
 smarty_assign_tsuite_info($smarty,$_REQUEST,$db,$tree_mgr,$tcase_id,$args->tproject_id);
 
 // BUGID 2455, BUGID 3026
+// BUGID 3516
 // remove testcases which shall not be displayed because they were filtered out
-if (isset($args->tcids_to_show) && $args->level == 'testsuite') {
+if (isset($args->testcases_to_show) && $args->level == 'testsuite') {
 	foreach($gui->map_last_exec as $key => $tc) {
-		if (!in_array($tc['testcase_id'], $args->tcids_to_show)) {
+		if (!in_array($tc['testcase_id'], $args->testcases_to_show)) {
 			//unset, tc shall not be displayed
 			unset($gui->map_last_exec[$key]);
 		}
@@ -332,13 +350,23 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
   returns: 
   
   rev:
+	20100625 - asimon - fixed a little bug in platform id initializing when no platform is used
+	                    (now number 0 instead of value null)
 	20090913 - franciscom - fixed bug on filter_status initialization
 */
 function init_args($cfgObj)
 {
-    $args = new stdClass();
- 	$_REQUEST = strings_stripSlashes($_REQUEST);
-
+	$args = new stdClass();
+	$_REQUEST = strings_stripSlashes($_REQUEST);
+	
+    // BUGID 3516
+	$form_token = isset($_REQUEST['form_token']) ? $_REQUEST['form_token'] : 0;
+	
+	$mode = 'execution_mode';
+	
+	$session_data = isset($_SESSION[$mode]) && isset($_SESSION[$mode][$form_token])
+	                ? $_SESSION[$mode][$form_token] : null;
+	
 	$args->doExec = isset($_REQUEST['execute_cases']) ? 1 : 0;
 	$args->doDelete = isset($_REQUEST['do_delete']) ? $_REQUEST['do_delete'] : 0;
 	$args->cf_selected = isset($_REQUEST['cfields']) ? unserialize($_REQUEST['cfields']) : null;
@@ -346,10 +374,15 @@ function init_args($cfgObj)
 	// can be a list, will arrive via form POST
 	$args->tc_versions = isset($_REQUEST['tc_version']) ? $_REQUEST['tc_version'] : null;  
   
+	// BUGID 3516
+	$args->filter_status = isset($session_data['filter_result_result']) ? 
+	                       $session_data['filter_result_result']: null;
+	$args->filter_assigned_to = isset($session_data['filter_assigned_user']) ? 
+	                            $session_data['filter_assigned_user'] : null;
+	//$key2loop = array('level' => '','status' => null, 'do_bulk_save' => 0, 'save_results' => 0, 
+	//                  'save_and_next' => 0,'filter_status' => null,'filter_assigned_to' => null);
 	$key2loop = array('level' => '','status' => null, 'do_bulk_save' => 0, 'save_results' => 0, 
-	                  'save_and_next' => 0,
-	                  'filter_status' => null,'filter_assigned_to' => null);
-
+	                  'save_and_next' => 0);
 	foreach($key2loop as $key => $value)
 	{
 		$args->$key = isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
@@ -364,15 +397,16 @@ function init_args($cfgObj)
     {
         $args->filter_status = unserialize($args->filter_status);
     }
-    
-    if(trim($args->filter_assigned_to) == "")
-    {
-        $args->filter_assigned_to = null;  
-    }
-    else
-    {
-        $args->filter_assigned_to = unserialize($args->filter_assigned_to);
-    }
+
+    // trim and unserialize not needed anymore, now is already array in session
+//    if(trim($args->filter_assigned_to) == "")
+//    {
+//        $args->filter_assigned_to = null;
+//    }
+//    else
+//    {
+//        $args->filter_assigned_to = unserialize($args->filter_assigned_to);
+//    }
 
  	$args->id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
     $cookiePrefix = 'TL_execSetResults_';
@@ -382,8 +416,9 @@ function init_args($cfgObj)
        
     // IMPORTANT: logic for test suite notes CAN NOT BE IMPLEMENTED HERE
     //            see smarty_assign_tsuite_info() in this file.  
-    $key4cookies = array('tpn_view_status' => 'testplan_notes','bn_view_status' => 'build_description');
-       
+    $key4cookies = array('tpn_view_status' => 'testplan_notes','bn_view_status' => 'build_description',
+                         'platform_notes_view_status' => 'platform_description');
+    
 	$key2loop = array('id' => 0,'build_id' => 0, 'exec_to_delete' => 0, 'version_id' => 0,
 	   	              'tpn_view_status' => 0, 'bn_view_status' => 0, 'bc_view_status' => 1,
 	   	              'platform_notes_view_status' => 0,'platform_id' => 0);
@@ -419,11 +454,16 @@ function init_args($cfgObj)
 		}
 	}
 
+	// 3516
+	$args->build_id = isset($session_data['setting_build']) ? 
+	                  intval($session_data['setting_build']) : null;
+	$args->platform_id = isset($session_data['setting_platform']) ? 
+	                  intval($session_data['setting_platform']) : 0;
+	
     switch($args->level)
     {
         case 'testcase':
         $args->tc_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
-        
         // some problems with $_GET that has impact on logic 'Save and Go to next test case';
         if( !is_null($args->tc_versions) )
         {
@@ -441,26 +481,61 @@ function init_args($cfgObj)
     }
 
 
-
-    if( isset($_REQUEST['keyword_id']) )
-    {
-       // can be a list
-       $args->keyword_id=explode(',',$_REQUEST['keyword_id']);
-       if( count($args->keyword_id) == 1)
-       {
-           $args->keyword_id=$args->keyword_id[0]; 
-       }
-    }
-    else
-    {
-        $args->keyword_id=0;  
-    }
-
-    // Checkbox
-    $args->include_unassigned=isset($_REQUEST['include_unassigned']) ? $_REQUEST['include_unassigned'] : 0;
+	// BUGID 3516
+//    if( isset($_REQUEST['keyword_id']) )
+//    {
+//       // can be a list
+//       $args->keyword_id=explode(',',$_REQUEST['keyword_id']);
+//       if( count($args->keyword_id) == 1)
+//       {
+//           $args->keyword_id=$args->keyword_id[0]; 
+//       }
+//    }
+//    else
+//    {
+//        $args->keyword_id=0;  
+//    }
+	$args->keyword_id = 0;
+	$fk = 'filter_keywords';
+	if (isset($session_data[$fk])) {
+		$args->keyword_id = $session_data[$fk];
+		if (is_array($args->keyword_id) && count($args->keyword_id) == 1) {
+			$args->keyword_id = $args->keyword_id[0];
+		}
+	}
+	
+	$args->keywordsFilterType = null;
+	$ft = 'filter_keywords_filter_type';
+	if (isset($session_data[$ft])) {
+		$args->keywordsFilterType = $session_data[$ft];
+	}
     
+    // Checkbox
+    //$args->include_unassigned=isset($_REQUEST['include_unassigned']) ? $_REQUEST['include_unassigned'] : 0;
+    $args->include_unassigned = isset($session_data['filter_assigned_user_include_unassigned']) 
+                                && $session_data['filter_assigned_user_include_unassigned'] != 0 ? 1 : 0;
+	
+	
     // 20090419 - franciscom - BUGID
-    $args->refreshTree=isset($_REQUEST['refreshTree']) ? 1 : 0;
+    // BUGID 3301 and related - asimon - changed refresh tree logic 
+    // to adapt behavior of other forms (like tc edit)
+    // additionally modified to only refresh on saving of test results, not on every click
+//    if(isset($_SESSION['setting_refresh_tree_on_action']))
+//	{
+//		$args->refreshTree = $_SESSION['setting_refresh_tree_on_action'] == 'yes' ? 1 : 0;
+//    }
+//    else
+//    {
+//    	// use default from config
+//    	$args->refreshTree = $cfgObj->spec_cfg->automatic_tree_refresh ? 1 : 0;
+//    }
+//    // if nothing has been executed (no status sent), don't refresh tree, ignore settings
+//    if (is_null($args->status)) {
+//    	$args->refreshTree = 0; 
+//    }
+    $args->refreshTree = isset($session_data['setting_refresh_tree_on_action'])
+                         ? $session_data['setting_refresh_tree_on_action'] : 0;
+	
 	$args->tproject_id = isset($_REQUEST['tproject_id']) ? $_REQUEST['tproject_id'] : $_SESSION['testprojectID'];
 	
 	//BUGID 2267
@@ -468,12 +543,16 @@ function init_args($cfgObj)
 	$args->user = $_SESSION['currentUser'];
     $args->user_id = $args->user->dbID;
 
+    // BUGID 3516
    	// BUGID 2455,BUGID 3026
-	if (isset($_REQUEST['show_only_tcs']) && isset($_REQUEST['show_only_tcs']) != '') {
-		$args->tcids_to_show = explode(",", $_REQUEST['show_only_tcs']);
+//	if (isset($_REQUEST['show_only_tcs']) && isset($_REQUEST['show_only_tcs']) != '') {
+//		$args->tcids_to_show = explode(",", $_REQUEST['show_only_tcs']);
+//	}
+	if (isset($session_data['testcases_to_show'])) {
+		$args->testcases_to_show = $session_data['testcases_to_show'];
 	}
-
-	return $args;  
+	
+	return $args;
 }
 
 
@@ -648,11 +727,16 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
   
   returns: 
 
+@internal revisions:
+  20100625 - asimon - added parameters $bugInterfaceOn, $bugInterface 
+                      to get rid of warning in event log
+
 */
-function exec_additional_info(&$db,$attachmentRepository,&$tcase_mgr,$other_execs,$tplan_id,$tproject_id)
+function exec_additional_info(&$db, $attachmentRepository, &$tcase_mgr, $other_execs, 
+                              $tplan_id, $tproject_id, $bugInterfaceOn, $bugInterface)
 {
-  $bugInterfaceOn = config_get('bugInterfaceOn');
-  $bugInterface = config_get('bugInterface');
+//  $bugInterfaceOn = config_get('bugInterfaceOn');
+//  $bugInterface = config_get('bugInterface');
   $attachmentInfos = null;
   $bugs = null;
   $cfexec_values = null;
@@ -1034,7 +1118,11 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
     $gui->bc_view_status=$argsObj->bc_view_status;
     $gui->platform_notes_view_status=$argsObj->platform_notes_view_status;
 
-    $gui->refreshTree=$argsObj->refreshTree;
+    $gui->refreshTree = $argsObj->refreshTree;
+    if (!$argsObj->status || $argsObj->status == $cfgObj->tc_status['not_run']) {
+    	$gui->refreshTree = 0;
+    }
+    
     $gui->map_last_exec_any_build=null;
     $gui->map_last_exec=null;
 
@@ -1120,7 +1208,7 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
   	20080811 - franciscom - BUGID 1650 (REQ)
   
 */
-function processTestCase(&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,
+function processTestCase($tcase,&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,
                          &$treeMgr,&$tcaseMgr,&$docRepository)
 {     
 
@@ -1131,42 +1219,42 @@ function processTestCase(&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,
     $guiObj->design_time_cfields='';
   	$guiObj->testplan_design_time_cfields='';
   	
-  	$tcase_id = $argsObj->id;
-  	$items_to_exec[$argsObj->id] = $linked_tcversions[$argsObj->id][0]['tcversion_id'];    
+  	$tcase_id = isset($tcase['tcase_id']) ? $tcase['tcase_id'] : $argsObj->id;
+
+  	$items_to_exec[$tcase_id] = $linked_tcversions[$tcase_id][0]['tcversion_id'];    
+  	// $tcversion_id = $linked_tcversions[$tcase_id][0]['tcversion_id'];
+  	$tcversion_id = isset($tcase['tcversion_id']) ? $tcase['tcversion_id'] : $items_to_exec[$tcase_id];
   	
-  	$tcversion_id = $linked_tcversions[$argsObj->id][0]['tcversion_id'];
-  	$link_id = $linked_tcversions[$argsObj->id][0]['feature_id'];
-  	$guiObj->tcAttachments[$argsObj->id] = getAttachmentInfos($docRepository,$argsObj->id,'nodes_hierarchy',1);
+  	$link_id = $linked_tcversions[$tcase_id][0]['feature_id'];
+  	$guiObj->tcAttachments[$tcase_id] = getAttachmentInfos($docRepository,$tcase_id,'nodes_hierarchy',1);
 
 	foreach($locationFilters as $locationKey => $filterValue)
 	{
 		// 20090718 - franciscom
 		$finalFilters=$cf_filters+$filterValue;
-    	$guiObj->design_time_cfields[$argsObj->id][$locationKey] = 
-  		         $tcaseMgr->html_table_of_custom_field_values($argsObj->id,'design',$finalFilters,
+    	$guiObj->design_time_cfields[$tcase_id][$locationKey] = 
+  		         $tcaseMgr->html_table_of_custom_field_values($tcase_id,'design',$finalFilters,
   		                                                      null,null,$argsObj->tproject_id);
     	
     	// 20090718 - franciscom - TO BE refactored
-    	$guiObj->testplan_design_time_cfields[$argsObj->id] = 
+    	$guiObj->testplan_design_time_cfields[$tcase_id] = 
   		         $tcaseMgr->html_table_of_custom_field_values($tcversion_id,'testplan_design',$cf_filters,
   		                                                      null,null,$argsObj->tproject_id,null,$link_id);
-    	
 
     }
 
     // BUGID 856: Guest user can execute test case
   	if($guiObj->grants->execute)
   	{
-  	   $guiObj->execution_time_cfields[$argsObj->id] = 
-  	            $tcaseMgr->html_table_of_custom_field_inputs($argsObj->id,null,'execution',"_{$argsObj->id}",null,
+  	   $guiObj->execution_time_cfields[$tcase_id] = 
+  	            $tcaseMgr->html_table_of_custom_field_inputs($tcase_id,null,'execution',"_{$tcase_id}",null,
   	                                                         null,$argsObj->tproject_id);
   	}
-  	// 20070405 - BUGID 766
     $tc_info=$treeMgr->get_node_hierarchy_info($tcase_id);
 	$guiObj->tSuiteAttachments[$tc_info['parent_id']] = getAttachmentInfos($docRepository,$tc_info['parent_id'],
 		                                                                   'nodes_hierarchy',true,1);
-		                                                                      
 
+		                                                                      
     return array($tcase_id,$tcversion_id);
 }
 
@@ -1280,8 +1368,6 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
     
     $tsuite_mgr=new testsuite($dbHandler); 
     $tsuite_data = $tsuite_mgr->get_by_id($argsObj->id);
-    
-    // 20090808 - franciscom
     $opt = array('write_button_only_if_linked' => 1, 'prune_unlinked_tcversions' => 1);
 
     // @TODO - 20090815 - franciscom
@@ -1307,9 +1393,9 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
     // ---------------------------------------------------------------------------------
    
     // Get the path for every test case, grouping test cases that have same parent.
-    if( count($testSet->tcase_id) > 0 )
+    $testCaseQty = count($testSet->tcase_id);
+    if( $testCaseQty > 0 )
     {
-       	// 20090718 - franciscom 
 		$dummy = $tcaseMgr->cfield_mgr->getLocations();
 		$verboseLocationCode = array_flip($dummy['testcase']);
 		$filters=null;
@@ -1318,6 +1404,14 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
     		$filters[$key]['location']=$value;
     	}	     
 
+		$dummy_id = current($testSet->tcase_id);
+		$index = $testCaseQty == 1 ? $dummy_id : 0;  // 0 => BULK
+		$suffix = '_' . $index;
+		$execution_time_cfields = 
+				$tcaseMgr->html_table_of_custom_field_inputs($dummy_id,$argsObj->tproject_id,'execution',$suffix,
+	            	                               			 null,null,$argsObj->tproject_id);
+		
+		$guiObj->execution_time_cfields[$index] = $execution_time_cfields;
         foreach($testSet->tcase_id as $testcase_id)
         {
             $path_f = $treeMgr->get_path($testcase_id,null,'full');
@@ -1332,12 +1426,9 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
                 	
 	            	foreach($locationFilters as $locationKey => $filterValue)
 	            	{
-	            		// 20090718 - franciscom
                         $finalFilters=$cf_filters+$filterValue;
             			$guiObj->design_time_cfields[$testcase_id][$locationKey] = 
             				$tcaseMgr->html_table_of_custom_field_values($testcase_id,'design',$finalFilters);
-                		
-                		// 20090526 - franciscom - typo bug
                 		$guiObj->testplan_design_time_cfields[$testcase_id] = 
   	            		        $tcaseMgr->html_table_of_custom_field_values($testcase_id,'testplan_design',$cf_filters,
   	            		                                                     null,null,$argsObj->tproject_id);

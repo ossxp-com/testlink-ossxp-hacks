@@ -4,8 +4,8 @@
  *
  * Filename $RCSfile: int_bugtracking.php,v $
  *
- * @version $Revision: 1.35 $
- * @modified $Date: 2009/12/25 18:44:49 $ $Author: franciscom $
+ * @version $Revision: 1.43 $
+ * @modified $Date: 2010/06/24 17:25:56 $ $Author: asimon83 $
  *
  * @author Andreas Morsing
  *
@@ -19,20 +19,28 @@
  *
  *
  * rev:
- *     20081217 - franciscom - BUGID 1939
- *                             removed global coupling, usign config_get()
- *     20081102 - franciscom - refactored to ease configuration
- *     20080207 - needles - added notation for Seapine's TestTrackPro
- *     20070505 - franciscom - TL_INTERFACE_BUGS -> $g_interface_bugs
- *     20070304 - franciscom - added new method checkBugID_existence()
+ *	20100616 - eloff - Show error message if bts config is broken
+ *	20100311 - Julian - BUGID 3256, BUGID 3098
+ *						function checkBugID_existence() has to return true
+ *						in this parent class to be able to add bugs if
+ *						function has not been overloaded in child classes
+ *
+ *	20081217 - franciscom - BUGID 1939
+ *							removed global coupling, usign config_get()
+ *	20081102 - franciscom - refactored to ease configuration
+ *	20080207 - needles - added notation for Seapine's TestTrackPro
+ *	20070505 - franciscom - TL_INTERFACE_BUGS -> $g_interface_bugs
+ *	20070304 - franciscom - added new method checkBugID_existence()
  *
  *
 **/
 require_once(TL_ABS_PATH. "/lib/functions/database.class.php");
 
 // Add new bugtracking interfaces here
+// If user configures an interface not declared here, pages trying to use bts
+// will give error message
 $btslist = array('BUGZILLA','MANTIS','JIRA', 'JIRASOAP', 'TRACKPLUS',
-				    	 'EVENTUM','TRAC','SEAPINE','REDMINE','GFORGE','FOGBUGZ');
+		    	 'EVENTUM','TRAC','SEAPINE','REDMINE','GFORGE','FOGBUGZ');
 
 $bts = array_flip($btslist);
 
@@ -104,14 +112,17 @@ class bugtrackingInterface
 		{
 			return false;
 		}
-
+       
 		$this->dbConnection = new database($this->dbType);
 		$result = $this->dbConnection->connect(false, $this->dbHost,$this->dbUser,$this->dbPass, $this->dbName);
 
 		if (!$result['status'])
 		{
-			tLog('Connect to Bug Tracker database fails!!! ' . $result['dbms_msg'], 'ERROR');
 			$this->dbConnection = null;
+			$bts_type = config_get('interface_bugs');
+			$connection_args = "(interface: $bts_type - Host:$this->dbHost - DBName: $this->dbName - User: $this->dbUser) "; 
+			$msg = sprintf(lang_get('BTS_connect_to_database_fails'),$connection_args);
+			tLog($msg  . $result['dbms_msg'], 'ERROR');
 		}
 
 		elseif (BUG_TRACK_DB_TYPE == 'mysql')
@@ -265,9 +276,13 @@ class bugtrackingInterface
 		$valid = true;	
 	  	$forbidden_chars = '/\D/i';  
 		if (preg_match($forbidden_chars, $id))
+    	{
 			$valid = false;	
+    	}
 		else 
-      		$valid = (intval($id) > 0);	
+    	{
+	    	$valid = (intval($id) > 0);	
+    	}
 
       	return $valid;
 	}
@@ -326,21 +341,22 @@ class bugtrackingInterface
 
 	/**
 	* checks if bug id is present on BTS
+	* Function has to be overloaded on child classes
 	*
 	* @return bool
 	**/
 	function checkBugID_existence($id)
 	{
-		return false;
+		// BUGID 3256, BUGID 3098
+		return true;
 	}
 }
 
-//DONT TOUCH ANYTHING BELOW THIS NOTICE!
+// -----------------------------------------------------------------------------------
+// DONT TOUCH ANYTHING BELOW THIS NOTICE!
+// -----------------------------------------------------------------------------------
 $g_bugInterfaceOn = false;
 $g_bugInterface = null;
-
-// global $g_interface_bugs;
-
 $bts_type = config_get('interface_bugs');
 if (isset($bts[$bts_type]))
 {
@@ -357,6 +373,13 @@ if (isset($bts[$bts_type]))
 	{
 		$g_bugInterface->connect();
 	}
+	
+	// Important: connect() do log if something fails
 	$g_bugInterfaceOn = ($g_bugInterface && $g_bugInterface->isConnected());
+}
+else if ($bts_type != 'NO') {
+    $errorMsg = sprintf(lang_get('BTS_integration_failure'),$bts_type);
+    tLog($errorMsg, 'ERROR');
+    die($errorMsg);
 }
 ?>

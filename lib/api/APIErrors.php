@@ -1,7 +1,7 @@
 <?php
 /*
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * $Id: APIErrors.php,v 1.27 2009/09/17 17:29:28 franciscom Exp $
+ * $Id: APIErrors.php,v 1.30 2010/06/24 17:25:56 asimon83 Exp $
  */
 
 /** 
@@ -137,6 +137,9 @@ define('PLATFORM_NOT_LINKED_TO_TESTPLAN_STR', lang_get('API_PLATFORM_NOT_LINKED_
 define('TESTPLAN_HAS_NO_PLATFORMS', 3041);
 define('TESTPLAN_HAS_NO_PLATFORMS_STR',lang_get('API_TESTPLAN_HAS_NO_PLATFORMS',null,1));
 
+define('TCASEID_NOT_IN_TPLANID_FOR_PLATFORM', 3042);
+define('TCASEID_NOT_IN_TPLANID_FOR_PLATFORM_STR', lang_get('API_TCASEID_NOT_IN_TPLANID_FOR_PLATFORM',null,1));
+
 
 /**
  * 4000 level - Build errors
@@ -152,6 +155,9 @@ define('BUILDID_NOGUESS_STR', lang_get('API_BUILDID_NOGUESS',null,1));
 
 define('BUILDNAME_ALREADY_EXISTS', 4030);
 define('BUILDNAME_ALREADY_EXISTS_STR', lang_get('API_BUILDNAME_ALREADY_EXISTS',null,1));
+
+define('BUILDNAME_DOES_NOT_EXIST', 4040);
+define('BUILDNAME_DOES_NOT_EXIST_STR', lang_get('API_BUILDNAME_DOES_NOT_EXIST',null,1));
 
 
 

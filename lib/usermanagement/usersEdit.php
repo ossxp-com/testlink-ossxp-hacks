@@ -1,19 +1,25 @@
 <?php
 /**
-* TestLink Open Source Project - http://testlink.sourceforge.net/
-* This script is distributed under the GNU General Public License 2 or later.
-*
-* Filename $RCSfile: usersEdit.php,v $
-*
-* @version $Revision: 1.35 $
-* @modified $Date: 2009/08/28 20:37:04 $ $Author: schlundus $
-*
-* Allows editing a user
-*/
+ * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * This script is distributed under the GNU General Public License 2 or later.
+ *
+ * Allows editing a user
+ *
+ * @package 	TestLink
+ * @copyright 	2005-2010, TestLink community
+ * @version    	CVS: $Id: usersEdit.php,v 1.39 2010/05/02 16:54:28 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ * @internal Revisions:
+ *	20100502 - franciscom - BUGID 3417
+ *
+ */
 require_once('../../config.inc.php');
 require_once('testproject.class.php');
 require_once('users.inc.php');
 require_once('email_api.php');
+require_once('Zend/Validate/Hostname.php');
+
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
@@ -78,6 +84,11 @@ $smarty->assign('optRights',$roles);
 $smarty->assign('userData', $user);
 renderGui($smarty,$args,$templateCfg);
 
+
+/**
+ * 
+ *
+ */
 function init_args()
 {
 	$iParams = array(
@@ -182,17 +193,47 @@ function doUpdate(&$dbHandler,&$argsObj,$sessionUserID)
     return $op;
 }
 
+/**
+ * 
+ *
+ * @internal revisions
+ *	20100502 - franciscom - BUGID 3417
+ */
 function createNewPassword(&$dbHandler,&$argsObj,&$userObj)
 {
 	$op = new stdClass();
 	$op->user_feedback = '';
-	$op->status = resetPassword($dbHandler,$argsObj->user_id,$op->user_feedback);
-	if ($op->status >= tl::OK)
+	
+	// Try to validate mail configuration
+	//
+	// From Zend Documentation
+	// You may find you also want to match IP addresses, Local hostnames, or a combination of all allowed types. 
+	// This can be done by passing a parameter to Zend_Validate_Hostname when you instantiate it. 
+	// The paramter should be an integer which determines what types of hostnames are allowed. 
+	// You are encouraged to use the Zend_Validate_Hostname constants to do this.
+    // The Zend_Validate_Hostname constants are: ALLOW_DNS to allow only DNS hostnames, ALLOW_IP to allow IP addresses, 
+    // ALLOW_LOCAL to allow local network names, and ALLOW_ALL to allow all three types. 
+	// 
+	$validator = new Zend_Validate_Hostname(Zend_Validate_Hostname::ALLOW_ALL);
+	$smtp_host = config_get( 'smtp_host' );
+	if( $validator->isValid($smtp_host) )
 	{
-		logAuditEvent(TLS("audit_pwd_reset_requested",$userObj->login),"PWD_RESET",$argsObj->user_id,"users");
-		$op->user_feedback = lang_get('password_reseted');
+		$op->status = resetPassword($dbHandler,$argsObj->user_id,$op->user_feedback);
+		if ($op->status >= tl::OK)
+		{
+			logAuditEvent(TLS("audit_pwd_reset_requested",$userObj->login),"PWD_RESET",$argsObj->user_id,"users");
+			$op->user_feedback = lang_get('password_reseted');
+		}
+		else
+		{
+			$op->user_feedback = sprintf(lang_get('password_cannot_be_reseted_reason'),$op->user_feedback);
+		}
 	}
-
+	else
+	{
+		$op->status = tl::ERROR;
+		$op->user_feedback = lang_get('password_cannot_be_reseted_invalid_smtp_hostname');
+	}
 	return $op;
 }
 
@@ -209,8 +250,9 @@ function createNewPassword(&$dbHandler,&$argsObj,&$userObj)
 function initializeUserProperties(&$userObj,&$argsObj)
 {
 	if (!is_null($argsObj->login))
+	{
     	$userObj->login = $argsObj->login;
-
+	}
 	$userObj->emailAddress = $argsObj->emailAddress;
 	$userObj->firstName = $argsObj->firstName;
 	$userObj->lastName = $argsObj->lastName;
@@ -254,7 +296,9 @@ function renderGui(&$smartyObj,&$argsObj,$templateCfg)
     }
 
     if($doRender)
+    {
         $smartyObj->display($templateCfg->template_dir . $tpl);
+    }    
 }
 
 function checkRights(&$db,&$user)

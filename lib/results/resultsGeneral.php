@@ -4,13 +4,14 @@
  * This script is distributed under the GNU General Public License 2 or later.
  * 
  * @filesource $RCSfile: resultsGeneral.php,v $
- * @version $Revision: 1.64 $
- * @modified $Date: 2010/02/17 21:32:44 $ by $Author: franciscom $
+ * @version $Revision: 1.68 $
+ * @modified $Date: 2010/06/24 17:25:52 $ by $Author: asimon83 $
  * @author	Martin Havlat <havlat at users.sourceforge.net>
  * 
  * Show Test Results over all Builds.
  *
  * Revisions:
+ *  20100621 - eloff - BUGID 3542 - fixed typo
  *  20100206 - eloff - BUGID 3060 - Show verbose priority statistics like other tables.
  *  20100201 - franciscom - BUGID 0003123: General Test Plan Metrics - order of columns
  *                                         with test case exec results
@@ -43,9 +44,9 @@ $tproject_info = $tproject_mgr->get_by_id($args->tproject_id);
 $arrDataSuite = array();
 
 $gui = new stdClass();
+$gui->title = lang_get('title_gen_test_rep');
 $gui->do_report = array();
 $gui->showPlatforms=true;
-$gui->colDefinition = array();
 $gui->columnsDefinition = new stdClass();
 $gui->columnsDefinition->keywords = null;
 $gui->columnsDefinition->testers = null;
@@ -55,7 +56,9 @@ $gui->statistics->keywords = null;
 $gui->statistics->testers = null;
 $gui->statistics->milestones = null;
 $gui->tplan_name = $tplan_info['name'];
+$gui->tproject_name = $tproject_info['name'];
 
+$mailCfg = buildMailCfg($gui);
 
 $getOpt = array('outputFormat' => 'map');
 $gui->platformSet = $tplan_mgr->getPlatforms($args->tplan_id,$getOpt);
@@ -67,8 +70,7 @@ if( is_null($gui->platformSet) )
 
 $metricsMgr = new tlTestPlanMetrics($db);
 
-$re = new results($db, $tplan_mgr, $tproject_info, $tplan_info,
-                  ALL_TEST_SUITES,ALL_BUILDS);
+$re = new results($db, $tplan_mgr, $tproject_info, $tplan_info,ALL_TEST_SUITES,ALL_BUILDS);
 // ----------------------------------------------------------------------------
 $topLevelSuites = $re->getTopLevelSuites();
 
@@ -200,7 +202,7 @@ else // do report
     // new dBug($results);    
     
 
-	$colDefiniton = null;
+	$colDefinition = null;
 	$results = null;
 	if($gui->do_report['status_ok'])
 	{
@@ -253,7 +255,7 @@ $smarty = new TLSmarty;
 $smarty->assign('gui', $gui);
 $smarty->assign('buildColDefinition', $colDefinition);
 $smarty->assign('buildResults',$results);
-displayReport($templateCfg->template_dir . $templateCfg->default_template, $smarty, $args->format);
+displayReport($templateCfg->template_dir . $templateCfg->default_template, $smarty, $args->format,$mailCfg);
 
 
 
@@ -304,5 +306,20 @@ function get_percentage($total, $parameter)
 function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'testplan_metrics');
+}
+
+/**
+ * 
+ *
+ */
+function buildMailCfg(&$guiObj)
+{
+	$labels = array('testplan' => lang_get('testplan'), 'testproject' => lang_get('testproject'));
+	$cfg = new stdClass();
+	$cfg->cc = ''; 
+	$cfg->subject = $guiObj->title . ' : ' . $labels['testproject'] . ' : ' . $guiObj->tproject_name . 
+	                ' : ' . $labels['testplan'] . ' : ' . $guiObj->tplan_name;
+	                 
+	return $cfg;
 }
 ?>

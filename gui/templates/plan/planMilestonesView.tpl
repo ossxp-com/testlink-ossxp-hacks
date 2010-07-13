@@ -1,8 +1,9 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: planMilestonesView.tpl,v 1.8 2010/02/17 21:32:43 franciscom Exp $
+$Id: planMilestonesView.tpl,v 1.10 2010/05/01 19:39:55 franciscom Exp $
 
 Rev:
+  20100427 - franciscom - BUGID 3402 - missing refactoring of test project options
   20090910 - franciscom - added start_date
 *}
 {lang_get var='labels' s='no_milestones,title_milestones,title_existing_milestones,th_name,
@@ -10,7 +11,7 @@ Rev:
                          btn_new_milestone,start_date,
                          th_perc_testcases,th_delete,alt_delete_milestone,no_milestones'}
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {* Configure Actions *}
@@ -67,7 +68,7 @@ var del_action=fRoot+'{$deleteAction}';
 				  {$milestone.start_date|date_format:$gsmarty_date_format}
 				{/if}
 			</td>
-			{if $session['testprojectOptPriority']}
+			{if $session['testprojectOptions']->testPriorityEnabled}
 				<td style="text-align: right">{$milestone.high_percentage|escape}</td>
 				<td style="text-align: right">{$milestone.medium_percentage|escape}</td>
 				<td style="text-align: right">{$milestone.low_percentage|escape}</td>

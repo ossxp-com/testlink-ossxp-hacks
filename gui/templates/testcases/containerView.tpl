@@ -1,22 +1,23 @@
 {* TestLink Open Source Project - http://testlink.sourceforge.net/ *}
-{* $Id: containerView.tpl,v 1.28 2010/03/02 09:19:37 asimon83 Exp $ *}
+{* $Id: containerView.tpl,v 1.31 2010/06/24 17:25:53 asimon83 Exp $ *}
 {*
 Purpose: smarty template - view test specification containers
 
 rev :
+  20100501 - franciscom - BUGID 3410: Smarty 3.0 compatibility
 	20100212 - asimon - BUGID 3049 - added removing of testplan assignment feature
-    20100102 - franciscom - refactoring to use $gui
-    20080805 - franciscom - fixed undefined variable log warning.
-                            BUGID 1661 - removed reorder button if tree component support drag & drop
-                            
-    20080706 - franciscom - fixed refactorization bug that broke attachments feature
-    20080606 - havlatm - refactorization; layout update
-    20080403 - franciscom - BUGID  - problems with IE 7 and incomplete URL
-    20080329 - franciscom - added contribution by Eugenia Drosdezki
-                              choose testcases to move/copy inside a testsuite
-    20071102 - franciscom - added contribution
+  20100102 - franciscom - refactoring to use $gui
+  20080805 - franciscom - fixed undefined variable log warning.
+                          BUGID 1661 - removed reorder button if tree component support drag & drop
+                          
+  20080706 - franciscom - fixed refactorization bug that broke attachments feature
+  20080606 - havlatm - refactorization; layout update
+  20080403 - franciscom - BUGID  - problems with IE 7 and incomplete URL
+  20080329 - franciscom - added contribution by Eugenia Drosdezki
+                            choose testcases to move/copy inside a testsuite
+  20071102 - franciscom - added contribution
 
-    20070216 - franciscom  moved parameters from GET to hidden
+  20070216 - franciscom  moved parameters from GET to hidden
 *}
 {lang_get var='labels' 
           s='th_product_name,edit_testproject_basic_data,th_notes,test_suite,details,none,
@@ -40,8 +41,8 @@ rev :
 {assign var="tsuiteExportAction" value="$basehref$tcExportAction&amp;useRecursion=1"}
 
 {include file="inc_head.tpl" openHead="yes"}
-{assign var="ext_version" value="-2.0"}
-<link rel="stylesheet" type="text/css" href="{$basehref}third_party/ext{$ext_version}/css/ext-all.css" />
+{assign var="ext_location" value=$smarty.const.TL_EXTJS_RELATIVE_PATH}
+<link rel="stylesheet" type="text/css" href="{$basehref}{$ext_location}/css/ext-all.css" />
 {include file="inc_del_onclick.tpl" openHead="yes"}
 
 <script type="text/javascript">
@@ -70,7 +71,7 @@ function warn_unassign_tcs(tp_id, tp_name, msgbox_title, msgbox_content) {
 <div class="workBack">
 
 {include file="inc_update.tpl" result=$gui->sqlResult item=$gui->level
-         name=$gui->moddedItem.name refresh=$smarty.session.tcspec_refresh_on_action}
+         name=$gui->moddedItem.name refresh=$smarty.session.setting_refresh_tree_on_action}
 
 {assign var="bDownloadOnly" value=true}
 {assign var="drawReorderButton" value=true}
@@ -251,8 +252,7 @@ function warn_unassign_tcs(tp_id, tp_name, msgbox_title, msgbox_content) {
 	{/if}
 	
 	{* ----- show Test Suite data --------------------------------------------- *}
-  {assign var=this_template_dir value=$smarty.template|dirname}
-	{include file="$this_template_dir/inc_testsuite_viewer_ro.tpl"}
+	{include file="testcases/inc_testsuite_viewer_ro.tpl"}
 
 	{if $gui->modify_tc_rights eq 'yes'}
 		{assign var="bDownloadOnly" value=false}
@@ -266,7 +266,8 @@ function warn_unassign_tcs(tp_id, tp_name, msgbox_title, msgbox_content) {
 
 </div>
 {if $gui->refreshTree}
-   {include file="inc_refreshTree.tpl"}
+   	{include file="inc_refreshTreeWithFilters.tpl"}
+	{*include file="inc_refreshTree.tpl"*}
 {/if}
 </body>
 </html>

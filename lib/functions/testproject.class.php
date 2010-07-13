@@ -6,11 +6,15 @@
  * @package 	TestLink
  * @author 		franciscom
  * @copyright 	2005-2009, TestLink community 
- * @version    	CVS: $Id: testproject.class.php,v 1.163 2010/02/20 09:06:07 franciscom Exp $
+ * @version    	CVS: $Id: testproject.class.php,v 1.168 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  * @internal Revisions:
- *
+ * 20100516 - franciscom - BUGID 3464 - delete()
+ * 20100310 - asimon - BUGID 3227 - refactored get_all_requirement_ids() and count_all_requirements()
+ *                                  to not be recursive and pascal-like anymore
+ *                                  and to use new method on tree class
+ * 20100309 - asimon - BUGID 3227 - added get_all_requirement_ids() and count_all_requirements()
  * 20100209 - franciscom - BUGID 3147 - Delete test project with requirements defined crashed with memory exhausted
  * 20100203 - franciscom - addKeyword() return type changed
  * 20100201 - franciscom - delete() - missing delete of platforms
@@ -125,7 +129,7 @@ class testproject extends tlObjectWithAttachments
  * @TODO havlatm: described return parameter differs from reality
  * @TODO havlatm: parameter $options should be 
  */
-function projectCreate($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_public=1)
+function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_public=1)
 {
 	// Create Node and get the id
 	$root_node_id = $this->tree_manager->new_root_node($name);
@@ -1573,6 +1577,29 @@ function setPublicStatus($id,$status)
 		$error = '';
 		$reqspec_mgr = new requirement_spec_mgr($this->db);
 		
+
+        //		
+		// Notes on delete related to Foreing Keys
+		// All link tables has to be deleted first
+		//
+		// req_relations
+		// 
+		// testplan_tcversions
+		// testplan_platforms
+		// object_keywords
+        // user_assignments
+		// builds
+		// milestones
+		//
+		// testplans
+        // keywords		
+		// platforms 
+		// attachtments
+		// testcases
+		// testsuites
+		// inventory
+		//
+		// testproject
 		$this->deleteKeywords($id);
 		$this->deleteAttachments($id);
 		
@@ -1596,7 +1623,6 @@ function setPublicStatus($id,$status)
 			}
 		}
 
-		// 20100201 - 
 		$platform_mgr = new tlPlatform($this->db,$id);
 		$platform_mgr->deleteByTestProject($id);
 		
@@ -1604,6 +1630,19 @@ function setPublicStatus($id,$status)
 		                 " SET default_testproject_id = NULL " .
 			             " WHERE default_testproject_id = {$id}",
 			             'info_resetting_default_project_fails');
+
+
+		// BUGID 3464
+		$inventory_mgr = new tlInventory($id,$this->db);
+		$invOpt = array('detailLevel' => 'minimun', 'accessKey' => 'id');
+		$inventorySet = $inventory_mgr->getAll($invOpt);
+		if( !is_null($inventorySet) )
+		{
+			foreach($inventorySet as $key => $dummy)
+			{
+				$inventory_mgr->deleteInventory($key);
+			}		
+		}
 		
 		foreach ($a_sql as $oneSQL)
 		{
@@ -2168,6 +2207,38 @@ function copy_as($id,$new_id,$user_id,$new_name=null,$options=null)
 	
 } // end function copy_as
 
+
+/**
+ * function to get an array with all requirement IDs in testproject
+ * 
+ * @param string $IDList commaseparated list of Container-IDs - can be testproject ID or reqspec IDs 
+ * @return array $reqIDs result IDs
+ * 
+ * @internal revisions:
+ * 20100310 - asimon - removed recursion logic
+ */
+public function get_all_requirement_ids($IDList) {
+	
+	$coupleTypes = array();
+	$coupleTypes['target'] = $this->tree_manager->node_descr_id['requirement'];
+	$coupleTypes['container'] = $this->tree_manager->node_descr_id['requirement_spec'];
+	
+	$reqIDs = array();
+	$this->tree_manager->getAllItemsID($IDList,$reqIDs,$coupleTypes);
+
+	return $reqIDs;
+}
+
+
+/**
+ * uses get_all_requirements_ids() to count all requirements in testproject
+ * 
+ * @param integer $tp_id ID of testproject
+ * @return integer count of requirements in given testproject
+ */
+public function count_all_requirements($tp_id) {
+	return count($this->get_all_requirement_ids($tp_id));
+}
 
 /**
  * Copy user roles to a new Test Project

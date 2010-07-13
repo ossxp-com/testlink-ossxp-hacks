@@ -4,12 +4,17 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *  
  * @filesource $RCSfile: reqView.php,v $
- * @version $Revision: 1.27 $
- * @modified $Date: 2009/12/31 10:53:13 $ by $Author: franciscom $
+ * @version $Revision: 1.32 $
+ * @modified $Date: 2010/05/09 07:38:12 $ by $Author: franciscom $
  * @author Martin Havlat
  * 
  * Screen to view content of requirement.
+ *
  *	@internal revision
+ *  20100324 - asimon - BUGID 1748 - Moved init_relation_type_select to requirement_mgr
+ *                                   as it is now used from multiple files
+ *	20100319 - franciscom - refactoring of BUGID 1748 
+ *  20100319 - asimon - BUGID 1748 - implemented display of req relations
  *	20091217 - franciscom - display type and expected coverage
  */
 require_once('../../config.inc.php');
@@ -40,8 +45,10 @@ $smarty->display($templateCfg->template_dir . 'reqViewVersions.tpl');
  */
 function init_args()
 {
+	// BUGID 1748
 	$iParams = array("requirement_id" => array(tlInputParameter::INT_N),
-			         "showReqSpecTitle" => array(tlInputParameter::INT_N));	
+			         "showReqSpecTitle" => array(tlInputParameter::INT_N),
+			         "relation_add_result_msg" => array(tlInputParameter::STRING_N));	
 		
 	$args = new stdClass();
 	R_PARAMS($iParams,$args);
@@ -49,7 +56,9 @@ function init_args()
     $args->req_id = $args->requirement_id;
     $args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
     $args->tproject_name = isset($_SESSION['testprojectName']) ? $_SESSION['testprojectName'] : null;
-    
+    $user = $_SESSION['currentUser'];
+	$args->userID = $user->dbID;
+	
     return $args;
 }
 
@@ -97,13 +106,49 @@ function initialize_gui(&$dbHandler,$argsObj)
    	$gui->attachments[$gui->req_id] = getAttachmentInfosFrom($req_mgr,$gui->req_id);
     
     $gui->attachmentTableName = $req_mgr->getAttachmentTableName();
-    $gui->reqStatus = init_labels(config_get('req_status'));
+    $gui->reqStatus = init_labels($gui->req_cfg->status_labels);
     $gui->reqTypeDomain = init_labels($gui->req_cfg->type_labels);
+
+    // added req relations for BUGID 1748
+    $gui->req_relations = FALSE;
+    $gui->req_relation_select = FALSE;
+    $gui->testproject_select = FALSE;
+    $gui->req_add_result_msg = isset($argsObj->relation_add_result_msg) ? 
+    							     $argsObj->relation_add_result_msg : "";
+    
+    if ($gui->req_cfg->relations->enable) {
+    	$gui->req_relations = $req_mgr->get_relations($gui->req_id);
+    	$gui->req_relation_select = $req_mgr->init_relation_type_select();
+    	if ($gui->req_cfg->relations->interproject_linking) {
+    		$gui->testproject_select = initTestprojectSelect($db, $argsObj, $tproject_mgr);
+    	}
+    }
+    
     return $gui;
 }
+
 
 function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'mgt_view_req');
 }
+
+
+/**
+ * Initializes the select field for the testprojects.
+ * 
+ * @param resource $db reference to database handler
+ * @param array $args reference to user input data
+ * 
+ * @return array $htmlSelect array with info, needed to create testproject select box on template
+ */
+function initTestprojectSelect(&$db, &$args, &$tprojectMgr) {
+	
+	$testprojects = $tprojectMgr->get_accessible_for_user($args->userID, 'map', 
+	                                                      config_get('gui')->tprojects_combo_order_by);	
+	$htmlSelect = array('items' => $testprojects, 'selected' => $args->tproject_id);
+	
+	return $htmlSelect;
+}
+
 ?>

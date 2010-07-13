@@ -1,15 +1,16 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: tcNew.tpl,v 1.9 2010/01/03 16:48:46 franciscom Exp $
+$Id: tcNew.tpl,v 1.13 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: smarty template - create new testcase
 
+20100315 - franciscom - BUGID 3410: Smarty 3.0 compatibility - changes in smarty.template behaviour
 20100103 - franciscom - refactoring to use $gui
 20091122 - franciscom - refactoring to use ext-js alert
 20070214 - franciscom -
-BUGID 628: Name edit – Invalid action parameter/other behaviours if “Enter” pressed.
+BUGID 628: Name edit Invalid action parameter/other behaviours if Enter pressed.
  ----------------------------------------------------------------- *}
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {lang_get var='labels' s='btn_create,cancel,warning,title_new_tc,
@@ -68,18 +69,41 @@ function validateForm(f)
       name="tc_new" id="tc_new"
       onSubmit="javascript:return validateForm(this);">
 
+
+  {if $gui->steps != ''}
+  <table class="simple">
+  	<tr>
+  		<th width="{$tableColspan}">{$labels.step_number}</th>
+  		<th>{$labels.step_details}</th>
+  		<th>{$labels.expected_results}</th>
+  		<th width="25">{$labels.execution_type_short_descr}</th>
+  	</tr>
+  
+   	{foreach from=$gui->steps item=step_info}
+  	<tr>
+  		<td style="text-align:righ;">{$step_info.step_number}</td>
+  		<td >{$step_info.actions}</td>
+  		<td >{$step_info.expected_results}</td>
+  		<td>{$gui->execution_types[$step_info.execution_type]}</td>
+  	</tr>
+    {/foreach}	
+  </table>	
+  <p>
+  <hr>
+  {/if}
+
+
+
 	<div class="groupBtn">
-	    {* BUGID 628: Name edit – Invalid action parameter/other behaviours if “Enter” pressed. *}
+	    {* BUGID 628: Name edit Invalid action parameter/other behaviours if Enter pressed. *}
 			<input type="hidden" id="do_create"  name="do_create" value="do_create" />
 			<input type="submit" id="do_create_button"  name="do_create_button" value="{$labels.btn_create}" />
 			<input type="button" name="go_back" value="{$labels.cancel}" onclick="javascript: history.back();"/>
 	</div>	
-
-  {assign var=this_template_dir value=$smarty.template|dirname}
-	{include file="$this_template_dir/tcEdit_New_viewer.tpl"}
+	{include file="testcases/tcEdit_New_viewer.tpl"}
 
 	<div class="groupBtn">
-	    {* BUGID 628: Name edit – Invalid action parameter/other behaviours if “Enter” pressed. *}
+	    {* BUGID 628: Name edit Invalid action parameter/other behaviours if Enter pressed. *}
 			<input type="hidden" id="do_create_2"  name="do_create" value="do_create" />
 			<input type="submit" id="do_create_button_2"  name="do_create_button" value="{$labels.btn_create}" />
 			<input type="button" name="go_back" value="{$labels.cancel}" onclick="javascript: history.back();"/>
@@ -89,8 +113,8 @@ function validateForm(f)
 </div>
 
 {if $gui->sqlResult eq 'ok'}
-	{if ($smarty.session.tcspec_refresh_on_action eq "yes") }
-		{include file="inc_refreshTree.tpl"}
+	{if ($smarty.session.setting_refresh_tree_on_action)}
+		{include file="inc_refreshTreeWithFilters.tpl"}
 	{/if}
 {/if}
 

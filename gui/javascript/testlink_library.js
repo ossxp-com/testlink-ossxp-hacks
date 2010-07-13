@@ -1,7 +1,7 @@
 // TestLink Open Source Project - http://testlink.sourceforge.net/
 // This script is distributed under the GNU General Public License 2 or later.
 //
-// $Id: testlink_library.js,v 1.96 2010/03/02 09:19:37 asimon83 Exp $
+// $Id: testlink_library.js,v 1.102 2010/06/24 17:25:57 asimon83 Exp $
 //
 // Javascript functions commonly used through the GUI
 // Rule: DO NOT ADD FUNCTIONS FOR ONE USING
@@ -25,6 +25,7 @@
 //
 // ------ Revisions ---------------------------------------------------------------------
 //
+// 20100518 - franciscom - BUGID 3471 - spaces on window.open() name parameter
 // 20100301 - asimon - added openLinkedReqWindow() and openLinkedReqSpecWindow()
 // 20100223 - asimon - added PL() for BUGID 3049
 // 20100216 - asimon - added triggerBuildChooser() and triggerAssignedBox() for BUGID 2455, BUGID 3026
@@ -171,7 +172,9 @@ function ST(id,version)
 */
 function STS(id)
 {
+  var _FUNCTION_NAME_='STS';
 	var action_url = fRoot+'/'+menuUrl+"?level=testsuite&id="+id+args;
+	// alert(_FUNCTION_NAME_ + " " +action_url);
 	parent.workframe.location = action_url;
 }
 
@@ -286,6 +289,23 @@ function TPROJECT_PTC(id)
 {
 	parent.workframe.location = fRoot+menuUrl+"?type=testspec&level=tc&id="+id+args;
 }
+
+
+/* Generate doc: all Req Specs, complete project */
+function TPROJECT_PTP_RS(id)
+{
+	var pParams = tree_getPrintPreferences();
+	parent.workframe.location = fRoot+menuUrl+"?type=reqspec&level=testproject&id="+id+args+"&"+pParams;
+}
+
+
+/* Generate doc: one Req Spec (with children) */
+function TPROJECT_PRS(id)
+{
+	var pParams = tree_getPrintPreferences();
+	parent.workframe.location = fRoot+menuUrl+"?type=reqspec&level=reqspec&id="+id+args+"&"+pParams;
+}
+
 
 /*
   function: TPLAN_PTS
@@ -498,16 +518,23 @@ function confirm_and_submit(msg,form_id,field_id,field_value,action_field_id,act
 
   returns:
 
-  rev  :
+  rev  : 
+         20100617 - asimon - removed setting_refresh_tree_on_action
+                             (is now handled by filter control class)
+         20100325 - asimon - added additional fields for req spec document printing
          20070509 - franciscom - added 'author'
-         20070218 - franciscom - added tcspec_refresh_on_action
+         20070218 - franciscom - added setting_refresh_tree_on_action
                                  useful on test case specification edit NOT Printing
 */
 function tree_getPrintPreferences()
 {
 	var params = [];
 	var fields = ['header','summary','toc','body','passfail', 'cfields','testplan', 'metrics', 
-	              'tcspec_refresh_on_action','author','requirement','keyword'];
+	              'author','requirement','keyword',
+	              'req_spec_scope','req_spec_author','req_spec_overwritten_count_reqs',
+	              'req_spec_type','req_spec_cf','req_scope','req_author','req_status',
+	              'req_type','req_cf','req_relations','req_linked_tcs','req_coverage', 
+	              'headerNumbering'];
 
   for (var idx= 0;idx < fields.length;idx++)
 	{
@@ -723,7 +750,7 @@ function openLinkedReqWindow(req_id, anchor)
 	var feature_url = "lib/requirements/reqView.php";
 	feature_url += "?showReqSpecTitle=1&requirement_id=" + req_id + anchor;
 
-	windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	windowCfg="width=800,height=400,resizable=yes,scrollbars=yes,dependent=yes";
 	window.open(fRoot+feature_url,"Requirement",windowCfg);
 }
 
@@ -746,8 +773,8 @@ function openLinkedReqSpecWindow(reqspec_id, anchor)
 	var feature_url = "lib/requirements/reqSpecView.php";
 	feature_url += "?req_spec_id=" + reqspec_id + anchor;
 
-	windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
-	window.open(fRoot+feature_url,"Requirement Specification",windowCfg);
+	windowCfg="width=800,height=400,resizable=yes,scrollbars=yes,dependent=yes";
+	window.open(fRoot+feature_url,"RequirementSpecification",windowCfg);
 }
 
 
@@ -1045,75 +1072,4 @@ function get_docs(name, server_name)
       var w = window.open();
       w.location = server_name + '/docs/' + name;
   }
-}
-
-/**
- * used to disable the build chooser field (and make it invisible) if it should not be used
- * (in case of some filter settings)
- * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
- * 
- * @author asimon
- * @param build_id_combo box in which the build is chosen
- * @param filter_method_combo box in which the filter method is chosen
- * @param specific_build_value value for which the box shall be disabled
- */
-function triggerBuildChooser(deactivatable_id, filter_method_combo_id, specific_build_value) 
-{
-	deactivatable = document.getElementById(deactivatable_id);
-	filter_method_combo = document.getElementById(filter_method_combo_id);
-	var index = filter_method_combo.options.selectedIndex;  
-	deactivatable.style.visibility = "hidden";
-	
-	if(filter_method_combo[index].value == specific_build_value) 
-	{
-		deactivatable.style.visibility = "visible";
-	} 
-}
-
-/**
- * used to disable the "include unassigned testcases" checkbox when it should not be used
- * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
- * 
- * @author asimon
- * @param filter_assigned_to combobox in which assignment is chosen
- * @param include_unassigned checkbox for including unassigned testcases
- * @param str_option_any string value anybody
- * @param str_option_none string value nobody
- * @param str_option_somebody string value somebody
- */
-function triggerAssignedBox(filter_assigned_to_id, include_unassigned_id,
-							str_option_any, str_option_none, str_option_somebody) 
-{
-	filter_assigned_to = document.getElementById(filter_assigned_to_id);
-	include_unassigned = document.getElementById(include_unassigned_id);
-	var index = filter_assigned_to.options.selectedIndex;
-	var choice = filter_assigned_to.options[index].label;
-	include_unassigned.disabled = false;
-
-	if (choice == str_option_any || choice == str_option_none || choice == str_option_somebody) 
-	{
-		include_unassigned.disabled = true;
-		include_unassigned.checked = false;
-	} 
-}
-
-/**
- * disable unneeded filters in the filter method combo box
- * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
- * 
- * @author asimon
- * @param filter_method_combo the box which shall be disabled
- * @param value2select the string which shall be selected in the box before disabling it
- */
-function disableUnneededFilters(filter_method_combo_id, value2select) {
-	filter_method_combo = document.getElementById(filter_method_combo_id);
-	var length = filter_method_combo.options.length;
-	
-	for (var index = 0; index < length; index ++) {
-		if (filter_method_combo.options[index].value == value2select) {
-			filter_method_combo.options.selectedIndex = index;
-		}
-	}
-	
-	filter_method_combo.disabled = true;
 }

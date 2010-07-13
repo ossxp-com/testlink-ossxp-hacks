@@ -5,14 +5,25 @@
  *
  * Filename $RCSfile: requirement_mgr.class.php,v $
  *
- * @version $Revision: 1.69 $
- * @modified $Date: 2010/03/01 10:38:07 $ by $Author: asimon83 $
+ * @version $Revision: 1.85 $
+ * @modified $Date: 2010/06/24 17:25:53 $ by $Author: asimon83 $
  * @author Francisco Mancardi
  *
  * Manager for requirements.
  * Requirements are children of a requirement specification (requirements container)
  *
  * rev:
+ *	20100520 - franciscom - BUGID 2169 - customFieldValuesAsXML() new method_exists
+ *	20100511 - franciscom - createFromXML() new method
+ *	20100509 - franciscom - update() interface changes.
+ *  20100324 - asimon - BUGID 1748 - Moved init_relation_type_select here from reqView.php
+ *                                   as it is now used from multiple files.
+ *  20100323 - asimon - BUGID 1748 - added count_relations()
+ *  20100319 - asimon - BUGID 1748 - added functions for requirement relations: 
+ *	                    get_relations(), get_all_relation_labels(), delete_relation(),
+ *	                    add_relation(), check_if_relation_exists(), delete_all_relations()
+ *                      modified delete() to also delete all relations with req
+ *	20100309 - franciscom - get_by_id() removed useless code pointed by BUGID 3254
  *	20100124 - franciscom - BUGID 0003089: Req versions new attributes - active and open 
  *							new methods updateActive(),updateOpen()
  *  20091228 - franciscom - exportReqToXML() - added expected_coverage
@@ -40,7 +51,7 @@
  *                          delete() - fixed delete order due to FK.
  *  20090222 - franciscom - exportReqToXML() - (will be available for TL 1.9)
  *  20081129 - franciscom - BUGID 1852 - bulk_assignment() 
-*/
+ */
 
 // Needed to use extends tlObjectWithAttachments, If not present autoload fails.
 require_once( dirname(__FILE__) . '/attachments.inc.php');
@@ -53,6 +64,17 @@ class requirement_mgr extends tlObjectWithAttachments
 	var $node_types_descr_id;
     var $node_types_id_descr;
 	var $attachmentTableName;
+
+
+	// 20100220 - franciscom - I'm will work only on XML
+	// then remove other formats till other dev do refactor
+	var $import_file_types = array("csv" => "CSV",
+	                               "csv_doors" => "CSV (Doors)",
+	                               "XML" => "XML",
+							       "DocBook" => "DocBook");
+
+	var $export_file_types = array("XML" => "XML");
+
 	
     const AUTOMATIC_ID=0;
     const ALL_VERSIONS=0;
@@ -84,6 +106,41 @@ class requirement_mgr extends tlObjectWithAttachments
 
 
 	}
+
+	/*
+	  function: get_export_file_types
+	            getter
+	
+	  args: -
+	
+	  returns: map
+	           key: export file type code
+	           value: export file type verbose description
+	
+	*/
+	function get_export_file_types()
+	{
+    	return $this->export_file_types;
+  	}
+
+	/*
+	  function: get_impor_file_types
+	            getter
+	
+	  args: -
+	
+	  returns: map
+	           key: import file type code
+	           value: import file type verbose description
+	
+	*/
+	function get_import_file_types()
+	{
+     	return $this->import_file_types;
+  	}
+
+
+
 
 
 /*
@@ -124,12 +181,8 @@ function get_by_id($id,$version_id=self::ALL_VERSIONS,$version_number=1,$options
     	$filter_clause = implode(" AND ",$dummy);
     }
 
-    $fields2get="REQ.id,REQ.srs_id,REQ.req_doc_id,REQV.scope,REQV.status,REQV.type,REQV.active," . 
-                "REQV.is_open,REQV.author_id,REQV.version,REQV.id AS version_id," .
-                "REQV.expected_coverage,REQV.creation_ts,REQV.modifier_id," .
-                "REQV.modification_ts,NH_REQ.name AS title";
 	$where_clause = " WHERE NH_REQV.parent_id ";
-	if(is_array($id))
+	if( ($id_is_array=is_array($id)) )
 	{
 		$where_clause .= "IN (" . implode(",",$id) . ") ";
 	}
@@ -145,28 +198,25 @@ function get_by_id($id,$version_id=self::ALL_VERSIONS,$version_number=1,$options
 	}
 	else
 	{
-		if(is_array($version_id))
+		if( is_null($version_id) )
 		{
-		    $versionid_list = implode(",",$version_id);
-		    $where_clause .= " AND REQV.version IN ({$versionid_list}) ";
+		    // search by "human" version number
+		    $where_clause .= " AND REQV.version = {$version_number} ";
 		}
-        else
-        {
-			if( is_null($version_id) )
-			{
-			    $where_clause .= " AND REQV.version = {$version_number} ";
-			}
-			else 
-			{
-			    if($version_id != self::ALL_VERSIONS && $version_id != self::LATEST_VERSION)
-			    {
-			    	$where_clause .= " AND REQV.id = {$version_id} ";
-			    }
-	    	}
-        }
+		else 
+		{
+		    if($version_id != self::ALL_VERSIONS && $version_id != self::LATEST_VERSION)
+		    {
+		    	$where_clause .= " AND REQV.id = {$version_id} ";
+		    }
+		}
     }
   
-	$sql = " /* $debugMsg */ SELECT {$fields2get}, REQ_SPEC.testproject_id, " .
+	$sql = " /* $debugMsg */ SELECT REQ.id,REQ.srs_id,REQ.req_doc_id," . 
+		   " REQV.scope,REQV.status,REQV.type,REQV.active," . 
+           " REQV.is_open,REQV.author_id,REQV.version,REQV.id AS version_id," .
+           " REQV.expected_coverage,REQV.creation_ts,REQV.modifier_id," .
+           " REQV.modification_ts,NH_REQ.name AS title, REQ_SPEC.testproject_id, " .
 	       " NH_RSPEC.name AS req_spec_title, REQ_SPEC.doc_id AS req_spec_doc_id, NH_REQ.node_order " .
 	       " FROM {$this->object_table} REQ " .
 	       " JOIN {$this->tables['nodes_hierarchy']} NH_REQ ON NH_REQ.id = REQ.id " .
@@ -176,7 +226,30 @@ function get_by_id($id,$version_id=self::ALL_VERSIONS,$version_number=1,$options
 	       " JOIN {$this->tables['nodes_hierarchy']} NH_RSPEC ON NH_RSPEC.id = REQ_SPEC.id " .
            $where_clause . $filter_clause . $my['options']['order_by'];
 
-	$recordset = $this->db->get_recordset($sql);
+
+	if ($version_id != self::LATEST_VERSION)
+	{
+		$recordset = $this->db->get_recordset($sql);
+	}
+	else
+	{
+	    // 20090413 - franciscom - 
+	    // But, how performance wise can be do this, instead of using MAX(version)
+	    // and a group by? 
+	    //           
+	    // 20100309 - franciscom - 
+	    // if $id was a list then this will return something USELESS
+	    //           
+	    if( !$id_is_array )
+	    {         
+			$recordset = array($this->db->fetchFirstRow($sql));
+		}	
+		else
+		{
+			// Write to event viewer ???
+		}
+	}
+
   	$rs = null;
   	$userCache = null;  // key: user id, value: display name
   	if(!is_null($recordset))
@@ -258,7 +331,7 @@ function create($srs_id,$reqdoc_id,$title, $scope, $user_id,
 
 			$version_number = 1;
 			$op = $this->create_version($result['id'],$version_number,$scope,$user_id,
-			                            $status,$type,$expected_coverage);
+			                            $status,$type,intval($expected_coverage));
 			$result['msg'] = $op['status_ok'] ? $result['msg'] : $op['msg'];
 		}	
 	}
@@ -291,7 +364,7 @@ function create($srs_id,$reqdoc_id,$title, $scope, $user_id,
   */
 
 function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $type,
-                $expected_coverage,$skip_controls=0)
+                $expected_coverage,$node_order=null,$tproject_id=null,$skip_controls=0)
 {
 	$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
     
@@ -305,7 +378,9 @@ function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $t
     $rs=$this->get_by_id($id,$version_id);
     $req = $rs[0];
     $srs_id=$req['srs_id'];
-	$tproject_id = $this->tree_mgr->getTreeRoot($srs_id);
+    
+    // try to avoid function calls when data is available on caller
+	$tproject_id = is_null($tproject_id) ? $this->tree_mgr->getTreeRoot($srs_id): $tproject_id;
 
     /* contribution by asimon83/mx-julian */
 	if (config_get('internal_links')->enable ) 
@@ -322,10 +397,14 @@ function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $t
 	{
  		$sql = array();
 
-  		$sql[] = "/* $debugMsg */ UPDATE {$this->tables['nodes_hierarchy']} " .
-  		  	     " SET name='" . $this->db->prepare_string($title) . "'" .
-  		  	     " WHERE id={$id}";
- 	  	
+  		$q = "/* $debugMsg */ UPDATE {$this->tables['nodes_hierarchy']} " .
+  		  	 " SET name='" . $this->db->prepare_string($title) . "'";
+	  	if( !is_null($node_order) )
+	  	{
+  			$q .= ', node_order= ' . abs(intval($node_order));  	     
+	  	}
+ 	  	$sql[] = $q . " WHERE id={$id}";
+
 	  	$sql[] = "/* $debugMsg */ UPDATE {$this->tables['requirements']} " .
 	  	         " SET req_doc_id='" . $this->db->prepare_string($reqdoc_id) . "'" .
 	  	         " WHERE id={$id}";
@@ -365,6 +444,7 @@ function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $t
     function: delete
               Requirement
               Requirement link to testcases
+              Requirement relations
               Requirement custom fields values
               Attachments
 
@@ -452,6 +532,9 @@ function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $t
 
 	  		$sql = "DELETE FROM {$this->tables['nodes_hierarchy']} " . $where_clause_this;
 	  		$result = $this->db->exec_query($sql);
+	  		
+	  		//also delete relations to other requirements
+	  		$this->delete_all_relations($id);
 		}
 	
 	    $result = (!$result) ? lang_get('error_deleting_req') : 'ok';
@@ -468,7 +551,7 @@ function update($id,$version_id,$reqdoc_id,$title, $scope, $user_id, $status, $t
 function get_coverage($id)
 {
 	$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
-    $sql = " SELECT DISTINCT NHA.id,NHA.name,TCV.tc_external_id " .
+    $sql = "/* $debugMsg */ SELECT DISTINCT NHA.id,NHA.name,TCV.tc_external_id " .
   	       " FROM {$this->tables['nodes_hierarchy']} NHA, " .
   	       " {$this->tables['nodes_hierarchy']} NHB, " .
   	       " {$this->tables['tcversions']} TCV, " .
@@ -521,22 +604,7 @@ function get_coverage($id)
   	if($ret['status_ok'])
   	{
   		$ret['msg'] = 'ok';
-
-  		// if($req_cfg->reqdoc_id->is_system_wide)
-  		// {
-  		// 	// req doc id MUST BE unique inside the whole DB
-        // 	$my_srs_id = null;
-  		// }
   		$rs = $this->getByDocID($reqdoc_id,$tproject_id);
-        // new dBug($rs);
-        // $checks = array();
-        // $checks['!is_null(rs)'] = !is_null($rs);
-        // $checks['is_null(id)'] = is_null($id);
-        // $checks['!isset(rs[$id]'] = !isset($rs[$id]);
-        // 
-        // new dBug($checks);
-        
-        
  		if(!is_null($rs) && (is_null($id) || !isset($rs[$id])))
   		{
   			$ret['msg'] = sprintf(lang_get("warning_duplicate_reqdoc_id"),$reqdoc_id);
@@ -561,10 +629,6 @@ function get_coverage($id)
 function create_tc_from_requirement($mixIdReq,$srs_id, $user_id, $tproject_id = null, $tc_count=null)
 {
 	$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
-    $fields2get="RSPEC.id,testproject_id,RSPEC.scope,RSPEC.total_req,RSPEC.type," .
-                "RSPEC.author_id,RSPEC.creation_ts,RSPEC.modifier_id," .
-                "RSPEC.modification_ts, NH.parent_id, NH.name AS title";
-    
     $tcase_mgr = new testcase($this->db);
    	$tsuite_mgr = new testsuite($this->db);
 
@@ -1015,6 +1079,9 @@ function set_order($map_id_order)
  */
 function exportReqToXML($id,$tproject_id=null)
 {            
+	// BUGID 2169
+	$cfXML = $this->customFieldValuesAsXML($id,$tproject_id);
+
  	$rootElem = "{{XMLCODE}}";
 	$elemTpl = "\t" .   "<requirement>" .
 	           "\n\t\t" . "<docid><![CDATA[||DOCID||]]></docid>" .
@@ -1024,6 +1091,7 @@ function exportReqToXML($id,$tproject_id=null)
 			   "\n\t\t" . "<status><![CDATA[||STATUS||]]></status>" .
 			   "\n\t\t" . "<type><![CDATA[||TYPE||]]></type>" .
 			   "\n\t\t" . "<expected_coverage><![CDATA[||EXPECTED_COVERAGE||]]></expected_coverage>" .			   
+			   "\n\t\t" . $cfXML . 
 			   "\n\t" . "</requirement>" . "\n";
 					   
 	$info = array (	"||DOCID||" => "req_doc_id",
@@ -1037,7 +1105,9 @@ function exportReqToXML($id,$tproject_id=null)
 	
 	$req = $this->get_by_id($id,requirement_mgr::LATEST_VERSION);
 	$reqData[] = $req[0]; 
-	$xmlStr=exportDataToXML($reqData,$rootElem,$elemTpl,$info,true);						    
+	
+	
+	$xmlStr = exportDataToXML($reqData,$rootElem,$elemTpl,$info,true);						    
 	return $xmlStr;
 }
 
@@ -1079,6 +1149,77 @@ function xmlToMapRequirement($xml_item)
 	}
 	return $dummy;
 }
+
+
+/**
+ * createFromXML
+ *
+ */
+function createFromXML($xml,$tproject_id,$parent_id,$author_id,$filters = null,$options=null)
+{
+	$user_feedback = null;
+	$req = $this->xmlToMapRequirement($xml);
+
+    $copy_req = null;
+	$getOptions = array('output' => 'minimun');
+    $has_filters = !is_null($filters);
+	$my['options'] = array( 'actionOnDuplicate' => "update");
+	$my['options'] = array_merge($my['options'], (array)$options);
+
+	$labels = array('import_req_created' => '','import_req_skipped' =>'', 'import_req_updated' => '');
+	foreach($labels as $key => $dummy)
+	{
+		$labels[$key] = lang_get($key);
+	}
+
+    // Check:
+    // If item with SAME DOCID exists inside container
+	// If there is a hit
+	//	   We will follow user option: update,create new version
+	//
+	// If do not exist check must be repeated, but on WHOLE test project
+	// 	If there is a hit -> we can not create
+	//		else => create
+	// 
+	$getOptions = array('output' => 'minimun');
+	$msgID = 'import_req_skipped';
+	$check_in_reqspec = $this->getByDocID($req['docid'],$tproject_id,$parent_id,$getOptions);
+	if(is_null($check_in_reqspec))
+	{
+		$check_in_tproject = $this->getByDocID($req['docid'],$tproject_id,null,$getOptions);
+		if(is_null($check_in_tproject))
+		{
+			$this->create($parent_id,$req['docid'],$req['title'],$req['description'],
+		    		         $author_id,$req['status'],$req['type'],$req['expected_coverage'],
+		    		         $req['node_order']);
+			$msgID = 'import_req_created';
+		}             		 
+        else
+        {
+			// Can not have req with same req doc id on another branch => BLOCK
+			// What to do if is Frozen ??? -> now ignore and update anyway
+			$msgID = 'import_req_skipped';
+
+        }               		 
+	}
+    else
+    {
+		// Need to get Last Version no matter active or not.
+		// What to do if is Frozen ??? -> now ignore and update anyway
+		$reqID = key($check_in_reqspec);
+		$last_version = $this->get_last_version_info($reqID);
+		$result = $this->update($reqID,$last_version['id'],$req['docid'],$req['title'],$req['description'],
+								$author_id,$req['status'],$req['type'],$req['expected_coverage'],
+								$req['node_order']);
+		$msgID = 'import_req_updated';
+    }               		 
+    $user_feedback = array('doc_id' => $req['docid'],'title' => $req['title'], 
+    				 	   'import_status' => sprintf($labels[$msgID],$req['docid']));
+	
+	
+	return $user_feedback;
+}
+
 
 
 
@@ -1275,6 +1416,30 @@ function html_table_of_custom_field_values($id)
     $this->cfield_mgr->design_values_to_db($hash,$node_id,$cf_map,$hash_type);
   }
 
+
+ /**
+  * customFieldValuesAsXML
+  *
+  * @param $id: requirement spec id
+  * @param $tproject_id: test project id
+  *
+  *
+  */
+ function customFieldValuesAsXML($id,$tproject_id)
+ {
+    $xml = null;
+    $cfMap=$this->get_linked_cfields($id,$tproject_id);
+	if( !is_null($cfMap) && count($cfMap) > 0 )
+	{
+        $xml = $this->cfield_mgr->exportValueAsXML($cfMap);
+    }
+    return $xml;
+ }
+
+
+
+
+
   /*
    function: getByDocID
    get req information using document ID as access key.
@@ -1298,10 +1463,9 @@ function html_table_of_custom_field_values($id)
 		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
 
 	    $my['options'] = array( 'check_criteria' => '=', 'access_key' => 'id', 
-	                            'case' => 'sensitive');
+	                            'case' => 'sensitive', 'output' => 'standard');
 	    $my['options'] = array_merge($my['options'], (array)$options);
     	
-    	$fields2get="REQ.id,REQ.srs_id,REQ.req_doc_id,NH_REQ.name AS title";
     	   
   		$output=null;
   		$the_doc_id = $this->db->prepare_string(trim($doc_id));
@@ -1317,15 +1481,25 @@ function html_table_of_custom_field_values($id)
 	    	break;
 	    }
   		
-		$sql = " /* $debugMsg */ SELECT {$fields2get}, REQ_SPEC.testproject_id, " .
-		       " NH_RSPEC.name AS req_spec_title, REQ_SPEC.doc_id AS req_spec_doc_id, NH_REQ.node_order " .
-		       " FROM {$this->object_table} REQ " .
-		       " /* Get Req info from NH */ " .
-		       " JOIN {$this->tables['nodes_hierarchy']} NH_REQ ON NH_REQ.id = REQ.id " .
-		       " JOIN {$this->tables['req_specs']} REQ_SPEC ON REQ_SPEC.id = REQ.srs_id " .
-		       " JOIN {$this->tables['nodes_hierarchy']} NH_RSPEC ON NH_RSPEC.id = REQ_SPEC.id " .
-		       " WHERE REQ.req_doc_id {$check_criteria} ";
-
+		$sql = " /* $debugMsg */ SELECT ";
+		switch($my['options']['output'])
+		{
+			case 'standard':
+				 $sql .= " REQ.id,REQ.srs_id,REQ.req_doc_id,NH_REQ.name AS title, REQ_SPEC.testproject_id, " .
+		       			 " NH_RSPEC.name AS req_spec_title, REQ_SPEC.doc_id AS req_spec_doc_id, NH_REQ.node_order ";
+		    break;
+		       			 
+			case 'minimun':
+				 $sql .= " REQ.id,REQ.srs_id,REQ.req_doc_id,NH_REQ.name AS title, REQ_SPEC.testproject_id";
+		    break;
+			
+		}
+		$sql .= " FROM {$this->object_table} REQ " .
+		       	" /* Get Req info from NH */ " .
+		       	" JOIN {$this->tables['nodes_hierarchy']} NH_REQ ON NH_REQ.id = REQ.id " .
+		       	" JOIN {$this->tables['req_specs']} REQ_SPEC ON REQ_SPEC.id = REQ.srs_id " .
+		       	" JOIN {$this->tables['nodes_hierarchy']} NH_RSPEC ON NH_RSPEC.id = REQ_SPEC.id " .
+				" WHERE REQ.req_doc_id {$check_criteria} ";
   		
   		if( !is_null($tproject_id) )
   		{
@@ -1345,7 +1519,7 @@ function html_table_of_custom_field_values($id)
 	/**
 	 * Copy a requirement to a new requirement specification
 	 * requirement DOC ID will be changed because must be unique inside
-	 * MASTER CONATAINER (test project)
+	 * MASTER CONTAINER (test project)
 	 * 
 	 * @param integer $id: requirement ID
 	 * @param integer $parent_id: target req spec id (where we want to copy)
@@ -1357,7 +1531,7 @@ function html_table_of_custom_field_values($id)
 	function copy_to($id,$parent_id,$user_id,$tproject_id=null,$options=null)
 	{
 	    $new_item = array('id' => -1, 'status_ok' => 0, 'msg' => 'ok', 'mappings' => null);
-	    $my['options'] = array();
+		$my['options'] = array('copy_also' => null);
 	    $my['options'] = array_merge($my['options'], (array)$options);
     
    	    if( is_null($my['options']['copy_also']) )
@@ -1663,5 +1837,253 @@ function html_table_of_custom_field_values($id)
 	}	
 
 
+	/**
+	 * get relations for a given requirement ID
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param int $id Requirement ID
+	 * 
+	 * @return array $relations in which this req is either source or destination
+	 */
+	public function get_relations($id) 
+	{
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$relations = array();
+		$relations['num_relations'] = 0;
+	    $relations['req'] = current($this->get_by_id($id));
+		$relations['relations'] = array();
+
+		$tproject_mgr = new testproject($this->db);
+		$interproject_linking = config_get('req_cfg')->relations->interproject_linking;
+
+		$sql = " $debugMsg SELECT id, source_id, destination_id, relation_type, author_id, creation_ts " . 
+			   " FROM {$this->tables['req_relations']} " .
+			   " WHERE source_id=$id OR destination_id=$id " .
+			   " ORDER BY id ASC ";
+   
+    	$relations['relations']= $this->db->get_recordset($sql);  
+    	
+    	if( !is_null($relations['relations']) && count($relations['relations']) > 0 )
+    	{
+    		$labels = $this->get_all_relation_labels();
+			$label_keys = array_keys($labels);
+    		foreach($relations['relations'] as $key => $rel) {
+        	
+    			// is this relation type is configured?
+    			if( ($relTypeAllowed = in_array($rel['relation_type'],$label_keys)) ) 
+    			{ 
+	    			$relations['relations'][$key]['source_localized'] = $labels[$rel['relation_type']]['source'];
+	    			$relations['relations'][$key]['destination_localized'] = $labels[$rel['relation_type']]['destination'];
+	    			
+	    			if ($id == $rel['source_id']) {
+	    				$type_localized = 'source_localized';
+	    				$other_key = 'destination_id';
+	    			} else {
+	    				$type_localized = 'destination_localized';
+	    				$other_key = 'source_id';
+	    			}
+	    			$relations['relations'][$key]['type_localized'] = $relations['relations'][$key][$type_localized];
+	    			$other_req = $this->get_by_id($rel[$other_key]);
+			    		    		
+	    			// only add it, if either interproject linking is on or if it is in the same project
+	    			$relTypeAllowed = false;
+	    			if ($interproject_linking || ($other_req[0]['testproject_id'] == $relations['req']['testproject_id'])) {
+	    			
+	    				$relTypeAllowed = true;
+			    		$relations['relations'][$key]['related_req'] = $other_req[0];
+			    		$other_tproject = $tproject_mgr->get_by_id($other_req[0]['testproject_id']);
+			    		$relations['relations'][$key]['related_req']['testproject_name'] = $other_tproject['name'];
+			    		
+			    		$user = tlUser::getByID($this->db,$rel['author_id']);
+			    		$relations['relations'][$key]['author'] = $user->getDisplayName();
+	    			} 
+    			} 
+    			
+    			if( !$relTypeAllowed )
+    			{
+    				unset($relations['relations'][$key]);
+    			}
+    			   		
+    		} // end foreach
+    		
+    		$relations['num_relations'] = count($relations['relations']);
+		}
+		return $relations;
+	}
+	
+	
+	/**
+	 * checks if there is a relation of a given type between two requirements
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param integer $first_id requirement ID to check
+	 * @param integer $second_id another requirement ID to check
+	 * @param integer $rel_type_id relation type ID to check
+	 * 
+	 * @return true, if relation already exists, false if not
+	 */
+	public function check_if_relation_exists($first_id, $second_id, $rel_type_id) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$sql = " $debugMsg SELECT COUNT(0) AS qty " .
+			   " FROM {$this->tables['req_relations']} " .
+			   " WHERE ((source_id=$first_id AND destination_id=$second_id) " . 
+			   " OR (source_id=$second_id AND destination_id=$first_id)) " . 
+			   " AND relation_type=$rel_type_id";
+		$rs = $this->db->get_recordset($sql);
+    	return($rs[0]['qty'] > 0);
+	}
+	
+	
+	/**
+	 * Get count of all relations for a requirement, no matter if it is source or destination
+	 * or what type of relation it is.
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param integer $id requirement ID to check
+	 * 
+	 * @return integer $count
+	 */
+	public function count_relations($id) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$sql = " $debugMsg SELECT COUNT(*) AS qty " .
+			   " FROM {$this->tables['req_relations']} " .
+			   " WHERE source_id=$id OR destination_id=$id ";
+		$rs = $this->db->get_recordset($sql);
+    	return($rs[0]['qty']);
+	}
+	
+	
+	/**
+	 * add a relation of a given type between two requirements
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param integer $source_id ID of source requirement
+	 * @param integer $destination_id ID of destination requirement
+	 * @param integer $type_id relation type ID to set
+	 * @param integer $author_id user's ID
+	 */
+	public function add_relation($source_id, $destination_id, $type_id, $author_id) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$time = $this->db->db_now();
+		$sql = " $debugMsg INSERT INTO {$this->tables['req_relations']} "	. 
+			   " (source_id, destination_id, relation_type, author_id, creation_ts) " .
+			   " values ($source_id, $destination_id, $type_id, $author_id, $time)";
+		$this->db->exec_query($sql);
+	}
+	
+	
+	/**
+	 * delete an existing relation with between two requirements
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param int $id requirement relation id
+	 */
+	public function delete_relation($id) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$sql = " $debugMsg DELETE FROM {$this->tables['req_relations']} WHERE id=$id ";
+		$this->db->exec_query($sql);
+	}
+	
+	
+	/**
+	 * delete all existing relations for (from or to) a given req id, no matter which project
+	 * they belong to or which other requirement they are related to
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @param int $id requirement ID (can be array of IDs)
+	 */
+	public function delete_all_relations($id) {
+		
+		$debugMsg = '/* Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__ . ' */';
+		$id_list = implode(",", (array)$id);
+		$sql = " $debugMsg DELETE FROM {$this->tables['req_relations']} " . 
+			   " WHERE source_id IN ($id_list) OR destination_id IN ($id_list) ";
+		$this->db->exec_query($sql);
+	}
+	
+	
+	/**
+	 * initialize the requirement relation labels
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @return array $labels a map with all labels in following form:
+	 *		Array
+	 *		(
+	 *			    [1] => Array
+	 *			        (
+	 *			            [source] => parent of
+	 *			            [destination] => child of
+	 *			        )
+	 *			    [2] => Array
+	 *			        (
+	 *			            [source] => blocks
+	 *			            [destination] => depends on
+	 *			        )
+	 *			    [3] => Array
+	 *			        (
+	 *			            [source] => related to
+	 *			            [destination] => related to
+	 *			        )
+	 *			)
+	 */
+	public static function get_all_relation_labels() {
+		
+		$labels = config_get('req_cfg')->rel_type_labels;
+		
+		foreach ($labels as $key => $label) {
+			$labels[$key] = init_labels($label);
+		}
+		
+		return $labels;
+	}
+	
+	
+	/**
+	 * Initializes the select field for the localized requirement relation types.
+	 * 
+	 * @author Andreas Simon
+	 * 
+	 * @return array $htmlSelect info needed to create select box on multiple templates
+	 */
+	function init_relation_type_select() {
+		
+		$htmlSelect = array('items' => array(), 'selected' => null, 'equal_relations' => array());
+		$labels = $this->get_all_relation_labels();
+		
+		foreach ($labels as $key => $lab) {
+			$htmlSelect['items'][$key . "_source"] = $lab['source'];
+			if ($lab['source'] != $lab['destination']) {
+				// relation is not equal as labels for source and dest are different
+				$htmlSelect['items'][$key . "_destination"] = $lab['destination']; 
+			} else {
+				// mark this as equal relation - no parent/child, makes searching simpler
+				$htmlSelect['equal_relations'][] = $key . "_source"; 
+			}
+		}
+		
+		// set "related to" as default preselected value in forms
+		if (defined('TL_REQ_REL_TYPE_RELATED') && isset($htmlSelect[TL_REQ_REL_TYPE_RELATED . "_source"])) {
+			$selected_key = TL_REQ_REL_TYPE_RELATED . "_source";
+		} else {
+			// "related to" is not configured, so take last element as selected one
+			$keys = array_keys($htmlSelect['items']);
+			$selected_key = end($keys);
+		}
+		$htmlSelect['selected'] = $selected_key;
+		
+		return $htmlSelect;
+	}
 } // class end
 ?>

@@ -5,11 +5,15 @@
  * 
  * @package 	TestLink
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: tlUser.class.php,v 1.6 2010/02/17 22:57:43 franciscom Exp $
+ * @version    	CVS: $Id: tlUser.class.php,v 1.10 2010/05/23 09:31:36 franciscom Exp $
  * @filesource	http://testlink.cvs.sourceforge.net/viewvc/testlink/testlink/lib/functions/user.class.php?view=markup
  * @link 		http://www.teamst.org/index.php
  *
  * @internal Revisions:
+ *	
+ *	20100522 - franciscom - getAccessibleTestPlans() - added arguments options
+ *	20100427 - franciscom - BUGID 3396 - writePasswordToDB() method
+ *	20100326 - franciscom - setActive() method
  *	20100217 - franciscom - getNamesForProjectRight() - fixed error displayed on event viewer + refactoring
  *  20090726 - franciscom - new method getAccessibleTestPlans()
  * 	20090419 - franciscom - refactoring replace product with test project (where possible).
@@ -386,13 +390,13 @@ class tlUser extends tlDBObject
 			if($this->dbID)
 			{
 				$sql = "UPDATE {$this->tables['users']} " .
-			       "SET first = '" . $db->prepare_string($this->firstName) . "'" .
-			       ", last = '" .  $db->prepare_string($this->lastName)    . "'" .
-			       ", email = '" . $db->prepare_string($this->emailAddress)   . "'" .
-				   ", locale = ". "'" . $db->prepare_string($this->locale) . "'" . 
-				   ", password = ". "'" . $db->prepare_string($this->password) . "'" .
-				   ", role_id = ". $db->prepare_string($this->globalRoleID) . 
-				   ", active = ". $db->prepare_string($this->isActive);
+			       	   "SET first = '" . $db->prepare_string($this->firstName) . "'" .
+			       	   ", last = '" .  $db->prepare_string($this->lastName)    . "'" .
+			       	   ", email = '" . $db->prepare_string($this->emailAddress)   . "'" .
+				   	   ", locale = ". "'" . $db->prepare_string($this->locale) . "'" . 
+				   	   ", password = ". "'" . $db->prepare_string($this->password) . "'" .
+				   	   ", role_id = ". $db->prepare_string($this->globalRoleID) . 
+				   	   ", active = ". $db->prepare_string($this->isActive);
 				$sql .= " WHERE id = " . $this->dbID;
 				$result = $db->exec_query($sql);
 			}
@@ -495,11 +499,14 @@ class tlUser extends tlDBObject
 	public function setPassword($pwd)
 	{
 		if (self::isPasswordMgtExternal())
+		{
 			return self::S_PWDMGTEXTERNAL;
-
+		}
 		$pwd = trim($pwd);	
 		if ($pwd == "")
+		{
 			return self::E_PWDEMPTY;
+		}
 		$this->password = $this->encryptPassword($pwd);
 		return tl::OK;
 	}
@@ -783,13 +790,26 @@ class tlUser extends tlDBObject
      *            Used as filter when you want to check if this test plan
      *            is accessible.
      *
+     * @param map options keys :
+     * 							'output' => null -> get numeric array
+     *									 => map => map indexed by testplan id
+     *									 => combo => map indexed by testplan id and only returns name
+     *
      * @return array if 0 accessible test plans => null
      */
-	function getAccessibleTestPlans(&$db,$testprojectID,$testplanID=null)
+	function getAccessibleTestPlans(&$db,$testprojectID,$testplanID=null, $options=null)
 	{
-		$debugTag = 'Class:' .  __CLASS__ . '- Method:' . __FUNCTION__ . '-'; 
-		$sql = " /* $debugTag */ " .
-		       " SELECT NH.id, NH.name, TPLAN.active, 0 AS selected " .
+		$debugTag = 'Class:' .  __CLASS__ . '- Method:' . __FUNCTION__ . '-';
+		
+		$my['options'] = array( 'output' => null);
+	    $my['options'] = array_merge($my['options'], (array)$options);
+		
+		$fields2get = ' NH.id, NH.name ';
+		if( $my['options']['output'] != 'combo' )
+		{
+			$fields2get .= ' ,TPLAN.active, 0 AS selected ';
+		}
+		$sql = " /* $debugTag */  SELECT {$fields2get} " .
 		       " FROM {$this->tables['nodes_hierarchy']} NH" .
 		       " JOIN {$this->tables['testplans']} TPLAN ON NH.id=TPLAN.id  " .
 		       " LEFT OUTER JOIN {$this->tables['user_testplan_roles']} USER_TPLAN_ROLES" .
@@ -820,7 +840,21 @@ class tlUser extends tlDBObject
 	  	}
 			
 		$sql .= " ORDER BY name";
-		$testPlanSet = $db->get_recordset($sql);
+		switch($my['options']['output'])
+		{
+			case 'map':
+				$testPlanSet = $db->fetchRowsIntoMap($sql,'id');
+			break;
+			
+			case 'combo':
+				$testPlanSet = $db->fetchColumnsIntoMap($sql,'id','name');
+			break;
+			
+			default:
+				$testPlanSet = $db->get_recordset($sql);
+			break;
+		}
+		
 		return $testPlanSet;
 	}
 
@@ -899,5 +933,36 @@ class tlUser extends tlDBObject
 		
 		return tlDBObject::createObjectsFromDBbySQL($db,$sql,'id',__CLASS__,true,$detailLevel);
 	}
+
+	/** 
+	 */
+	public function setActive(&$db,$value)
+	{
+		$booleanVal = intval($value) > 0 ? 1 : 0;
+		$sql = " UPDATE {$this->tables['users']} SET active = {$booleanVal} " .
+			   " WHERE id = " . $this->dbID;
+		$result = $db->exec_query($sql);
+	}
+
+
+	/** 
+	 * Writes user password into the database
+	 * 
+	 * @param resource &$db reference to database handler
+	 * @return integer tl::OK if no problem written to the db, else error code
+	 */
+	public function writePasswordToDB(&$db)
+	{
+		if($this->dbID)
+		{
+			$sql = "UPDATE {$this->tables['users']} " .
+		       	   " SET password = ". "'" . $db->prepare_string($this->password) . "'";
+			$sql .= " WHERE id = " . $this->dbID;
+			$result = $db->exec_query($sql);
+		}
+		$result = $result ? tl::OK : self::E_DBERROR;
+		return $result;
+	}	
+
 }
 ?>

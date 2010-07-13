@@ -1,14 +1,14 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_controls.tpl,v 1.10 2009/12/07 20:12:18 franciscom Exp $
+$Id: inc_exec_controls.tpl,v 1.14 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: draw execution controls (input for notes and results)
 Author : franciscom
 
-Rev: 20080503 - franciscom - use of tlCfg 
-
+Rev: 
+  BUGID 3479: Bulk Execution - Custom Fields Bulk Assignment
 *}	
       {assign var="ResultsStatusCode" value=$tlCfg->results.status_code}
-      {if $args_save_type == 'bulk' }
+      {if $args_save_type == 'bulk'}
         {assign var="radio_id_prefix" value="bulk_status"}
       {else}
         {assign var="radio_id_prefix" value="status"}
@@ -16,10 +16,10 @@ Rev: 20080503 - franciscom - use of tlCfg
 
   		<table class="invisible">
   		<tr>
-  			<th rowspan="2" style="text-align: center;">
+  			<td style="text-align: center;">
   				<div class="title">{$args_labels.test_exec_notes}</div>
           {$args_webeditor} 
-  			</th>
+  			</td>
   			<td valign="top" style="width: 30%;">			
     				{* status of test *}
       			<div class="title" style="text-align: center;">{$args_labels.test_exec_result}</div>
@@ -52,10 +52,20 @@ Rev: 20080503 - franciscom - use of tlCfg
     		 			  {else}
      	    	        <input type="submit" id="do_bulk_save" name="do_bulk_save"
       	    	             value="{$args_labels.btn_save_tc_exec_results}"/>
+
     		 			  {/if}       
     				</div>
     			</td>
     		</tr>
+        {if $args_save_type == 'bulk' && $args_execution_time_cfields != ''}
+          <tr><td colspan="2">
+  					<div id="cfields_exec_time_tcversionid_{$tcversion_id}" class="custom_field_container" 
+  						style="background-color:#dddddd;">
+            {$args_labels.testcase_customfields}
+            {$args_execution_time_cfields.0} {* 0 => bulk *}
+            </div> 
+          </td></tr>
+        {/if}
   		</table>
       <div class="messages" style="align:center;">
       {$labels.exec_not_run_result_note}

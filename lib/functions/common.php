@@ -13,11 +13,13 @@
  * @package 	TestLink
  * @author 		Martin Havlat, Chad Rosen
  * @copyright 	2005, TestLink community 
- * @version    	CVS: $Id: common.php,v 1.188 2010/02/14 18:11:54 franciscom Exp $
+ * @version    	CVS: $Id: common.php,v 1.192 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  * @since 		TestLink 1.5
  *
  * @internal Revisions:
+ *	20100616 - eloff - config_get: log warning when requested option does not exist
+ * 	20100310 - franciscom - changes to make code compatible with smarty 3
  * 	20100207 - havlatm - cleanup
  * 	20100124 - eloff - added $redirect parameter to checkSessionValid()
  * 	20100124 - eloff - BUGID 3012 - added buildExternalIdString()
@@ -60,6 +62,10 @@ require_once('roles.inc.php');
 /** Testlink Smarty class wrapper sets up the default smarty settings for testlink */
 require_once('tlsmarty.inc.php');
 
+// Needed to avoid problems with Smarty 3
+spl_autoload_register('tlAutoload');
+
+
 /** Input data validation */
 require_once("inputparameter.inc.php");
 
@@ -72,7 +78,8 @@ require_once("exec_cfield_mgr.class.php");
  * Automatic loader for PHP classes
  * See PHP Manual for details 
  */
-function __autoload($class_name) 
+// function __autoload($class_name) 
+function tlAutoload($class_name) 
 {
 	// exceptions
 	$tlClasses = null;
@@ -526,26 +533,35 @@ function set_dt_formats()
  * @return mixed the configuration parameter(s)
  * 
  * @internal Revisions
- *	20080326 - franciscom - removed eval
  */
 function config_get($config_id)
 {
 	$t_value = '';  
 	$t_found = false;  
-
+	$logInfo = array('msg' => "config option not available: {$config_id}", 'level' => 'WARNING');
 	if(!$t_found)
 	{
- 		$my = "g_" . $config_id;
-        if (isset($GLOBALS[$my]))
-	    	$t_value = $GLOBALS[$my];
-	    else 
-	    {
+		$my = "g_" . $config_id;
+		if( ($t_found = isset($GLOBALS[$my])) )
+		{
+			$t_value = $GLOBALS[$my];
+		}
+		else
+		{
 			$cfg = $GLOBALS['tlCfg'];
-			if (property_exists($cfg,$config_id))
+			if( ($t_found = property_exists($cfg,$config_id)) )
+			{
 				$t_value = $cfg->$config_id;
-	    }
+			}
+		}
+		
+		if( $t_found )
+		{
+			$logInfo = array('msg' => "config option: {$config_id} is {$t_value}", 'level' => 'INFO');
+		}
 	}
-	tlog('config_get global var with key ['.$config_id.'] is ' . $t_value);
+	
+	tLog($logInfo['msg'],$logInfo['level']);
 	return $t_value;
 }
 

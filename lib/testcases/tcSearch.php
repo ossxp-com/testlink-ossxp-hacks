@@ -8,13 +8,17 @@
  * @package 	TestLink
  * @author 		TestLink community
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: tcSearch.php,v 1.5 2010/01/24 11:07:09 franciscom Exp $
+ * @version    	CVS: $Id: tcSearch.php,v 1.14 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  *
  *	@internal revisions
+ *	20100609 - franciscom - BUGID 1627: Search Test Case by Date of Creation
+ *  20100526 - Julian - BUGID 3490 - Search Test Cases based on requirements
+ *	20100409 - franciscom - BUGID 3371 - Search Test Cases based on Test Importance
+ *	20100326 - franciscom - BUGID 3334 - search fails if test case has 0 steps
  *  20100124 - franciscom - BUGID 3077 - search on preconditions
- *	20100106	 - franciscom - Multiple Test Case Steps Feature
+ *	20100106 - franciscom - Multiple Test Case Steps Feature
  *	20090228 - franciscom - if targetTestCase == test case prefix => 
  *                             consider as empty => means search all.
  *
@@ -28,9 +32,11 @@ $templateCfg = templateConfiguration();
 $tproject_mgr = new testproject($db);
 
 $tcase_cfg = config_get('testcase_cfg');
-$gui = initializeGui();
-$map = null;
 $args = init_args();
+
+$gui = initializeGui($args);
+$map = null;
+
 if ($args->tprojectID)
 {
 	$tables = tlObjectWithDB::getDBTables(array('cfield_design_values','nodes_hierarchy',
@@ -42,6 +48,26 @@ if ($args->tprojectID)
 
     $from = array('by_keyword_id' => ' ', 'by_custom_field' => ' ', 'by_requirement_doc_id' => '');
     $filter = null;
+    
+    // if Both dates exists check From >= To
+    if( !is_null($args->creation_date_from) &&  !is_null($args->creation_date_to) )
+    {
+    	$date_from = date_create_from_format('Y-n-j', $args->creation_date_from);
+    	$date_to = date_create_from_format('Y-n-j', $args->creation_date_to);
+    }
+    
+    if( !is_null($args->creation_date_from) )
+    {
+    	$db_date = $db->db->DBdate($args->creation_date_from);
+        $filter['by_creation_date_from'] = " AND TCV.creation_ts >= {$db_date} ";
+	}
+
+    if( !is_null($args->creation_date_to) )
+    {
+    	$db_date = $db->db->DBdate($args->creation_date_to);
+        $filter['by_creation_date_to'] = " AND TCV.creation_ts <= {$db_date} ";
+	}
+    
     
     if($args->targetTestCase != "" && strcmp($args->targetTestCase,$gui->tcasePrefix) != 0)
     {
@@ -110,28 +136,35 @@ if ($args->tprojectID)
         $filter['by_custom_field'] = " AND CFD.field_id={$args->custom_field_id} " .
                                      " AND CFD.value like '%{$args->custom_field_value}%' ";
     }
-   
+
    	if($args->requirement_doc_id != "")
     {
     	$args->requirement_doc_id = $db->prepare_string($args->requirement_doc_id);
-     	$from['by_requirement_doc_id'] = " JOIN {$tables['requirements']} REQ " .
-     	                                 " ON AND REQ.id=RC.req_id " .
-                                         " JOIN {$tables['req_coverage']} RC" .  
-                                         " ON RC.testcase_id = NH_TC.id ";
+     	$from['by_requirement_doc_id'] = " JOIN {$tables['req_coverage']} RC" .  
+                                         " ON RC.testcase_id = NH_TC.id " .
+     									 " JOIN {$tables['requirements']} REQ " .
+		                                 " ON REQ.id=RC.req_id " ;
     	$filter['by_requirement_doc_id'] = " AND REQ.req_doc_id like '%{$args->requirement_doc_id}%' ";
     }   
+
+	// BUGID 3371 
+   	if( $args->importance > 0)
+    {
+        $filter['importance'] = " AND TCV.importance = {$args->importance} ";
+	}  
     
     $sqlFields = " SELECT NH_TC.id AS testcase_id,NH_TC.name,TCV.id AS tcversion_id," .
                  " TCV.summary, TCV.version, TCV.tc_external_id "; 
-                 // " TCSTEPS.actions, TCSTEPS.expected_results";
     
     $sqlCount  = "SELECT COUNT(NH_TC.id) ";
     
+    // BUGID 3334 - search fails if test case has 0 steps
+    // Added LEFT OUTER
     $sqlPart2 = " FROM {$tables['nodes_hierarchy']} NH_TC " .
                 " JOIN {$tables['nodes_hierarchy']} NH_TCV ON NH_TCV.parent_id = NH_TC.id  " .
-                " JOIN {$tables['nodes_hierarchy']} NH_TCSTEPS ON NH_TCSTEPS.parent_id = NH_TCV.id " .
                 " JOIN {$tables['tcversions']} TCV ON NH_TCV.id = TCV.id " .
-                " JOIN {$tables['tcsteps']} TCSTEPS ON NH_TCSTEPS.id = TCSTEPS.id  " .
+                " LEFT OUTER JOIN {$tables['nodes_hierarchy']} NH_TCSTEPS ON NH_TCSTEPS.parent_id = NH_TCV.id " .
+                " LEFT OUTER JOIN {$tables['tcsteps']} TCSTEPS ON NH_TCSTEPS.id = TCSTEPS.id  " .
                 " {$from['by_keyword_id']} {$from['by_custom_field']} {$from['by_requirement_doc_id']} " .
                 " WHERE 1=1 ";
            
@@ -139,7 +172,7 @@ if ($args->tprojectID)
     {
         $sqlPart2 .= implode("",$filter);
     }
-    
+  
     // Count results
     $sql = $sqlCount . $sqlPart2;
     $gui->row_qty = $db->fetchOneValue($sql); 
@@ -179,6 +212,10 @@ $smarty->assign('gui',$gui);
 $smarty->display($templateCfg->template_dir . $tpl);
 
 
+/**
+ *
+ *
+ */
 function init_args()
 {
 	$args = new stdClass();
@@ -193,7 +230,13 @@ function init_args()
 					 "targetTestCase" => array(tlInputParameter::STRING_N,0,30),
 					 "preconditions" => array(tlInputParameter::STRING_N,0,50),
 					 "requirement_doc_id" => array(tlInputParameter::STRING_N,0,32),
-	);	
+					 "importance" => array(tlInputParameter::INT_N),
+					 "creation_date_from_Day" => array(tlInputParameter::INT_N),
+					 "creation_date_from_Month" => array(tlInputParameter::INT_N),
+					 "creation_date_from_Year" => array(tlInputParameter::INT_N),
+					 "creation_date_to_Day" => array(tlInputParameter::INT_N),
+					 "creation_date_to_Month" => array(tlInputParameter::INT_N),
+					 "creation_date_to_Year" => array(tlInputParameter::INT_N) );	
 		
 	$args = new stdClass();
 	R_PARAMS($iParams,$args);
@@ -201,6 +244,33 @@ function init_args()
 	$args->userID = isset($_SESSION['userID']) ? $_SESSION['userID'] : 0;
     $args->tprojectID = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 
+
+	// special situation: dates
+	$date_vars = array('target_date_Year','target_date_Month','target_date_Day');
+  	$start_date_vars = array('start_date_Year','start_date_Month','start_date_Day');
+
+	$date_vars_prefix = array('creation_date_from','creation_date_to');
+	$date_pieces = array('_Year','_Month','_Day');
+	$create_date = array('creation_date_from' => true,'creation_date_to' => true);
+	
+	foreach($date_vars_prefix as $target)
+  	{
+  		$xx = array();
+  		$args->$target = null;
+  		foreach($date_pieces as $pk)
+  		{
+  			$accessKey = $target . $pk;
+  	    	$create_date[$target] = $create_date[$target] && !is_null($args->$accessKey) && trim($args->$accessKey) != '' && 
+  	    							intval($args->$accessKey) > 0;
+  	    	$xx[] = $args->$accessKey;
+  		}
+  		if($create_date[$target])
+  		{
+  			$args->$target = implode('-',$xx);
+  		}
+  	}
+
+	new dBug($args);
     return $args;
 }
 
@@ -209,7 +279,7 @@ function init_args()
  * 
  *
  */
-function initializeGui()
+function initializeGui(&$argsObj)
 {
 	$gui = new stdClass();
 
@@ -225,6 +295,9 @@ function initializeGui()
 	$gui->show_match_count = false;
 	$gui->tc_current_version = null;
 	$gui->row_qty = 0;
+	$gui->creation_date_from = $argsObj->creation_date_from;
+	$gui->creation_date_to = $argsObj->creation_date_to;
+	
     return $gui;
 }
 

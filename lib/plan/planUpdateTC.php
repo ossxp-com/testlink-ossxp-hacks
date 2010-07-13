@@ -1,7 +1,7 @@
 <?php
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * @version $Id: planUpdateTC.php,v 1.41 2010/01/31 18:32:00 franciscom Exp $
+ * @version $Id: planUpdateTC.php,v 1.45 2010/06/28 16:19:36 asimon83 Exp $
  *
  * Author: franciscom
  *
@@ -10,6 +10,9 @@
  * Test Case Execution assignments will be auto(magically) updated.
  *
  * 	@internal revisions:
+ *  20100628 - asimon - removal of constants from filter control class
+ *  20160625 - asimon - refactoring for new filter features and BUGID 3516
+ *  20100624 - asimon - CVS merge (experimental branch to HEAD)
  *	20100131 - franciscom - BUGID 3008/3109	
  *	20100123 - franciscom - BUGID 2652 + missing refactoring for table prefix doUpdate()
  *	20091212 - franciscom - added contribution by asimon83 (refactored) - BUGID 2652
@@ -116,11 +119,11 @@ function init_args(&$tplanMgr)
     $args->newVersionSet = isset($_REQUEST['new_tcversion_for_tcid']) ? $_REQUEST['new_tcversion_for_tcid'] : null;
     $args->version_id = isset($_REQUEST['version_id']) ? $_REQUEST['version_id'] : 0;
 
+    // BUGID 3516
     // Can be a list (string with , (comma) has item separator), that will be trasformed in an array.
-    $keywordSet = isset($_REQUEST['keyword_id']) ? $_REQUEST['keyword_id'] : null;
-    $args->keyword_id = is_null($keywordSet) ? 0 : explode(',',$keywordSet); 
-    $args->keywordsFilterType = isset($_REQUEST['keywordsFilterType']) ? $_REQUEST['keywordsFilterType'] : 'OR';
-
+//    $keywordSet = isset($_REQUEST['keyword_id']) ? $_REQUEST['keyword_id'] : null;
+//    $args->keyword_id = is_null($keywordSet) ? 0 : explode(',',$keywordSet); 
+//    $args->keywordsFilterType = isset($_REQUEST['keywordsFilterType']) ? $_REQUEST['keywordsFilterType'] : 'OR';
     
     $args->tplan_id = isset($_REQUEST['tplan_id']) ? intval($_REQUEST['tplan_id']) : 0;
     if($args->tplan_id == 0)
@@ -136,6 +139,34 @@ function init_args(&$tplanMgr)
     $args->tproject_id = $_SESSION['testprojectID'];
     $args->tproject_name = $_SESSION['testprojectName'];
 
+    // BUGID 3516
+	// For more information about the data accessed in session here, see the comment
+	// in the file header of lib/functions/tlTestCaseFilterControl.class.php.
+	$form_token = isset($_REQUEST['form_token']) ? $_REQUEST['form_token'] : 0;
+	
+	$mode = 'plan_mode';
+	
+	$session_data = isset($_SESSION[$mode]) && isset($_SESSION[$mode][$form_token])
+	                ? $_SESSION[$mode][$form_token] : null;
+	
+	$args->refreshTree = isset($session_data['setting_refresh_tree_on_action']) ?
+                         $session_data['setting_refresh_tree_on_action'] : 0;
+    
+    $args->keyword_id = 0;
+	$fk = 'filter_keywords';
+	if (isset($session_data[$fk])) {
+		$args->keyword_id = $session_data[$fk];
+		if (is_array($args->keyword_id) && count($args->keyword_id) == 1) {
+			$args->keyword_id = $args->keyword_id[0];
+		}
+	}
+	
+	$args->keywordsFilterType = null;
+	$ft = 'filter_keywords_filter_type';
+	if (isset($session_data[$ft])) {
+		$args->keywordsFilterType = $session_data[$ft];
+	}
+	
     return $args;
 }
 
@@ -225,8 +256,9 @@ function processTestSuite(&$dbHandler,&$argsObj,$keywordsFilter,&$tplanMgr,&$tca
 function doUpdateAllToLatest(&$dbObj,$argsObj,&$tplanMgr)
 {
   $qty=0;
-  $linkedItems=$tplanMgr->get_linked_tcversions($argsObj->tplan_id);
-  
+  // 
+  // $linkedItems=$tplanMgr->get_linked_tcversions($argsObj->tplan_id);
+  $linkedItems = $tplanMgr->get_linked_items_id($argsObj->tplan_id);
   if( is_null($linkedItems) )
   {
      return lang_get('no_testcase_available');  

@@ -2,7 +2,7 @@
 /** 
 * 	TestLink Open Source Project - http://testlink.sourceforge.net/
 * 
-* 	@version 	$Id: gettprojectnodes.php,v 1.16 2009/12/08 14:43:37 franciscom Exp $
+* 	@version 	$Id: gettprojectnodes.php,v 1.20 2010/06/24 17:25:53 asimon83 Exp $
 * 	@author 	Francisco Mancardi
 * 
 *   **** IMPORTANT *****   
@@ -18,7 +18,13 @@
 *   - Assign keywords to test cases
 *   - Assign requirements to test cases
 *
-*   rev: 20081213 - franciscom - BUGID 1928 - contribution
+* 	EXT-JS - Important:
+* 	Custom keys can be added, and will be access on EXT-JS code using
+* 	public property 'attributes' of object of Class Ext.tree.TreeNode 
+* 	
+*
+*   rev: 20100530 - franciscom - added custom node attribute: tlNodeType
+*		 20081213 - franciscom - BUGID 1928 - contribution
 *        20080820 - franciscom - added operation argument
 *                                values: 'manage','print'
 *                                used to change Javascript functions to call on item click.
@@ -111,13 +117,16 @@ function display_children($dbHandler,$root_node,$parent,$filter_node,
 	    $tproject_mgr = new testproject($dbHandler);
 	    foreach($nodeSet as $key => $row)
 	    {
-	        $path['text'] = htmlspecialchars($row['name']);                                  
+	        $path['text'] = htmlspecialchars($row['name']);
 	        $path['id'] = $row['id'];                                                           
         
           	// this attribute/property is used on custom code on drag and drop
 	        $path['position'] = $row['node_order'];                                                   
           	$path['leaf'] = false;
  	        $path['cls'] = 'folder';
+
+			// customs key will be accessed using node.attributes.[key name]
+	        $path['tlNodeType'] = $row['node_type'];
 	       
 	        $tcase_qty = null;
 	        switch($row['node_type'])
@@ -137,8 +146,9 @@ function display_children($dbHandler,$root_node,$parent,$filter_node,
 		       		$path['href'] = "javascript:" . $js_function[$row['node_type']]. "({$path['id']})";
                   	// BUGID 1928
                   	if(is_null($showTestCaseID))
+                  	{
                   		$showTestCaseID = config_get('treemenu_show_testcase_id');
-                  	
+                  	}
                   	if($showTestCaseID)
 	                {
 	                	$path['text'] = htmlspecialchars($tcprefix . $external[$row['id']]['tc_external_id'] . ":") .

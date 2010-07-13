@@ -1,10 +1,18 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_show_tc_exec.tpl,v 1.14 2009/12/25 18:57:37 franciscom Exp $
+$Id: inc_exec_show_tc_exec.tpl,v 1.24 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: 
 Author: franciscom
 
-Rev:           
+Rev:  
+	20100617 - eloff - Row coloring in execution history should include notes and cf in same color
+	20100614 - eloff - BUGID 3522 - fix issue with multiple note panels
+	20100426 - Julian - BUGID 2454 - minor changes to properly show executions if exec
+						history was configured
+						
+	20100310 - Julian - BUGID 2454 - now showing lock-symbol for attachment column if
+						build is closed
+						
     20090909 - franciscom - removed code regarding $gui->grants->edit_exec_notes,
                             that on 1.11 was commented, and on 1.12 uncommented
                             creating an empty row with icon and link to edit notes.
@@ -51,7 +59,7 @@ Rev:
 		  {$tsuite_info[$tc_id].details}
 		  </div>
 
-		  {if $ts_cf_smarty[$tc_id] neq ''}
+		  {if $ts_cf_smarty[$tc_id] != ''}
 		    <br />
 		    <div class="custom_field_container" style="border-color:black;width:95%;">
          {$ts_cf_smarty[$tc_id]}
@@ -66,7 +74,7 @@ Rev:
 			        	 attach_attachmentInfos=$gui->tSuiteAttachments[$tc_exec.tsuite_id]
 			        	 attach_inheritStyle=1
 			        	 attach_tableClassName="none"
-				         attach_tableStyles="background-color:#ffffcc;width:100%" }
+				         attach_tableStyles="background-color:#ffffcc;width:100%"}
 	    {/if}
 	    <br />
     </div>
@@ -83,7 +91,7 @@ Rev:
     {$labels.title_test_case}&nbsp;{$labels.th_test_case_id}{$gui->tcasePrefix|escape}{$cfg->testcase_cfg->glue_character}{$tc_exec.tc_external_id|escape} :: {$labels.version}: {$tc_exec.version}
 		<br />
 		    {$tc_exec.name|escape}<br />
-		    {if $tc_exec.assigned_user eq ''}
+		    {if $tc_exec.assigned_user == ''}
 		      {$labels.has_no_assignment}
 		    {else}
           {$labels.assigned_to}{$title_sep}{$tc_exec.assigned_user|escape}
@@ -124,7 +132,7 @@ Rev:
   				  {$users[$abs_last_exec.tester_id]->getDisplayName()|escape}
   				{else}
   				  {assign var="deletedTester" value=$abs_last_exec.tester_id}
-            {assign var="deletedUserString" value=$labels.deleted_user|replace:"%s":$deletedTester }
+            {assign var="deletedUserString" value=$labels.deleted_user|replace:"%s":$deletedTester}
             {$deletedUserString}
   				{/if}  
      			{$title_sep_type3}
@@ -158,14 +166,16 @@ Rev:
 				  <th style="text-align:left">{$labels.build}</th>
 				{/if}
 				{if $gui->has_platforms && 
-				    ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms) }
+				    ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms)}
+					{assign var="my_colspan" value=$my_colspan+1}
 				  <th style="text-align:left">{$labels.platform}</th>
 				{/if}
 				<th style="text-align:left">{$labels.test_exec_by}</th>
 				<th style="text-align:center">{$labels.exec_status}</th>
 				<th style="text-align:center">{$labels.testcaseversion}</th>
-
-				{if $attachment_model->show_upload_column && !$att_download_only}
+				
+				{* BUGID 2545: show attachments column even if all builds are closed *}
+				{if $attachment_model->show_upload_column && $gsmarty_attachments->enabled}
 						<th style="text-align:center">{$labels.attachment_mgmt}</th>
 				{else}		
             {assign var="my_colspan" value=$my_colspan-1}
@@ -188,7 +198,8 @@ Rev:
 			{* ----------------------------------------------------------------------------------- *}
 			{foreach item=tc_old_exec from=$gui->other_execs.$tcversion_id}
   	     {assign var="tc_status_code" value=$tc_old_exec.status}
-   			<tr style="border-top:1px solid black; background-color:{cycle values='#eeeeee,#d0d0d0'}">
+			{cycle values='#eeeeee,#d0d0d0' assign="bg_color"}
+			<tr style="border-top:1px solid black; background-color: {$bg_color}">
   			  <td>
           {* Check also that Build is Open *}
   			  {if $gui->grants->edit_exec_notes && $tc_old_exec.build_is_open}
@@ -206,18 +217,18 @@ Rev:
   				{/if}
 
 				  {if $gui->has_platforms && 
-				      ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms) }
+				      ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms)}
   				  <td>
 					  {$tc_old_exec.platform_name}
   				  </td>
   				{/if}
 
   				<td>
-  				{if isset($users[$tc_old_exec.tester_id]) }
+  				{if isset($users[$tc_old_exec.tester_id])}
   				  {$users[$tc_old_exec.tester_id]->getDisplayName()|escape}
   				{else}
   				  {assign var="deletedTester" value=$tc_old_exec.tester_id}
-            {assign var="deletedUserString" value=$labels.deleted_user|replace:"%s":$deletedTester }
+            {assign var="deletedUserString" value=$labels.deleted_user|replace:"%s":$deletedTester}
             {$deletedUserString}
   				{/if}  
   				</td>
@@ -232,12 +243,25 @@ Rev:
 
   				<td  style="text-align:center">{$tc_old_exec.tcversion_number}</td>
 
-          {if $attachment_model->show_upload_column && !$att_download_only && $tc_old_exec.build_is_open}
+		  {* BUGID 2545: adjusted if statement to show executions properly
+		   *   if execution history was configured 
+		   *}
+          {if ($attachment_model->show_upload_column && !$att_download_only && $tc_old_exec.build_is_open 
+               && $gsmarty_attachments->enabled) || ($attachment_model->show_upload_column && $gui->history_on == 1 
+               && $tc_old_exec.build_is_open && $gsmarty_attachments->enabled)}
       			  <td align="center"><a href="javascript:openFileUploadWindow({$tc_old_exec.execution_id},'executions')">
       			    <img src="{$smarty.const.TL_THEME_IMG_DIR}/upload_16.png" title="{$labels.alt_attachment_mgmt}"
       			         alt="{$labels.alt_attachment_mgmt}"
       			         style="border:none" /></a>
               </td>
+			  {*BUGID 2454*}
+			  {else}
+			  	{if $attachment_model->show_upload_column && $gsmarty_attachments->enabled}
+					<td align="center">
+						<img src="{$smarty.const.TL_THEME_IMG_DIR}/lock.png" title="{$labels.closed_build}">
+					</td>
+				{/if}
+			  {*END BUGID 2454*}
   	      {/if}
 
     			{if $gsmarty_bugInterfaceOn}
@@ -272,24 +296,29 @@ Rev:
   			</tr>
  			  {if $tc_old_exec.execution_notes neq ""}
   			<script>
+		{*  BUGID 3522
+		Initialize panel if notes exists. There might be multiple note panels
+		visible at the same time, so we need to collect those init functions in
+		an array and execute them from Ext.onReady(). See execSetResults.tpl *}
         {literal}
-        Ext.onReady(function(){
-		    var p = new Ext.Panel({
-        title: {/literal}'{$labels.exec_notes}'{literal},
-        collapsible:true,
-        collapsed: true,
-        baseCls: 'x-tl-panel',
-        renderTo: {/literal}'exec_notes_container_{$tc_old_exec.execution_id}'{literal},
-        width:'100%',
-        html:''
-        });
+        var panel_init = function(){
+            var p = new Ext.Panel({
+            title: {/literal}'{$labels.exec_notes}'{literal},
+            collapsible:true,
+            collapsed: true,
+            baseCls: 'x-tl-panel',
+            renderTo: {/literal}'exec_notes_container_{$tc_old_exec.execution_id}'{literal},
+            width:'100%',
+            html:''
+            });
 
-        p.on({'expand' : function(){load_notes(this,{/literal}{$tc_old_exec.execution_id}{literal});}});
-        });
+            p.on({'expand' : function(){load_notes(this,{/literal}{$tc_old_exec.execution_id}{literal});}});
+        };
+        panel_init_functions.push(panel_init);
         {/literal}
 
   			</script>
-  			<tr>
+			<tr style="background-color: {$bg_color}">
   			 <td colspan="{$my_colspan}" id="exec_notes_container_{$tc_old_exec.execution_id}"
   			     style="padding:5px 5px 5px 5px;">
   			 </td>
@@ -297,7 +326,7 @@ Rev:
  			  {/if}
 
   			{* 20070105 - Custom field values  *}
-  			<tr>
+			<tr style="background-color: {$bg_color}">
   			<td colspan="{$my_colspan}">
   				{assign var="execID" value=$tc_old_exec.execution_id}
   				{assign var="cf_value_info" value=$gui->other_exec_cfields[$execID]}
@@ -308,7 +337,7 @@ Rev:
 
 
   			{* Attachments *}
-  			<tr>
+			<tr style="background-color: {$bg_color}">
   			<td colspan="{$my_colspan}">
   				{assign var="execID" value=$tc_old_exec.execution_id}
 
@@ -328,7 +357,7 @@ Rev:
 
         {* Execution Bugs (if any) *}
         {if $gui->bugs[$execID] neq ""}
-   		<tr>
+		<tr style="background-color: {$bg_color}">
    			<td colspan="{$my_colspan}">
    				{include file="inc_show_bug_table.tpl"
    			         bugs_map=$gui->bugs[$execID]

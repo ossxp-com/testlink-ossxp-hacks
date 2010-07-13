@@ -1,9 +1,11 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: tcEdit.tpl,v 1.25 2010/01/27 08:16:23 erikeloff Exp $ 
+$Id: tcEdit.tpl,v 1.27 2010/05/01 19:19:51 franciscom Exp $ 
 Purpose: smarty template - edit test specification: test case
 
 @internal Revisions:
+  20100315 - franciscom - BUGID 3410: Smarty 3.0 compatibility - changes in smarty.template behaviour
+	20100306 - eloff - BUGID 3062 - Check for duplicate name
 	20100124 - eloff - BUGID 3088 - Check valid session before submit
 	20100110 - eloff - BUGID 2036 - Check modified content before exit
 	20090422 - franciscom - BUGID 2414
@@ -73,6 +75,22 @@ function validateForm(the_form)
 	return Ext.ux.requireSessionAndSubmit(the_form);
 }
 
+function checkDuplicateName() {
+	Ext.Ajax.request({
+		url: 'lib/ajax/checkDuplicateName.php',
+		method: 'GET',
+		params: {
+			testcase_id: $('testcase_id').value,
+			name: $('testcase_name').value
+		},
+		success: function(result, request) {
+			var obj = Ext.util.JSON.decode(result.responseText);
+			$("testcase_name_warning").innerHTML = obj['message'];
+		},
+		failure: function (result, request) {
+		}
+	});
+}
 
 {/literal}
 </script>
@@ -100,7 +118,7 @@ var tc_editor = "{$tlCfg->gui->text_editor.all.type}";
 <form method="post" action="lib/testcases/tcEdit.php" name="tc_edit"
       onSubmit="return validateForm(this);">
 
-	<input type="hidden" name="testcase_id" value="{$gui->tc.testcase_id}" />
+	<input type="hidden" name="testcase_id" id="testcase_id" value="{$gui->tc.testcase_id}" />
 	<input type="hidden" name="tcversion_id" value="{$gui->tc.id}" />
 	<input type="hidden" name="version" value="{$gui->tc.version}" />
 	<input type="hidden" name="doAction" value="" />
@@ -113,9 +131,7 @@ var tc_editor = "{$tlCfg->gui->text_editor.all.type}";
 		<input type="button" name="go_back" value="{$labels.cancel}" 
 		       onclick="history.back();"/>
 	</div>	
-
-	{assign var=this_template_dir value=$smarty.template|dirname}
-	{include file="$this_template_dir/tcEdit_New_viewer.tpl"}
+	{include file="testcases/tcEdit_New_viewer.tpl"}
 	
 	<div class="groupBtn">
 		<input id="do_update" type="submit" name="do_update" 

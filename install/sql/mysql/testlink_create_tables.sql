@@ -1,12 +1,15 @@
 # TestLink Open Source Project - http://testlink.sourceforge.net/
 # This script is distributed under the GNU General Public License 2 or later.
 # ---------------------------------------------------------------------------------------
-# $Id: testlink_create_tables.sql,v 1.75 2010/02/18 21:52:11 havlat Exp $
+# $Id: testlink_create_tables.sql,v 1.77 2010/03/14 08:54:28 franciscom Exp $
 #
 # SQL script - create all DB tables for MySQL
 # tables are in alphabetic order  
 #
 # ATTENTION: do not use a different naming convention, that one already in use.
+#
+# IMPORTANT NOTE:
+# each NEW TABLE added here NEED TO BE DEFINED in object.class.php getDBTables()
 #
 # IMPORTANT NOTE - DATETIME or TIMESTAMP
 # Extracted from MySQL Manual
@@ -35,6 +38,7 @@
 # ---------------------------------------------------------------------------------------
 # Revisions:
 #
+# 20100308 - Julian - req_relations table added
 # 20100124 - franciscom - is_open,active added to req_versions table
 # 20100113 - franciscom - doc_id increased to 64 and setted NOT NULL
 # 20100106 - franciscom - Test Case Step feature
@@ -400,7 +404,15 @@ CREATE TABLE /*prefix*/req_versions (
   PRIMARY KEY  (`id`,`version`)
 ) DEFAULT CHARSET=utf8;
 
-
+CREATE TABLE /*prefix*/req_relations (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `source_id` int(10) unsigned NOT NULL,
+  `destination_id` int(10) unsigned NOT NULL,
+  `relation_type` smallint(5) unsigned NOT NULL default '1',
+  `author_id` int(10) unsigned default NULL,
+  `creation_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`)
+) DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE /*prefix*/rights (

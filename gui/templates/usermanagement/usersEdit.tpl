@@ -1,6 +1,6 @@
 {*
 Testlink: smarty template -
-$Id: usersEdit.tpl,v 1.25 2009/08/29 23:18:02 havlat Exp $
+$Id: usersEdit.tpl,v 1.28 2010/06/24 17:25:56 asimon83 Exp $
 
 20080419 - franciscom - BUGID 1496
          -  bug 1000  - Testplan User Role Assignments
@@ -101,10 +101,8 @@ function validateForm(f,check_password)
 }
 </script>
 {/literal}
-
-
-{assign var="ext_version" value="-2.0"}
-<link rel="stylesheet" type="text/css" href="{$basehref}third_party/ext{$ext_version}/css/ext-all.css" />
+{assign var="ext_location" value=$smarty.const.TL_EXTJS_RELATIVE_PATH}
+<link rel="stylesheet" type="text/css" href="{$basehref}{$ext_location}/css/ext-all.css" />
 </head>
 
 <body>
@@ -118,7 +116,7 @@ function validateForm(f,check_password)
 {assign var="show_password_field" value=1}
 
 
-{if $operation == 'doCreate' }
+{if $operation == 'doCreate'}
    {assign var="check_password" value=1}
    {if $userData neq null}
        {assign var="user_login" value=$userData->login}
@@ -132,7 +130,7 @@ function validateForm(f,check_password)
    {assign var="show_password_field" value=0}
 {/if}
 
-{if $external_password_mgmt eq 1 }
+{if $external_password_mgmt eq 1}
   {assign var="check_password" value=0}
   {assign var="reset_password_enabled" value=0}
   {assign var="show_password_field" value=0}
@@ -189,7 +187,7 @@ function validateForm(f,check_password)
 
 		{if $show_password_field}
 		     <tr>
-			    {if $external_password_mgmt eq 0 }
+			    {if $external_password_mgmt eq 0}
  			      <th style="background:none;">{$labels.th_password}</th>
 		        <td><input type="password" id="password" name="password"
 		                   size="{#PASSWD_SIZE#}"
@@ -246,7 +244,7 @@ function validateForm(f,check_password)
 			</td>
 		</tr>
 
-    {if $external_password_mgmt eq 1 }
+    {if $external_password_mgmt eq 1}
       <td>{$labels.password_mgmt_is_external}</td>
     {/if}
 

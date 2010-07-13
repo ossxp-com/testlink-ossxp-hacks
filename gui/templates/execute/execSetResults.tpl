@@ -1,15 +1,18 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: execSetResults.tpl,v 1.51 2010/01/29 20:50:01 franciscom Exp $
+$Id: execSetResults.tpl,v 1.59 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: smarty template - show tests to add results
 Rev:
+
+  20100614 - eloff - BUGID 3522 - fix issue with multiple note panels
+  20100503 - franciscom - BUGID 3260: Import XML Results is not working with Internet Explorer
+                          reason: passing string without string separator to  openImportResult()
   20090901 - franciscom - preconditions
   20090815 - franciscom - platform feature
   20090418 - franciscom - BUGID 2364 - added logic to refresh tree, 
                           due to access to test spec to edit it.
 
-  20090329 - franciscom - when using bulk mode, user can access test case spec
-                          opening a new window.
+  20090329 - franciscom - when using bulk mode, user can access test case spec opening a new window.
                           
   20090212 - amitkhullar - BUGID 2068
   20081231 - franciscom - new implementation of Bulk TC Status 
@@ -34,7 +37,7 @@ Rev:
           s='edit_notes,build_is_closed,test_cases_cannot_be_executed,test_exec_notes,test_exec_result,
              th_testsuite,details,warning_delete_execution,title_test_case,th_test_case_id,
              version,has_no_assignment,assigned_to,execution_history,exec_notes,step_actions,
-             execution_type_short_descr,expected_results,
+             execution_type_short_descr,expected_results,testcase_customfields,
              last_execution,exec_any_build,date_time_run,test_exec_by,build,exec_status,
              test_status_not_run,tc_not_tested_yet,last_execution,exec_current_build,
 	           attachment_mgmt,bug_mgmt,delete,closed_build,alt_notes,alt_attachment_mgmt,
@@ -44,12 +47,12 @@ Rev:
 	           testcaseversion,btn_print,execute_and_save_results,warning,warning_nothing_will_be_saved,
 	           test_exec_steps,test_exec_expected_r,btn_save_tc_exec_results,only_test_cases_assigned_to,
              deleted_user,click_to_open,reqs,requirement,show_tcase_spec,edit_execution, 
-             btn_save_exec_and_movetonext,
+             btn_save_exec_and_movetonext,step_number,
              preconditions,platform,platform_description,exec_not_run_result_note'}
 
 
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {include file="inc_head.tpl" popup='yes' openHead='yes' jsValidate="yes" editorType=$gui->editorType}
@@ -70,6 +73,7 @@ var import_xml_results="{$labels.import_xml_results}";
 
 <script language="JavaScript" type="text/javascript">
 {literal}
+
 function load_notes(panel,exec_id)
 {
   // 20100129 - BUGID 3113 - franciscom   -  solved ONLY for  $webeditorType == 'none'
@@ -176,7 +180,19 @@ function checkSubmitForStatus($statusCode)
 {/literal}
 
 
+{* Initialize note panels. The array panel_init_functions is filled with init
+functions from inc_exec_show_tc_exec.tpl and executed from onReady below *}
+<script>
+{literal}
+panel_init_functions = new Array();
+Ext.onReady(function() {
+	for(var i=0;i<panel_init_functions.length;i++) {
+		panel_init_functions[i]();
+	}
+});
+{/literal}
 
+</script>
 
 
 </head>
@@ -196,9 +212,9 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
               multiple_show_hide('{$tsd_div_id_list}','{$tsd_hidden_id_list}',
                                  '{$tsd_val_for_hidden_list}');
               {if $round_enabled}Nifty('div.exec_additional_info');{/if}
-              {if #ROUND_TC_SPEC# }Nifty('div.exec_test_spec');{/if}
-              {if #ROUND_EXEC_HISTORY# }Nifty('div.exec_history');{/if}
-              {if #ROUND_TC_TITLE# }Nifty('div.exec_tc_title');{/if}">
+              {if #ROUND_TC_SPEC#}Nifty('div.exec_test_spec');{/if}
+              {if #ROUND_EXEC_HISTORY#}Nifty('div.exec_history');{/if}
+              {if #ROUND_TC_TITLE#}Nifty('div.exec_tc_title');{/if}">
 
 <h1 class="title">
 	{$labels.title_t_r_on_build} {$gui->build_name|escape}
@@ -303,11 +319,10 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
         {assign var="draw_submit_button" value=true}
 
 
-        {if $cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op }
+        {if $cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op}
             {lang_get s='bulk_tc_status_management' var='container_title'}
             {assign var="div_id" value='bulk_controls'}
             {assign var="memstatus_id" value=$bulk_controls_view_memory_id}
-            
             {include file="inc_show_hide_mgmt.tpl"
                      show_hide_container_title=$container_title
                      show_hide_container_id=$div_id
@@ -321,12 +336,13 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
                        args_input_enable_mgmt=$input_enabled_disabled
                        args_tcversion_id='bulk'
                        args_webeditor=$gui->bulk_exec_notes_editor
+                       args_execution_time_cfields=$gui->execution_time_cfields
                        args_labels=$labels}
             </div>
         {/if}
     	{/if}
 
-      {if !($cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op) }
+      {if !($cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op)}
           <hr />
           <div class="groupBtn">
     	    	  <input type="button" name="print" id="print" value="{$labels.btn_print}"
@@ -336,10 +352,10 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
     	    	         value="{lang_get s=$gui->history_status_btn_name}" />
     	    	  <input type="button" id="pop_up_import_button" name="import_xml_button"
     	    	         value="{$labels.import_xml_results}"
-    	    	         onclick="javascript: openImportResult(import_xml_results);" />
+    	    	         onclick="javascript: openImportResult('import_xml_results');" />
           
               {* 20081125 - franciscom - BUGID 1902*}
-		          {if $tlCfg->exec_cfg->enable_test_automation }
+		          {if $tlCfg->exec_cfg->enable_test_automation}
 		          <input type="submit" id="execute_cases" name="execute_cases"
 		                 value="{$labels.execute_and_save_results}"/>
 		          {/if}
@@ -350,7 +366,7 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
       <hr />
 	{/if}
 
-  {if $cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op }
+  {if $cfg->exec_cfg->show_testsuite_contents && $gui->can_use_bulk_op}
       {* this message will be displate dby inc_exec_controls.tpl 
       <div class="messages" style="align:center;">
       {$labels.exec_not_run_result_note}
@@ -380,7 +396,7 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
         <tr bgcolor="{cycle values="#eeeeee,#d0d0d0"}">       
         <td>{$tsuite_info[$tc_id].tsuite_name}</td>{* <td>&nbsp;</td> *}
         <td>
-        <a href="javascript:openTCaseWindow({$tc_exec.testcase_id},{$tc_exec.id})" title="{$labels.show_tcase_spec}">
+        <a href="javascript:openTCaseWindow({$tc_exec.testcase_id},{$tc_exec.id},'editOnExec')" title="{$labels.show_tcase_spec}">
         {$gui->tcasePrefix|escape}{$cfg->testcase_cfg->glue_character}{$tc_exec.tc_external_id|escape}::{$labels.version}: {$tc_exec.version}::{$tc_exec.name|escape}
         </a>
         </td>
@@ -400,7 +416,8 @@ IMPORTANT: if you change value, you need to chang init_args() logic on execSetRe
 
     {* 20090419 - BUGID 2364 - franciscom*}
     {if isset($gui->refreshTree) && $gui->refreshTree}
-	    {include file="inc_refreshTree.tpl"}
+	    {include file="inc_refreshTreeWithFilters.tpl"}
+	    {*include file="inc_refreshTree.tpl"*}
     {/if}
   {/if}
   

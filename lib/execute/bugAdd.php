@@ -5,12 +5,16 @@
  *
  * Filename $RCSfile: bugAdd.php,v $
  *
- * @version $Revision: 1.10 $
- * @modified $Date: 2009/12/25 18:53:04 $ by $Author: franciscom $
+ * @version $Revision: 1.13 $
+ * @modified $Date: 2010/06/24 17:25:57 $ by $Author: asimon83 $
  */
 require_once('../../config.inc.php');
 require_once('common.php');
-if (config_get('interface_bugs') != 'NO')
+
+$gui = new stdClass();
+$gui->interface_bugs = config_get('interface_bugs');
+
+if( $gui->interface_bugs != 'NO' )
 {
   require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' . 
                DIRECTORY_SEPARATOR . 'int_bugtracking.php');
@@ -20,7 +24,7 @@ require_once('exec.inc.php');
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
-$args = init_args();
+$args = init_args($g_bugInterface);
 $msg = "";
 
 if($args->bug_id != "")
@@ -50,23 +54,21 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
  * 
  * @return object returns the arguments of the page
  */
-function init_args()
+function init_args($bugInterface)
 {
-	global $g_bugInterface;
-	
-	$iParams = array(
-		"exec_id" => array("GET",tlInputParameter::INT_N),
-		"bug_id" => array("POST",tlInputParameter::STRING_N,0,$g_bugInterface->getBugIDMaxLength()),
-	);
+	$iParams = array("exec_id" => array("GET",tlInputParameter::INT_N),
+		             "bug_id" => array("POST",tlInputParameter::STRING_N,0,$bugInterface->getBugIDMaxLength()));
 	$args = new stdClass();
-	
-	$pParams = I_PARAMS($iParams,$args);
+	I_PARAMS($iParams,$args);
 	
 	if ($args->exec_id)
+	{
 		$_SESSION['bugAdd_execID'] = $args->exec_id;
+	}
 	else
+	{
 		$args->exec_id = isset($_SESSION['bugAdd_execID']) ? $_SESSION['bugAdd_execID'] : 0;
-		
+	}	
 	
 	return $args;
 }
@@ -82,11 +84,11 @@ function init_args()
  */
 function checkRights(&$db,&$user)
 {
-	global $g_bugInterfaceOn;
-	
-	if (!$g_bugInterfaceOn)
-		return false;
-		
-	return $user->hasRight($db,"testplan_execute");
+	$hasRights = false;	
+	if( config_get('bugInterfaceOn') )
+	{
+		$hasRights = $user->hasRight($db,"testplan_execute");
+	}
+	return $hasRights;
 }
 ?>

@@ -1,10 +1,11 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_test_spec.tpl,v 1.14 2010/01/06 18:34:10 franciscom Exp $
+$Id: inc_exec_test_spec.tpl,v 1.19 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: draw execution controls (input for notes and results)
 Author : franciscom
 
 Rev:
+    20100621 - eloff - BUGID 3241 - Implement vertical layout
     20100105 - franciscom - Test Case Steps
     20090901 - franciscom - preconditions + exec_cfg->steps_results_layout
     20090718 - franciscom - added design time custom field location management
@@ -16,7 +17,7 @@ Rev:
 	  {assign var="testcase_id" value=$args_tc_exec.testcase_id}
     {assign var="tcversion_id" value=$args_tc_exec.id}
     
-    {if isset($args_req_details) }
+    {if isset($args_req_details)}
 	  <div class="exec_test_spec">
 		  <table class="test_exec"  >
 		  <tr>
@@ -43,8 +44,6 @@ Rev:
 		 {/if}
      
     <div class="exec_test_spec">
-		{* <table class="simple"> *}
-		{* <table class="mainTable-x" width="100%"> *} 
 		<table class="simple" width="100%">
 		<tr>
 			<th colspan="{$tableColspan}" class="title">{$args_labels.test_exec_summary}</th>
@@ -73,54 +72,15 @@ Rev:
 		</tr>
 		{/if}
 
-   	<tr>
-		<th width="5">{$args_labels.step_number}</th>
-		<th>{$args_labels.step_actions}</th>
-		<th>{$args_labels.expected_results}</th>
-		<th width="25">{$args_labels.execution_type_short_descr}</th>
-  	</tr>
-  	{if $args_tc_exec.steps != ''}
- 	    {foreach from=$args_tc_exec.steps item=step_info }
-    	<tr>
-		  <td style="text-align:righ;">{$step_info.step_number}</td>
-		  <td>{$step_info.actions}</td>
-		  <td>{$step_info.expected_results}</td>
-		  <td>{$execution_types[$step_info.execution_type]}</td>
-	    </tr>
- 	    {/foreach}
-    {/if}
-  	
+	{if $args_tc_exec.steps != ''}
+		{include file="inc_steps.tpl"
+		         layout=$args_cfg->exec_cfg->steps_results_layout
+		         edit_enabled=false
+		         steps=$args_tc_exec.steps}
+	{/if}
 
-    {* ------------------------------------------------------------------------------- 
-      {if $args_cfg->exec_cfg->steps_results_layout == 'horizontal'}
-		    <tr>
-		    	<th width="50%">{$args_labels.test_exec_steps}</th>
-		    	<th width="50%">{$args_labels.test_exec_expected_r}</th>
-		    </tr>
-		    <tr>
-		    	<td style="vertical-align:top;">{$args_tc_exec.steps}</td>
-		    	<td style="vertical-align:top;">{$args_tc_exec.expected_results}</td>
-		    </tr>
-		  {else}
-		    <tr>
-		    	<th width="100%">{$args_labels.test_exec_steps}</th>
-		    </tr>
-		    <tr>
-		    	<td style="vertical-align:top;">{$args_tc_exec.steps}</td>
-		    </tr>
-		    <tr>
-		    	<th width="50%">{$args_labels.test_exec_expected_r}</th>
-		    </tr>
-		    <tr>
-		    	<td style="vertical-align:top;">{$args_tc_exec.expected_results}</td>
-		    </tr>
-		  {/if}
-		 ------------------------------------------------------------------------------- 
-    *}
-
-		
     {* ------------------------------------------------------------------------------------- *}
-    {if $args_enable_custom_field and $args_tc_exec.active eq 1}
+    {if $args_enable_custom_field and $args_tc_exec.active == 1}
   	  {if isset($args_execution_time_cf[$testcase_id]) && $args_execution_time_cf[$testcase_id] != ''}
   	 		<tr>
   				<td colspan="{$tableColspan}">
@@ -137,7 +97,7 @@ Rev:
   	<tr>
 		  <td colspan="{$tableColspan}">
 		  {* 20090718 - franciscom - CF location management*}
-      {if $args_design_time_cf[$testcase_id].standard_location neq ''}
+      {if $args_design_time_cf[$testcase_id].standard_location != ''}
 					<div id="cfields_design_time_tcversionid_{$tcversion_id}" class="custom_field_container" 
 					style="background-color:#dddddd;">{$args_design_time_cf[$testcase_id].standard_location}
 					</div>
@@ -145,10 +105,9 @@ Rev:
 			</td>
 		</tr>
  
-    {* 20090526 - franciscom *}
   	<tr>
 		  <td colspan="{$tableColspan}">
-      {if $args_testplan_design_time_cf[$testcase_id] neq ''}
+      {if $args_testplan_design_time_cf[$testcase_id] != ''}
 					<div id="cfields_testplan_design_time_tcversionid_{$tcversion_id}" class="custom_field_container" 
 					style="background-color:#dddddd;">{$args_testplan_design_time_cf[$testcase_id]}
 					</div>

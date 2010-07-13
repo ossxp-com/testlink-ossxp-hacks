@@ -1,11 +1,11 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+ * ♔ TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: strings.txt,v $
- * @version $Revision: 1.8 $
- * @modified $Date: 2009/04/16 22:27:34 $ $Author: havlat $
+ * @version $Revision: 1.12 $
+ * @modified $Date: 2010/06/24 17:25:52 $ $Author: asimon83 $
  * @author Pavel Kalian
  * @author Martin Havlat
  *
@@ -257,7 +257,7 @@ $TLS_mail_passwd_subject = "Vaše nové heslo pro TestLink.";
 $TLS_mail_problems 		= "Chyby v nastavení pošty, kontaktujte prosím svého správce.";
 $TLS_page_title_lost_passwd = "TestLink - Ztracené heslo";
 $TLS_your_info_for_passwd = "Zadejte své přihlašovací informace, aby Vám mohlo být heslo zasláno elektronickou poštou.";
-$TLS_your_password_is 	= "Vaše nové heslo pro TestLink je: <br>";
+$TLS_your_password_is 	= "Vaše nové heslo pro TestLink je:";
 
 
 
@@ -325,8 +325,11 @@ $TLS_title_delete_attachment = "Smazat přílohu";
 $TLS_btn_yes_del_comp = "Ano, smazat testovací sadu";
 $TLS_container_title_testsuite = $TLS_test_suite;
 $TLS_linked_but_not_executed = "Propojený s jedním nebo více testovacími plány, ale neprovedený";
-$TLS_question_del = "Skutečně smazat";
+$TLS_question_del_testsuite = "Skutečně smazat";
 $TLS_th_link_exec_status = "Stav propojení a provedení";
+$TLS_testsuite_successfully_deleted = "The Test Suite was successfully deleted";
+$TLS_no_links = "No dependent data.";
+$TLS_linked_and_executed = "Test case was added into a Test Plan and has results.";
 
 
 

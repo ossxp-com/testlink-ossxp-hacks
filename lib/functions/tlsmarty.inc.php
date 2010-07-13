@@ -9,12 +9,13 @@
  * @package 	TestLink
  * @author 		Martin Havlat
  * @copyright 	2005-2009, TestLink community 
- * @version    	CVS: $Id: tlsmarty.inc.php,v 1.19 2010/02/07 20:57:44 havlat Exp $
+ * @version    	CVS: $Id: tlsmarty.inc.php,v 1.25 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  * @link 		http://www.smarty.net/ 
  *
  * @internal Revisions:
  *
+ *	20100621 - eloff - added guard_header_smarty() function
  * 	20100121 - franciscom - added show_help_icon to remove error on event viewer
  * 	20090304 - franciscom - removed some MAGIC NUMBERS 
  * 	20081027 - havlatm - moved to include Smarty library
@@ -67,6 +68,33 @@ function translate_tc_status_smarty($params, &$smarty)
 	}
 }
 
+/**
+ * This function should be used to prevent certain templates to only
+ * get included once per page load. For example javascript includes, such
+ * as ext-js.
+ *
+ * Usage (in template):
+ * <code>
+ * {if guard_header_smarty(__FILE__)}
+ *     template code
+ *     <script src="big-library.js type="text/javascript"></script>
+ * {/if}
+ * </code>
+ */
+function guard_header_smarty($file)
+{
+	static $guarded = array();
+
+	if (!isset($guarded[$file]))
+	{
+		$guarded[$file] = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 /**
  * TestLink wrapper for external Smarty class
@@ -77,8 +105,6 @@ class TLSmarty extends Smarty
     function TLSmarty()
     {
         global $tlCfg;
-        // global $g_bugInterfaceOn;
-        // global $g_interface_bugs;
         global $g_locales_html_select_date_field_order;
         global $g_locales_date_format;
         global $g_locales_timestamp_format;
@@ -124,6 +150,7 @@ class TLSmarty extends Smarty
         $this->assign('SP_html_help_file',null);
         $this->assign('menuUrl',null);
         $this->assign('args',null);
+        $this->assign('additionalArgs',null);
         $this->assign('pageTitle',null);
         
         $this->assign('css_only',null);
@@ -165,10 +192,7 @@ class TLSmarty extends Smarty
         $this->assign('pageCharset',$tlCfg->charset);
         $this->assign('tlVersion',TL_VERSION);
         
-        // $this->assign('g_bugInterfaceOn', $g_bugInterfaceOn);
-        // $this->assign('gsmarty_interface_bugs',$g_interface_bugs);
         $this->assign('gsmarty_bugInterfaceOn',config_get('bugInterfaceOn'));
-        $this->assign('gsmarty_interface_bugs',config_get('interface_bugs'));
         $this->assign('testproject_coloring',null);
         
         	
@@ -236,13 +260,13 @@ class TLSmarty extends Smarty
         $this->assign("delete_img",TL_THEME_IMG_DIR . "/trash.png");
         
         $msg = lang_get('show_hide_api_info');
-        $toggle_api_info_img="<img title=\"{$msg}\" alt=\"{$msg}\" " .
+        $toggle_api_info_img="<img class=\"clickable\" title=\"{$msg}\" alt=\"{$msg}\" " .
         " onclick=\"showHideByClass('span','api_info');event.stopPropagation();\" " .
         " src=\"{$api_info_img}\" align=\"left\" />";
         $this->assign("toggle_api_info_img",$toggle_api_info_img);
 
         $msg = lang_get('show_hide_direct_link');
-        $toggle_direct_link_img="<img title=\"{$msg}\" alt=\"{$msg}\" " .
+        $toggle_direct_link_img="<img class=\"clickable\" title=\"{$msg}\" alt=\"{$msg}\" " .
         " onclick=\"showHideByClass('div','direct_link');event.stopPropagation();\" " .
         " src=\"{$direct_link_img}\" align=\"left\" />";
         $this->assign("toggle_direct_link_img",$toggle_direct_link_img);

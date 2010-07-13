@@ -7,12 +7,13 @@
  * @package 	TestLink
  * @author		asimon
  * @copyright 	2005-2009, TestLink community 
- * @version    	CVS: $Id: reqSearchForm.php,v 1.1 2010/01/12 20:03:19 franciscom Exp $
+ * @version    	CVS: $Id: reqSearchForm.php,v 1.3 2010/05/08 17:59:36 franciscom Exp $
  * @link 		http://www.teamst.org/index.php
  *
  * This page presents the search formular for requirements.
  *
  * @internal Revisions:
+ * 20100323 - asimon - added searching for req relation types (BUGID 1748)
  */
 
 require_once("../../config.inc.php");
@@ -22,6 +23,7 @@ testlinkInitPage($db);
 
 $templateCfg = templateConfiguration();
 $tproject_mgr = new testproject($db);
+$req_mgr = new requirement_mgr($db);
 $tcase_cfg = config_get('testcase_cfg');
 
 $args = init_args();
@@ -49,20 +51,24 @@ $gui->types = init_labels($reqCfg->type_labels);
 $coverageManagement = $reqCfg->expected_coverage_management;
 $gui->filter_by['expected_coverage'] = !is_null($coverageManagement);
 
-$gui->reqStatus = init_labels(config_get('req_status'));
+$gui->reqStatus = init_labels($reqCfg->status_labels);
+
+//BUGID 1748
+$gui->filter_by['relation_type'] = $reqCfg->relations->enable;
+$gui->req_relation_select = $req_mgr->init_relation_type_select();
+foreach ($gui->req_relation_select['equal_relations'] as $key => $oldkey) {
+	// set new key in array and delete old one
+	$new_key = (int)str_replace("_source", "", $oldkey);
+	$gui->req_relation_select['items'][$new_key] = $gui->req_relation_select['items'][$oldkey];
+	unset($gui->req_relation_select['items'][$oldkey]);
+}
 
 $smarty = new TLSmarty();
 $smarty->assign('gui',$gui);
 $smarty->display($templateCfg->template_dir . 'reqSearchForm.tpl');
 
-/*
-  function: 
 
-  args:
-  
-  returns: 
 
-*/
 function init_args()
 {              
   	$args = new stdClass();
@@ -71,4 +77,5 @@ function init_args()
        
     return $args;
 }
+
 ?>

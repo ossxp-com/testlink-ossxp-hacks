@@ -9,12 +9,13 @@
  * @package 	TestLink
  * @author 		Martin Havlat
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: configCheck.php,v 1.51 2009/10/05 08:47:11 franciscom Exp $
+ * @version    	CVS: $Id: configCheck.php,v 1.55 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  * @see			sysinfo.php
  *
  * @internal Revisions:
  * 	
+ *  20100617 - franciscom - domxml is not needed anymore
  *  20090713 - franciscom - tested is_writable() on windows with PHP 5.
  *                          minor refactoring
  *  20090416 - havlatm - checking: database, GD lib and browser support
@@ -155,10 +156,10 @@ function checkLibGd()
 // * rev: 20081122 - franciscom - added gd2 check
 function checkForExtensions(&$msg)
 {
-	if (!function_exists('domxml_open_file'))
-	{
-		$msg[] = lang_get("error_domxml_missing");
-	}
+	// if (!function_exists('domxml_open_file'))
+	// {
+	// 	$msg[] = lang_get("error_domxml_missing");
+	// }
 	
 	// without this pChart do not work
 	if( !extension_loaded('gd') )
@@ -337,7 +338,9 @@ function checkForBTSConnection()
 	global $g_bugInterface;
 	$status_ok = true;
 	if($g_bugInterface && !$g_bugInterface->connect())
+	{	
 		$status_ok = false;
+	}
 	return $status_ok; 
 }
 
@@ -780,7 +783,9 @@ function check_file_permissions(&$errCounter, $inst_type, $checked_filename, $is
 		if(file_exists($checked_file)) 
 		{
   			if (is_writable($checked_file))
+  			{
   				$out .= "<td><span class='tab-success'>OK (writable)</span></td></tr>\n"; 
+  			}
   			else
   			{
  				if ($isCritical)
@@ -790,14 +795,18 @@ function check_file_permissions(&$errCounter, $inst_type, $checked_filename, $is
 					$errCounter += 1;
  				}
  				else
+ 				{
  					$out .= "<td><span class='tab-warning'>Not writable! Please fix the file " .
  							$checked_file . " permissions.</span></td></tr>"; 
+ 				}			
   			}
   		} 
 		else 
 		{
   			if (is_writable($checked_path))
+  			{
   				$out .= "<td><span class='tab-success'>OK</span></td></tr>\n"; 
+  			}
   			else
   			{
  				if ($isCritical)
@@ -807,8 +816,10 @@ function check_file_permissions(&$errCounter, $inst_type, $checked_filename, $is
 					$errCounter += 1;
  				}
  				else
+ 				{
  					$out .= "<td><span class='tab-warning'>Directory is not writable! Please fix " .
  							$checked_path . " permissions.</span></td></tr>"; 
+ 				}			
   			}
 		}
 	}
@@ -817,7 +828,9 @@ function check_file_permissions(&$errCounter, $inst_type, $checked_filename, $is
 		if(file_exists($checked_file)) 
 		{
   			if (!is_writable($checked_file))
+  			{
   				$out .= "<td><span class='tab-success'>OK (read only)</span></td></tr>\n"; 
+  			}
   			else
   			{
  				$out .= "<td><span class='tab-warning'>It's recommended to have read only permission for security reason.</span></td></tr>"; 
@@ -831,7 +844,9 @@ function check_file_permissions(&$errCounter, $inst_type, $checked_filename, $is
 				$errCounter += 1;
  			}
 			else
+			{
 				$out .= "<td><span class='tab-warning'>The file is not on place.</span></td></tr>"; 
+			}	
 		}
 	}
 
@@ -989,7 +1004,8 @@ function reportCheckingPermissions(&$errCounter,$installationType='none')
 	{
 		echo check_file_permissions($errCounter,$installationType,'config_db.inc.php', $blockingCheck);
 	}
-	echo check_file_permissions($errCounter,$installationType,'custom_config.inc.php');
+	// 20100502 - this file is not needed => IMHO we do not need to check existence
+	// echo check_file_permissions($errCounter,$installationType,'custom_config.inc.php');
 	echo '</table>';
 }
 

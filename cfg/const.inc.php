@@ -9,7 +9,7 @@
  * @package 	TestLink
  * @author 		Martin Havlat
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: const.inc.php,v 1.133 2010/02/17 15:57:26 asimon83 Exp $
+ * @version    	CVS: $Id: const.inc.php,v 1.148 2010/07/02 06:27:11 mx-julian Exp $
  * @see 		config.inc.php
  *
  * @internal 
@@ -21,20 +21,25 @@
 /* [GLOBAL SETTINGS] */
 
 /** TestLink Release version (MUST BE changed before the release day) */
-define('TL_VERSION', '1.9 (Beta 3 - Development)'); 
+define('TL_VERSION', '1.9 (Beta 5 - Development)'); 
 
 // needed to avoid problems in install scripts that do not include config.inc.php
 // want to point to root install dir, need to remove fixed part
 if (!defined('TL_ABS_PATH')) 
+{
     define('TL_ABS_PATH', str_replace('cfg','',dirname(__FILE__)));
+}
 
 /** Setting up the global include path for testlink */
+ini_set('include_path',ini_get('include_path') . PATH_SEPARATOR . '.' . PATH_SEPARATOR . 
+		TL_ABS_PATH . 'lib' . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR);
+
+// BUGID 3432
 ini_set('include_path',ini_get('include_path') . PATH_SEPARATOR . 
-        '.' . PATH_SEPARATOR . TL_ABS_PATH . 'lib' . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR);
+        TL_ABS_PATH . 'third_party' . DIRECTORY_SEPARATOR);
 
 /** Localization directory base */
 define('TL_LOCALE_PATH', TL_ABS_PATH . 'locale/');
-
 
 
 // --------------------------------------------------------------------------------------
@@ -64,7 +69,7 @@ define('COLLAPSE', 0);
 define('EXPAND',1 );
 
 
-/** @TODO havlatm: use ON || 'OFF' constant */
+/** @TODO havlatm: remove, use ON || 'OFF' constant */
 define('TL_FILTER_OFF',null);
 
 // used in several functions instead of MAGIC NUMBERS - Don't change 
@@ -138,7 +143,7 @@ define('GET_CLOSED_BUILD', 0);
 
 define('AUTOMATIC_ID', 0);
 define('NO_FILTER_SHOW_ON_EXEC', null);
-define('DONT_REFRESH', 'no');
+define('DONT_REFRESH', 0);
 define('DEFAULT_TC_ORDER', 0);
 
 // bug_interface->buildViewBugLink()
@@ -227,6 +232,9 @@ $g_field_size->req_docid = 64;
 $g_field_size->req_title = 100;
 $g_field_size->requirement_title = 100;
 $g_field_size->docid = 64;
+
+// execution table
+$g_field_size->bug_id = 16;
 
 
 // --------------------------------------------------------------------------------------
@@ -484,7 +492,7 @@ $tlCfg->execution_filter_methods['status_label'] = array('latest_execution' => '
     									     'specific_build' => 'filter_result_specific_build',
 										     'current_build' => 'filter_result_current_build');
 
-$tlCfg->execution_filter_methods['default_type'] = $tlCfg->filter_types['status_code']['current_build'];
+$tlCfg->execution_filter_methods['default_type'] = $tlCfg->execution_filter_methods['status_code']['current_build'];
 
 /*
  * same as above, but without current build
@@ -500,7 +508,7 @@ $tlCfg->execution_assignment_filter_methods['status_label'] = array('latest_exec
     									     'any_build' => 'filter_result_any_build',
     									     'specific_build' => 'filter_result_specific_build');
 
-$tlCfg->execution_assignment_filter_methods['default_type'] = $tlCfg->filter_types['status_code']['latest_execution'];
+$tlCfg->execution_assignment_filter_methods['default_type'] = $tlCfg->execution_assignment_filter_methods['status_code']['latest_execution'];
 
 
 
@@ -535,7 +543,7 @@ $g_role_colour = array (
 	'senior tester' => '#FFA',
 	'guest'         => 'pink',
 	'test designer' => 'cyan',
-	'<no rights>'   => 'salmon',
+	'<no rights>'   => 'grey',
 	'<inherited>'   => 'seashell' 
 );
 
@@ -569,6 +577,7 @@ $tlCfg->testcase_urgency_default = MEDIUM;
  * @var array Used to get localized string to show to users
  * key: numeric code
  * value: id to use with lang_get() to get the string, from strings.txt (or custom_strings.txt)
+ * @since 1.8 
  */
 $tlCfg->urgency['code_label'] = array(
 	HIGH => 'urgency_high',
@@ -582,20 +591,24 @@ $tlCfg->urgency['code_label'] = array(
 
 /**
  * data status constants are applicable for data like requirement, test case, Test Plan 
+ * @since 2.0 
  */
 /** Review status: design phase; data are not available for review or using */ 
 define('TL_REVIEW_STATUS_DRAFT', 	1);
+
 /** Review status: data was reviewed and are available for using */
 define('TL_REVIEW_STATUS_FINAL', 	2);
+
 /** Review status: data wait for review */ 
 define('TL_REVIEW_STATUS_REVIEW', 	3);
+
 /** Review status: data are not applicable for using (not listed in reports and lists) */ 
 define('TL_REVIEW_STATUS_OBSOLETE', 4); 
 define('TL_REVIEW_STATUS_FUTURE', 	5); 
 
 /** 
  * @var array localization identifiers for review states
- * @since 1.9 
+ * @since 2.0 
  **/
 $tlCfg->text_status_labels = array(
 		TL_REVIEW_STATUS_DRAFT => 'review_status_draft', 
@@ -612,10 +625,18 @@ $tlCfg->text_status_labels = array(
  **/
 define('TL_REQ_STATUS_VALID', 		'V');
 define('TL_REQ_STATUS_NOT_TESTABLE','N');
+define('TL_REQ_STATUS_DRAFT','D');
+define('TL_REQ_STATUS_REVIEW','R');
+define('TL_REQ_STATUS_REWORK','W');
+define('TL_REQ_STATUS_FINISH','F');
 
 // key: status; value: text label
-$g_req_status = array(TL_REQ_STATUS_VALID => 'review_status_valid', 
-					  TL_REQ_STATUS_NOT_TESTABLE => 'req_status_not_testable');
+$tlCfg->req_cfg->status_labels = array(TL_REQ_STATUS_VALID => 'review_status_valid', 
+					                   TL_REQ_STATUS_NOT_TESTABLE => 'req_status_not_testable',
+					                   TL_REQ_STATUS_DRAFT => 'req_status_draft',
+					                   TL_REQ_STATUS_REVIEW => 'req_status_review',
+					                   TL_REQ_STATUS_REWORK => 'req_status_rework',
+					                   TL_REQ_STATUS_FINISH => 'req_status_finish');
 
 /** 
  * Types of requirements (with respect to standards)
@@ -636,6 +657,7 @@ define('TL_REQ_TYPE_USE_CASE',3);
 define('TL_REQ_TYPE_INTERFACE',4);
 define('TL_REQ_TYPE_NON_FUNCTIONAL',5);
 define('TL_REQ_TYPE_CONSTRAIN',6);
+define('TL_REQ_TYPE_SYSTEM_FUNCTION',7);
 
 
 /** 
@@ -648,7 +670,69 @@ $tlCfg->req_cfg->type_labels = array(
 		TL_REQ_TYPE_USE_CASE => 'req_type_use_case', 
 		TL_REQ_TYPE_INTERFACE => 'req_type_interface', 
 		TL_REQ_TYPE_NON_FUNCTIONAL => 'req_type_non_functional', 
-		TL_REQ_TYPE_CONSTRAIN => 'req_type_constrain');
+		TL_REQ_TYPE_CONSTRAIN => 'req_type_constrain',
+		TL_REQ_TYPE_SYSTEM_FUNCTION => 'req_type_system_function');
+
+		
+
+/** 
+ * All possible types of requirement relations (BUGID 1748).
+ * 
+ * Important:
+ * When you add your own relation types here, you also have to add localization strings
+ * and configure those below.
+ * 
+ * Add you types ONLY AFTER LAST RESERVED
+ *
+ * @since TestLink 1.9
+ **/
+define('TL_REQ_REL_TYPE_PARENT_CHILD', 1);
+define('TL_REQ_REL_TYPE_BLOCKS_DEPENDS', 2);
+define('TL_REQ_REL_TYPE_RELATED', 3);
+define('TL_REQ_REL_TYPE_RESERVED_1', 4);
+define('TL_REQ_REL_TYPE_RESERVED_2', 5);
+define('TL_REQ_REL_TYPE_RESERVED_3', 6);
+define('TL_REQ_REL_TYPE_RESERVED_4', 7);
+define('TL_REQ_REL_TYPE_RESERVED_5', 8);
+define('TL_REQ_REL_TYPE_RESERVED_6', 9);
+
+
+
+/** 
+ * Localization identifiers for requirement relation types (BUGID 1748).
+ * Types, which are configured above, have to be configured 
+ * here too with attributes "source" and "destination".
+ *
+ * Last value will be selected in GUI as default.
+ * 
+ * Form has to be like this:
+ * 
+ * $tlCfg->req_cfg->rel_type_labels = array(
+ *		RELATIONNAME => array(
+ *			'source' => 'SOURCE_LOCALIZATION_KEY',
+ *			'destination' => 'DESTINATION_LOCALIZATION_KEY'),
+ *		...
+ * 
+ * @since TestLink 1.9
+ **/
+$tlCfg->req_cfg->rel_type_labels = array(
+	TL_REQ_REL_TYPE_PARENT_CHILD => array(
+		'source' => 'req_rel_is_parent_of',
+		'destination' => 'req_rel_is_child_of'),
+	TL_REQ_REL_TYPE_BLOCKS_DEPENDS => array(
+		'source' => 'req_rel_blocks',
+		'destination' => 'req_rel_depends'),
+	TL_REQ_REL_TYPE_RELATED => array( // this is a flat relation, so strings are identical
+		'source' => 'req_rel_is_related_to',
+		'destination' => 'req_rel_is_related_to')
+	);
+
+
+
+$tlCfg->req_cfg->rel_type_description = array(TL_REQ_REL_TYPE_PARENT_CHILD => 'parent_child',
+	                                          TL_REQ_REL_TYPE_BLOCKS_DEPENDS => 'blocks_depends',
+	                                          TL_REQ_REL_TYPE_RELATED => 'related_to');
+	
 
 /** 
  * @var array controls is expected_coverage must be requested at user interface.
@@ -665,13 +749,9 @@ $tlCfg->req_cfg->type_expected_coverage = array(TL_REQ_TYPE_INFO => false);
 
 
 
-// Need to be defined better
-define('TL_REQ_SPEC_TYPE_INFO', 1); 
-define('TL_REQ_SPEC_TYPE_FEATURE', 2);
-define('TL_REQ_SPEC_TYPE_USE_CASE', 3);
-define('TL_REQ_SPEC_TYPE_INTERFACE', 4);
-define('TL_REQ_SPEC_TYPE_NON_FUNCTIONAL', 5);
-define('TL_REQ_SPEC_TYPE_CONSTRAIN', 6);
+define('TL_REQ_SPEC_TYPE_SECTION', 1); 
+define('TL_REQ_SPEC_TYPE_USER_REQ_SPEC', 2);
+define('TL_REQ_SPEC_TYPE_SYSTEM_REQ_SPEC', 3);
 
 
 // define('TL_REQ_SPEC_TYPE_FUNCTIONAL_AND_DATA', 1);
@@ -687,13 +767,9 @@ define('TL_REQ_SPEC_TYPE_CONSTRAIN', 6);
 
 
 $tlCfg->req_spec_cfg->type_labels = array(
-		TL_REQ_SPEC_TYPE_INFO => 'req_spec_type_info', 
-		TL_REQ_SPEC_TYPE_FEATURE => 'req_spec_type_feature',
-		TL_REQ_SPEC_TYPE_USE_CASE => 'req_spec_type_use_case', 
-		TL_REQ_SPEC_TYPE_INTERFACE => 'req_spec_type_interface', 
-		TL_REQ_SPEC_TYPE_NON_FUNCTIONAL => 'req_spec_type_non_functional', 
-		TL_REQ_SPEC_TYPE_CONSTRAIN => 'req_spec_type_constrain');
-
+		TL_REQ_SPEC_TYPE_SECTION => 'req_spec_type_section', 
+		TL_REQ_SPEC_TYPE_USER_REQ_SPEC => 'req_spec_type_user_req_spec',
+		TL_REQ_SPEC_TYPE_SYSTEM_REQ_SPEC => 'req_spec_type_system_req_spec');
 
 
 /**
@@ -756,9 +832,9 @@ $tlCfg->gui->custom_fields->time_format = 'H:i:s';
 
 /** 
  * Review types - user can define type for his review comment (disabled by default)
- * @since TestLink version 1.9 
+ * @since TestLink version 2.0 
  **/
-$tlCfg->review_types = array(1 => 'type_undefined',
+$tlCfg->review_types = array(1 => 'undefined',
 	                         2 => 'typo', 
 	                         3 => 'recommendation', 
 	                         4 => 'question', 
@@ -787,16 +863,24 @@ $tlCfg->guiTopMenu[1] = array(
 		'condition'=>'',
 		'shortcut'=>'h',
 		'target'=>'_parent'
-); 
+);
 $tlCfg->guiTopMenu[2] = array(
+		'label' => 'title_requirements',
+		'url' => 'lib/general/frmWorkArea.php?feature=reqSpecMgmt',
+		'right' => 'mgt_view_req',
+		'condition'=>'',
+		'shortcut'=>'r',
+		'target'=>'mainframe'
+); 
+$tlCfg->guiTopMenu[3] = array(
 		'label' => 'title_specification',
 		'url' => 'lib/general/frmWorkArea.php?feature=editTc',
 		'right' => 'mgt_view_tc',
 		'condition'=>'',
-		'shortcut'=>'s',
+		'shortcut'=>'t',
 		'target'=>'mainframe'
 ); 
-$tlCfg->guiTopMenu[3] = array(
+$tlCfg->guiTopMenu[4] = array(
 		'label' => 'title_execute',
 		'url' => 'lib/general/frmWorkArea.php?feature=executeTest',
 		'right' => 'testplan_execute',
@@ -804,7 +888,7 @@ $tlCfg->guiTopMenu[3] = array(
 		'shortcut'=>'e',
 		'target'=>'mainframe'
 ); 
-$tlCfg->guiTopMenu[4] = array(
+$tlCfg->guiTopMenu[5] = array(
 		'label' => 'title_results',
 		'url' => 'lib/general/frmWorkArea.php?feature=showMetrics',
 		'right' => 'testplan_metrics',
@@ -812,7 +896,7 @@ $tlCfg->guiTopMenu[4] = array(
 		'shortcut'=>'r',
 		'target'=>'mainframe'
 ); 
-$tlCfg->guiTopMenu[5] = array(
+$tlCfg->guiTopMenu[6] = array(
 		'label' => 'title_admin',
 		'url' => 'lib/usermanagement/usersView.php',
 		'right' => 'mgt_users',
@@ -820,7 +904,7 @@ $tlCfg->guiTopMenu[5] = array(
 		'shortcut'=>'u',
 		'target'=>'mainframe'
 ); 
-$tlCfg->guiTopMenu[6] = array(
+$tlCfg->guiTopMenu[7] = array(
 		'label' => 'title_events',
 		'url' => 'lib/events/eventviewer.php',
 		'right' => 'events_mgt',
@@ -832,14 +916,6 @@ $tlCfg->guiTopMenu[6] = array(
 
 /**  @TODO havlatm: remove const; in addition the text should refer to Install manual */  
 define( 'PARTIAL_URL_TL_FILE_FORMATS_DOCUMENT',	'docs/tl-file-formats.pdf');
-                                                       
-/** 
- * Bug tracking objects (do not change)
- * @TODO havlatm: move to appropriate file - not configuration
- **/
-$g_bugInterfaceOn = false;
-$g_bugInterface = null;
-
 
 // ----- END ----------------------------------------------------------------------------
 ?>

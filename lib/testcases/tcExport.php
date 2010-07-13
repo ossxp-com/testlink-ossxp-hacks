@@ -5,18 +5,19 @@
  *
  * Filename $RCSfile: tcExport.php,v $
  *
- * @version $Revision: 1.9 $
- * @modified $Date: 2010/02/21 15:07:50 $ by $Author: franciscom $
+ * @version $Revision: 1.14 $
+ * @modified $Date: 2010/03/15 22:21:20 $ by $Author: franciscom $
  *
  * Scope: test case and test suites export
  * 
  * Revisions:
- * 20081027 - martin - cleanup
- * 20070113 - franciscom - added logic to create message when there is 
- *                         nothing to export.
  *
- * 20061118 - franciscom - using different file name, depending the
- *                         type of exported elements.
+ * 20100315 - franciscom - improvements on goback management
+ * 20100315 - amitkhullar - Added checkboxes options for Requirements and CFields for Export.
+ * 20081027 - martin - cleanup
+ * 20070113 - franciscom - added logic to create message when there is nothing to export.
+ *
+ * 20061118 - franciscom - using different file name, depending type of exported elements.
  *
  * ----------------------------------------------------------------------------------- */
 /** @TODO martin: csv export is not available now - get it back */
@@ -29,12 +30,14 @@ $templateCfg = templateConfiguration();
 
 $tree_mgr = new tree($db);
 $args = init_args();
+
 $gui = new stdClass();
 $gui->do_it = 1;
 $gui->nothing_todo_msg = '';
 $gui->export_filename = '';
 $gui->page_title = '';
 $gui->object_name='';
+$gui->goback_url = !is_null($args->goback_url) ? $args->goback_url : ''; 
 
 $exporting_just_one_tc = 0;
 $node_id = $args->container_id;
@@ -101,7 +104,8 @@ if ($args->doExport)
 	$tcase_mgr = new testcase($db);
 	$tsuite_mgr = new testsuite($db);
 	
-	$optExport = array('KEYWORDS' => $args->exportKeywords, 'RECURSIVE' => $args->useRecursion);
+	$optExport = array('REQS' => $args->exportReqs, 'CFIELDS' => $args->exportCFields,
+	                   'KEYWORDS' => $args->exportKeywords, 'RECURSIVE' => $args->useRecursion);
 	$pfn = null;
 	switch($args->exportType)
 	{
@@ -169,7 +173,9 @@ function init_args()
     
     $args = new stdClass();
     $args->doExport = isset($_REQUEST['export']) ? $_REQUEST['export'] : null;
-    $args->exportKeywords = isset($_REQUEST['bKeywords']) ? 1 : 0;
+    $args->exportReqs = isset($_REQUEST['exportReqs']) ? 1 : 0;
+    $args->exportCFields = isset($_REQUEST['exportCFields']) ? 1 : 0;
+    $args->exportKeywords = isset($_REQUEST['exportKeywords']) ? 1 : 0;
     $args->exportType = isset($_REQUEST['exportType']) ? $_REQUEST['exportType'] : null;
     $args->tcase_id = isset($_REQUEST['testcase_id']) ? intval($_REQUEST['testcase_id']) : 0;
     $args->tcversion_id = isset($_REQUEST['tcversion_id']) ? intval($_REQUEST['tcversion_id']) : 0;
@@ -178,6 +184,9 @@ function init_args()
     $args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
     $args->tproject_name = $_SESSION['testprojectName'];
     $args->export_filename=isset($_REQUEST['export_filename']) ? $_REQUEST['export_filename'] : null;
+
+	// 20100315 - franciscom
+    $args->goback_url=isset($_REQUEST['goback_url']) ? $_REQUEST['goback_url'] : null;
 
     return $args;
 }

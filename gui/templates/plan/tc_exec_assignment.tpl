@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: tc_exec_assignment.tpl,v 1.22 2010/02/17 21:32:44 franciscom Exp $
+$Id: tc_exec_assignment.tpl,v 1.26 2010/07/01 11:59:30 mx-julian Exp $
 generate the list of TC that can be removed from a Test Plan 
 
 rev :
@@ -47,7 +47,7 @@ function check_action_precondition(container_id,action)
   {* --------------------------------------------------------------------------------------------------------------- *}
   <div id="header-wrap"> <!-- header-wrap -->
 	<h1 class="title">{$gui->main_descr|escape}</h1>
-  {if $gui->has_tc }
+  {if $gui->has_tc}
     {include file="inc_update.tpl" result=$sqlResult refresh="yes"}
 	  <div class="groupBtn">    
 	  	<input type='submit' name='doAction' value='{$labels.btn_update_selected_tc}' />
@@ -56,21 +56,21 @@ function check_action_precondition(container_id,action)
 	  	</span>
 	  </div>
   {else}
-	  <div class="workBack">{$labels.no_testcase_available'}</div>
+	  <div class="workBack">{$labels.no_testcase_available}</div>
   {/if}
 	</div> <!-- header-wrap -->
 
-  {if $gui->has_tc }
+  {if $gui->has_tc}
    <div class="workBack">
 	  {assign var=top_level value=$gui->items[0].level}
 	  {foreach from=$gui->items item=ts key=idx name="div_drawing"}
 	    {assign var="ts_id" value=$ts.testsuite.id}
-	    {assign var="div_id" value=div_$ts_id}
-	    {if $ts_id != '' }
+	    {assign var="div_id" value="div_$ts_id"}
+	    {if $ts_id != ''}
 	      <div id="{$div_id}" style="margin-left:{$ts.level}0px; border:1;">
         <br />
         {* check/uncheck on ALL contained test suites is implemented with this clickable image *}
-	      <h3 class="testlink"><img src="{$smarty.const.TL_THEME_IMG_DIR}/toggle_all.gif"
+	      <h3 class="testlink"><img class="clickable" src="{$smarty.const.TL_THEME_IMG_DIR}/toggle_all.gif"
 			                            onclick='cs_all_checkbox_in_div("{$div_id}","{$add_cb}_","add_value_{$ts_id}");'
                                   title="{$labels.check_uncheck_children_checkboxes}" />
         {$ts.testsuite.name|escape}
@@ -94,13 +94,13 @@ function check_action_precondition(container_id,action)
   		  <br />
 
     	  {if $ts.write_buttons eq 'yes'}
-          {if $ts.testcase_qty gt 0 }
+          {if $ts.testcase_qty gt 0}
             <table cellspacing="0" style="font-size:small;" width="100%">
             {* ---------------------------------------------------------------------------------------------------- *}
 			      {* Heading *}
 			      <tr style="background-color:#059; font-weight:bold; color:white">
 			      	<td width="5" align="center">
-			          <img src="{$smarty.const.TL_THEME_IMG_DIR}/toggle_all.gif"
+			          <img class="clickable" src="{$smarty.const.TL_THEME_IMG_DIR}/toggle_all.gif"
 			               onclick='cs_all_checkbox_in_div("{$div_id}","{$add_cb}_{$ts_id}_","add_value_{$ts_id}");'
                      title="{$labels.check_uncheck_all_checkboxes}" />
 			      	</td>
@@ -119,13 +119,13 @@ function check_action_precondition(container_id,action)
             </tr>
             {* ---------------------------------------------------------------------------------------------------- *}
       
-            {foreach from=$ts.testcases item=tcase }
+            {foreach from=$ts.testcases item=tcase}
               {* loop over platforms *}
               {foreach from=$tcase.feature_id key=platform_id item=feature}
                 {if $tcase.linked_version_id != 0}
-                  {assign var="userID" value=0 }
-           	    	{if isset($tcase.user_id[$platform_id]) }
-            	    	  {assign var="userID" value=$tcase.user_id[$platform_id] } 
+                  {assign var="userID" value=0}
+           	    	{if isset($tcase.user_id[$platform_id])}
+            	    	  {assign var="userID" value=$tcase.user_id[$platform_id]} 
                   {/if} 
             	    <tr>
             	    	<td>
@@ -155,9 +155,9 @@ function check_action_precondition(container_id,action)
             	    		<td align="center">{if isset($gui->priority_labels[$tcase.priority])}{$gui->priority_labels[$tcase.priority]}{/if}</td>
             	    	{/if}
             	    	<td align="center">
-            	    	{if isset($tcase.user_id[$platform_id]) }
-            	    	  {assign var="userID" value=$tcase.user_id[$platform_id] } 
-                      userID::{$userID}
+            	    	{if isset($tcase.user_id[$platform_id])}
+            	    	  {assign var="userID" value=$tcase.user_id[$platform_id]} 
+                      {*userID::{$userID}*}
             	    		{$gui->users[$userID]|escape}
             	    		{if $gui->users[$userID] != '' && $gui->testers[$userID] == ''}{$labels.can_not_execute}{/if}
             	    	{/if}
@@ -176,12 +176,12 @@ function check_action_precondition(container_id,action)
               {if $gui->platforms != ''}
                 <td colspan="8"><hr></td>
               {/if}
-            {/foreach} {* {foreach from=$ts.testcases item=tcase } *}
+            {/foreach} {* {foreach from=$ts.testcases item=tcase} *}
           </table>
           {/if}
       {/if} {* write buttons*}
 
-      {if $gui->items_qty eq $smarty.foreach.div_drawing.iteration }
+      {if $gui->items_qty eq $smarty.foreach.div_drawing.iteration}
           {assign var=next_level value=0}
       {else}
           {assign var=next_level value=$gui->items[$smarty.foreach.div_drawing.iteration].level}

@@ -1,18 +1,18 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * ♔ TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * English (en_GB) strings (en_GB is default development language)
  *
- * This list of labels is defined as GLOBAL string variables. The first sections are general 
- * for strings used over all GUI. These definition should not be redefined. Next sections are 
- * related to particular pages. Comment with page filename indicate a begin of section. There 
- * must be defined all other strings. 
+ * This list of labels is defined as GLOBAL string variables. The first sections are general
+ * for strings used over all GUI. These definition should not be redefined. Next sections are
+ * related to particular pages. Comment with page filename indicate a begin of section. There
+ * must be defined all other strings.
  * Do not use html elements in this file.
  *
  * To avoid override of other globals we are using $TLS_ (Test Link String) prefix.
- * This must be a reserved prefix. The second part of variable name (after 
+ * This must be a reserved prefix. The second part of variable name (after
  * prefix) should indicate usage (warning, title), the third one indicate the page relation
  * and text at the end.
  *
@@ -20,18 +20,18 @@
  * 		comment only with "//" except header
  * Warning: for JS string you must use \\n to get \n for end of line
  * Note: API interface is not localized (except error messages)
- * 
+ *
  * @package 	TestLink
  * @author 		Francisco Mancardi, Andreas Morsing, Martin Havlat
- * @copyright 	2003, TestLink community 
- * @version    	CVS: $Id: strings.txt,v 1.567 2010/03/02 10:18:00 asimon83 Exp $
+ * @copyright 	2003, TestLink community
+ * @version    	CVS: $Id: strings.txt,v 1.634 2010/07/02 06:27:11 mx-julian Exp $
  * @link 		http://www.teamst.org/index.php
- * 
+ *
  * @internal Revisions: Not listed - check repository history
- * 
+ *
  **/
 
-// Define character set of this file (UTF-8 is common value) 
+// Define character set of this file (UTF-8 is common value)
 $TLS_STRINGFILE_CHARSET = "UTF-8";
 
 
@@ -55,6 +55,7 @@ $TLS_desc = "Descending";
 $TLS_description = "Description";
 $TLS_delete_confirm_question = "Are your sure you want to delete?";
 $TLS_doc_id = "Document ID";
+$TLS_doc_id_short = "Doc ID";
 $TLS_destination_top = "Destination position top";
 $TLS_destination_bottom = "Destination position bottom";
 $TLS_error = "Error";
@@ -108,7 +109,13 @@ $TLS_title = "Title";
 $TLS_title_admin = "Administration";
 $TLS_warning = "Warning";
 $TLS_max_size_file_msg = "Max. allowed file size:  %s KB";
+$TLS_due_since = "Test Case Assigned Since(days)";
+$TLS_parent_child='is Parent or is Child';
+$TLS_blocks_depends = 'Blocks or Depends';
+$TLS_related_to='is related to';
+$TLS_unknown_code='unknown code: %s';
 
+$TLS_file_size_exceeded = 'File size (%s) > allowed size (%s)';
 
 $TLS_total = "Total";
 $TLS_Unknown = "Unknown";
@@ -117,12 +124,14 @@ $TLS_weeks = "weeks";
 $TLS_container = "container";
 $TLS_platform = "Platform";
 
-// Actions (used wide) 
+// Actions (used wide)
 $TLS_add = "add";
 $TLS_assigned = "assigned";
 $TLS_create = "create";
 $TLS_copy = "copy";
 $TLS_delete = "delete";
+$TLS_disable = "disable";
+
 $TLS_executed	= "executed";
 $TLS_move	= "Move";
 $TLS_remove = "remove";
@@ -137,6 +146,7 @@ $TLS_btn_cancel	= "Cancel";
 $TLS_btn_check 	= "Check";
 $TLS_btn_close 	= "Close";
 $TLS_btn_cp = "Copy";
+$TLS_btn_copy_step = "Copy step";
 $TLS_btn_create = "Create";
 $TLS_btn_create_step = "Create step";
 $TLS_btn_delete = "Delete";
@@ -157,7 +167,7 @@ $TLS_btn_update = "Update";
 $TLS_btn_upd = $TLS_btn_update; //obsolete
 $TLS_btn_upload = "Upload";
 $TLS_btn_advanced_filters = "Advanced Filters";
-$TLS_btn_simple_filters = "Simple Filters"; 
+$TLS_btn_simple_filters = "Simple Filters";
 $TLS_btn_reorder_steps = "Reorder Steps";
 
 // Status (used wide)
@@ -179,29 +189,31 @@ $TLS_review_status_todo = 'To do';
 $TLS_req_type_info = "Informational";
 $TLS_req_type_feature = 'Feature';
 $TLS_req_type_use_case = 'Use Case';
-$TLS_req_type_interface = 'Interface';
+$TLS_req_type_interface = 'User Interface';
 $TLS_req_type_non_functional = 'Non functional';
-$TLS_req_type_constrain = 'Constrain';
+$TLS_req_type_constrain = 'Constraint';
+$TLS_req_type_system_function = 'System Function';
 
-$TLS_req_spec_type_info = "Informational";
-$TLS_req_spec_type_feature = 'Feature';
-$TLS_req_spec_type_use_case = 'Use Case';
-$TLS_req_spec_type_interface = 'Interface';
-$TLS_req_spec_type_non_functional = 'Non functional';
-$TLS_req_spec_type_constrain = 'Constrain';
+$TLS_req_spec_type_section = "Section";
+$TLS_req_spec_type_user_req_spec = "User Requirement Specification";
+$TLS_req_spec_type_system_req_spec = "System Requirement Specification";
 
 
 $TLS_exec_not_run_result_note = "Important Notice: Once a Result is updated from 'Not Run' to another value, " .
                                 "you cannot set it back to 'Not Run'. <br />You can still set the Result to any other value.";
 
 $TLS_req_status_not_testable = "Not testable"; // defined for historical reason (should be replaced by $TLS_req_type_info)
+$TLS_req_status_draft = "Draft";
+$TLS_req_status_review = "Review";
+$TLS_req_status_rework = "Rework";
+$TLS_req_status_finish = "Finish";
 
 $TLS_reserved_system_role_1 = 'reserved system role 1';
 $TLS_reserved_system_role_2 = 'reserved system role 2';
 
 
 // ----- unsorted (TODO move) -------------------------------------
-$TLS_problems_loading_xml_content = "Unable to load XML data, Check your file."; 
+$TLS_problems_loading_xml_content = "Unable to load XML data, Check your file.";
 $TLS_search_type_like = "Search on this value will be done on LIKE mode";
 $TLS_exec_assign_no_testcase = "Please select at least one Test Case.";
 $TLS_select_at_least_one_testcase = "Please select at least one Test Case and a target!";
@@ -350,14 +362,14 @@ $TLS_wrong_keywords_file = "Wrong Keyword file (wrong format)";
 
 // ----- lostPassword.php -----
 $TLS_bad_user = "User not found, please try again";
-$TLS_contact_admin = "<br /> If you have any further problems please contact your administrator.";
+$TLS_contact_admin = "If you have any further problems please contact your administrator.";
 $TLS_mail_empty_address = "You don't have specified an email address in your user profile! " .
                           " Please contact your TestLink administrator about resetting your password!";
 $TLS_mail_passwd_subject = "Your new TestLink password.";
 $TLS_mail_problems = "Errors in mail setup, please contact your administrator.";
 $TLS_page_title_lost_passwd = "TestLink - Lost password";
 $TLS_your_info_for_passwd = "Enter Your User Information so that your new password can be mailed to you.";
-$TLS_your_password_is = "Your new TestLink password is: <br />";
+$TLS_your_password_is = "Your new TestLink password is:";
 
 
 
@@ -388,7 +400,7 @@ $TLS_report_tcase_platorm_relationship = "Platforms has been defined for this te
                                          "a test case that must be executed in N platforms " .
                                          "is considered as N test cases on metrics.<br />" .
                                          "Example: if user U1 has been assigned execution of Test Case TC1 <br />" .
-                                         "on platform X and Y, then user U1 has TWO test cases to execute NOT ONE ";  
+                                         "on platform X and Y, then user U1 has TWO test cases to execute NOT ONE ";
 
 // ----- resultsNavigator.php -----
 $TLS_title_nav_results = "Reports and Metrics";
@@ -564,11 +576,11 @@ $TLS_warning = "Warning!!";
 $TLS_was_success = " was successfully ";
 
 
-// ----- gui/templates/execNavigator.tpl -----
-$TLS_TestPlan = $TLS_testplan;
+// ----- gui/templates/inc_filter_panel.tpl -----
+$TLS_logical_and = "And";
+$TLS_logical_or = "Or";
 $TLS_btn_apply_filter = $TLS_btn_apply;
-$TLS_btn_update_menu = "Update menu";
-$TLS_caption_nav_filter_settings = "Filters & Settings";
+$TLS_btn_reset_filters = "Reset Filters";
 $TLS_caption_nav_filters = "Filters";
 $TLS_caption_nav_settings = "Settings";
 $TLS_current_build = "Current build";
@@ -577,7 +589,6 @@ $TLS_filter_result = "Result";
 $TLS_filter_on = "on";
 $TLS_filter_tcID = "Test Case ID";
 $TLS_include_unassigned_testcases = "include unassigned Test Cases";
-$TLS_test_status_all_status = $TLS_test_status_all;
 $TLS_filter_result_all_builds = "ALL Builds";
 $TLS_filter_result_any_build = "ANY Build";
 $TLS_filter_result_specific_build = "specific Build";
@@ -587,6 +598,13 @@ $TLS_filter_somebody = "Somebody";
 $TLS_exec_build = "Build to execute";
 $TLS_filter_result_all_prev_builds = "ALL Previous Builds";
 $TLS_filter_result_any_prev_build = "ANY Previous Build";
+
+
+// ----- gui/templates/execNavigator.tpl -----
+$TLS_TestPlan = $TLS_testplan;
+$TLS_btn_update_menu = "Update menu";
+$TLS_caption_nav_filter_settings = "Filters & Settings";
+$TLS_test_status_all_status = $TLS_test_status_all;
 
 
 // ----- gui/templates/mainPage.tpl -----
@@ -636,6 +654,8 @@ $TLS_title_choose_file_type = "Choose file type";
 $TLS_title_choose_local_file = "Choose a Local File to Upload";
 $TLS_title_req_import = "Import requirements";
 $TLS_title_req_import_check_input = "Check import data";
+$TLS_title_req_spec_import = "Import Req. Spec.";
+$TLS_check_status = "Check Status";
 
 
 
@@ -652,6 +672,7 @@ $TLS_warning_delete_attachment = "Really delete the attachment '%s' ?";
 
 // gui/templates/resultsNavigator.tpl
 $TLS_note_email_sent_t = "note: email format sent to user's email";
+$TLS_show_inactive_tplans = "Show inactive test plans";
 $TLS_send_results = "Send results";
 $TLS_send_to = "To:";
 $TLS_subject = "Subject:";
@@ -762,7 +783,10 @@ $TLS_btn_copy_requirements = "Copy Requirements";
 $TLS_btn_copy_req_spec = "Copy";
 $TLS_btn_delete_spec = "Delete document";
 $TLS_btn_edit_spec = "Edit document";
-$TLS_btn_export_reqs = "Export requirements";
+$TLS_btn_export_reqs = "Export Child Requirements";
+$TLS_btn_export_req_spec = "Export Req. Spec.";
+$TLS_btn_import_reqs = "Import Requirements";
+$TLS_btn_import_req_spec = "Import Req. Spec.";
 $TLS_btn_req_create = "Create Requirement";
 $TLS_btn_spec_list = "List of all documents";
 $TLS_btn_uncheck_all = "Uncheck All";
@@ -924,7 +948,7 @@ $TLS_th_rolename = "Role name";
 $TLS_th_system_rights = "System rights";
 $TLS_th_tp_rights = "Test Plan";
 $TLS_th_user_rights = "User";
-$TLS_title_user_mgmt = "User Administration";
+$TLS_title_user_mgmt = "User Management";
 $TLS_warning_empty_role_name = "Please give a name to Role";
 $TLS_warning_modify_role = "Really modify the role?";
 
@@ -939,6 +963,9 @@ $TLS_th_tcversion = "Version";
 $TLS_th_title = "Title";
 $TLS_title_search_tcs = "Search";
 $TLS_requirement_document_id = "Req. Doc. ID";
+$TLS_creation_date_from = 'Creation Date From:';
+$TLS_creation_date_to = 'Creation Date To:';
+
 
 
 // ----- gui/templates/testcases/searchData.tpl -----
@@ -1004,6 +1031,7 @@ $TLS_before_steps_results = "Before steps";
 $TLS_No = "No";
 $TLS_Yes = "Yes";
 $TLS_alt_delete_user = "Really delete the selected user?";
+$TLS_alt_disable_user = "Set user Inactive";
 $TLS_alt_edit_user = "Edit user";
 $TLS_order_by_login = "Order by login";
 $TLS_order_by_role_descr = "Order by role description";
@@ -1016,10 +1044,12 @@ $TLS_th_role = "Role";
 $TLS_th_api = "API Key";
 //$TLS_api_gen_key_action = "generate";
 $TLS_warning_delete_user = "You are going to delete: %s <br /><br /> Are you sure?";
+$TLS_warning_disable_user = "You are going to disable: %s <br /><br /> Are you sure?";
 $TLS_order_by_login_dir = "Order by login";
 $TLS_order_by_role_dir = "Order by role";
 $TLS_alt_active_user = "Active user";
-
+$TLS_show_inactive_users = "Show inactive users";
+$TLS_hide_inactive_users = "Hide inactive users";
 
 // ----- gui/templates/login.tpl -----
 $TLS_btn_login = "Login";
@@ -1107,6 +1137,7 @@ $TLS_show_hide_reorder = "Show / Hide reorder ";
 $TLS_tc_not_tested_yet = "Not Tested Yet";
 $TLS_test_cases_cannot_be_executed = "Test cases can not be executed";
 $TLS_testcase_version_is_inactive_on_exec = "This version is inactive => Can not be executed";
+$TLS_testcase_customfields = "Test Cases Custom Fields";
 $TLS_test_exec_by = "Tested by";
 $TLS_test_exec_expected_r = "Expected Results";
 $TLS_test_exec_last_run_date = "Most recent Run";
@@ -1141,11 +1172,11 @@ $TLS_product = "Test Project";
 $TLS_product_role = "Test Project role ";
 $TLS_search_testcase = "Search";
 $TLS_title_edit_personal_data = "Personal";
-$TLS_title_admin = "Administrate";
+$TLS_title_admin = "User Management";
 $TLS_title_events = "Events";
-$TLS_title_execute = "Execute";
-$TLS_title_results = "Results";
-$TLS_title_specification = "Specification";
+$TLS_title_execute = "Test Execution";
+$TLS_title_results = "Test Results";
+$TLS_title_specification = "Test Specification";
 $TLS_session_inactivity_timeout_at = "Session idle timeout at";
 
 
@@ -1212,7 +1243,7 @@ $TLS_update_all_testcase_versions = "Update ALL Linked Test Case Versions";
 $TLS_update_testcase_versions = "Update Linked Test Case Versions";
 $TLS_no_testcase_checked = "There are no checked Test Cases. Nothing will be done";
 $TLS_tplan_updated = "Test Plan was updated";
-$TLS_update2latest = "<p>This set show linked Test Cases for which a newer active version is available. " . 
+$TLS_update2latest = "<p>This set show linked Test Cases for which a newer active version is available. " .
                      "Select those you want to update to the newest available active version.</p>";
 $TLS_noupdateneeded="All Test Cases are already updated to latest version";
 
@@ -1435,8 +1466,10 @@ $TLS_warning_enter_less1 = "Please enter less than";
 $TLS_warning_enter_less2 = " chars.";
 $TLS_export_platforms = "Export platforms";
 $TLS_import_platforms = "Import platforms";
-$TLS_platform_updated = "Platform %s Updated";
-$TLS_platform_imported = "Platform %s Imported";
+$TLS_platform_created = "Platform %s created";
+$TLS_platform_updated = "Platform %s updated";
+$TLS_platform_deleted = "Platform %s deleted";
+$TLS_platform_imported = "Platform %s imported";
 
 
 // ----- gui/templates/platformsAssign.tpl -----
@@ -1452,7 +1485,8 @@ $TLS_platform_unlink_warning_message = "The selected platform(s) are being used.
 
 // ----- gui/templates/reqexport.tpl -----
 $TLS_title_req_export = "Export requirements";
-$TLS_all_reqspecs_in_tproject = "All Requirement Specs in Test Project";
+$TLS_title_req_spec_export = "Export Req. Spec.";
+$TLS_all_reqspecs_in_tproject = "All Req. Specs in Test Project";
 
 
 
@@ -1573,7 +1607,7 @@ $TLS_req_without_tcase = "Requirements Not Covered by Test Cases";
 
 
 // IMPORTANT for dynamic generation labels
-// $TLS_req_title_<test case status> 
+// $TLS_req_title_<test case status>
 // If user add a new test case status he/she MUST add a new label
 $TLS_req_title_blocked = "Blocked Requirements";
 $TLS_req_title_failed = "Failed Requirements";
@@ -1621,8 +1655,8 @@ $TLS_testsuite_is_empty = 'Test suite has no test cases. Nothing can be done';
 // ----- gui/templates/printDocOptions.tpl -----
 $TLS_doc_opt_title = 'Document options';
 $TLS_doc_opt_guide = 'Modify options for required structure of document. ' .
-                     '<br />Select the top line in tree menu for all or a required ' .
-                     'suite to generate a document content.';
+                     '<br />Select the top line in tree menu for all or a specific ' .
+                     'element to generate a document content.';
 $TLS_tr_td_show_as = "Show as";
 $TLS_check_uncheck_all_options = "check / uncheck all";
 
@@ -1657,7 +1691,7 @@ $TLS_user_bulk_assignment = "Bulk user assignment";
 $TLS_mail_subject_testcase_assigned = 'Test Link - Test Case Assignment - Test Plan';
 $TLS_mail_subject_testcase_assignment_removed = 'Test Link - Test Case Assignment REMOVED - Test Plan';
 $TLS_mail_testcase_assigned = "Following Test Cases has been assigned to you %s by %s <br /><br />";
-$TLS_mail_testcase_assignment_removed = "%s - Your following Test Cases assigments AS BEEN REMOVED  by %s <br /><br />";
+$TLS_mail_testcase_assignment_removed = "%s - Your following Test Cases assigments HAS BEEN REMOVED  by %s <br /><br />";
 $TLS_send_mail_to_tester = "Send mail notification to tester";
 
 
@@ -1792,21 +1826,23 @@ $TLS_href_assign_user_roles = "Assign user roles";
 $TLS_href_browse_tc = "Browse Test Cases";
 $TLS_href_cfields_management = "Define custom fields";
 $TLS_href_cfields_tproject_assign = "Assign custom fields";
-$TLS_href_edit_tc = "Edit Test Cases";
+$TLS_href_edit_tc = "Test Specification";
 $TLS_href_inventory = "Inventory";
 $TLS_href_inventory_management = 'Inventory management';
 $TLS_href_keywords_assign = "Assign Keywords";
 $TLS_href_keywords_manage = "Keyword Management";
 $TLS_href_keywords_view = "View Keywords";
 $TLS_href_print_tc = "Generate Test Specification document";
+$TLS_href_print_req = "Generate Requirement Specification Document";
 $TLS_href_req_assign = "Assign Requirements";
-$TLS_href_req_spec = "Requirement Specification document";
+$TLS_href_req_spec = "Requirement Specification";
+$TLS_href_req_overview = "Requirement Overview";
 $TLS_href_roles_management = "Role Management";
 $TLS_href_search_tc = "Search Test Cases";
 $TLS_href_tproject_management = "Test Project Management";
 $TLS_href_user_management = "User Management";
 $TLS_href_admin_modules = "System Configuration";
-$TLS_title_requirements = "Requirements";
+$TLS_title_requirements = "Requirement Specification";
 $TLS_title_test_spec = "Test Specification";
 $TLS_title_product_mgmt = "Test Project";
 $TLS_href_plan_define_priority = "Test Plan priority";
@@ -1827,6 +1863,7 @@ $TLS_title_search_req_spec = "Search";
 $TLS_requirements = "Requirements";
 $TLS_req_specs = "Req. Specs";
 $TLS_req_expected_coverage = "Expected no. of testcases";
+$TLS_has_relation_type = "Has relation of type";
 $TLS_reqid = "Requirement ID";
 
 
@@ -1890,7 +1927,7 @@ $TLS_import_results_tc_exists = "Test Case %s - version = %s - is in the test pl
 $TLS_tcase_external_id_do_not_exists = "Test Case with external id=%s, can not be found " . $TLS_imp_result_ko;
 $TLS_tcase_internal_id_do_not_exists = "Test Case with internal id=%s, can not be found "  . $TLS_imp_result_ko;
 $TLS_tcase_id_is_not_number = "Test Case internal id=%s is not a number " . $TLS_imp_result_ko;
-
+$TLS_bug_id_invalid_len = "BUG ID length is invalid [%s > %s] " . $TLS_imp_result_ko;
 
 
 // ----- lib/functions/results.inc.php -----
@@ -1986,7 +2023,7 @@ $TLS_warning_duplicated_req_spec_title = "There's already a req. spec (doc id:%s
 
 
 // ----- lib/functions/testcase.class.php -----
-$TLS_create_new_version="Created new version %s"; 
+$TLS_create_new_version="Created new version %s";
 $TLS_testcase_name_already_exists = "There's already a Test Case with this title (%s)";
 $TLS_created_with_title = "Created with title (%s)";
 $TLS_the_format_tc_xml_import = "";
@@ -2050,10 +2087,10 @@ $TLS_sec_note_admin_default_pwd = "You should change the default password for th
 $TLS_sec_note_remove_install_dir = "Install directory should be removed!";
 $TLS_error_domxml_missing = "Domxml doesn't seem to be present. Importing XML stuff will not work!";
 $TLS_error_gd_missing = "PHP extension for GD library is not available. Charts will not work. " .
-		"Locate your php.ini file. Open the file and remove the ; in front of ;extension=php_gd2.dll. " . 
+		"Locate your php.ini file. Open the file and remove the ; in front of ;extension=php_gd2.dll. " .
 		"Restart apache (if you are using apache). If that does not help, you will probably need to " .
 		"install php-GD libraries. ";
-$TLS_error_gd_png_support_disabled = "PHP extension for GD library is available without PNG format support. 
+$TLS_error_gd_png_support_disabled = "PHP extension for GD library is available without PNG format support.
 		Charts will not work. Configure PHP or install required libraries.";
 
 
@@ -2171,6 +2208,7 @@ $TLS_unknown_platform="Warning/Critic<br>" .
 						          " without platorms, all linked test cases will be updated with this platform ";
 
 // ----- lib/results/printDocOptions.php -----
+$TLS_opt_show_hdrNumbering = "Header Numbering";
 $TLS_opt_show_toc = "Table of Contents";
 $TLS_opt_show_suite_txt = "Test Suite description";
 $TLS_opt_show_tplan_txt = "Test Plan description";
@@ -2182,11 +2220,26 @@ $TLS_opt_show_tc_keys = "Test Case keywords";
 $TLS_opt_show_cfields	= "Test Case Custom Fields";
 $TLS_opt_show_passfail = "Test results";
 $TLS_opt_show_metrics = "Metrics";
+$TLS_opt_req_spec_scope = "Requirement Specification Doc. Scope";
+$TLS_opt_req_spec_author = "Requirement Specification Doc. Author";
+$TLS_opt_req_spec_overwritten_count_reqs = "Requirement Specification Doc. Overwritten Count of REQs";
+$TLS_opt_req_spec_type = "Requirement Specification Doc. Type";
+$TLS_opt_req_spec_cf = "Requirement Specification Doc. Custom Fields";
+$TLS_opt_req_scope = "Requirement Scope";
+$TLS_opt_req_author = "Requirement Author";
+$TLS_opt_req_status = "Requirement Status";
+$TLS_opt_req_type = "Requirement Type";
+$TLS_opt_req_cf = "Requirement Custom Fields";
+$TLS_opt_req_relations = "Requirement Relations";
+$TLS_opt_req_linked_tcs = "Requirement related Test Cases";
+$TLS_opt_req_coverage = "Requirement Coverage";
 $TLS_title_tc_print_navigator = "Navigator - Print Test Specification";
+$TLS_title_req_print_navigator = "Navigator - Print Requirement Specification";
 $TLS_title_tp_print_navigator = "Navigator - Print Test Plan ";
 $TLS_testplan_report = "Test Plan Report";
 $TLS_testspecification_report = "Test Specification Report";
-
+$TLS_requirement_specification_report = "Requirement Specification Report";
+$TLS_related_tcs = "Related Test Cases";
 
 // ----- lib/project/projectedit.php -----
 $TLS_error_product_name_duplicate = "There's already Test Project named %s.";
@@ -2225,6 +2278,8 @@ $TLS_please_choose_req_file = "Please choose the file to upload";
 $TLS_req_import_finished = "The import is finished!";
 $TLS_tproject_import_requirements = '%s : Import Requirements';
 $TLS_reqspec_import_requirements = '%s : Import Requirements';
+$TLS_tproject_import_req_spec = '%s : Import Req. Specs';
+$TLS_reqspec_import_req_spec = '%s : Import Req. Specs';
 
 
 // ----- lib/req/reqSpecView.php -----
@@ -2238,10 +2293,48 @@ $TLS_req_msg_noselect = "Nothing selected";
 $TLS_req_msg_notupdated_coverage = "Coverage was not updated for Requirements ";
 $TLS_bulk_req_assign_msg = 'This operation will assign selected requirements to (maximun number of) %s test cases' .
                          '<br />belonging to test suites present on selected branch.';
+
+$TLS_bulk_req_assign_no_test_cases = 'Operation can not be done because there are no test cases inside selected test suite';
+
 $TLS_bulk_assigment_done = '%s assignments has been done';
 $TLS_req_title_bulk_assign = 'Requirements Bulk Assignment';
 $TLS_req_title_available = 'Available Requirements';
 $TLS_no_req_spec_available = "No Requirements Specification available for this Test Project";
+
+
+// ----- requirement relations (BUGID 1748)
+$TLS_relation_id = "#";
+$TLS_current_req = "Current requirement";
+$TLS_relation_type = "Type";
+$TLS_relation_document = "Related Requirement";
+$TLS_relation_status = "Status";
+$TLS_relation_set_by = "Set by";
+$TLS_relation_delete = "Delete";
+$TLS_relations = "Relations";
+$TLS_th_relations = "# Related Req.";
+$TLS_new_relation = "New relation";
+$TLS_relation_project = "In TestProject";
+$TLS_in = "in project";
+$TLS_relation_destination_doc_id = "Requirement Document ID";
+$TLS_new_rel_add_success = "New relation was added successfully.";
+$TLS_rel_add_error_dest_id = "Destination Document ID is invalid.";
+$TLS_rel_add_error = "Error adding new relation.";
+$TLS_rel_add_error_self = "A Requirement cannot have a relation to itself.";
+$TLS_rel_add_error_exists_already = "A relation of similar type (\"%s\") already exists between these two requirements.";
+$TLS_delete_rel_success = "Relation was deleted successfully.";
+$TLS_error_deleting_rel = "Relation could not be deleted.";
+$TLS_delete_rel_msgbox_title = "Delete relation";
+$TLS_delete_rel_msgbox_msg = "Really delete relation #%i?";
+$TLS_img_title_delete_relation = "Click to delete this relation.";
+
+
+// ----- configured requirement relation types (BUGID 1748) -----
+$TLS_req_rel_is_parent_of = "parent of";
+$TLS_req_rel_is_child_of = "child of";
+$TLS_req_rel_blocks = "blocks";
+$TLS_req_rel_depends = "depends on";
+$TLS_req_rel_is_related_to = "related to";
+
 
 
 // ----- lib/results/resultsBugs.php -----
@@ -2266,6 +2359,7 @@ $TLS_caption_testPlanWithCF = $TLS_link_report_tplans_with_cf;
 
 // ----- lib/results/resultsTC.php -----
 $TLS_result_on_last_build = '[Last Build]';
+$TLS_tcversion_indicator = ' [v%s]';
 
 
 // ----- cfg/reports.cfg.php -----
@@ -2285,10 +2379,12 @@ $TLS_link_report_test_report = "Test Report";
 $TLS_link_report_total_bugs = "Bugs per Test Case";
 $TLS_link_report_uncovered_testcases = "Test Cases without Requirements Assignment";
 $TLS_link_report_tcases_with_cf = "Test Cases with Custom Fields info";
+$TLS_link_report_reqs_with_cf = "Requirements with Custom Fields info";
 $TLS_caption_testCasesWithCF = $TLS_link_report_tcases_with_cf;
+$TLS_caption_requirementsWithCF = $TLS_link_report_reqs_with_cf;
 $TLS_link_report_free_testcases_on_testproject = "Test Cases not assigned to Any Test Plan";
 
-
+$TLS_no_linked_req_cf='There are no Requirements with Custom Field information';
 $TLS_no_linked_tc_cf='There are no Test Cases with Custom Field information';
 
 $TLS_format_html = 'HTML';
@@ -2310,7 +2406,8 @@ $TLS_warning_create_build_first = "You must create builds or import data at firs
 $TLS_error_sendreport_no_email_credentials = "Email for this user is not specified, ".
 		                                         "please edit email credentials in 'Personal' tab";
 
-
+$TLS_mail_sent_to = 'mail sent to %s';
+$TLS_send_mail_ko = 'Warning: Problems sending mail - details: ';
 
 // ----- lib/testcases/archive.inc.php -----
 
@@ -2322,6 +2419,7 @@ $TLS_error_sendreport_no_email_credentials = "Email for this user is not specifi
 
 // ----- lib/testcases/tcImport.php -----
 $TLS_action_on_duplicated_name = "Action for duplicated names";
+$TLS_action_for_duplicates = "Action for duplicates";
 $TLS_already_exists_updated = "Already exists, data of LAST version has been updated.";
 $TLS_please_choose_file_to_import = "Please choose file to import";
 $TLS_title_tc_import_to = "Import Test Cases";
@@ -2330,7 +2428,7 @@ $TLS_wrong_xml_tcase_file = "Wrong xml Test Case file";
 $TLS_wrong_xml_tsuite_file = "Wrong xml Test Suite file";
 $TLS_cf_value_not_imported_missing_cf_on_testproject = "Value of Custom Field '%s' ".
     "can not be imported because there is no Custom Field with this name " .
-    "and Available for %s on this Test Project"; 
+    "and Available for %s on this Test Project";
 
 $TLS_req_not_in_req_spec_on_tcimport = "Requirement DOCID=%s can not be linked to testcase," .
 		                                   "because is not direct child of Req. Spec: %s";
@@ -2343,10 +2441,15 @@ $TLS_create_new_testcase_version='Create a new version';
 $TLS_generate_new_testcase='Create a new test case with different title';
 $TLS_no_cf_defined_can_not_import="Custom Field values are present on import file ".
                                   "but can not be imported because there are no " .
-                                  "Custom Fields with Test Spec. Design Scope on this Test Project"; 
+                                  "Custom Fields with Test Spec. Design Scope on this Test Project";
 $TLS_no_reqspec_defined_can_not_import="Requirements are present on import file ".
                                        "but can not be imported because there are no " .
-                                       "Requirement Specification defined for this Test Project"; 
+                                       "Requirement Specification defined for this Test Project";
+
+$TLS_same_internalID = 'has same Internal ID';
+$TLS_same_externalID = 'has same External ID'; // (only applicable to Test Cases)';
+$TLS_same_name = 'has same name';
+$TLS_duplicate_criteria = "Consider Test Case as duplicate if";
 
 
 // ----- lib/testcases/tcexport.php -----
@@ -2395,11 +2498,15 @@ $TLS_test_plan_user_roles_updated = "User Roles updated";
 // ----- lib/usermanagement/usersedit.php -----
 $TLS_user_created = "User %s was successfully created";
 $TLS_user_deleted = "User %s was successfully deleted";
+$TLS_user_disabled = "User %s was successfully disabled";
 $TLS_user_not_added = "The user wasn't added!";
 $TLS_error_user_not_updated = "The user couldn't be updated!";
 $TLS_error_user_not_deleted = "The user couldn't be deleted!";
+$TLS_error_user_not_disabled = "The user couldn't be disabled!";
 $TLS_error_user_login_length_error = "The login was either too short or too long!";
-
+$TLS_invalid_smtp_hostname = 'SMTP Hostname seems to be invalid';
+$TLS_password_cannot_be_reseted_invalid_smtp_hostname = 'Password Reset can not be done. Reason: SMTP Hostname seems to be invalid';
+$TLS_password_cannot_be_reseted_reason = 'Password Reset can not be done. Reason: %s ';
 
 
 // ----- lib/usermanagement/rolesedit.php -----
@@ -2431,6 +2538,17 @@ $TLS_no_tplans_to_fix = "You currently have no Test Plans that are not associate
 $TLS_btn_new_req_spec = "New Requirement Specification";
 $TLS_btn_reorder_req_spec = "Reorder Requirement Specifications";
 $TLS_btn_export_all_reqspec = "Export All Requirement Specifications";
+
+
+// ----- lib/requirements/reqOverview.php -----
+$TLS_caption_req_overview = "Requirement Overview";
+$TLS_no_linked_req = 'There are no Requirements defined in this Test Project.';
+$TLS_th_coverage = 'Coverage';
+$TLS_all_versions_displayed = 'All versions of each requirement are shown.';
+$TLS_latest_version_displayed = 'Only the latest version of each requirement is shown.';
+$TLS_dont_show_all_versions_btn = 'Show only latest version of each requirement';
+$TLS_show_all_versions_btn = 'Show all versions of each requirement';
+$TLS_frozen = 'Frozen';
 
 
 // ----- reqSpecEdit.php -----
@@ -2473,7 +2591,7 @@ $TLS_warning_empty_keyword = "Keyword must not be empty!";
 $TLS_platform_management = "Platform Management";
 $TLS_create_platform = "Create platform";
 $TLS_edit_platform = "Edit platform";
-$TLS_platform_name_already_exists = "Platform Name %s already Exists";
+$TLS_platform_name_already_exists = "Platform name %s already exists!";
 $TLS_platform_update_failed = "Platform update failed";
 $TLS_warning_empty_platform = "Platform can not be empty!";
 
@@ -2491,18 +2609,19 @@ $TLS_API_NO_TESTPROJECTID = "No testprojectid provided.";
 $TLS_API_NO_TESTSUITEID = "No testsuiteid provided.";
 $TLS_API_NO_TPID = "No testplan ID (testplanid) provided.";
 $TLS_API_NO_TCID = "No testcase ID (testcaseid) provided.";
-$TLS_API_INVALID_TCASEID= "The Test Case ID (testcaseid) provided does not exist!";
-$TLS_API_INVALID_BUILDID = "The Build ID (buildid) provided does not exist!";
+$TLS_API_INVALID_TCASEID= "The Test Case ID (testcaseid: %s) provided does not exist!";
+$TLS_API_INVALID_BUILDID = "The Build ID (buildid: %s) provided does not exist!";
 $TLS_API_INVALID_TPLANID = "The Test Plan ID (%s) provided does not exist!";
-$TLS_API_INVALID_STATUS = "The status (status) provided is not valid!";
+$TLS_API_INVALID_STATUS = "The status code (%s) provided is not valid!";
 $TLS_API_INVALID_TESTCASE_EXTERNAL_ID="Test Case External ID (%s) does not exist!";
 
 $TLS_API_TCASEID_NOT_INTEGER = "Test Case ID (testcaseid) must be an integer!";
 $TLS_API_TESTCASENAME_NOT_STRING = "testcasename must be a string!";
-$TLS_API_NO_BUILD_FOR_TPLANID = "No builds exist for the test plan id provided! " . 
+$TLS_API_NO_BUILD_FOR_TPLANID = "No builds exist for the test plan id provided! " .
                                 "A build must be created to report results.";
 $TLS_API_BUILDID_NOGUESS = "Guessing is disabled so a buildid must be specified!";
 $TLS_API_BUILDNAME_ALREADY_EXISTS = "Build name (%s) already exists (id:%s)";
+$TLS_API_BUILDNAME_DOES_NOT_EXIST = "Build Name (buildname: %s) provided does not exist!";
 $TLS_API_NO_BUILDID = "No buildid provided. A valid buildid must be provided!";
 $TLS_API_TCASEID_NOT_IN_TPLANID = "Test Case (name=%s/id=%s) is not associated with Test Plan (name=%s/id=%s).";
 $TLS_API_GENERAL_SUCCESS = "Success!";
@@ -2512,11 +2631,11 @@ $TLS_API_NO_TESTCASE_BY_THIS_NAME = "Cannot find matching test case. No testcase
 $TLS_API_NOT_YET_IMPLEMENTED = "This functionality has not been implemented yet!";
 $TLS_API_NO_CUSTOMFIELD_BY_THIS_NAME="Cannot Find Custom Field with name (%s) ";
 
-$TLS_API_NO_USER_BY_THIS_LOGIN = "Cannot Find User Login provided.";
+$TLS_API_NO_USER_BY_THIS_LOGIN = "Cannot Find User Login provided (%s).";
 $TLS_API_MISSING_REQUIRED_PARAMETER = "Parameter %s is required, but has not been provided";
- 
+
 $TLS_API_INVALID_TESTCASE_VERSION_NUMBER="The required version number does not exist for test case";
-$TLS_API_PARAMETER_NOT_INT = "Parameter %s must be an integer.";
+$TLS_API_PARAMETER_NOT_INT = "Parameter (%s) must be an integer (current value: %s).";
 
 $TLS_API_TPLAN_TPROJECT_KO="Test Plan (name=%s / id=%s) does not belong to Test Project (name=%s / id=%s)";
 $TLS_API_TCASE_TPROJECT_KO="Test Case (%s:%s) does not belong to Test Project (name=%s / id=%s)";
@@ -2558,8 +2677,11 @@ $TLS_API_NODEID_DOESNOT_EXIST="Node with id (%s) does not exist on system.";
 
 $TLS_API_CFG_DELETE_EXEC_DISABLED = "Configuration does not allow delete executions";
 
-$TLS_API_PLATFORM_NOT_LINKED_TO_TESTPLAN = "Platform (name=%s) is not linked to test plan (name:%s).";
+$TLS_API_PLATFORM_NOT_LINKED_TO_TESTPLAN = "Platform (name=%s/id=%s) is not linked to test plan (name:%s).";
 $TLS_API_TESTPLAN_HAS_NO_PLATFORMS = "Test plan (name:%s) has no platforms linked";
+
+$TLS_API_TCASEID_NOT_IN_TPLANID_FOR_PLATFORM = "Test Case (name=%s/id=%s) is not associated with " .
+                                               "Test Plan (name=%s/id=%s) for Platform (name=%s/id=%s).";
 
 
 // ----- audit log entries -----
@@ -2588,6 +2710,7 @@ $TLS_audit_all_user_roles_removed_testplan = "All user roles were unassigned fro
 $TLS_audit_all_user_roles_removed_testproject = "All user roles were unassigned from the Test Project with id '{%1}'";
 $TLS_audit_user_created = "User '{%1}' was created";
 $TLS_audit_user_deleted = "User '{%1}' was deleted";
+$TLS_audit_user_disabled = "User '{%1}' was disabled";
 $TLS_audit_user_logout = "Logout of '{%1}'";
 $TLS_audit_users_self_signup = "User '{%1}' created by self-sign up";
 $TLS_audit_pwd_reset_requested = "Password reset requested for '{%1}'";
@@ -2624,7 +2747,7 @@ $TLS_audit_requirement_deleted = "Requirement '{%1}' was deleted";
 $TLS_audit_req_assigned_tc = "Requirement with title '{%1}' was assigned to the Test Case '{%2}'";
 $TLS_audit_req_assignment_removed_tc = "Requirement with title '{%1}' was unassigned from the Test Case '{%2}'";
 $TLS_audit_requirement_copy = "Req 'DOCID:{%1}' was created as a copy of Req 'DOCID:{%2}'";
-$TLS_audit_req_version_deleted = " Version {%1} of Req 'DOCID:{%2}' - {%3} was deleted."; 
+$TLS_audit_req_version_deleted = " Version {%1} of Req 'DOCID:{%2}' - {%3} was deleted.";
 $TLS_audit_req_version_frozen = " Version {%1} of Req 'DOCID:{%2}' - {%3} was frozen.";
 
 $TLS_audit_build_created = $TLS_testproject . " '{%1}' - " . $TLS_testplan . " '{%2}' - Build '{%3}' was created";
@@ -2643,7 +2766,8 @@ $TLS_audit_tc_removed_from_testplan = "Test Case '{%1}' version {%2} was removed
 
 $TLS_audit_missing_localization = "String '{%1}' is not localized for '{%2}'";
 
-$TLS_audit_events_deleted = "User '{%1}' deleted all events";
+$TLS_audit_all_events_deleted = "User '{%1}' deleted all events";
+$TLS_audit_events_with_level_deleted = "User '{%1}' deleted events with level: {%2}";
 
 
 // ----- eventviewer.php -----
@@ -2670,13 +2794,18 @@ $TLS_title_eventinfo = "Event information";
 $TLS_title_eventdetails = "Event details";
 $TLS_th_user = "User";
 $TLS_show_event_history = "Show the event history";
-$TLS_btn_clear_events = "Clear All Events";
+$TLS_btn_clear_all_events = "Clear All Events";
+$TLS_btn_clear_events = "Clear Events";
 $TLS_th_event_description = "Description";
 $TLS_select_user = "User (Default All)";
+$TLS_clear_tip = "Delete events with log level(s) selected, or all if no level selected";
 
 
 // ----- int_mantis.php -----
 // Used to display at User interface label as title attribute
+// Attention must follow rule: issue_status_, because there is logic
+// build on this.
+//
 $TLS_issue_status_new = "New issue";
 $TLS_issue_status_feedback = "Feedback";
 $TLS_issue_status_acknowledged = "Acknowledged issue ";
@@ -2684,6 +2813,7 @@ $TLS_issue_status_confirmed = "Confirmed issue";
 $TLS_issue_status_assigned = "Assigned issue";
 $TLS_issue_status_resolved = "Resolved issue";
 $TLS_issue_status_closed = "Closed issue";
+$TLS_issue_status_custom_undefined_on_tl = 'Custom status NOT CONFIGURED on Test Link - see event viewer';
 $TLS_access_to_bts="Access issue tracking system";
 
 
@@ -2703,7 +2833,7 @@ $TLS_report_free_testcases_on_testproject=$TLS_link_report_free_testcases_on_tes
 $TLS_all_testcases_has_testplan="All Test Cases has been assigned to a Test Plan";
 $TLS_all_testcases_are_free="No Test Case has been assigned to a Test Plan";
 
-// ----- timeCharts ----- 
+// ----- timeCharts -----
 $TLS_interval_end_date 		= "Last Interval Date";
 $TLS_interval_header 		= "Interval Type";
 $TLS_interval_number 		= "Number of Intervals";
@@ -2737,7 +2867,7 @@ $TLS_no_changes = "No changes in %s.";
 $TLS_context = "Context (number of lines):";
 $TLS_show_all = "show all";
 $TLS_version_short = "v";
-$TLS_diff_subtitle_tc = "Differences between version %s (v%s) and version %s (v%s) of testcase %s"; 
+$TLS_diff_subtitle_tc = "Differences between version %s (v%s) and version %s (v%s) of testcase %s";
 $TLS_diff_subtitle_req = "Differences between version %s (v%s) and version %s (v%s) of requirement %s";
 $TLS_warning_context = "Context (lines) must be a number.";
 $TLS_warning_context_range = "Context is out of range (must be a positive number).";
@@ -2751,6 +2881,7 @@ $TLS_step_details="Step details";
 $TLS_step_number="#";
 $TLS_step_number_verbose = "Step number";
 $TLS_step_number_x_created = "Step number: %s created";
+$TLS_step_number_x_created_as_copy = "Step number: %s created as copy of %s";
 $TLS_edit_step_number_x = "Edit Step number: %s - Test Case: %s - Version: %s";
 $TLS_create_step = "Create Step - Test Case: %s - Version: %s";
 $TLS_delete_step = "Delete step";
@@ -2758,6 +2889,23 @@ $TLS_warning_delete_step = "<p>You are going to delete step number: %s </p><p>Ar
 $TLS_warning_step_number = " Step number must be a number and > 0";
 $TLS_warning_step_number_already_exists = " Step number %s already exists";
 
+$TLS_BTS_integration_failure = " Integration with Bugtracking System: %s - Failed";
+$TLS_BTS_connect_to_database_fails = "Connect to Bug Tracker database fails: %s";
+$TLS_MANTIS_status_not_configured = 'Get Bug Status: %s from Mantis DB, but status is not configured on int_mantis.php';
+$TLS_testcase_set_copied = "%s test cases has been copied";
+$TLS_one_testcase_copied = "test case has been copied";
+
+$TLS_import_req_spec_created = 'Created - Req. Spec. - Doc ID:%s';
+$TLS_import_req_spec_skipped = 'Skipped - Req. Spec. - Doc ID:%s - Already exists on other branch';
+$TLS_import_req_spec_updated = 'Updated - Req. Spec. - Doc ID:%s';
+$TLS_import_req_spec_ancestor_skipped = 'Skipped - Req. Spec. - Doc ID:%s - a parent container already exists on other branch';
+
+$TLS_import_req_created = 'Created - Requirement - Doc ID:%s';
+$TLS_import_req_skipped = 'Skipped - Requirement - Doc ID:%s - Already exists on other branch';
+$TLS_import_req_updated = 'Updated - Requirement - Doc ID:%s';
+$TLS_import_done = 'Import done';
+$TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
+$TLS_import_req_exists_here = 'Doc ID exists';
 
 // ----- END ------------------------------------------------------------------
 ?>

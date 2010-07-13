@@ -8,12 +8,13 @@
  * @package 	TestLink
  * @author 		-
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: usersView.php,v 1.32 2010/01/11 19:17:10 franciscom Exp $
+ * @version    	CVS: $Id: usersView.php,v 1.35 2010/04/19 20:59:39 franciscom Exp $
  * @link 		http://www.teamst.org/index.php
  *
  *
  * @internal Revisions:
- *
+ *  20100419 - franciscom - BUGID 3355: A user can not be deleted from the list
+ *	20100326 - franciscom - BUGID 3324
  *	20100106 - franciscom - security improvement - checkUserOrderBy()
  *                         (after scanning with Acunetix Web Security Scanner)
  *                          
@@ -36,8 +37,8 @@ $orderBy->dir = array('order_by_login_dir' => 'asc');
 	
 switch($args->operation)
 {
-	case 'delete':
-		//user cannot delete itself
+	case 'disable':
+		// user cannot disable => inactivate itself
 		if ($args->user_id != $args->currentUserID)
 		{
 			$user = new tlUser($args->user_id);
@@ -45,21 +46,48 @@ switch($args->operation)
 			if ($sqlResult >= tl::OK)
 			{
 				$userLogin = $user->login;
-				$sqlResult = $user->deleteFromDB($db);
+				$sqlResult = $user->setActive($db,0);
 				if ($sqlResult >= tl::OK)
 				{
-					logAuditEvent(TLS("audit_user_deleted",$user->login),"DELETE",$args->user_id,"users");
-					$user_feedback = sprintf(lang_get('user_deleted'),$userLogin);
+					logAuditEvent(TLS("audit_user_disabled",$user->login),"DISABLE",$args->user_id,"users");
+					$user_feedback = sprintf(lang_get('user_disabled'),$userLogin);
 				}
 			}
 		}
-
+    	
 		if ($sqlResult != tl::OK)
-			$user_feedback = lang_get('error_user_not_deleted');
-
+		{
+			$user_feedback = lang_get('error_user_not_disabled');
+	    }
+		
 		$orderBy->type = $args->user_order_by;
 		$orderBy->dir = $args->order_by_dir;
-		break;
+	break;
+		
+	// case 'delete':
+	// 	//user cannot delete itself
+	// 	if ($args->user_id != $args->currentUserID)
+	// 	{
+	// 		$user = new tlUser($args->user_id);
+	// 		$sqlResult = $user->readFromDB($db);
+	// 		if ($sqlResult >= tl::OK)
+	// 		{
+	// 			$userLogin = $user->login;
+	// 			$sqlResult = $user->deleteFromDB($db);
+	// 			if ($sqlResult >= tl::OK)
+	// 			{
+	// 				logAuditEvent(TLS("audit_user_deleted",$user->login),"DELETE",$args->user_id,"users");
+	// 				$user_feedback = sprintf(lang_get('user_deleted'),$userLogin);
+	// 			}
+	// 		}
+	// 	}
+    // 
+	// 	if ($sqlResult != tl::OK)
+	// 		$user_feedback = lang_get('error_user_not_deleted');
+    // 
+	// 	$orderBy->type = $args->user_order_by;
+	// 	$orderBy->dir = $args->order_by_dir;
+	// 	break;
 
 	case 'order_by_role':
 	case 'order_by_login':
@@ -76,6 +104,8 @@ switch($args->operation)
 		$order_by_dir['order_by_login_dir'] = 'desc';
 		break;
 }
+
+// $body_onload = "onload=\"toggleRowByClass('hide_inactive_users','inactive_user','table-row')\"";
 $order_by_clause = get_order_by_clause($orderBy);
 $users = getAllUsersRoles($db,$order_by_clause);
 
@@ -96,6 +126,8 @@ $smarty->assign('result',$sqlResult);
 $smarty->assign('action',$action);
 $smarty->assign('base_href', $args->basehref);
 $smarty->assign('grants',$grants);
+$smarty->assign('body_onload',$args->body_onload);
+$smarty->assign('checked_hide_inactive_users',$args->checked_hide_inactive_users);
 
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
@@ -142,7 +174,6 @@ function get_order_by_clause($order)
 */
 function init_args()
 {
-	
 	// input from GET['HelloString3'], 
 	// type: string,  
 	// minLen: 1, 
@@ -155,7 +186,8 @@ function init_args()
 			         "user_order_by" => array(tlInputParameter::STRING_N,0,50,null,'checkUserOrderBy'),			
 			         "order_by_role_dir" => array(tlInputParameter::STRING_N,0,4),
 			         "order_by_login_dir" => array(tlInputParameter::STRING_N,0,4),
-			         "user" => array(tlInputParameter::INT_N));
+			         "user" => array(tlInputParameter::INT_N),
+			         "hide_inactive_users" => array(tlInputParameter::CB_BOOL));
 
 	$pParams = R_PARAMS($iParams);
 
@@ -165,6 +197,13 @@ function init_args()
     $args->order_by_dir["order_by_role_dir"] = ($pParams["order_by_role_dir"] != '') ? $pParams["order_by_role_dir"] : 'asc';
     $args->order_by_dir["order_by_login_dir"] = ($pParams["order_by_login_dir"] != '') ? $pParams["order_by_login_dir"] : 'asc';
     $args->user_id = $pParams['user'];
+	
+	
+	// BUGID 3355: A user can not be deleted from the list
+	$args->hide_inactive_users = $pParams["hide_inactive_users"];
+	$args->checked_hide_inactive_users = $args->hide_inactive_users ? 'checked="checked"' : '';
+	$display = $args->hide_inactive_users ? 'none' : 'table-row';
+	$args->body_onload = "onload=\"toggleRowByClass('hide_inactive_users','inactive_user','{$display}')\"";
 
     $args->currentUser = $_SESSION['currentUser'];
     $args->currentUserID = $_SESSION['currentUser']->dbID;

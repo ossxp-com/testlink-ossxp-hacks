@@ -6,12 +6,13 @@
  * @package TestLink
  * @author Erik Eloff
  * @copyright 2009, TestLink community
- * @version CVS: $Id: tlHTMLTable.class.php,v 1.1 2009/12/23 13:42:41 erikeloff Exp $
+ * @version CVS: $Id: tlHTMLTable.class.php,v 1.3 2010/05/15 13:29:06 franciscom Exp $
  * @filesource http://testlink.cvs.sourceforge.net/viewvc/testlink/testlink/lib/functions/tlHTMLTable.class.php?view=markup
  * @link http://www.teamst.org
  * @since 1.9
  *
  * @internal Revision:
+ *  20100503 - franciscom - BUGID 3418 - changed in renderStatus(), due to changes on data structure
  *  20091223 - eloff - created class
  *
  **/
@@ -64,14 +65,19 @@ class tlHTMLTable extends tlTable
 			$s .= "<th>{$title}</th>";
 		}
 		$s .= '</tr>';
-		foreach ($this->data as $rowData) {
+		foreach ($this->data as $rowData) 
+		{
 			$s .= '<tr>';
-			foreach ($rowData as $colIndex => $value) {
-				if ($this->columns[$colIndex]['type'] == 'priority') {
-					$value = $this->renderPriority($value);
-				}
-				if ($this->columns[$colIndex]['type'] == 'status') {
-					$value = $this->renderStatus($value);
+			foreach ($rowData as $colIndex => $value) 
+			{
+				if( isset($this->columns[$colIndex]['type']) )
+				{
+					if ($this->columns[$colIndex]['type'] == 'priority') {
+						$value = $this->renderPriority($value);
+					}
+					if ($this->columns[$colIndex]['type'] == 'status') {
+						$value = $this->renderStatus($value);
+					}
 				}
 				$s .= "<td>{$value}</td>";
 			}
@@ -81,11 +87,13 @@ class tlHTMLTable extends tlTable
 		return $s;
 	}
 
+	// BUGID 3418
 	public function renderStatus($value)
 	{
-		$status = $this->code_status[$value[0]];
-		$color = $this->status_color[$status];
-		return "<span style=\"color: #{$color}\">{$value[1]}</span>";
+		// $status = $this->code_status[$value[0]];
+		// $color = $this->status_color[$status];
+		// return "<span style=\"color: #{$color}\">{$value[1]}</span>";
+		return $value[0];
 	}
 
 	public function renderPriority($prio)

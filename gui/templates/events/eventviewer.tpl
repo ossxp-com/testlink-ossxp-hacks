@@ -1,16 +1,17 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: eventviewer.tpl,v 1.24 2009/10/07 06:13:32 franciscom Exp $
+$Id: eventviewer.tpl,v 1.26 2010/05/08 17:38:17 franciscom Exp $
 
 Event Viewer
+20100508 - franciscom - BUGID 3445
 *}
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {lang_get var='labels'
           s='event_viewer,th_loglevel,th_timestamp,th_description,title_eventdetails,
              title_eventinfo,label_startdate,label_enddate,btn_apply,click_on_event_info,
-             btn_clear_events,th_event_description,select_user,
+             btn_clear_events,btn_clear_all_events,th_event_description,select_user,clear_tip,
              message_please_wait,btn_close,th_role_description,th_user'}
 
 
@@ -144,7 +145,7 @@ fieldset
 
 			<fieldset class="x-fieldset" style="float:left"><legend>{$labels.select_user}</legend>
         <select name="testers[]" size="5" multiple="multiple">
-        	{foreach from=$gui->testers item=userid key=row  }
+        	{foreach from=$gui->testers item=userid key=row}
 			      {if in_array((string)$row,$gui->selectedTesters) neq false}
         	    <option value="{$row}" selected="selected">{$gui->testers[$row]|escape}</option>
         	  {else}
@@ -164,7 +165,8 @@ fieldset
 			<br />
 			{if $gui->canDelete}
 			  <br />
-			  <input type="submit" value="{$labels.btn_clear_events}" onclick="doAction.value='clear'" />
+			  <input type="submit"  value="{$labels.btn_clear_events}" onclick="doAction.value='clear'" />
+			  <img src="{$smarty.const.TL_THEME_IMG_DIR}/sym_question.gif" title="{$labels.clear_tip}">
 			{/if}
 			</fieldset>
 			<br />

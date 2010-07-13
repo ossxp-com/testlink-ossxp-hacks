@@ -1,11 +1,11 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * ♔ TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: strings.txt,v $
- * @version $Revision: 1.15 $
- * @modified $Date: 2009/06/04 05:26:30 $ by $Author: tosikawa $
+ * @version $Revision: 1.18 $
+ * @modified $Date: 2010/06/24 17:25:53 $ by $Author: asimon83 $
  *
  * @copyright Copyright (c) 2003-9, TestLink community
  * @author Francisco Mancardi, Andreas Morsing, Martin Havlat
@@ -58,7 +58,7 @@
  * Yasuhiko Okada,       Yoichi Kunihiro,      Yoshihiro Yoshimura,
  * Yukiko Kajino
  *
- * @modified $Date: 2009/06/04 05:26:30 $ $Author: tosikawa $
+ * @modified $Date: 2010/06/24 17:25:53 $ $Author: asimon83 $
  *-------------------------------------------------------------------
 **/
 
@@ -304,14 +304,14 @@ $TLS_wrong_keywords_file = "キーワードファイルが正しくありませ�
 
 // ----- lostPassword.php -----
 $TLS_bad_user = "ユーザが見つかりません。再入力してださい。";
-$TLS_contact_admin = "<br />さらなる問題が発生している場合は管理者に連絡してください。";
+$TLS_contact_admin = "さらなる問題が発生している場合は管理者に連絡してください。";
 $TLS_mail_empty_address = "あなたのユーザプロファイルにはメールアドレスが設定されていません!" .
                           "TestLinkの管理者に連絡をとり、パスワードをリセットしてもらってください!";
 $TLS_mail_passwd_subject = "あなたの新しいTestLinkパスワード。";
 $TLS_mail_problems = "メールの設定中にエラーが発生しました。管理者に連絡してください。";
 $TLS_page_title_lost_passwd = "TestLink - パスワード忘れ";
 $TLS_your_info_for_passwd = "新しいパスワードをメールで発行するために、あなたのユーザ情報を入力してください。";
-$TLS_your_password_is = "あなたの新しいTestLinkパスワード: <br>";
+$TLS_your_password_is = "あなたの新しいTestLinkパスワード:";
 
 
 

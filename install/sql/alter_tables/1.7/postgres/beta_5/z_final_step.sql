@@ -2,7 +2,7 @@
 $Revision: 1.1 $
 $Date: 2007/02/05 08:06:54 $
 $Author: franciscom $
-$Name: testlink_1_9_beta3 $
+$Name:  $
 */
 
 UPDATE priorities

@@ -1,11 +1,11 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * ♔ TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: texts.php,v $
- * @version $Revision: 1.3 $
- * @modified $Date: 2009/04/04 22:35:13 $ by $Author: havlat $
+ * @version $Revision: 1.5 $
+ * @modified $Date: 2010/06/24 17:25:56 $ by $Author: asimon83 $
  * @author Martin Havlat and reviewers from TestLink Community
  *
  * --------------------------------------------------------------------------------------

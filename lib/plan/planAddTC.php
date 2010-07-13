@@ -7,15 +7,19 @@
  *
  * @package 	TestLink
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: planAddTC.php,v 1.94 2010/02/25 19:58:31 erikeloff Exp $
+ * @version    	CVS: $Id: planAddTC.php,v 1.100 2010/06/28 16:19:37 asimon83 Exp $
  * @filesource	http://testlink.cvs.sourceforge.net/viewvc/testlink/testlink/lib/functions/object.class.php?view=markup
  * @link 		http://www.teamst.org/index.php
  * 
  * @internal Revisions:
+ * 20100628 - asimon - removal of constants from filter control class
+ * 20100625 - asimon - refactoring for new filter features and BUGID 3516
+ * 20100624 - asimon - CVS merge (experimental branch to HEAD)
+ * 20100417 - BUGDID 2498 - filter by test case importance
+ * 20100411 - BUGID 2797 - filter by test case execution type
  * 20100225 - eloff - BUGID 3205 - Don't show "save platforms" when platforms aren't used
  * 20100129 - franciscom - moved here from template, logic to initialize:
- *                         drawSavePlatformsButton,drawSaveCFieldsButton        
- *                         
+ *                         drawSavePlatformsButton,drawSaveCFieldsButton
  * 20090922 - franciscom - add contribution - bulk tester assignment while adding test cases
  *
  **/
@@ -176,9 +180,43 @@ if($do_display)
 	$tsuite_data = $tsuite_mgr->get_by_id($args->object_id);
 		
 	// This does filter on keywords ALWAYS in OR mode.
+	//
+	// CRITIC:
+	// We have arrived after clicking in a node of Test Spec Tree where we have two classes of filters
+	// 1. filters on attribute COMMON to all test case versions => TEST CASE attribute like keyword_id
+	// 2. filters on attribute that can change on each test case version => execution type.
+	//
+	// For attributes at Version Level, filter is done ON LAST ACTIVE version, that can be NOT the VERSION
+	// already linked to test plan.
+	// This can produce same weird effects like this:
+	//
+	//  1. Test Suite A - create TC1 - Version 1 - exec type MANUAL
+	//  2. Test Suite A - create TC2 - Version 1 - exec type AUTO
+	//  3. Test Suite A - create TC3 - Version 1 - exec type MANUAL
+	//  4. Use feature ADD/REMOVE test cases from test plan.
+	//  5. Add TC1 - Version 1 to test plan
+	//  6. Apply filter on exec type AUTO
+	//  7. Tree will display (Folder) Test Suite A with 1 element
+	//  8. click on folder, then on RIGHT pane:
+	//     TC2 - Version 1 NOT ASSIGNED TO TEST PLAN is displayed
+	//  9. Use feature edits test cases, to create a new version for TC1 -> Version 2 - exec type AUTO
+	// 10. Use feature ADD/REMOVE test cases from test plan.
+	// 11. Apply filter on exec type AUTO
+	// 12. Tree will display (Folder) Test Suite A with 2 elements
+	// 13. click on folder, then on RIGHT pane:
+	//     TC2 - Version 1 NOT ASSIGNED TO TEST PLAN is displayed
+	//     TC1 - Version 2 NOT ASSIGNED TO TEST PLAN is displayed  ----> THIS IS RIGHT but WRONG
+	//     Only one TC version can be linked to test plan, and TC1 already is LINKED BUT with VERSION 1.
+	//     Version 2 is displayed because it has EXEC TYPE AUTO
+	// 
+	// How to solve ?
+	// Filters regarding this kind of attributes WILL BE NOT APPLIEDED to get linked items
+	// In this way counters on Test Spec Tree and amount of TC displayed on right pane will be coherent.
+	// 
+	
 	$tplan_linked_tcversions = getFilteredLinkedVersions($args,$tplan_mgr,$tcase_mgr);
 	$testCaseSet = null;
-	if(!is_null($keywordsFilter))
+	if(!is_null($keywordsFilter) )
 	{ 
 	    // With this pieces we implement the AND type of keyword filter.
 	    $keywordsTestCases = $tproject_mgr->get_keywords_tcases($args->tproject_id,$keywordsFilter->items,
@@ -196,8 +234,12 @@ if($do_display)
 	$cfields=$tsuite_mgr->cfield_mgr->get_linked_cfields_at_testplan_design($args->tproject_id,1,'testcase');
     $opt = array('write_button_only_if_linked' => 0, 'add_custom_fields' => 0);
     $opt['add_custom_fields'] = count($cfields) > 0 ? 1 : 0;
-    $filters = array('keywords' => $args->keyword_id, 'testcases' => $testCaseSet);
-	$out = gen_spec_view($db,'testproject',$args->tproject_id,$args->object_id,$tsuite_data['name'],
+
+	// 20100411 - BUGID 2797 - filter by test case execution type
+    $filters = array('keywords' => $args->keyword_id, 'testcases' => $testCaseSet, 
+                     'exec_type' => $args->executionType, 'importance' => $args->importance);
+
+	$out = gen_spec_view($db,'testPlanLinking',$args->tproject_id,$args->object_id,$tsuite_data['name'],
 	                     $tplan_linked_tcversions,null,$filters,$opt);
   
   	
@@ -208,8 +250,6 @@ if($do_display)
     $gui->drawSavePlatformsButton = false;
     $gui->drawSaveCFieldsButton = false;
 
-    // new dBug($gui->items);
-    // die();
     if( !is_null($gui->items) )
     {
 		initDrawSaveButtons($gui);
@@ -248,15 +288,16 @@ function init_args()
 	$args->tcversion_for_tcid = isset($_REQUEST['tcversion_for_tcid']) ? $_REQUEST['tcversion_for_tcid'] : null;
 	$args->testcases2remove = isset($_REQUEST['remove_checked_tc']) ? $_REQUEST['remove_checked_tc'] : null;
 
-	// Can be a list (string with , (comma) has item separator), that will be trasformed in an array.
-	$keywordSet = isset($_REQUEST['keyword_id']) ? $_REQUEST['keyword_id'] : null;
-	
-	$args->keyword_id = 0;  
-	if(!is_null($keywordSet))
-	{
-		$args->keyword_id = explode(',',$keywordSet);  
-	}
-	$args->keywordsFilterType = isset($_REQUEST['keywordsFilterType']) ? $_REQUEST['keywordsFilterType'] : 'OR';
+	// BUGID 3516
+//	// Can be a list (string with , (comma) has item separator), that will be trasformed in an array.
+//	$keywordSet = isset($_REQUEST['keyword_id']) ? $_REQUEST['keyword_id'] : null;
+//	
+//	$args->keyword_id = 0;  
+//	if(!is_null($keywordSet))
+//	{
+//		$args->keyword_id = explode(',',$keywordSet);  
+//	}
+//	$args->keywordsFilterType = isset($_REQUEST['keywordsFilterType']) ? $_REQUEST['keywordsFilterType'] : 'OR';
 
 	$args->testcases2order = isset($_REQUEST['exec_order']) ? $_REQUEST['exec_order'] : null;
 	$args->linkedOrder = isset($_REQUEST['linked_exec_order']) ? $_REQUEST['linked_exec_order'] : null;
@@ -268,6 +309,51 @@ function init_args()
 	$args->testerID = isset($_REQUEST['testerID']) ? intval($_REQUEST['testerID']) : 0;
     $args->send_mail = isset($_REQUEST['send_mail']) ? $_REQUEST['send_mail'] : false;
 
+    // BUGID 3516
+//	// BUGID 2797 - filter by test case execution type
+//	// 0 -> Any, but has to be converter to null to be used on call to other functions
+//	$args->executionType = isset($_REQUEST['executionType']) ? intval($_REQUEST['executionType']) : 0;
+//	$args->executionType = ($args->executionType > 0) ? $args->executionType : null;
+//
+//	// 0 -> Any, but has to be converter to null to be used on call to other functions
+//	$args->importance = isset($_REQUEST['importance']) ? intval($_REQUEST['importance']) : 0;
+//	$args->importance = ($args->importance > 0) ? $args->importance : null;
+
+	// BUGID 3516
+	// For more information about the data accessed in session here, see the comment
+	// in the file header of lib/functions/tlTestCaseFilterControl.class.php.
+	$form_token = isset($_REQUEST['form_token']) ? $_REQUEST['form_token'] : 0;
+	
+	$mode = 'plan_add_mode';
+	
+	$session_data = isset($_SESSION[$mode]) && isset($_SESSION[$mode][$form_token])
+	                ? $_SESSION[$mode][$form_token] : null;
+	
+	$args->refreshTree = isset($session_data['setting_refresh_tree_on_action']) ?
+                         $session_data['setting_refresh_tree_on_action'] : 0;    
+    
+	$args->executionType = isset($session_data['filter_execution_type']) ? 
+	                       $session_data['filter_execution_type'] : 0;
+	
+	$args->importance = isset($session_data['filter_priority']) ? 
+	                    $session_data['filter_priority'] : 0;
+	$args->importance = ($args->importance > 0) ? $args->importance : null;
+	
+	$args->keyword_id = 0;
+	$fk = 'filter_keywords';
+	if (isset($session_data[$fk])) {
+		$args->keyword_id = $session_data[$fk];
+		if (is_array($args->keyword_id) && count($args->keyword_id) == 1) {
+			$args->keyword_id = $args->keyword_id[0];
+		}
+	}
+	
+	$args->keywordsFilterType = null;
+	$ft = 'filter_keywords_filter_type';
+	if (isset($session_data[$ft])) {
+		$args->keywordsFilterType = $session_data[$ft];
+	}
+	
 	return $args;
 }
 
@@ -333,7 +419,7 @@ function doReorder(&$argsObj,&$tplanMgr)
     
     if(!is_null($mapo))
     {
-        $tplanMgr->setExecutionOrder($argsObj->tplan_id,$mapo);  
+        $tplanMgr->setExecutionOrder($argsObj->tplan_id,$mapo);
     }
     
 }
@@ -381,7 +467,7 @@ function initializeGui(&$dbHandler,$argsObj,&$tplanMgr,&$tcaseMgr)
     $tplan_info = $tplanMgr->get_by_id($argsObj->tplan_id);
     $gui->testPlanName = $tplan_info['name'];
     $gui->pageTitle = lang_get('test_plan') . $title_separator . $gui->testPlanName;
-    $gui->refreshTree = false;
+    $gui->refreshTree = $argsObj->refreshTree;
     $gui->testers = getTestersForHtmlOptions($dbHandler,$argsObj->tplan_id,$argsObj->tproject_id);
     $gui->testerID = $argsObj->testerID;
     $gui->send_mail = $argsObj->send_mail;
