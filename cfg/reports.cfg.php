@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later. 
  *
  * Filename $RCSfile: reports.cfg.php,v $
- * @version $Revision: 1.12.2.1 $
- * @modified $Date: 2009/04/21 05:49:22 $ by $Author: amkhullar $
+ * @version $Revision: 1.15 $
+ * @modified $Date: 2010/02/01 11:08:32 $ by $Author: franciscom $
  * @author Martin Havlat
  *
  * SCOPE: Definition of report/metrics menu 
@@ -77,13 +77,13 @@ $tlCfg->reports_file_extension = array(
  * 	3. req (if project has available requirements only)
  */
 $tlCfg->reports_list['test_plan'] = array( 
-	'title' => 'test_plan',
+	'title' => 'link_report_test_plan',
 	'url' => 'lib/results/printDocOptions.php?type='.DOC_TEST_PLAN,
 	'enabled' => 'all',
 	'format' => 'format_html,format_odt,format_msword'
 );
 $tlCfg->reports_list['test_report'] = array( 
-	'title' => 'test_report',
+	'title' => 'link_report_test_report',
 	'url' => 'lib/results/printDocOptions.php?type='.DOC_TEST_REPORT,
 	'enabled' => 'all',
 	'format' => 'format_html,format_odt,format_msword'
@@ -165,6 +165,13 @@ $tlCfg->reports_list['tplan_with_cf'] = array(
 	'url' => 'lib/results/testPlanWithCF.php',
 	'enabled' => 'all',
 	'format' => 'format_html'
+);
+
+$tlCfg->reports_list['free_tcases'] = array( 
+'title' => 'link_report_free_testcases_on_testproject',
+'url' => 'lib/results/freeTestCases.php',
+'enabled' => 'all',
+'format' => 'format_html'
 );
 // -------------------------------------------------------------------
 ?>

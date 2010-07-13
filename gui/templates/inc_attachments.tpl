@@ -1,6 +1,6 @@
 {*
 Testlink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_attachments.tpl,v 1.20 2009/02/03 20:10:06 schlundus Exp $
+$Id: inc_attachments.tpl,v 1.23 2009/12/28 10:12:25 franciscom Exp $
 Generic attachment management
 
 Input:
@@ -24,6 +24,8 @@ $gsmarty_attachments
 20070307 - franciscom - BUGID 722
 
 *}
+{lang_get s='warning_delete_attachment' var="warning_msg" }
+{lang_get s='delete' var="del_msgbox_title" }
 
 {literal}
 <script type="text/javascript">
@@ -41,9 +43,8 @@ var warning_delete_attachment = "{lang_get s='warning_delete_attachment'}";
     {$gsmarty_attachments->disabled_msg}
     </div>
 {/if}
-
-
-{if $gsmarty_attachments->enabled && ($attach_attachmentInfos neq "" || $attach_show_upload_btn) }
+{include file="inc_del_onclick.tpl"}
+{if $gsmarty_attachments->enabled && ($attach_attachmentInfos != "" || $attach_show_upload_btn) }
 
 <table class="{$attach_tableClassName}" {if $attach_inheritStyle == 0} style="{$attach_tableStyles}" {/if}>
 
@@ -68,8 +69,9 @@ var warning_delete_attachment = "{lang_get s='warning_delete_attachment'}";
 			<td style="vertical-align:middle;"><a href="lib/attachments/attachmentdownload.php?id={$info.id}" target="_blank" class="bold">
 			{$my_link}</a> - <span class="italic">{$info.file_name|escape} ({$info.file_size|escape} bytes, {$info.file_type|escape}) {localize_date d=$info.date_added|escape}</span>
 				{if !$attach_downloadOnly}
-				<a href="javascript:deleteAttachment_onClick({$info.id});">
-				<img style="border:none;" alt="{lang_get s='alt_delete_attachment'}"
+				<a href="javascript:delete_confirmation({$info.id},'{$info.title|escape:'javascript'|escape}',
+					                                '{$del_msgbox_title|escape:'javascript'|escape}','{$warning_msg|escape:'javascript'|escape}',deleteAttachment_onClick);"
+					<img style="border:none;" alt="{lang_get s='alt_delete_attachment'}"
 				                         title="{lang_get s='alt_delete_attachment'}"
 				                         src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png" /></a>
 				{/if}

@@ -5,10 +5,10 @@
  *
  * Filename $RCSfile: reqExport.php,v $
  *
- * @version $Revision: 1.5 $
- * @modified $Date: 2008/12/16 20:11:53 $ by $Author: schlundus $
+ * @version $Revision: 1.9 $
+ * @modified $Date: 2010/02/18 21:29:20 $ by $Author: franciscom $
  *
- * This page this allows users to export requirements.
+ * Allows users to export requirements.
  *
 **/
 require_once("../../config.inc.php");
@@ -16,55 +16,150 @@ require_once("csv.inc.php");
 require_once("xml.inc.php");
 require_once("common.php");
 require_once("requirements.inc.php");
-require_once('requirement_spec_mgr.class.php');
+
 testlinkInitPage($db,false,false,"checkRights");
-
-$template_dir = "requirements/";
-$default_template = str_replace('.php','.tpl',basename($_SERVER['SCRIPT_NAME']));
-
-$bExport = isset($_REQUEST['export']) ? $_REQUEST['export'] : null;
-$exportType = isset($_REQUEST['exportType']) ? $_REQUEST['exportType'] : null;
-$req_spec_id = isset($_REQUEST['req_spec_id']) ? $_REQUEST['req_spec_id'] : null;
-$export_filename = isset($_REQUEST['export_filename']) ? $_REQUEST['export_filename'] : "requirements.xml";
-
+$templateCfg = templateConfiguration();
 $req_spec_mgr = new requirement_spec_mgr($db);
-$req_spec = $req_spec_mgr->get_by_id($req_spec_id);
-$export_types = $req_spec_mgr->get_export_file_types();
 
-if ($bExport)
+$args = init_args();
+$gui = initializeGui($args,$req_spec_mgr);
+
+switch($args->doAction)
 {
-	$requirements_map = $req_spec_mgr->get_requirements($req_spec_id);
-
-	$pfn = null;
-	switch($exportType)
-	{
-		case 'csv':
-			$pfn = "exportReqDataToCSV";
-			$fileName = 'reqs.csv';
-			break;
-		case 'XML':
-			$pfn = "exportReqDataToXML";
-			$fileName = 'reqs.xml';
-			break;
-	}
-	if ($pfn)
-	{
-		$fileName = is_null($export_filename) ? $fileName : $export_filename;
-		$content = $pfn($requirements_map);
-		downloadContentsToFile($content,$fileName);
-		exit();
-	}
+    case 'export':
+        $smarty = new TLSmarty();
+        $smarty->assign('gui', $gui);
+        $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
+    break;
+    
+    case 'doExport':
+        doExport($args,$req_spec_mgr);
+    break;
+      
 }
 
-$smarty = new TLSmarty();
-$smarty->assign('req_spec_id', $req_spec_id);
-$smarty->assign('req_spec', $req_spec);
-$smarty->assign('exportTypes',$export_types);
-$smarty->assign('export_filename',$export_filename);
-$smarty->display($template_dir . $default_template);
 
+/**
+ * checkRights
+ *
+ */
 function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'mgt_view_req');
+}
+
+
+/**
+ * init_args
+ *
+ */
+function init_args()
+{
+	$_REQUEST = strings_stripSlashes($_REQUEST);
+	$args = new stdClass();
+	$args->doAction = isset($_REQUEST['doAction']) ? $_REQUEST['doAction'] : 'export';
+	$args->exportType = isset($_REQUEST['exportType']) ? $_REQUEST['exportType'] : null;
+	$args->req_spec_id = isset($_REQUEST['req_spec_id']) ? $_REQUEST['req_spec_id'] : null;
+	$args->export_filename = isset($_REQUEST['export_filename']) ? $_REQUEST['export_filename'] : "";
+	
+	$args->tproject_id = isset($_REQUEST['tproject_id']) ? $_REQUEST['tproject_id'] : 0;
+    if( $args->tproject_id == 0 )
+    {	
+		$args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
+	}
+	$args->scope = isset($_REQUEST['scope']) ? $_REQUEST['scope'] : 'branch';
+	return $args;  
+}
+
+
+/**
+ * initializeGui
+ *
+ */
+function initializeGui(&$argsObj,&$req_spec_mgr)
+{
+	$gui = new stdClass();
+	$gui->exportTypes = $req_spec_mgr->get_export_file_types();
+	$gui->exportType = $argsObj->exportType; 
+	$gui->scope = $argsObj->scope;
+	$gui->tproject_id = $argsObj->tproject_id;
+	
+	switch($argsObj->scope)
+    {
+  		case 'tree':
+			 $gui->req_spec['title'] = lang_get('all_reqspecs_in_tproject');
+			 $gui->req_spec_id = 0;
+  			 $exportFileName = 'all-req.xml';
+  		break;
+  		
+  		case 'branch':
+			 $gui->req_spec = $req_spec_mgr->get_by_id($argsObj->req_spec_id);
+			 $gui->req_spec_id = $argsObj->req_spec_id;
+			 $exportFileName = $gui->req_spec['title'] . '-req.xml';
+  		break;
+  		
+	}
+	
+	$gui->export_filename = trim($argsObj->export_filename);
+	if($gui->export_filename == "")
+	{
+	    $gui->export_filename = $exportFileName;
+	}
+	return $gui;  
+}
+
+
+
+/**
+ * doExport
+ *
+ */
+function doExport(&$argsObj,&$req_spec_mgr)
+{
+	$pfn = null;
+	switch($argsObj->exportType)
+	{
+		case 'csv':
+	    	$requirements_map = $req_spec_mgr->get_requirements($argsObj->req_spec_id);
+			$pfn = "exportReqDataToCSV";
+			$fileName = 'reqs.csv';
+			$content = $pfn($requirements_map);
+			break;
+
+		case 'XML':
+			$pfn = "exportReqSpecToXML";
+			$fileName = 'reqs.xml';
+  			$content = TL_XMLEXPORT_HEADER;
+ 			
+  			switch($argsObj->scope)
+  			{
+  				case 'tree':
+  					$reqSpecSet = $req_spec_mgr->getFirstLevelInTestProject($argsObj->tproject_id);
+  					$reqSpecSet = array_keys($reqSpecSet);
+  				break;
+  				
+  				case 'branch':
+  					$reqSpecSet = array($argsObj->req_spec_id);
+  				break;
+  			}
+			
+			$content .= "<requirement-specification>\n";
+  			if(!is_null($reqSpecSet))
+  			{
+  				foreach($reqSpecSet as $reqSpecID)
+  				{
+					$content .= $req_spec_mgr->$pfn($reqSpecID,$argsObj->tproject_id);
+				}
+			}
+			$content .= "</requirement-specification>\n";
+			break;
+	}
+
+	if ($pfn)
+	{
+		$fileName = is_null($argsObj->export_filename) ? $fileName : $argsObj->export_filename;
+		downloadContentsToFile($content,$fileName);
+		exit();
+	}
 }
 ?>

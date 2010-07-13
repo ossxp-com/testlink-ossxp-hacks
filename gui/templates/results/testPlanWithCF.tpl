@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: testPlanWithCF.tpl,v 1.1.2.1 2009/04/21 05:49:59 amkhullar Exp $
+$Id: testPlanWithCF.tpl,v 1.2 2009/04/21 05:58:36 amkhullar Exp $
 
 Purpose: For a test plan, list test cases with Custom Fields at Execution
 

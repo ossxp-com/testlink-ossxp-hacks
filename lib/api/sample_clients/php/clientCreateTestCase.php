@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: clientCreateTestCase.php,v $
  *
- * @version $Revision: 1.4.2.1 $
- * @modified $Date: 2009/05/02 09:08:13 $ by $Author: franciscom $
+ * @version $Revision: 1.6 $
+ * @modified $Date: 2009/11/29 16:25:31 $ by $Author: franciscom $
  * @Author: francisco.mancardi@gmail.com
  *
  * rev: 
@@ -21,14 +21,14 @@ $unitTestDescription="Test - {$method}";
 
 $args=array();
 $args["devKey"]=DEV_KEY;
-$args["testprojectid"]=1;
-$args["testsuiteid"]=186;
+$args["testprojectid"]=19;
+$args["testsuiteid"]=33;
 $args["testcasename"]='File System Check';
 $args["summary"]='Test Case created via API';
 $args["steps"]="These are the steps";
 $args["expectedresults"]="All OK";
 $args["authorlogin"]='admin';
-$args["authorlogin"]='admin';
+// $args["authorlogin"]='admin';
 $args["checkduplicatedname"]=1;
 // $args["keywordid"]='1,2,3';
 // $args["keywords"]='ALFA,BETA,ZETA';

@@ -1,33 +1,42 @@
 // TestLink Open Source Project - http://testlink.sourceforge.net/
 // This script is distributed under the GNU General Public License 2 or later.
 //
-// $Id: testlink_library.js,v 1.69.2.6 2009/09/04 19:30:19 schlundus Exp $
+// $Id: testlink_library.js,v 1.96 2010/03/02 09:19:37 asimon83 Exp $
 //
 // Javascript functions commonly used through the GUI
-// This library is automatically loaded with inc_header.tpl
+// Rule: DO NOT ADD FUNCTIONS FOR ONE USING
 //
-// DO NOT ADD FUNCTIONS FOR ONE USING
+// @used This library is automatically loaded with inc_header.tpl
 //
-// ----------------------------------------------------------------------------
-//                               Development Notes
-// ----------------------------------------------------------------------------
+//                               
+// ----- Development Notes --------------------------------------------------------------
 //
-// Globals variables:
-// fRoot
-// menuUrl
-// args
+// @global variables:
+// 	fRoot
+// 	menuUrl
+// 	args
 //
 // value to this variables is assigned using different smarty templates,
 // like inc_head.tpl
 //
-// 
 // Attention:
 // window.open() - on Firefox is window name contains blank nothing happens (no good)
 //                 on I.E. => generates a bug - BE CAREFUL
-//                 
-// ----------------------------------------------------------------------------
-// 20090518 - amitkhullar - added func openTCExecWindow()
-// 20090518 - franciscom - BUGID 2508
+//
+// ------ Revisions ---------------------------------------------------------------------
+//
+// 20100301 - asimon - added openLinkedReqWindow() and openLinkedReqSpecWindow()
+// 20100223 - asimon - added PL() for BUGID 3049
+// 20100216 - asimon - added triggerBuildChooser() and triggerAssignedBox() for BUGID 2455, BUGID 3026
+// 20100212 - eloff - BUGID 3103 - remove js-timeout alert in favor of BUGID 3088
+// 20100131 - franciscom - BUGID 3118: Help files are not getting opened when selected in the dropdown 
+// 20090906 - franciscom - added openTestSuiteWindow()
+// 20090821 - havlatm - added support for session timeout
+// 20090530 - franciscom - openExecEditWindow()
+// 20090419 - franciscom - BUGID 2364 - added std_dialog()
+//                         added some comments to explain how a bug has been solved
+//
+// 20090329 - franciscom - openTCaseWindow(), added second argument
 // 20081220 - franciscom - toggleInput()
 // 20080724 - havlatm - bug 1638, 1639
 // 20080322 - franciscom - openExecNotesWindow()
@@ -35,8 +44,8 @@
 // 20070930 - franciscom - REQ - BUGID 1078 - openTCaseWindow()
 // 20070509 - franciscom - changes in tree_getPrintPreferences()
 //                         to support new options (Contribution)
-//
-//
+
+
 /*
   function: focusInputField
 
@@ -113,14 +122,21 @@ function close_help()
 */
 function open_popup(page)
 {
-	window.open(page, "_blank", "left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes,toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no,location=no,width=400,height=650")
+  var windowCfg="left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes," + 
+                "toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no,location=no," +
+                "width=400,height=650";
+	window.open(page, "_blank",windowCfg);
 	return true;
 }
 
 // middle window (information, TC)
 function open_top(page)
 {
-	window.open(page, "_blank", "left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes,toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no,location=no,width=600,height=400")
+  var windowCfg="left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes," + 
+                "toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no,location=no," +
+                "width=600,height=400";
+  
+	window.open(page, "_blank", windowCfg);
 	return true;
 }
 
@@ -193,6 +209,18 @@ function EP(id)
 	                 "&level=testproject&id="+id+args+"&"+pParams;
 
 	//alert(_FUNCTION_NAME_ + " " +action_url);
+	parent.workframe.location = action_url;
+}
+
+/*
+function: PL
+          printing of Test Plan for BUGID 3049
+args: id
+*/
+function PL(id)
+{
+	var _FUNCTION_NAME_="PL";
+	var action_url = fRoot + 'lib/testcases/archiveData.php?edit=testplan&level=testplan&id=' + id;
 	parent.workframe.location = action_url;
 }
 
@@ -296,28 +324,21 @@ function TPLAN_PTC(id)
 	parent.workframe.location = my_location;
 }
 
-//==========================================
-// Set DIV ID to hide
-//==========================================
-function my_hide_div(itm)
+function showOrHideElement(oid,hide)
 {
-	if (!itm)
-		return;
-
-	itm.style.display = "none";
+	  var obj = document.getElementById(oid);
+	  var displayValue = "";
+    
+    if (!obj)
+    {
+    	return;
+    }
+  	if(hide)
+  	{
+  		displayValue = "none";
+    }
+  	obj.style.display = displayValue;
 }
-
-//==========================================
-// Set DIV ID to show
-//==========================================
-function my_show_div(itm)
-{
-	if (!itm)
-		return;
-
-	itm.style.display = "";
-}
-
 
 /**
  * Display a confirmation dlg before modifying roles
@@ -327,32 +348,38 @@ function my_show_div(itm)
  **/
 function modifyRoles_warning()
 {
+  var ret=false;
 	if (confirm(warning_modify_role))
-		return true;
-
-	return false;
+	{
+		ret=true;
+  } 
+	return ret;
 }
 
 /**
  * 
- *
- * @param string feature the feature, could be testplan or testproject
+ * @param string feature the feature, could be testplan or product
  **/
 function changeFeature(feature)
 {
 	var tmp = document.getElementById('featureSel');
+	var fID = '';
 	if (!tmp)
+	{
 		return;
-	
-	var fID = tmp.value;
+	}
+	fID = tmp.value;
 	if(fID)
-		location = fRoot+"lib/usermanagement/usersAssign.php?feature="+feature+"&featureID="+fID;
+	{
+		location = fRoot+"lib/usermanagement/usersAssign.php?featureType="+feature+"&featureID="+fID;
+	}	
 }
 
 function openFileUploadWindow(id,tableName)
 {
+  var windowCfg="width=510,height=300,resizable=yes,dependent=yes";
 	window.open(fRoot+"lib/attachments/attachmentupload.php?id="+id+"&tableName="+tableName,
-	            "FileUpload","width=510,height=300,resizable=yes,dependent=yes");
+	            "FileUpload",windowCfg);
 }
 
 
@@ -364,10 +391,14 @@ function openFileUploadWindow(id,tableName)
   returns:
 
 */
-function deleteAttachment_onClick(id)
+function deleteAttachment_onClick(btn,txt,id)
 {
-	if (confirm(warning_delete_attachment))
-		window.open(fRoot+"lib/attachments/attachmentdelete.php?id="+id,"Delete","width=510,height=150,resizable=yes,dependent=yes");
+	if (btn == 'yes')
+	{
+	  var windowCfg="width=510,height=150,resizable=yes,dependent=yes";
+		window.open(fRoot+"lib/attachments/attachmentdelete.php?id="+id,
+		            "Delete",windowCfg);
+	}	
 }
 
 function attachmentDlg_onUnload()
@@ -380,7 +411,9 @@ function attachmentDlg_onUnload()
 	try
 	{
 		if (attachmentDlg_refWindow == top.opener)
+		{
 			top.opener.location = attachmentDlg_refLocation;
+		}	
 	}
 	catch(e)
 	{}
@@ -397,18 +430,20 @@ function attachmentDlg_onLoad()
 		attachmentDlg_refWindow = top.opener;
 		attachmentDlg_refLocation = top.opener.location;
 		if (attachmentDlg_refWindow.attachment_reloadOnCancelURL)
+		{
 			attachmentDlg_refLocation = attachmentDlg_refWindow.attachment_reloadOnCancelURL;
+		}	
 	}
 	catch(e)
 	{}
 }
 
-function attachmentDlg_onSubmit(bAllowEmptyTitle)
+function attachmentDlg_onSubmit(allowEmptyTitle)
 {
 	var bSuccess = true;
 	attachmentDlg_bNoRefresh = true;
 
-	if (!bAllowEmptyTitle)
+	if (!allowEmptyTitle)
 	{
 		var titleField = document.getElementById('title');
 		if (isWhitespace(titleField.value))
@@ -457,7 +492,7 @@ function confirm_and_submit(msg,form_id,field_id,field_value,action_field_id,act
 }
 
 /*
-  function:
+  function: tree_getPrintPreferences
 
   args :
 
@@ -474,21 +509,26 @@ function tree_getPrintPreferences()
 	var fields = ['header','summary','toc','body','passfail', 'cfields','testplan', 'metrics', 
 	              'tcspec_refresh_on_action','author','requirement','keyword'];
 
-  for (var i= 0;i < fields.length;i++)
+  for (var idx= 0;idx < fields.length;idx++)
 	{
-		var v = tree_getCheckBox(fields[i]);
+		var v = tree_getCheckBox(fields[idx]);
 		if (v)
+		{
 			params.push(v);
+		}	
 	}
 	var f = document.getElementById('format');
 	if(f)
+	{
 		params.push("format="+f.value);
-
+  }
 	params = params.join('&');
 
 	return params;
 }
 
+
+// TODO understand where is used - 20090715 - franciscom
 function tree_getCheckBox(id)
 {
 	var	cb = document.getElementById('cb'+id);
@@ -505,6 +545,7 @@ function open_bug_add_window(exec_id)
 	window.open(fRoot+"lib/execute/bugAdd.php?exec_id="+exec_id,"bug_add",
 	            "width=510,height=270,resizable=yes,dependent=yes");
 }
+
 function bug_dialog()
 {
 	this.refWindow = null;
@@ -512,8 +553,19 @@ function bug_dialog()
 	this.NoRefresh = false;
 }
 
+function std_dialog(additional)
+{
+  // alert('std_dialog() - called');
+	this.refWindow = null;
+	this.refLocation = null;
+	this.refAdditional=additional;
+	this.NoRefresh = false;
+}
+
+
 function dialog_onSubmit(odialog)
 {
+  // In this way we do not do refresh.
 	odialog.NoRefresh = true;
 	return true;
 }
@@ -526,6 +578,10 @@ function dialog_onLoad(odialog)
 	{
 		odialog.refWindow = top.opener;
 		odialog.refLocation = top.opener.location;
+		if(odialog.refAdditional != undefined)
+		{
+		   odialog.refLocation += odialog.refAdditional;
+		} 
 	}
 	catch(e)
 	{}
@@ -541,7 +597,9 @@ function dialog_onUnload(odialog)
 	try
 	{
 		if (odialog.refWindow == top.opener)
+		{
 			top.opener.location = odialog.refLocation;
+		}	
 	}
 	catch(e)
 	{}
@@ -549,15 +607,29 @@ function dialog_onUnload(odialog)
 	odialog.refLocation = null;
 }
 
-function deleteBug_onClick(execution_id,bug_id,warning_msg)
+/**
+ * Calls the bug delete page when the 'yes' button in the delete confirmation dialog
+ * was clicked
+ * 
+ * @param btn string id of the button clicked
+ * @param text string not used
+ * @param combinedBugID string like <executionID-bugID>
+ */
+function deleteBug(btn,text,combinedBugID)
 {
-	if (confirm(warning_msg))
-	{
-		window.open(fRoot+"lib/execute/bugDelete.php?exec_id="+execution_id+"&bug_id="+bug_id,
+	if (btn != 'yes')
+		return;
+	var idx = combinedBugID.indexOf('-');
+	if (idx < 0)
+		return;
+
+	var executionID = combinedBugID.substr(0,idx)
+	var bugID = combinedBugID.substr(idx+1);
+	window.open(fRoot+"lib/execute/bugDelete.php?exec_id="+executionID+"&bug_id="+bugID,
 		            "Delete","width=510,height=150,resizable=yes,dependent=yes");
-	}
 }
 
+// seems is not used => do more checks and remove
 function planRemoveTC(warning_msg)
 {
 	var cbs = document.getElementsByTagName('input');
@@ -582,20 +654,6 @@ function planRemoveTC(warning_msg)
 }
 
 /*
-  function: openExecNotesWindow
-
-  args :
-
-  returns:
-
-*/
-function openExecNotesWindow(exec_id)
-{
-	window.open(fRoot+"lib/execute/execNotes.php?doAction=edit&exec_id="+exec_id,
-	            "execution_notes","width=510,height=270,resizable=yes,dependent=yes");
-}
-
-/*
   function: open_help_window
 
   args :
@@ -605,43 +663,93 @@ function openExecNotesWindow(exec_id)
 */
 function open_help_window(help_page,locale)
 {
-	window.open(fRoot+"lib/general/show_help.php?help="+help_page+"&locale="+locale,"_blank", "left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes,toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no,location=no,width=400,height=650")
+    var windowCfg='';
+    windowCfg="left=350,top=50,screenX=350,screenY=50,fullscreen=no,resizable=yes," + 
+               "toolbar=no,status=no,menubar=no,scrollbars=yes,directories=no," + 
+               "location=no,width=400,height=650";
+    window.open(fRoot+"lib/general/show_help.php?help="+help_page+"&locale="+locale,"_blank",windowCfg);
 }
 
 
 /*
-  function:
+  function: openTCaseWindow
 
-  args :
+  args: tcase_id: test case id
+        tcversion_id: test case version id
+        show_mode: string used on testcase.show() to manage refresh 
+                   logic of frames when Edit Test case page is closed.
+                   This argument was added to allow automatic referesh
+                   of frames when user uses the feature that allows 
+                   edit a test case while execution it.
 
   returns:
 
   rev :
-       20090518 - franciscom - BUGID 2508
+       20090715 - franciscom - added documentation
        20070930 - franciscom - REQ - BUGID 1078
 
 */
-function openTCaseWindow(tcase_id)
+function openTCaseWindow(tcase_id,tcversion_id,show_mode)
 {
+	  //@TODO schlundus, what is show_mode? not used in archiveData.php
+	  //You are right: problem fixed see documentation added on header (franciscom)
+	  // 
+    var windowCfg='';
 	  var feature_url = "lib/testcases/archiveData.php";
-	  feature_url += "?allow_edit=0&edit=testcase&id="+tcase_id;
-	  window.open(fRoot+feature_url,"TestCaseSpec",
-	            "width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes");
+	  feature_url +="?allow_edit=0&show_mode="+show_mode+"&edit=testcase&id="+
+                    tcase_id+"&tcversion_id="+tcversion_id;
+    
+    // second parameter(window name) with spaces caused bug on IE
+	  windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	  window.open(fRoot+feature_url,"TestCaseSpec",windowCfg);
 }
-/*
-function: Open a window with Test Execution Page.
-args : tcase_id, build_id, version_id,tplan_id
-returns: Pop Up Window
-rev :
-     20070930 - amitkhullar - BUGID 2529
-*/
-function openTCExecWindow(tcase_id, build_id, version_id,tplan_id)
-{
-	  var feature_url = "lib/execute/execSetResults.php";
-	  feature_url += "?level=testcase&build_id="+build_id+"&id="+tcase_id+"&version_id="+version_id+"&tplan_id="+tplan_id;
-	  window.open(fRoot+feature_url,"TestCaseExec", "width=650,height=400,resizable=yes,scrollbars=yes,dependent=yes");
 
+
+/**
+ * open a requirement in a popup window
+ * 
+ * @param req_id Requirement ID
+ * @param anchor string with anchor name
+ */
+function openLinkedReqWindow(req_id, anchor)
+{
+	if (anchor == null) {
+		anchor = '';
+	} else {
+		anchor = '#' + anchor;
+	}
+	
+	var windowCfg='';
+	var feature_url = "lib/requirements/reqView.php";
+	feature_url += "?showReqSpecTitle=1&requirement_id=" + req_id + anchor;
+
+	windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	window.open(fRoot+feature_url,"Requirement",windowCfg);
 }
+
+
+/**
+ * open a req spec in a popup window
+ * 
+ * @param reqspec_id Requirement Specification ID
+ * @param anchor string with anchor name
+ */
+function openLinkedReqSpecWindow(reqspec_id, anchor)
+{
+	if (anchor == null) {
+		anchor = '';
+	} else {
+		anchor = '#' + anchor;
+	}
+	
+	var windowCfg='';
+	var feature_url = "lib/requirements/reqSpecView.php";
+	feature_url += "?req_spec_id=" + reqspec_id + anchor;
+
+	windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	window.open(fRoot+feature_url,"Requirement Specification",windowCfg);
+}
+
 
 /*
   function: TPROJECT_REQ_SPEC_MGMT
@@ -788,10 +896,14 @@ function showEventHistoryFor(objectID,objectType)
 	{
 		f = document.createElement("form");
 		if (!f)
+		{
 			return;
+		}
 		var b = document.getElementsByTagName('body')[0];
 		if (!b)
+		{
 			return;
+		}
 		b.appendChild(f);
 		f.style.display = "none";
 		f.id = "eventhistory";
@@ -826,11 +938,15 @@ function showEventHistoryFor(objectID,objectType)
 
 */
 function openReqWindow(tcase_id)
-{                        
-  var feature_url="lib/requirements/reqTcAssign.php";
-  feature_url +="?edit=testcase&showCloseButton=1&id="+tcase_id;
-	window.open(fRoot+feature_url,"TestCase_Requirement_link",
-	            "width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes");
+{ 
+  var windowCfg='';                       
+	var feature_url = "lib/requirements/reqTcAssign.php";
+	
+	feature_url +="?edit=testcase&showCloseButton=1&id="+tcase_id;
+
+	// second parameter(window name) with spaces generate bug on IE
+	windowCfg="width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	window.open(fRoot+feature_url,"TestCase_Requirement_link",windowCfg);
 }
 
 /*
@@ -840,15 +956,164 @@ function openReqWindow(tcase_id)
   
   returns: 
 
+  rev: 20090716 - franciscom - fixed refactored that does not work
 */
 function toggleInput(oid)
 {
-    if(document.getElementById(oid).value == 1)
-    {
-        document.getElementById(oid).value=0;
-    }
-    else
-    {
-        document.getElementById(oid).value=1;
-    }
+	var elem = document.getElementById(oid);
+	if (elem)
+	{
+    elem.value = (elem.value == 1) ? 0 : 1;
+  }  
+}
+
+
+/**
+ * Show User feedback
+ * @param boolean success 	[0] = error
+ * @param string message 	localized text
+ */
+function showFeedback(success, msg_text)
+{
+	var base = document.getElementById('user_feedback');
+	if (base)
+	{
+    	if (success)
+    	{
+    		base.className = 'user_feedback';
+    	} else {
+	    	base.className = 'error';
+	    }
+		base.innerHTML = msg_text;
+	}
+/*	else
+	{
+		// add div element 'user_feedback' if don't exists
+		// havlatm: I don't know why doesn't work :-(
+		var oNewDiv = document.createElement("div");
+		var dim = document.body.insertBefore(oNewDiv, document.getElementsByTagName('div')[0]);
+		if (dim)
+		{
+    		dim.setAttribute('id','user_feedback');
+    		showFeedback(success, msg_text);
+		} 
+	}
+*/	 
+}
+
+
+/*
+  function: openExecEditWindow
+
+  args :
+
+  returns:
+
+*/
+function openExecEditWindow(exec_id,tcversion_id,tplan_id,tproject_id)
+{
+	var target_url = "lib/execute/editExecution.php";
+	var windowCfg = "width=510,height=270,resizable=yes,dependent=yes,scrollbars=yes";
+	window.open(fRoot+target_url+"?exec_id="+exec_id+"&tcversion_id="+tcversion_id+"&tplan_id="+tplan_id+"&tproject_id="+tproject_id,
+	            "execution_notes",windowCfg);
+}
+
+/* 
+ * use to display test suite content (read only mode) on execution feature
+ * on user request
+ */
+function openTestSuiteWindow(tsuite_id)
+{ 
+	var windowCfg = '';                       
+	var feature_url = "lib/testcases/archiveData.php";
+
+	feature_url +="?show_mode=readonly&print_scope=test_specification&edit=testsuite&level=testsuite&id="+tsuite_id;
+
+	// second parameter(window name) with spaces generate bug on IE
+	windowCfg = "width=510,height=300,resizable=yes,scrollbars=yes,dependent=yes";
+	window.open(fRoot+feature_url,"TestSuite",windowCfg);
+}
+
+/* 
+ * use to display documentation included on test link distribution
+ * 20100131 - franciscom - moved here to solve BUGID 3118: Help files are not getting 
+ *                         opened when selected in the dropdown
+ */
+function get_docs(name, server_name)
+{
+  if (name != 'leer') {
+      var w = window.open();
+      w.location = server_name + '/docs/' + name;
+  }
+}
+
+/**
+ * used to disable the build chooser field (and make it invisible) if it should not be used
+ * (in case of some filter settings)
+ * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
+ * 
+ * @author asimon
+ * @param build_id_combo box in which the build is chosen
+ * @param filter_method_combo box in which the filter method is chosen
+ * @param specific_build_value value for which the box shall be disabled
+ */
+function triggerBuildChooser(deactivatable_id, filter_method_combo_id, specific_build_value) 
+{
+	deactivatable = document.getElementById(deactivatable_id);
+	filter_method_combo = document.getElementById(filter_method_combo_id);
+	var index = filter_method_combo.options.selectedIndex;  
+	deactivatable.style.visibility = "hidden";
+	
+	if(filter_method_combo[index].value == specific_build_value) 
+	{
+		deactivatable.style.visibility = "visible";
+	} 
+}
+
+/**
+ * used to disable the "include unassigned testcases" checkbox when it should not be used
+ * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
+ * 
+ * @author asimon
+ * @param filter_assigned_to combobox in which assignment is chosen
+ * @param include_unassigned checkbox for including unassigned testcases
+ * @param str_option_any string value anybody
+ * @param str_option_none string value nobody
+ * @param str_option_somebody string value somebody
+ */
+function triggerAssignedBox(filter_assigned_to_id, include_unassigned_id,
+							str_option_any, str_option_none, str_option_somebody) 
+{
+	filter_assigned_to = document.getElementById(filter_assigned_to_id);
+	include_unassigned = document.getElementById(include_unassigned_id);
+	var index = filter_assigned_to.options.selectedIndex;
+	var choice = filter_assigned_to.options[index].label;
+	include_unassigned.disabled = false;
+
+	if (choice == str_option_any || choice == str_option_none || choice == str_option_somebody) 
+	{
+		include_unassigned.disabled = true;
+		include_unassigned.checked = false;
+	} 
+}
+
+/**
+ * disable unneeded filters in the filter method combo box
+ * (testcase execution & testcase execution assignment, BUGID 2455, BUGID 3026)
+ * 
+ * @author asimon
+ * @param filter_method_combo the box which shall be disabled
+ * @param value2select the string which shall be selected in the box before disabling it
+ */
+function disableUnneededFilters(filter_method_combo_id, value2select) {
+	filter_method_combo = document.getElementById(filter_method_combo_id);
+	var length = filter_method_combo.options.length;
+	
+	for (var index = 0; index < length; index ++) {
+		if (filter_method_combo.options[index].value == value2select) {
+			filter_method_combo.options.selectedIndex = index;
+		}
+	}
+	
+	filter_method_combo.disabled = true;
 }

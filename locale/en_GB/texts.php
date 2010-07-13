@@ -3,14 +3,6 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
- * Filename $RCSfile: texts.php,v $
- * @version $Revision: 1.15.2.2 $
- * @modified $Date: 2009/08/19 09:44:01 $ by $Author: havlat $
- * @author Martin Havlat and reviewers from TestLink Community
- *
- * --------------------------------------------------------------------------------------
- *
- * Scope:
  * English (en_GB) texts for help/instruction pages. Strings for dynamic pages
  * are stored in strings.txt pages.
  *
@@ -22,8 +14,22 @@
  *
  *
  * Revisions history is not stored for the file
+ * 
+ * @package 	TestLink
+ * @author 		Martin Havlat
+ * @copyright 	2003-2009, TestLink community 
+ * @version    	CVS: $Id: texts.php,v 1.24 2010/02/23 13:08:22 asimon83 Exp $
+ * @link 		http://www.teamst.org/index.php
  *
- * ------------------------------------------------------------------------------------ */
+ **/
+
+
+// --------------------------------------------------------------------------------------
+$TLS_htmltext_title['error']	= "Application error";
+$TLS_htmltext['error'] 		= "<p>Unexpected error happens. Please check event viewer or " .
+		"logs for details.</p><p>You are welcome to report the problem. Please visit our " .
+		"<a href='http://www.teamst.org'>website</a>.</p>";
+
 
 
 $TLS_htmltext_title['assignReqs']	= "Assign Requirements to Test Case";
@@ -34,7 +40,7 @@ requirements and vice versa. Such traceability matrix helps to investigate test 
 of requirements and find out which ones successfully failed during a testing. This
 analyse serves as confirmation that all defined expectations are met.</p>
 
-<h2>Get Started:</h2>
+<h2>Getting Started:</h2>
 <ol>
 	<li>Choose an Test Case in tree at the left. The combo box with list of Requirements
 	Specifications is shown at the top of the workarea.</li>
@@ -55,11 +61,11 @@ $TLS_htmltext['editTc'] 		= "<p>The <i>Test Specification</i> allows users to vi
 		"and edit all of the existing <i>Test Suites</i> and <i>Test Cases</i>. " .
 		"Test Cases are versioned and all of the previous versions are available and can be " .
 		"viewed and managed here.</p>
-
+		
 <h2>Getting Started:</h2>
 <ol>
-	<li>Select your Test Project in the navigation tree (the root node). <i>Please note: " .
-	"You can always change the activate Test Project by selecting a different one from the " .
+	<li>Select your <i>Test Project</i> in the navigation tree (the root node). <i>Please note: " .
+	"You can always change the active Test Project by selecting a different one from the " .
 	"drop-down list in the top-right corner.</i></li>
 	<li>Create a new Test Suite by clicking on <b>New Child Test Suite</b>. Test Suites can " .
 	"bring structure to your test documents according to your conventions (functional/non-functional " .
@@ -69,21 +75,21 @@ $TLS_htmltext['editTc'] 		= "<p>The <i>Test Specification</i> allows users to vi
 	"all annotations that are common to the Child Test Cases. Test Suites follow " .
 	"the &quot;folder&quot; metaphor, thus users can move and copy Test Suites within " .
 	"the Test project. Also, they can be imported or exported (including the contained Test cases).</li>
-	<li>Test suites are scalable folders. User can move or copy Test Suites within " .
-	"the Test project. Test suites could be imported or exported (include Test cases).
+	<li>Test Suites are scalable folders. Users can move or copy Test Suites within " .
+	"the Test project. Test Suites can be imported or exported (include Test Cases).
 	<li>Select your newly created Test Suite in the navigation tree and create " .
 	"a new Test Case by clicking on <b>Create Test Case</b>. A Test Case specifies " .
 	"a particular testing scenario, expected results and custom fields defined " .
 	"in the Test Project (refer to the user manual for more information). It is also possible " .
 	"to assign <b>keywords</b> for improved traceability.</li>
-	<li>Navigate via the tree view on the left side and edit data. Test cases stores own history.</li>
-	<li>Assign your created Test Specification to <span class=\"help\" onclick=
+	<li>Navigate via the tree view on the left side and edit data. Each Test case stores own history.</li>
+	<li>Assign your created Test Specification to a 	<span class=\"help\" onclick=
 	\"javascript:open_help_window('glosary','$locale');\">Test Plan</span> when your Test cases are ready.</li>
 </ol>
 
-<p>With TestLink you can organize test cases into test suites." .
-"Test suites can be nested within other test suites, enabling you to create hierarchies of test suites.
- You can then print this information together with the test cases.</p>";
+<p>With TestLink you can organize Test Cases into Test Suites." .
+"Test Suites can be nested within other test suites, enabling you to create hierarchies of Test Suites.
+ You can then print this information together with the Test Cases.</p>";
 
 
 // ------------------------------------------------------------------------------------------
@@ -99,8 +105,44 @@ case sensitive. Result include just test cases from actual Test Project.</p>
 	<li>Write searched string to an appropriate box. Left blank unused fields in form.</li>
 	<li>Choose required keyword or left value 'Not applied'.</li>
 	<li>Click the Search button.</li>
-	<li>All fulfilled test cases are shown. You can modify test cases via 'Title' link.</li>
+	<li>All fulfilled test cases are shown. You can modify Test Cases via 'Title' link.</li>
 </ol>";
+
+/* contribution by asimon for 2976 */
+// requirements search
+// ------------------------------------------------------------------------------------------
+$TLS_htmltext_title['searchReq']	= "Requirement Search Page";
+$TLS_htmltext['searchReq'] 		= "<h2>Purpose:</h2>
+
+<p>Navigation according to keywords and/or searched strings. The search is not
+case sensitive. Result includes just requirements from actual Test Project.</p>
+
+<h2>To search:</h2>
+
+<ol>
+	<li>Write searched string to an appropriate box. Leave unused fields in form blank.</li>
+	<li>Choose required keyword or leave value 'Not applied'.</li>
+	<li>Click the 'Find' button.</li>
+	<li>All fulfilling requirements are shown. You can modify requirements via 'Title' link.</li>
+</ol>";
+
+// requirement specification search
+// ------------------------------------------------------------------------------------------
+$TLS_htmltext_title['searchReqSpec']	= "Requirement Specification Search Page";
+$TLS_htmltext['searchReqSpec'] 		= "<h2>Purpose:</h2>
+
+<p>Navigation according to keywords and/or searched strings. The search is not
+case sensitive. Result includes just requirement specifications from actual Test Project.</p>
+
+<h2>To search:</h2>
+
+<ol>
+	<li>Write searched string to an appropriate box. Leave unused fields in form blank.</li>
+	<li>Choose required keyword or leave value 'Not applied'.</li>
+	<li>Click the 'Find' button.</li>
+	<li>All fulfilling requirements are shown. You can modify requirement specifications via 'Title' link.</li>
+</ol>";
+/* end contribution */
 
 
 // ------------------------------------------------------------------------------------------
@@ -115,7 +157,7 @@ or all the test cases in a test project or plan.</p>
 test suite, or the test project. A printable page will be displayed.</p>
 </li>
 <li><p>Use the \"Show As\" drop-box in the navigation pane to specify whether you want 
-the information displayed as HTML, OpenOffice Writer or in a Microsoft Word document. 
+the information displayed as HTML, OpenOffice Writer or in a Micosoft Word document. 
 See <span class=\"help\" onclick=\"javascript:open_help_window('printFilter',
 '{$locale}');\">help</span> for more information.</p>
 </li>
@@ -192,14 +234,17 @@ $TLS_htmltext_title['executeTest']	= "Test Case Execution";
 $TLS_htmltext['executeTest'] 		= "<h2>Purpose:</h2>
 
 <p>Allows user to execute Test cases. User can assign Test result
-to Test Case for Build. See help for more information about filter and settings " .
+to Test Case for a Build. See help for more information about filters and settings " .
 		"(click on the question mark icon).</p>
 
 <h2>Get started:</h2>
 
 <ol>
 	<li>User must have defined a Build for the Test Plan.</li>
-	<li>Select a Build from the drop down box and the \"Apply\" button in the navigation pane.</li>
+	<li>Select a Build from the drop down box</li>
+	<li>If you want to see only a few testcases instead of the whole tree,
+		you can choose which filters to apply. Click the \"Apply\"-Button 
+		after you have changed the filters.</li>	
 	<li>Click on a test case in the tree menu.</li>
 	<li>Fill out the test case result and any applicable notes or bugs.</li>
 	<li>Save results.</li>
@@ -360,8 +405,14 @@ $TLS_htmltext['tc_exec_assignment'] 		= "<h2>Purpose</h2>
 	<li>Select a planned tester.</li>
 	<li>Click the 'Save' button to submit assignment.</li>
 	<li>Open execution page to verify assignment. You can set-up a filter for users.</li>
-</ol>";
+</ol>
 
+<h2>To unassign all Test cases:</h2>
+<ol>
+	<li>Click on the root node in the tree (the Test Project).</li>
+	<li>If there are assigned Test Cases, you will see a button to unassign all Test Cases. If you click it and confirm it,
+	all Test Cases will be unassigned.</li>
+</ol>";
 
 // ------------------------------------------------------------------------------------------
 $TLS_htmltext_title['planUpdateTC']	= "Update Test Cases in the Test Plan";

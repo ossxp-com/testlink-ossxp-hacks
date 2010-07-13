@@ -1,10 +1,11 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: resultsMoreBuilds_report.tpl,v 1.9.2.2 2009/12/04 13:00:02 havlat Exp $
+$Id: resultsMoreBuilds_report.tpl,v 1.14 2010/02/18 08:48:21 amkhullar Exp $
 
 rev :
-     20090409 - amitkhullar - BUGID 2156 - added new option on 
-     			Query Metrics for latest results
+     20100218 - amitkhullar - BUGID 2541
+     20100215 - eloff - BUGID 3160 - fixed missing platform column
+     20090409 - amitkhullar - BUGID 2156 - added new option on 	Query Metrics for latest results
      20080524 - franciscom - BUGID 1430
      20070902 - franciscom - refactoring
 *}
@@ -14,19 +15,19 @@ rev :
              th_total_cases,th_total_pass,th_total_fail,th_total_block,th_total_not_run,
              generated_by_TestLink_on,test_status_not_run,display_results_tc,results_latest,
              th_test_case_id,th_build,th_tester_id,th_execution_ts,th_status,th_notes,th_bugs,
+             th_test_case,th_platform,
              th_search_notes_string,any,caption_user_selected_query_parameters"}
 
 {include file="inc_head.tpl" openHead='yes' enableTableSorting="yes"}
 <script language="JavaScript" src="gui/javascript/expandAndCollapseFunctions.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
-		var bAllShown = false;
-		var g_progress = null;
-		var g_pCount = 0;
-		progress();
+var bAllShown = false;
+var g_progress = null;
+var g_pCount = 0;
+progress();
 </script>
 </head>
 <body>
-
 {assign var=depth value=0}
 <h1 class="title"> {$labels.query_metrics_report}</h1>
 {include file="inc_result_tproject_tplan.tpl"
@@ -47,7 +48,6 @@ rev :
 			<th>{$labels.th_executor}</th>
 			<th>{$labels.th_search_notes_string}</th>
 			<th>{$labels.display_results_tc}</th>
-
 		</tr>
 		<tr>
 			<td>
@@ -110,13 +110,16 @@ rev :
 {/if}
 
 	{if !$gui->display->suite_summaries}
-		<table class="simple" style="color:blue; width: 100%; margin-left: 0px;" border="0">
+		<table class="simple sortable" style="color:blue; width: 100%; margin-left: 0px;" border="0">
 			<tr>
-				<th>{$labels.th_test_case_id}</th>
-				<th>{$labels.th_build}</th>
-				<th>{$labels.th_tester_id}</th>
-				<th>{$labels.th_execution_ts}</th>
-				<th>{$labels.th_status}</th>
+				<th>{$sortHintIcon}{$labels.th_test_case}</th>
+				{if $gui->showPlatforms}
+					<th>{$sortHintIcon}{$labels.th_platform}</th>
+				{/if}
+				<th>{$sortHintIcon}{$labels.th_build}</th>
+				<th>{$sortHintIcon}{$labels.th_tester_id}</th>
+				<th>{$sortHintIcon}{$labels.th_execution_ts}</th>
+				<th>{$sortHintIcon}{$labels.th_status}</th>
 				<th>{$labels.th_notes}</th>
 				<th>{$labels.th_bugs}</th>
 			</tr>
@@ -200,45 +203,58 @@ rev :
 			    	{* test to make sure there are test cases to diplay before  print table and headers *}
 			    	{if $gui->suiteList[$suiteId]}
 			    		{if $gui->display->suite_summaries}
-			    			<table class="simple" style="width: 100%;margin-left: 0px;" border="0">
+			    			<table class="simple sortable" style="width: 100%;margin-left: 0px;" border="0">
 			    		{/if}
 			    
 			    		{if $gui->display->suite_summaries}
 			    		<tr>
-			    			<th>{$labels.th_test_case_id}</th>
-			    			<th>{$labels.th_build}</th>
-			    			<th>{$labels.th_tester_id}</th>
+			    			<th>{$sortHintIcon}{$labels.th_test_case}</th>
+			    			{if $gui->showPlatforms}
+			    			  <th>{$sortHintIcon}{$labels.th_platform}</th>
+			    			{/if}
+			    			<th>{$sortHintIcon}{$labels.th_build}</th>
+			    			<th>{$sortHintIcon}{$labels.th_tester_id}</th>
 			    			<th>{$labels.th_execution_ts}</th>
-			    			<th>{$labels.th_status}</th>
+			    			<th>{$sortHintIcon}{$labels.th_status}</th>
 			    			<th>{$labels.th_notes}</th>
 			    			<th>{$labels.th_bugs}</th>
 			    		</tr>
 			    		{/if}
 			    		{foreach key=executionInstance item=array from=$gui->suiteList[$suiteId]}
 			    			{assign var=inst value=$gui->suiteList[$suiteId][$executionInstance]}
-			    			<tr style="background-color:{cycle values='#eeeeee,#d0d0d0'}">
+
 			    			{if $gui->displayResults[$inst.status] }
-								{if $inst.status == $gui->resultsCfg.status_code.not_run}
-									<td>{$inst.testcasePrefix|escape}{$inst.external_id}:&nbsp;{$inst.name|escape}</td>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								{else}
-									<td>{$inst.execute_link}</td>
-									<td style="text-align:center;">{$gui->builds_html[$inst.build_id]|escape}</td>
-									<td style="text-align:center;">{$gui->users[$inst.tester_id]|escape}</td>
-									<td style="text-align:center;">{$inst.execution_ts|strip_tags|escape} </td>
-								{/if}
+			    			<tr style="background-color:{cycle values='#eeeeee,#d0d0d0'}">
+								  {if $inst.status == $gui->resultsCfg.status_code.not_run}
+								  	<td>{$inst.testcasePrefix|escape}{$inst.external_id}:&nbsp;{$inst.name|escape}</td>
+								  	{if $gui->showPlatforms}
+								  	  <td>{$gui->platformSet[inst.platform_id]|escape}</td>
+								  	{/if}
+								  	<td>&nbsp;</td>
+								  	<td>&nbsp;</td>
+								  	<td>&nbsp;</td>
+								  {else}
+								  	<td>{$inst.execute_link}</td>
+									{if $gui->showPlatforms}
+										<td>{$gui->platformSet[$inst.platform_id]|escape}</td>
+									{/if}
+								  	<td style="text-align:center;">{$gui->builds_html[$inst.build_id]|escape}</td>
+								  	<td style="text-align:center;">{$gui->users[$inst.tester_id]|escape}</td>
+								  	<td style="text-align:center;">{$inst.execution_ts|strip_tags|escape} </td>
+								  {/if}
+									
 									<td class="{$gui->resultsCfg.code_status[$inst.status]}" style="text-align:center;">{$gui->statusLabels[$inst.status]|escape}</td>
-								{if $inst.status == $gui->resultsCfg.status_code.not_run}
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								{else}
-									<td>{$inst.notes}&nbsp;</td>
-									<td style="text-align:center;">{$inst.bugString}&nbsp;</td>
-								{/if}
+								  
+								  {if $inst.status == $gui->resultsCfg.status_code.not_run}
+								  	<td>&nbsp;</td>
+								  	<td>&nbsp;</td>
+								  {else}
+								  	<td>{$inst.notes}&nbsp;</td>
+								  	<td style="text-align:center;">{$inst.bugString}&nbsp;</td>
+								  {/if}
+							</tr>
 			    			{/if}
-			    			</tr>
+
 			    		{/foreach}
 			    		{if $gui->display->suite_summaries}
 			    			</table>

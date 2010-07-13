@@ -3,45 +3,53 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  * 
- * @filesource $RCSfile: common.php,v $
- * @version $Revision: 1.139.2.5 $ $Author: amkhullar $
- * @modified $Date: 2009/04/27 03:56:13 $
- * @author 	Martin Havlat, Chad Rosen
- *
- * SCOPE:
  * Load core functions for TestLink GUI
  * Common functions: database connection, session and data initialization,
  * maintain $_SESSION data, redirect page, log, etc.
  * 
- * Note: this file cannot include a feature specific code for performance and 
- * readability reason
+ * Note: this file must uses only globally used functionality and cannot include 
+ * a feature specific code because of performance and readability reasons
  *
- * -----------------------------------------------------------------------------------
- * Revisions:
- * 20090425 - amitkhullar - BUGID 2431 - Improper Session Handler	
- * 20090409 - amitkhullar - BUGID 2354
- * 20090111 - franciscom - commented some required_once and some global coupling
- * 20081027 - havlatm - refactorization, description
+ * @package 	TestLink
+ * @author 		Martin Havlat, Chad Rosen
+ * @copyright 	2005, TestLink community 
+ * @version    	CVS: $Id: common.php,v 1.188 2010/02/14 18:11:54 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ * @since 		TestLink 1.5
+ *
+ * @internal Revisions:
+ * 	20100207 - havlatm - cleanup
+ * 	20100124 - eloff - added $redirect parameter to checkSessionValid()
+ * 	20100124 - eloff - BUGID 3012 - added buildExternalIdString()
+ * 	20091215 - eloff - save active testplan_id to cookie
+ * 	20091121 - franciscom - getItemTemplateContents() - contribution refactored
+ * 	20090425 - amitkhullar - BUGID 2431 - Improper Session Handler	
+ * 	20090409 - amitkhullar- BUGID 2354
+ * 	20090111 - franciscom - commented some required_once and some global coupling
+ * 	20081027 - havlatm - refactorization, description
  * 						removed unused $g_cache_config and some functions 
- * 20080907 - franciscom - isValidISODateTime()
- * 20080518 - franciscom - translate_tc_status()
- * 20080412 - franciscom - templateConfiguration()
- * 20080326 - franciscom - config_get() - refactored removed eval()
- * 20071027 - franciscom - added ini_get_bool() from mantis code, needed to user
+ * 	20080907 - franciscom - isValidISODateTime()
+ * 	20080518 - franciscom - translate_tc_status()
+ * 	20080412 - franciscom - templateConfiguration()
+ * 	20080326 - franciscom - config_get() - refactored removed eval()
+ * 	20071027 - franciscom - added ini_get_bool() from mantis code, needed to user
  *                         string_api.php, also from Mantis.
- *
- * 20071002 - jbarchibald - BUGID 1051
- * 20070705 - franciscom - init_labels()
- * 20070623 - franciscom - improved info in header of localize_dateOrTimeStamp()
- *
- * ----------------------------------------------------------------------------------- */
+ * 	20071002 - jbarchibald - BUGID 1051
+ * 	20070705 - franciscom - init_labels()
+ * 	20070623 - franciscom - improved info in header of localize_dateOrTimeStamp()
+ */
 
-
+/** core and parenthal classes */
 require_once('object.class.php');
 require_once('metastring.class.php');
 
 /** library for localization */
 require_once('lang_api.php');
+
+/** logging functions */
+require_once('logging.inc.php');
+require_once('logger.class.php');
+require_once('pagestatistics.class.php');
 
 /** library of database wrapper */
 require_once('database.class.php');
@@ -52,83 +60,51 @@ require_once('roles.inc.php');
 /** Testlink Smarty class wrapper sets up the default smarty settings for testlink */
 require_once('tlsmarty.inc.php');
 
-/** logging functions */
-require_once('logging.inc.php');
-require_once('logger.class.php');
-
-/** BTS interface */
-/** @TODO martin: remove from global loading - limited using */ 
-if ($g_interface_bugs != 'NO')
-{
-  require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' . 
-               DIRECTORY_SEPARATOR . 'int_bugtracking.php');
-}
-require_once("role.class.php");
-require_once("attachment.class.php");
-require_once("testproject.class.php"); 
+/** Input data validation */
+require_once("inputparameter.inc.php");
 
 /** @TODO use the next include only if it is used -> must be removed */
-require_once("user.class.php");
-require_once("keyword.class.php");
+require_once("testproject.class.php"); 
 require_once("treeMenu.inc.php");
 require_once("exec_cfield_mgr.class.php");
-require_once("plan.core.inc.php");
 
-
-/** load the php4 to php5 domxml wrapper if the php5 is used and 
- * the domxml extension is not loaded 
- **/
-if (version_compare(PHP_VERSION,'5','>=') && !extension_loaded("domxml"))
+/**
+ * Automatic loader for PHP classes
+ * See PHP Manual for details 
+ */
+function __autoload($class_name) 
 {
-	require_once(TL_ABS_PATH . 'third_party'. DIRECTORY_SEPARATOR . 
-		'domxml-php4-to-php5.php');
+	// exceptions
+	$tlClasses = null;
+	$tlClassPrefixLen = 2;
+	$classFileName = $class_name;
+    
+	if (isset($tlClasses[$classFileName]))
+	{
+    	$len = tlStringLen($classFileName) - $tlClassPrefixLen;
+		$classFileName = strtolower(tlSubstr($classFileName,$tlClassPrefixLen,$len));
+	} 
+    require_once $classFileName . '.class.php';
 }
 
-function printPageStatistics($startupMemory,$startupTime)
-{
-/*
-	global $db;
-	
-	print "<div style=\"color:red;font-weight:bold\">";	
-	print "startup: Memory: $startupMemory <br />";
-	echo $startupTime."<br />";
-	tlTimingStop();
-	$finishingTime = tlTimingCurrent();
-	$finishingMemory  = memory_get_peak_usage(true)."--".memory_get_usage(true);
-	print "finished: {$db->nQuery} SQL; Memory: $finishingMemory ";
-	print "took ".($finishingTime - $startupTime)." secs\n";
-	print "</div>";
-*/
-}
 
-// -------------------------------------------------------------------------------------
+// ----- End of loading and begin functions ---------------------------------------------
+
 /** @var integer global main DB connection identifier */
 $db = 0;
 
 
-// --------------------------------------------------------------------------------------
-/* See PHP Manual for details */
-function __autoload($class_name) 
-{
-    require_once $class_name . '.class.php';
-}
-
-
-// --------------------------------------------------------------------------------------
 /**
-* TestLink connects to the database
-*
-* @return assoc array
-*         aa['status'] = 1 -> OK , 0 -> KO
-*         aa['dbms_msg''] = 'ok', or $db->error_msg().
-*
-* 20050416 - fm
-*
-*/
+ * TestLink connects to the database
+ *
+ * @return array
+ *         aa['status'] = 1 -> OK , 0 -> KO
+ *         aa['dbms_msg''] = 'ok', or $db->error_msg().
+ */
 function doDBConnect(&$db)
 {
 	global $g_tlLogger;
-	// global $tlCfg;
+	
 	$charSet = config_get('charset');
 	$result = array('status' => 1, 'dbms_msg' => 'ok');
 
@@ -140,98 +116,73 @@ function doDBConnect(&$db)
 		echo $result['dbms_msg'];
 		$result['status'] = 0;
 		tLog('Connect to database fails!!! ' . $result['dbms_msg'], 'ERROR');
-  }
-  else
-	{
-		if((DB_TYPE == 'mysql') && ($charSet == 'UTF-8'))
-		{
-				$db->exec_query("SET CHARACTER SET utf8");
-				$db->exec_query("SET collation_connection = 'utf8_general_ci'");
-		}
-	}
-
-	//if we establish a DB connection, we reopen the session, to attach the db connection
-	$g_tlLogger->endTransaction();
-	$g_tlLogger->startTransaction();
-
- 	return $result;
-}
-
-
-// --------------------------------------------------------------------------------------
-/**
- * Set session data related to the current test project
- * @param array $tproject_info result of DB query
- */
-function setSessionTestProject($tproject_info)
-{
-	if ($tproject_info)
-	{
-		/** @todo check if the session test project is updated when its modified per projectEdit.php  */
-		$_SESSION['testprojectID'] = $tproject_info['id'];
-		$_SESSION['testprojectName'] = $tproject_info['name'];
-		$_SESSION['testprojectColor'] = $tproject_info['color'];
-		$_SESSION['testprojectPrefix'] = $tproject_info['prefix'];
-		$_SESSION['testprojectOptReqs'] = isset($tproject_info['option_reqs']) ? $tproject_info['option_reqs'] : null;
-		$_SESSION['testprojectOptPriority'] = isset($tproject_info['option_priority']) ? $tproject_info['option_priority'] : null;
-		$_SESSION['testprojectOptAutomation'] = isset($tproject_info['option_automation']) ? $tproject_info['option_automation'] : null;
-
-		tLog("Test Project was setted to [" . $tproject_info['id'] . "]" . $tproject_info['name'], 'INFO');
-		tLog("Test Project features REQ=" . $_SESSION['testprojectOptReqs'] . ", PRIORITY=" . $_SESSION['testprojectOptPriority']);
 	}
 	else
 	{
-		unset($_SESSION['testprojectID']);
-		unset($_SESSION['testprojectName']);
-		unset($_SESSION['testprojectColor']);
-		unset($_SESSION['testprojectOptReqs']);
-		unset($_SESSION['testprojectOptPriority']);
-		unset($_SESSION['testprojectOptAutomation']);
-		unset($_SESSION['testprojectPrefix']);
+		if((DB_TYPE == 'mysql') && ($charSet == 'UTF-8'))
+		{
+			$db->exec_query("SET CHARACTER SET utf8");
+			$db->exec_query("SET collation_connection = 'utf8_general_ci'");
+		}
 	}
+	
+	// if we establish a DB connection, we reopen the session, 
+	// to attach the db connection
+	$g_tlLogger->endTransaction();
+	$g_tlLogger->startTransaction();
+	
+	return $result;
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Set session data related to the current test plan
+ * and saves a cookie with current testplan id
+ * 
  * @param array $tplan_info result of DB query
  */
 function setSessionTestPlan($tplan_info)
 {
 	if ($tplan_info)
 	{
-		$_SESSION['testPlanId'] = $tplan_info['id'];
-		$_SESSION['testPlanName'] = $tplan_info['name'];
+		$_SESSION['testplanID'] = $tplan_info['id'];
+		$_SESSION['testplanName'] = $tplan_info['name'];
+		// Save testplan id for next session
+		setcookie('TL_lastTestPlanForUserID_' . 1, $tplan_info['id'], TL_COOKIE_KEEPTIME, '/');
 
 		tLog("Test Plan was adjusted to '" . $tplan_info['name'] . "' ID(" . $tplan_info['id'] . ')', 'INFO');
 	}
 	else
 	{
-		unset($_SESSION['testPlanId']);
-		unset($_SESSION['testPlanName']);
+		unset($_SESSION['testplanID']);
+		unset($_SESSION['testplanName']);
 	}
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Set home URL path
- * @todo solve problems after session expires
+ * @internal Revisions:
  * 200806 - havlatm - removed rpath
  */
 function setPaths()
 {
 	if (!isset($_SESSION['basehref']))
+	{
 		$_SESSION['basehref'] = get_home_url();
+	}	
 }
 
 
-// --------------------------------------------------------------------------------------
-/** Verify if user is log in. Redirect to login page if not. */
-function checkSessionValid(&$db)
+/** 
+ * Verify if user is log in. Redirect to login page if not.
+ * 
+ * @param integer $db DB identifier 
+ * @param boolean $redirect if true (default) redirects user to login page, otherwise returns true/false as login status
+ **/
+function checkSessionValid(&$db, $redirect=true)
 {
-	$bSessionValid = false;
+	$isValidSession = false;
 	if (isset($_SESSION['userID']) && $_SESSION['userID'] > 0)
 	{
 		/** @TODO martin: 
@@ -251,16 +202,16 @@ function checkSessionValid(&$db)
 			$user = new tlUser($_SESSION['userID']);
 			$user->readFromDB($db);
 			$_SESSION['currentUser'] = $user;
-			$bSessionValid = true;
+			$isValidSession = true;
 		}
 	}
-	if (!$bSessionValid)
+	if (!$isValidSession && $redirect)
 	{
-		$ip = $_SERVER["REMOTE_ADDR"];
+        $ip = $_SERVER["REMOTE_ADDR"];
 	    tLog('Invalid session from ' . $ip . '. Redirected to login page.', 'INFO');
 		
 		$fName = "login.php";
-        $baseDir = dirname(__FILE__);
+        $baseDir = dirname($_SERVER['SCRIPT_FILENAME']);
         
         while(!file_exists($baseDir.DIRECTORY_SEPARATOR.$fName))
         {
@@ -269,48 +220,81 @@ function checkSessionValid(&$db)
         redirect($fName . "?note=expired","top.location");
         exit();
 	}
+	return $isValidSession;
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
- * Function start session
+ * Start session
  */
 function doSessionStart()
 {
 	session_set_cookie_params(99999);
-
 	if(!isset($_SESSION))
+	{
 		session_start();
+	}
 }
 
-// --------------------------------------------------------------------------------------
-// If we receive TestPlan ID in the _SESSION
-//    then do some checks and if everything OK
-//    Update this value at Session Level, to set it available in other
-//    pieces of the application
-//
-//
-// Calling getUserProdTestPlans() instead of getUserTestPlans()
-//         to add ptoduct filtering of TP
-//
-// rev :
-//      20070906 - franciscom - getAccessibleTestPlans() interface changes
-function upd_session_tplan_tproject(&$db,$hash_user_sel)
+
+/**
+ * Initialize structure of top menu for the user and the project.
+ * 
+ * @param integer $db DB connection identifier
+ * @uses $_SESSION Requires initialized project, test plan and user data.
+ * @since 1.9
+ *
+ * @internal Revisions
+ *	20091119 - franciscom - removed global coupling 
+ *
+ */
+function initTopMenu(&$db)
+{
+	$_SESSION['testprojectTopMenu'] = '';
+	$guiTopMenu = config_get('guiTopMenu');
+    
+	// check if Project is available
+	if (isset($_SESSION['testprojectID']) && $_SESSION['testprojectID'] > 0)
+	{
+		$idx = 1;	
+    	foreach ($guiTopMenu as $element)
+		{
+			// check if Test Plan is available
+			if ((!isset($element['condition'])) || ($element['condition'] == '') ||
+				(($element['condition'] == 'TestPlanAvailable') && 
+				  isset($_SESSION['testplanID']) && $_SESSION['testplanID'] > 0))
+			{
+				// (is_null($element['right']) => no right needed => display always
+				if (is_null($element['right']) || has_rights($db,$element['right']) == "yes")
+				{
+					$_SESSION['testprojectTopMenu'] .= "<a href='{$element['url']}' " .
+						"target='{$element['target']}' accesskey='{$element['shortcut']}'" .
+	     				"tabindex=''" . $idx++ . "''>" . lang_get($element['label'])."</a> |";
+				}
+			}
+		}
+	}
+}
+
+
+/**
+ * Update Project and Test Plan data on Project change or startup
+ * Data are stored in $_SESSION array
+ * 
+ * If we receive TestPlan ID in the _SESSION then do some checks and if everything OK
+ * Update this value at Session Level, to set it available in other pieces of the application
+ * 
+ * @param integer $db DB connection identifier
+ * @param array $hash_user_sel input data for the page ($_REQUEST)
+ * 
+ * @uses initMenu() 
+ * @internal Revisions:
+ * 	20091111 - havlatm - menu generation added, name changed (from upd_session_tplan_tproject)
+ *	20090726 - franciscom - getAccessibleTestPlans() now is method on user class
+ **/
+function initProject(&$db,$hash_user_sel)
 {
 	$tproject = new testproject($db);
-
-	// ------------------------------------------------------------------
-	$filter_tp_by_product = 1;
-	if( isset($hash_user_sel['filter_tp_by_product']) )
-	{
-	  $filter_tp_by_product = 1;
-	}
-	else if ( isset($hash_user_sel['filter_tp_by_product_hidden']) )
-	{
-	  $filter_tp_by_product = 0;
-	}
-	// ------------------------------------------------------------------
 	$user_sel = array("tplan_id" => 0, "tproject_id" => 0 );
 	$user_sel["tproject_id"] = isset($hash_user_sel['testproject']) ? intval($hash_user_sel['testproject']) : 0;
 	$user_sel["tplan_id"] = isset($hash_user_sel['testplan']) ? intval($hash_user_sel['testplan']) : 0;
@@ -322,65 +306,73 @@ function upd_session_tplan_tproject(&$db,$hash_user_sel)
 	{
 		$tproject_id = $user_sel["tproject_id"];
 	}
-	$tproject_data = $tproject->get_by_id($tproject_id);
-
-	// We need to do checks before updating the SESSION
-	if (!$tproject_id || !$tproject_data)
+	// We need to do checks before updating the SESSION to cover the case that not defined but exists
+	if (!$tproject_id)
 	{
 		$all_tprojects = $tproject->get_all();
 		if ($all_tprojects)
 		{
 			$tproject_data = $all_tprojects[0];
+			$tproject_id = $tproject_data['id'];
 		}
 	}
-	setSessionTestProject($tproject_data);
+	$tproject->setSessionProject($tproject_id);
+	
+	// set a Test Plan
+	// Refresh test project id after call to setSessionProject
 	$tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
-
-	$tplan_id    = isset($_SESSION['testPlanId']) ? $_SESSION['testPlanId'] : null;
+	$tplan_id = isset($_SESSION['testplanID']) ? $_SESSION['testplanID'] : null;
 	// Now we need to validate the TestPlan
 	if($user_sel["tplan_id"] != 0)
 	{
 		$tplan_id = $user_sel["tplan_id"];
-  }
+	}
   
-	//check if the specific combination of testprojectid and testplanid is valid
-	$tplan_data = getAccessibleTestPlans($db,$tproject_id,$_SESSION['userID'],$tplan_id);
+	// check if the specific combination of testprojectid and testplanid is valid
+	$tplan_data = $_SESSION['currentUser']->getAccessibleTestPlans($db,$tproject_id,$tplan_id);
+	if(is_null($tplan_data))
+	{
+		// Need to get first accessible test plan for user, if any exists.
+		$tplan_data = $_SESSION['currentUser']->getAccessibleTestPlans($db,$tproject_id);
+    }
+	
 	if(!is_null($tplan_data))
 	{
 		$tplan_data = $tplan_data[0];
 		setSessionTestPlan($tplan_data);
-		return;
 	}
-
-	//get the first accessible TestPlan
-	$tplan_data = getAccessibleTestPlans($db,$tproject_id,$_SESSION['userID']);
-	if(!is_null($tplan_data))
-		$tplan_data = $tplan_data[0];
-
-	setSessionTestPlan($tplan_data);
+	
+	// initialize structure of top menu for the user and the project
+	initTopMenu($db);
+   
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
-* General page initialization procedure
-* - init session
-* - init database
-* - check rights
-* 
-* @param integer $db DB connection identifier
-* @param boolean $initProject (optional) Set true if adjustment of Product or
-* 		Test Plan is required; default is FALSE
-* @param boolean $bDontCheckSession (optional) Set to true if no session should be
-* 		 started
-*/
+ * General GUI page initialization procedure
+ * - init session
+ * - init database
+ * - check rights
+ * - initialize project data (if requested)
+ * 
+ * @param integer $db DB connection identifier
+ * @param boolean $initProject (optional) Set true if adjustment of Product or
+ * 		Test Plan is required; default is FALSE
+ * @param boolean $bDontCheckSession (optional) Set to true if no session should be
+ * 		 started
+ */
 function testlinkInitPage(&$db, $initProject = FALSE, $bDontCheckSession = false,$userRightsCheckFunction = null)
 {
 	doSessionStart();
 	setPaths();
 	set_dt_formats();
-
+	
 	doDBConnect($db);
+	
+	static $pageStatistics = null;
+	if (!$pageStatistics && (config_get('log_level') == 'EXTENDED'))
+		$pageStatistics = new tlPageStatistics($db);
+	
 	if (!$bDontCheckSession)
 		checkSessionValid($db);
 
@@ -390,8 +382,8 @@ function testlinkInitPage(&$db, $initProject = FALSE, $bDontCheckSession = false
 	// adjust Product and Test Plan to $_SESSION
 	if ($initProject)
 	{
-		upd_session_tplan_tproject($db,$_REQUEST);
-  }
+		initProject($db,$_REQUEST);
+    }
    
 	// used to disable the attachment feature if there are problems with repository path
 	/** @TODO this check should not be done anytime but on login and using */
@@ -411,7 +403,6 @@ function testlinkInitPage(&$db, $initProject = FALSE, $bDontCheckSession = false
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Redirect page to another one
  *
@@ -429,9 +420,9 @@ function redirect($path, $level = 'location')
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Security parser for input strings
+ * 
  * @param string $parameter
  * @return string cleaned parameter
  */
@@ -460,7 +451,6 @@ function strings_stripSlashes($parameter,$bGPC = true)
 }
 
 
-// --------------------------------------------------------------------------------------
 function to_boolean($alt_boolean)
 {
 	$the_val = 1;
@@ -483,82 +473,23 @@ function to_boolean($alt_boolean)
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-20050708 - fm
-Modified to cope with situation where you need to assign a Smarty Template variable instead
-of generate output.
-Now you can use this function in both situatuons.
-
-if the key 'var' is found in the associative array instead of return a value,
-this value is assigned to $params['var`]
-
-usage: Important: if registered as localize_date()
-       {localize_date d='the date to localize'}
-------------------------------------------------------------------------------------------
-*/
-function localize_date_smarty($params, &$smarty)
-{
-	return localize_dateOrTimeStamp($params,$smarty,'date_format',$params['d']);
-}
-
-
-// --------------------------------------------------------------------------------------
-/*
-  function:
-  args:
-  returns:
-*/
-function localize_timestamp_smarty($params, &$smarty)
-{
-	return localize_dateOrTimeStamp($params,$smarty,'timestamp_format',$params['ts']);
-}
-
-// --------------------------------------------------------------------------------------
-/*
-  function:
-  args :
-         $params: used only if you call this from an smarty template
-                  or a wrapper in an smarty function.
-
-         $smarty: when not used in an smarty template, pass NULL.
-         $what: give info about what kind of value is contained in value.
-                possible values: timestamp_format
-                                 date_format
-         $value: must be a date or time stamp in ISO format
-
-  returns:
-*/
-function localize_dateOrTimeStamp($params,&$smarty,$what,$value)
-{
-	// to supress E_STRICT messages
-	setlocale(LC_ALL, TL_DEFAULT_LOCALE);
-
-	$format = config_get($what);
-	if (!is_numeric($value))
-		$value = strtotime($value);
-	$retVal = strftime($format, $value);
-	if(isset($params['var']))
-		$smarty->assign($params['var'],$retVal);
-	return $retVal;
-}
-
-
-// --------------------------------------------------------------------------------------
 /**
+ * Validate string by relular expression
  *
  * @param string $str2check
- * @param string  $ereg_forbidden_chars: regular expression
+ * @param string $regexp_forbidden_chars Regular expression (perl format)
  *
- * @return  1: check ok, 0:check KO
+ * @return boolean 1: check ok, 0:check KO
+ * 
+ * @todo havlatm: remove as obsolete or move to inputparam.inc.php
  */
-function check_string($str2check, $ereg_forbidden_chars)
+function check_string($str2check, $regexp_forbidden_chars)
 {
 	$status_ok = 1;
 
-	if( $ereg_forbidden_chars != '' && !is_null($ereg_forbidden_chars))
+	if( $regexp_forbidden_chars != '' && !is_null($regexp_forbidden_chars))
 	{
-		if (eregi($ereg_forbidden_chars, $str2check))
+		if (preg_match($regexp_forbidden_chars, $str2check))
 		{
 			$status_ok=0;
 		}
@@ -567,12 +498,6 @@ function check_string($str2check, $ereg_forbidden_chars)
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-  function:
-  args :
-  returns:
-*/
 function set_dt_formats()
 {
 	global $g_date_format;
@@ -594,15 +519,15 @@ function set_dt_formats()
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-  function: config_get
-  args :
-  returns:
-  
-  rev:
-      20080326 - franciscom - removed eval
-*/
+/**
+ * Load global configuration to function
+ * 
+ * @param string $config_id key for identification of configuration parameter
+ * @return mixed the configuration parameter(s)
+ * 
+ * @internal Revisions
+ *	20080326 - franciscom - removed eval
+ */
 function config_get($config_id)
 {
 	$t_value = '';  
@@ -625,13 +550,13 @@ function config_get($config_id)
 }
 
 
-// --------------------------------------------------------------------------------------
 /**  
- * Return true if the parameter is an empty string or a string
+ * @return boolean Return true if the parameter is an empty string or a string
  * containing only whitespace, false otherwise
  * @author Copyright (C) 2000 - 2004  Mantis Team, Kenzaburo Ito
  */ 
-function is_blank( $p_var ) {
+function is_blank( $p_var ) 
+{
 	$p_var = trim( $p_var );
 	$str_len = strlen( $p_var );
 	if ( 0 == $str_len ) {
@@ -641,15 +566,12 @@ function is_blank( $p_var ) {
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Builds the header needed to make the content available for downloading
  *
  * @param string $content the content which should be downloaded
  * @param string $fileName the filename
- *
- *
-**/
+ **/
 function downloadContentsToFile($content,$fileName)
 {
 	$charSet = config_get('charset');
@@ -663,71 +585,12 @@ function downloadContentsToFile($content,$fileName)
 }
 
 
-// --------------------------------------------------------------------------------------
-/** @TODO martin: move the next two functions to appropriate class + describe */
-/*
-  function: translate_tc_status
-  args :
-  returns:
-*/
-function translate_tc_status($status_code)
-{
-	$resultsCfg = config_get('results'); 
-	$verbose = lang_get('test_status_not_run');
-	if( $status_code != '')
-	{
-		$suffix = $resultsCfg['code_status'][$status_code];
-		$verbose = lang_get('test_status_' . $suffix);
-	}
-	return $verbose;
-}
-
-/*
-  function: translate_tc_status_smarty
-  args :
-  returns:
-*/
-function translate_tc_status_smarty($params, &$smarty)
-{
-	$the_ret = translate_tc_status($params['s']);
-	if(	isset($params['var']) )
-	{
-		$smarty->assign($params['var'], $the_ret);
-	}
-	else
-	{
-		return $the_ret;
-	}
-}
-
-
-// --------------------------------------------------------------------------------------
-/** @TODO describe */
-/*
-  function:
-  args :
-  returns:
-*/
-function my_array_intersect_keys($array1,$array2)
-{
-	$aresult = array();
-	foreach($array1 as $key => $val)
-	{
-		if(isset($array2[$key]))
-		{
-			$aresult[$key] = $array2[$key];
-		}
-	}
-	return($aresult);
-}
-
-
-// --------------------------------------------------------------------------------------
-/*
-  function for performance timing
-  @TODO martin: move to logger?
-  returns:
-*/
+/**
+ * helper function for performance timing
+ * 
+ * @TODO havlatm: Andreas, move to logger?
+ * returns: ?
+ */
 function microtime_float()
 {
    list($usec, $sec) = explode(" ", microtime());
@@ -735,29 +598,25 @@ function microtime_float()
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-  function: init_labels
-
-  args : map key=a code
-             value: string_to_translate, that can be found in strings.txt
-
-  returns: map key=a code
-               value: lang_get(string_to_translate)
-*/
-function init_labels($map_code_label)
-{
-	foreach($map_code_label as $key => $label)
-	{
-		$map_code_label[$key] = lang_get($label);
-	}
-	return $map_code_label;
+/**
+ * Converts a priority weight (urgency * importance) to HIGH, MEDUIM or LOW
+ *
+ * @return integer HIGH, MEDUIM or LOW
+ */
+function priority_to_level($priority) {
+	$levels = config_get('priority_levels');
+	if ($priority >= $levels[HIGH])
+		return HIGH;
+	else if ($priority >= $levels[MEDIUM])
+		return MEDIUM;
+	else
+		return LOW;
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Get the named php ini variable but return it as a bool
+ * 
  * @author Copyright (C) 2000 - 2004  Mantis Team, Kenzaburo Ito
  */
 function ini_get_bool( $p_name ) {
@@ -841,7 +700,7 @@ function executeTestCase($testcase_id,$tree_manager,$cfield_manager){
   	// (-1 for executions results, and fault code and error message for message.
   	$xmlrpc_client = new xmlrpc_client($server_path,$server_host,$server_port);
 
-  	$tc_info = $tree_manager->get_node_hierachy_info($testcase_id);
+  	$tc_info = $tree_manager->get_node_hierarchy_info($testcase_id);
   	$testcase_name = $tc_info['name'];
 
   	//Create XML-RPC Objects to pass on to the the servers
@@ -873,53 +732,16 @@ function executeTestCase($testcase_id,$tree_manager,$cfield_manager){
 */
 
 
-// --------------------------------------------------------------------------------------
-// MHT: I'm not able find a simple SQL (subquery is not supported
-// in MySQL 4.0.x); probably temporary table should be used instead of the next
-function array_diff_byId ($arrAll, $arrPart)
-{
-	// solve empty arrays
-	if (!count($arrAll) || is_null($arrAll))
-	{
-		return(null);
-	}
-	if (!count($arrPart) || is_null($arrPart))
-	{
-		return $arrAll;
-	}
-
-	$arrTemp = array();
-	$arrTemp2 = array();
-
-	// converts to associated arrays
-	foreach ($arrAll as $penny) {
-		$arrTemp[$penny['id']] = $penny;
-	}
-	foreach ($arrPart as $penny) {
-		$arrTemp2[$penny['id']] = $penny;
-	}
-
-	// exec diff
-	$arrTemp3 = array_diff_assoc($arrTemp, $arrTemp2);
-
-	$arrTemp4 = null;
-	// convert to numbered array
-	foreach ($arrTemp3 as $penny) {
-		$arrTemp4[] = $penny;
-	}
-	return $arrTemp4;
-}
-
-
-// --------------------------------------------------------------------------------------
 /**
- * trim string and limit to N chars
+ * Trim string and limit to N chars
+ * 
  * @param string
  * @param int [len]: how many chars return
  *
  * @return string trimmed string
  *
  * @author Francisco Mancardi - 20050905 - refactoring
+ * @todo havlatm - 20100207 - using should be refactored for inputparameter.inc.php
  */
 function trim_and_limit($s, $len = 100)
 {
@@ -931,11 +753,10 @@ function trim_and_limit($s, $len = 100)
 	return $s;
 }
 
-// --------------------------------------------------------------------------------------
-//
+
+/** @todo havlatm - 20100207 - what's that? and why here. Remove' */
 // nodes_order format:  NODE_ID-?,NODE_ID-?
 // 2-0,10-0,3-0
-//
 function transform_nodes_order($nodes_order,$node_to_exclude=null)
 {
   $fa = explode(',',$nodes_order);
@@ -955,9 +776,9 @@ function transform_nodes_order($nodes_order,$node_to_exclude=null)
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
  * Checks $_FILES for errors while uploading
+ * 
  * @param array $fInfo an array used by uploading files ($_FILES)
  * @return string containing an error message (if any)
  */
@@ -984,11 +805,10 @@ function getFileUploadErrorMessage($fInfo)
 }
 
 
-// --------------------------------------------------------------------------------------
 /**
- * @abstract redirect to a page with static html defined in locale/en_GB/texts.php
+ * Redirect to a page with static html defined in locale/en_GB/texts.php
+ * 
  * @param string $key keyword for finding exact html text in definition array
- * @return N/A 
  */
 function show_instructions($key, $refreshTree=0)
 {
@@ -1002,37 +822,38 @@ function show_instructions($key, $refreshTree=0)
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-  function: templateConfiguration
-  args :
-  returns:
-*/
-function templateConfiguration()
+/**
+ * @TODO: franciscom - 20091003 - document return value
+ */
+function templateConfiguration($template2get=null)
 {
+	$custom_templates = config_get('tpl');
+	$access_key = $template2get;
+	if( is_null($access_key) )
+	{
+		$access_key = str_replace('.php','',basename($_SERVER['SCRIPT_NAME']));
+	}
+	
 	$path_parts=explode("/",dirname($_SERVER['SCRIPT_NAME']));
     $last_part=array_pop($path_parts);
-    
     $tcfg = new stdClass();
     $tcfg->template_dir = "{$last_part}/";
-    $tcfg->default_template = str_replace('.php','.tpl',basename($_SERVER['SCRIPT_NAME']));
+    $tcfg->default_template = isset($custom_templates[$access_key]) ? $custom_templates[$access_key] : ($access_key . '.tpl');
     $tcfg->template = null;
     return $tcfg;
 }
 
 
-// --------------------------------------------------------------------------------------
-/*
-  function: isValidISODateTime
-            check if an string is a valid ISO date/time
-            accepted format: YYYY-MM-DD HH:MM:SS
-
-  args: datetime to check
-
-  returns: true / false
-  
-  rev: 20080907 - franciscom - Code taked form PHP manual
-*/
+/**
+ * Check if an string is a valid ISO date/time
+ *          accepted format: YYYY-MM-DD HH:MM:SS
+ * 
+ * @param string $ISODateTime datetime to check
+ * @return boolean True if string has correct format
+ * 
+ * @internal   
+ * rev: 20080907 - franciscom - Code taked form PHP manual
+ */
 function isValidISODateTime($ISODateTime)
 {
    $dateParts=array('YEAR' => 1, 'MONTH' => 2 , 'DAY' => 3);
@@ -1045,6 +866,7 @@ function isValidISODateTime($ISODateTime)
    }
    return $status_ok;
 }
+
 
 function checkUserRightsFor(&$db,$pfn)
 {
@@ -1067,6 +889,7 @@ function checkUserRightsFor(&$db,$pfn)
 	}
 }
 
+
 function tlStringLen($str)
 {
 	$charset = config_get('charset');	
@@ -1078,6 +901,7 @@ function tlStringLen($str)
 	return $nLen; 
 }
 
+
 function tlSubStr($str,$start,$length = null)
 {
 	$charset = config_get('charset');
@@ -1086,5 +910,77 @@ function tlSubStr($str,$start,$length = null)
 		$length = iconv_strlen($str,$charset);
 	}	
 	return iconv_substr($str,$start,$length,$charset);
+}
+
+/**
+ * Get text from a configured item template for editor objects
+ * 
+ * @param $itemTemplate identifies a TestLink item that can have
+ *        templates that can be loaded when creating an item to semplify
+ *        or guide user's work.
+ *        $itemTemplate is a property (of type stdClass) of $tlCfg configuration object.
+ *
+ *        supported values:
+ *        testcase_template
+ *
+ * @param $webEditorName webeditor name, that identifies a propety of $tlCfg->$itemTemplate
+ *        that holds input tenmplate configuration
+ * 
+ * @param $defaultText text to use if:
+ *        $tlCfg->itemTemplate OR $tlCfg->itemTemplate->$webEditorName 
+ *        does not exists.
+ *
+ */
+function getItemTemplateContents($itemTemplate, $webEditorName, $defaultText='') 
+{
+    $editorTemplate = config_get($itemTemplate);
+    $value=$defaultText;
+    if( !is_null($editorTemplate) )
+    {
+      if (property_exists($editorTemplate, $webEditorName)) 
+      {
+      	switch($editorTemplate->$webEditorName->type)
+      	{
+      		case 'string':
+      			$value = $editorTemplate->$webEditorName->value;
+      			break;
+      			 
+      		case 'string_id':
+      			$value = lang_get($editorTemplate->$webEditorName->value);
+      			break;
+      			 
+      		case 'file':
+      			$value = getFileContents($editorTemplate->$webEditorName->value);
+				if (is_null($value))
+				{
+					$value = lang_get('problems_trying_to_access_template') . 
+					         " {$editorTemplate->$webEditorName->value} ";
+				}	
+      			break;
+      			 
+      		default:
+      			$value = '';
+      			break;
+      	}
+      }
+    }
+    return $value; 
+}
+
+
+/**
+ * Builds a string $testCasePrefix . $glueChar . $external_id
+ *
+ * @param string $testCasePrefix prefix for the project without glue character
+ * @param mixed $external_id
+ */
+function buildExternalIdString($testCasePrefix, $external_id)
+{
+	static $glueChar;
+	if (!$glueChar) {
+		$glueChar = config_get('testcase_cfg')->glue_character;
+	}
+	return $testCasePrefix . $glueChar . $external_id;
+
 }
 ?>

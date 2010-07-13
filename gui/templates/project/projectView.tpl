@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: projectView.tpl,v 1.14 2008/12/30 13:34:40 franciscom Exp $
+$Id: projectView.tpl,v 1.20 2010/02/20 08:01:27 franciscom Exp $
 Purpose: smarty template - edit / delete Test Plan
 
 Development hint:
@@ -23,10 +23,11 @@ Rev :
 {lang_get s='popup_product_delete' var="warning_msg" }
 {lang_get s='delete' var="del_msgbox_title" }
 
-{lang_get var="labels" s='title_testproject_management,testproject_txt_empty_list,tcase_id_prefix,
-                          th_name,th_notes,testproject_alt_edit,testproject_alt_active,
-                          th_requirement_feature,testproject_alt_delete,btn_create,
-                          testproject_alt_requirement_feature,th_active,th_delete,th_id'}
+{lang_get var="labels" 
+		s='title_testproject_management,testproject_txt_empty_list,tcase_id_prefix,
+		th_name,th_notes,testproject_alt_edit,testproject_alt_active,
+		th_requirement_feature,testproject_alt_delete,btn_create,public,
+		testproject_alt_requirement_feature,th_active,th_delete,th_id'}
 
 
 {include file="inc_head.tpl" openHead="yes" enableTableSorting="yes"}
@@ -42,10 +43,18 @@ var del_action=fRoot+'{$deleteAction}';
 
 <h1 class="title">{$labels.title_testproject_management}</h1>
 <div class="workBack">
-<div id="testproject_management_list">
-{if $tprojects eq ''}
-	{$labels.testproject_txt_empty_list}
 
+{if $gui->canManage}
+<div class="groupBtn">
+	<form method="post" action="{$createAction}">
+		<input type="submit" name="create" value="{$labels.btn_create}" />
+	</form>
+</div>
+{/if}
+
+<div id="testproject_management_list">
+{if $gui->tprojects == ''}
+	{$labels.testproject_txt_empty_list}
 {else}
 	<table id="item_view" class="simple sortable" width="95%">
 		<tr>
@@ -54,11 +63,14 @@ var del_action=fRoot+'{$deleteAction}';
 			<th>{$sortHintIcon}{$labels.tcase_id_prefix}</th>
 			<th class="{$noSortableColumnClass}">{$labels.th_requirement_feature}</th>
 			<th class="icon_cell">{$labels.th_active}</th>
-			{if $canManage == "yes"}
+{* havlatm: the feature is not ready for using - must be disabled (developed by Francisco)
+			<th class="icon_cell">{$labels.public}</th>
+*}
+			{if $gui->canManage == "yes"}
 			<th class="icon_cell">{$labels.th_delete}</th>
 			{/if}
 		</tr>
-		{foreach item=testproject from=$tprojects}
+		{foreach item=testproject from=$gui->tprojects}
 		<tr>
 			<td><span class="api_info" style='display:none'>{$tlCfg->api->id_format|replace:"%s":$testproject.id}</span>
 			    <a href="{$editAction}{$testproject.id}">
@@ -77,7 +89,7 @@ var del_action=fRoot+'{$deleteAction}';
 				{$testproject.prefix|escape}
 			</td>
 			<td class="clickable_icon">
-				{if $testproject.option_reqs eq 1}
+				{if $testproject.opt->requirementsEnabled}
   					<img style="border:none"
   				            title="{$labels.testproject_alt_requirement_feature}"
   				            alt="{$labels.testproject_alt_requirement_feature}"
@@ -87,7 +99,7 @@ var del_action=fRoot+'{$deleteAction}';
   				{/if}
 			</td>
 			<td class="clickable_icon">
-				{if $testproject.active eq 1}
+				{if $testproject.active}
   					<img style="border:none"
   				            title="{$labels.testproject_alt_active}"
   				            alt="{$labels.testproject_alt_active}"
@@ -96,14 +108,25 @@ var del_action=fRoot+'{$deleteAction}';
   					&nbsp;
   				{/if}
 			</td>
-			{if $canManage == "yes"}
+{* havlatm: the feature is not ready for using - must be disabled (developed by Francisco)
 			<td class="clickable_icon">
-				  <img style="border:none;cursor: pointer;"
-				       alt="{$labels.testproject_alt_delete}"
-					   title="{$labels.testproject_alt_delete}"
-					   onclick="delete_confirmation({$testproject.id},'{$testproject.name|escape:'javascript'|escape}',
+				{if $testproject.is_public}
+  					<img style="border:none"
+  				            title="{$labels.public}"
+  				            alt="{$labels.public}"
+  				            src="{$smarty.const.TL_THEME_IMG_DIR}/apply_f2_16.png"/>
+  				{else}
+  					&nbsp;
+  				{/if}
+			</td>
+*}
+			{if $gui->canManage == "yes"}
+			<td class="clickable_icon">
+				  <img style="border:none;cursor: pointer;"  alt="{$labels.testproject_alt_delete}"
+					     title="{$labels.testproject_alt_delete}"
+					     onclick="delete_confirmation({$testproject.id},'{$testproject.name|escape:'javascript'|escape}',
 					                                '{$del_msgbox_title}','{$warning_msg}');"
-				     src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
+				       src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
 			</td>
 			{/if}
 		</tr>
@@ -114,22 +137,14 @@ var del_action=fRoot+'{$deleteAction}';
 {/if}
 </div>
 
- {if $canManage}
- <div class="groupBtn">
-    <form method="post" action="{$createAction}">
-      <input type="submit" name="create" value="{$labels.btn_create}" />
-    </form>
-  </div>
- {/if}
 </div>
 
-{* *}
-{if $doAction == "reloadAll"}
+{if $gui->doAction == "reloadAll"}
 	<script type="text/javascript">
 	top.location = top.location;
 	</script>
 {else}
-  {if $doAction == "reloadNavBar"}
+  {if $gui->doAction == "reloadNavBar"}
 	<script type="text/javascript">
   // remove query string to avoid reload of home page,
   // instead of reload only navbar

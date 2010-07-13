@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: uncoveredTestCases.tpl,v 1.2.2.1 2009/09/05 18:23:29 schlundus Exp $
+$Id: uncoveredTestCases.tpl,v 1.3 2009/09/05 18:19:07 schlundus Exp $
 
 Purpose: For a test project, list test cases that has no requirement assigned
 

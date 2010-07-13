@@ -5,30 +5,18 @@
  *
  * Filename $RCSfile: keywordsExport.php,v $
  *
- * @version $Revision: 1.7 $
- * @modified $Date: 2008/12/13 23:47:01 $ by $Author: schlundus $
- *
- * test case and test suites export
- *
- * 20070113 - franciscom - added logic to create message when there is 
- *                         nothing to export.
- *
- * 20061118 - franciscom - using different file name, depending the
- *                         type of exported elements.
+ * @version $Revision: 1.10 $
+ * @modified $Date: 2009/08/24 19:18:45 $ by $Author: schlundus $
  *
 **/
 require_once("../../config.inc.php");
 require_once("common.php");
 require_once("csv.inc.php");
 require_once("xml.inc.php");
-require_once("keyword.class.php");
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
 $args = init_args();
-
-$main_descr = lang_get('testproject') . TITLE_SEP . $args->testproject_name;
-$fileName = is_null($args->export_filename) ? 'keywords.xml' : $args->export_filename;
 
 switch ($args->doAction)
 {
@@ -39,6 +27,8 @@ switch ($args->doAction)
 
 $keyword = new tlKeyword();
 $exportTypes = $keyword->getSupportedSerializationInterfaces();
+$main_descr = lang_get('testproject') . TITLE_SEP . $args->testproject_name;
+$fileName = is_null($args->export_filename) ? 'keywords.xml' : $args->export_filename;
 
 $smarty = new TLSmarty();
 $smarty->assign('export_filename',$fileName);
@@ -49,12 +39,14 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
 function init_args()
 {
-	$_REQUEST = strings_stripSlashes($_REQUEST);
-
+	$iParams = array(
+			"doAction" => array("GET",tlInputParameter::STRING_N,0,50),
+			"export_filename" => array("POST", tlInputParameter::STRING_N,0,255),
+			"exportType" => array("POST", tlInputParameter::STRING_N,0,255),
+		);
 	$args = new stdClass();
-	$args->doAction = isset($_REQUEST['doAction']) ? $_REQUEST['doAction'] : null;
-	$args->exportType = isset($_REQUEST['exportType']) ? $_REQUEST['exportType'] : null;
-	$args->export_filename = isset($_REQUEST['export_filename']) ? $_REQUEST['export_filename'] : null;
+		
+	$pParams = I_PARAMS($iParams,$args);
 
 	$args->testproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 	$args->testproject_name = $_SESSION['testprojectName'];
@@ -90,10 +82,6 @@ function do_export(&$db,&$smarty,&$args)
 		$tprojectMgr = new testproject($db);
 		$content = $tprojectMgr->$pfn($args->testproject_id);
 		downloadContentsToFile($content,$args->export_filename);
-
-		// why this exit() ?
-		// If we don't use it, we will find in the exported file
-		// the contents of the smarty template.
 		exit();
 	}
 }

@@ -1,17 +1,22 @@
 <?php
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * This script is distributed under the GNU General Public License 2 or later.
+ * This script is distributed under the GNU General Public License 2 or later. 
  *
- * Filename $RCSfile: usersView.php,v $
+ * Shows all users
  *
- * @version $Revision: 1.25.2.1 $
- * @modified $Date: 2010/01/20 22:04:57 $ -  $Author: havlat $
+ * @package 	TestLink
+ * @author 		-
+ * @copyright 	2007-2009, TestLink community 
+ * @version    	CVS: $Id: usersView.php,v 1.32 2010/01/11 19:17:10 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
  *
- * shows all users
  *
- * rev: 20080416 - franciscom - getRoleColourCfg()
+ * @internal Revisions:
  *
+ *	20100106 - franciscom - security improvement - checkUserOrderBy()
+ *                         (after scanning with Acunetix Web Security Scanner)
+ *                          
  */
 require_once("../../config.inc.php");
 require_once("users.inc.php");
@@ -19,7 +24,7 @@ testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
 $args = init_args();
-$grants = getGrantsForUserMgmt($db,$_SESSION['currentUser']);
+$grants = getGrantsForUserMgmt($db,$args->currentUser);
 
 $sqlResult = null;
 $action = null;
@@ -33,7 +38,7 @@ switch($args->operation)
 {
 	case 'delete':
 		//user cannot delete itself
-		if ($args->user_id != $_SESSION['currentUser']->dbID)
+		if ($args->user_id != $args->currentUserID)
 		{
 			$user = new tlUser($args->user_id);
 			$sqlResult = $user->readFromDB($db);
@@ -89,12 +94,10 @@ $smarty->assign('reload',0);
 $smarty->assign('users',$users);
 $smarty->assign('result',$sqlResult);
 $smarty->assign('action',$action);
-$smarty->assign('base_href', $_SESSION['basehref']);
+$smarty->assign('base_href', $args->basehref);
 $smarty->assign('grants',$grants);
-$smarty->display($templateCfg->template_dir . $g_tpl['usersview']);
 
-
-
+$smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
 
 function toggle_order_by_dir($which_order_by,$order_by_dir_map)
@@ -102,7 +105,6 @@ function toggle_order_by_dir($which_order_by,$order_by_dir_map)
 	$obm[$which_order_by] = $order_by_dir_map[$which_order_by] == 'asc' ? 'desc' : 'asc';
 	return $obm;
 }
-
 
 /*
   function: get_order_by_clause()
@@ -140,28 +142,34 @@ function get_order_by_clause($order)
 */
 function init_args()
 {
-    $args = new stdClass();
-    $_REQUEST = strings_stripSlashes($_REQUEST);
+	
+	// input from GET['HelloString3'], 
+	// type: string,  
+	// minLen: 1, 
+	// maxLen: 15,
+	// regular expression: null
+	// checkFunction: applys checks via checkFooOrBar() to ensure its either 'foo' or 'bar' 
+	// normalization: done via  normFunction() which replaces ',' with '.' 
+	// "HelloString3" => array("GET",tlInputParameter::STRING_N,1,15,'checkFooOrBar','normFunction'),
+	$iParams = array("operation" => array(tlInputParameter::STRING_N,0,50),
+			         "user_order_by" => array(tlInputParameter::STRING_N,0,50,null,'checkUserOrderBy'),			
+			         "order_by_role_dir" => array(tlInputParameter::STRING_N,0,4),
+			         "order_by_login_dir" => array(tlInputParameter::STRING_N,0,4),
+			         "user" => array(tlInputParameter::INT_N));
 
-    $key2loop = array('operation' => '', 'user_order_by' => 'order_by_login');
-    foreach($key2loop as $key => $value)
-    {
-        $args->$key = isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
-    }
+	$pParams = R_PARAMS($iParams);
 
-    $key2loop = array('order_by_role_dir' => 'asc', 'order_by_login_dir' => 'asc');
-    foreach($key2loop as $key => $value)
-    {
-        $args->order_by_dir[$key]=isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
-    }
-    $args->user_id = isset($_REQUEST['user']) ? intval($_REQUEST['user']) : 0;
+	$args = new stdClass();
+	$args->operation = $pParams["operation"];
+    $args->user_order_by = ($pParams["user_order_by"] != '') ? $pParams["user_order_by"] : 'order_by_login';
+    $args->order_by_dir["order_by_role_dir"] = ($pParams["order_by_role_dir"] != '') ? $pParams["order_by_role_dir"] : 'asc';
+    $args->order_by_dir["order_by_login_dir"] = ($pParams["order_by_login_dir"] != '') ? $pParams["order_by_login_dir"] : 'asc';
+    $args->user_id = $pParams['user'];
 
-	// trim alien values
-	$args->operation = substr($args->operation,0,20);
-	$args->user_order_by = substr($args->user_order_by,0,20);
-	$args->order_by_role_dir = substr($args->order_by_role_dir,0,4);
-	$args->order_by_login_dir = substr($args->order_by_login_dir,0,4);
-
+    $args->currentUser = $_SESSION['currentUser'];
+    $args->currentUserID = $_SESSION['currentUser']->dbID;
+    $args->basehref =  $_SESSION['basehref'];
+    
     return $args;
 }
 
@@ -180,20 +188,34 @@ function init_args()
   returns: map
 
 */
-function getRoleColourCfg(&$dbHandler)
+function getRoleColourCfg(&$db)
 {
     $role_colour = config_get('role_colour');
-    $roles = tlRole::getAll($dbHandler,null,null,null,tlRole::TLOBJ_O_GET_DETAIL_MINIMUM);
+    $roles = tlRole::getAll($db,null,null,null,tlRole::TLOBJ_O_GET_DETAIL_MINIMUM);
     unset($roles[TL_ROLES_UNDEFINED]);
     foreach($roles as $roleObj)
     {
-        if(!isset($role_colour[$roleObj->name]))
+    	if(!isset($role_colour[$roleObj->name]))
         {
             $role_colour[$roleObj->name] = '';
         }
     }
     return $role_colour;
 }
+
+
+/**
+ * check function for tlInputParameter user_order_by
+ *
+ */
+function checkUserOrderBy($input)
+{
+	$domain = array_flip(array('order_by_role','order_by_login'));
+	
+	$status_ok = isset($domain[$input]) ? true : false;
+	return $status_ok;
+}
+
 
 function checkRights(&$db,&$user)
 {

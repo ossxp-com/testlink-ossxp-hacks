@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: resultsMoreBuilds_query_form.tpl,v 1.12.2.1 2009/03/27 10:55:57 amkhullar Exp $
+$Id: resultsMoreBuilds_query_form.tpl,v 1.13 2009/03/27 11:10:05 amkhullar Exp $
 @author Francisco Mancardi
 
 rev :
@@ -215,17 +215,17 @@ franciscom - may be in the future - 20090107
 		    </tr>
 		    <tr>		
      		<td>{$labels.display_query_params}</td>
-	     		<td><select name="display_query_params">
-			    				<option value="1">{$labels.Yes}</option>
-			    				<option value="0" selected="selected">{$labels.No}</option>
-			    			</select>
-	    		</td>
+     		<td><select name="display_query_params">
+		    				<option value="1">{$labels.Yes}</option>
+		    				<option value="0" selected="selected">{$labels.No}</option>
+		    			</select>
+    		</td>
 		     <td>{$labels.display_totals}</td>
-			     <td><select name="display_totals">
-			    				<option value="1">{$labels.Yes}</option>
-			    				<option value="0" selected="selected">{$labels.No}</option>
-			    			</select>
-			     </td>
+		     <td><select name="display_totals">
+		    				<option value="1">{$labels.Yes}</option>
+		    				<option value="0" selected="selected">{$labels.No}</option>
+		    			</select>
+		    		</td>
 	    	</tr>
 		    </table>
 		  </td>

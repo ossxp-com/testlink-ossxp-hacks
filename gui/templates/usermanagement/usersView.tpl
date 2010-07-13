@@ -1,6 +1,6 @@
 {*
 Testlink Open Source Project - http://testlink.sourceforge.net/
-$Id: usersView.tpl,v 1.13.2.2 2009/05/20 03:10:08 havlat Exp $
+$Id: usersView.tpl,v 1.16 2009/06/04 19:53:27 schlundus Exp $
 
 Purpose: smarty template - users overview
 *}
@@ -71,16 +71,17 @@ Purpose: smarty template - users overview
 
 				<th>{$labels.th_locale}</th>
 				<th style="width:50px;">{$labels.th_active}</th>
-{*	#2376				<th style="width:50px;">{$labels.th_delete}</th> *}
+				<th style="width:50px;">{$labels.th_delete}</th>
 			</tr>
 
 			{section name=row loop=$users start=0}
 				{assign var="user" value="$users[row]"}
 				{assign var="userLocale" value=$user->locale}
-				{assign var="r_d" value=$user->globalRole->name}
+				{assign var="r_n" value=$user->globalRole->name}
+				{assign var="r_d" value=$user->globalRole->getDisplayName()}
 				{assign var="userID" value=$user->dbID}
 
-				<tr {if $role_colour[$r_d] neq ''} style="background-color: {$role_colour[$r_d]};" {/if}>
+				<tr {if $role_colour[$r_n] neq ''} style="background-color: {$role_colour[$r_n]};" {/if}>
 				<td><a href="{$editUserAction}{$user->dbID}">
 				    {$user->login|escape}
 			      {if $gsmarty_gui->show_icon_edit}
@@ -97,16 +98,13 @@ Purpose: smarty template - users overview
 				 {$optLocale[$userLocale]|escape}
 				</td>
 				<td align="center">
-					{if $user->bActive eq 1}
+					{if $user->isActive eq 1}
 				  		<img style="border:none" title="{$labels.alt_active_user}"
   				                             alt="{$labels.alt_active_user}"  src="{$checked_img}"/>
-  			  		{else}
-				  		<img style="border:none" title="{$labels.alt_delete_user}"
-  				                             alt="{$labels.alt_delete_user}"
-						       src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
-        			{/if}
+  			  {else}
+  				    &nbsp;
+        	{/if}
 				</td>
-{*	#2376
 				<td align="center">
 				  <img style="border:none;cursor: pointer;"
                alt="{$labels.alt_delete_user}"
@@ -115,7 +113,6 @@ Purpose: smarty template - users overview
 					                                  '{$del_msgbox_title}','{$warning_msg}');"
 				       src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
 				</td>
-*}
 			</tr>
 			{/section}
 		</table>

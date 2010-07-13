@@ -1,7 +1,7 @@
 <?php
 /*
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * $Id: APIErrors.php,v 1.17.2.1 2009/05/02 09:04:30 franciscom Exp $
+ * $Id: APIErrors.php,v 1.27 2009/09/17 17:29:28 franciscom Exp $
  */
 
 /** 
@@ -87,6 +87,14 @@ define('PARAMETER_NOT_INT_STR', lang_get('API_PARAMETER_NOT_INT',null,1));
 define('NO_TESTSUITENAME', 220);
 define('NO_TESTSUITENAME_STR', lang_get('API_NO_TESTSUITENAME',null,1));
 
+define('NODEID_IS_NOT_INTEGER',230);
+define('NODEID_IS_NOT_INTEGER_STR',lang_get('API_NODEID_IS_NOT_INTEGER',null,1));
+
+define('NODEID_DOESNOT_EXIST',231);
+define('NODEID_DOESNOT_EXIST_STR',lang_get('API_NODEID_DOESNOT_EXIST',null,1));
+
+define('CFG_DELETE_EXEC_DISABLED',232);
+define('CFG_DELETE_EXEC_DISABLED_STR',lang_get('API_CFG_DELETE_EXEC_DISABLED',null,1));
 
 
 /**
@@ -118,6 +126,17 @@ define('BAD_BUILD_FOR_TPLAN_STR', lang_get('API_BAD_BUILD_FOR_TPLAN',null,1));
 
 define('TESTPLANNAME_DOESNOT_EXIST', 3033);
 define('TESTPLANNAME_DOESNOT_EXIST_STR', lang_get('API_TESTPLANNAME_DOESNOT_EXIST',null,1));
+
+define('TESTPLANNAME_ALREADY_EXISTS', 3034);
+define('TESTPLANNAME_ALREADY_EXISTS_STR', lang_get('API_TESTPLANNAME_ALREADY_EXISTS',null,1));
+
+
+define('PLATFORM_NOT_LINKED_TO_TESTPLAN', 3040);
+define('PLATFORM_NOT_LINKED_TO_TESTPLAN_STR', lang_get('API_PLATFORM_NOT_LINKED_TO_TESTPLAN',null,1));
+
+define('TESTPLAN_HAS_NO_PLATFORMS', 3041);
+define('TESTPLAN_HAS_NO_PLATFORMS_STR',lang_get('API_TESTPLAN_HAS_NO_PLATFORMS',null,1));
+
 
 /**
  * 4000 level - Build errors
@@ -156,6 +175,9 @@ define('TCASE_VERSION_NUMBER_KO_STR', lang_get('API_TCASE_VERSION_NUMBER_KO',nul
 
 define('VERSION_NOT_VALID',5052);
 define('VERSION_NOT_VALID_STR', lang_get('API_VERSION_NOT_VALID',null,1));
+define('NO_TESTCASE_FOUND', 5053);
+define('NO_TESTCASE_FOUND_STR', lang_get('API_NO_TESTCASE_FOUND',null,1));
+
 
 /**
  * 6000 level - Status errors
@@ -193,6 +215,7 @@ define('REQSPEC_TPROJECT_KO_STR',lang_get('API_REQSPEC_TPROJECT_KO',null,1));
 
 define('TESTPROJECTNAME_DOESNOT_EXIST',7011);
 define('TESTPROJECTNAME_DOESNOT_EXIST_STR',lang_get('API_TESTPROJECTNAME_DOESNOT_EXIST',null,1));
+
 
 
 /**

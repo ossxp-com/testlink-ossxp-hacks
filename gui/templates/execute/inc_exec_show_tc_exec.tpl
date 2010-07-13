@@ -1,13 +1,21 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_show_tc_exec.tpl,v 1.3.2.2 2009/09/30 17:40:08 franciscom Exp $
+$Id: inc_exec_show_tc_exec.tpl,v 1.14 2009/12/25 18:57:37 franciscom Exp $
 Purpose: 
 Author: franciscom
 
-Rev:  
-  20090930 - franciscom - BUGID 2593
-  20090525 - franciscom - avoid deleted user crash
-  20090212 - amitkhullar - BUGID 2068
+Rev:           
+    20090909 - franciscom - removed code regarding $gui->grants->edit_exec_notes,
+                            that on 1.11 was commented, and on 1.12 uncommented
+                            creating an empty row with icon and link to edit notes.
+                            
+    20090901 - franciscom - exec_cfg->steps_results_layout
+    20090713 - franciscom - refactoring of edit execution.
+                            layout changed, added check on buid is open
+    20090526 - franciscom -  inc_exec_test_spec.tpl, added args_testplan_design_time_cf
+    20090418 - franciscom - deleted user crash
+    20090418 - franciscom - BUGID 2364 - access to test spec to edit it.
+    20090212 - amitkhullar - BUGID 2068
 *}	
  	{foreach item=tc_exec from=$gui->map_last_exec}
 
@@ -65,8 +73,15 @@ Rev:
 
 
 		<div class="exec_tc_title">
-		{* 20080126 - franciscom - external id - $tc_exec.testcase_id *}
-		{$labels.title_test_case} {$labels.th_test_case_id}{$gui->tcasePrefix|escape}{$cfg->testcase_cfg->glue_character}{$tc_exec.tc_external_id|escape} :: {$labels.version}: {$tc_exec.version}<br />
+		{* BUGID *}
+		{if $gui->grants->edit_testcase}
+		<a href="javascript:openTCaseWindow({$tc_exec.testcase_id},{$tc_exec.id},'editOnExec')">
+		<img src="{$smarty.const.TL_THEME_IMG_DIR}/note_edit.png"  title="{$labels.show_tcase_spec}">
+		</a>
+		{/if}
+		
+    {$labels.title_test_case}&nbsp;{$labels.th_test_case_id}{$gui->tcasePrefix|escape}{$cfg->testcase_cfg->glue_character}{$tc_exec.tc_external_id|escape} :: {$labels.version}: {$tc_exec.version}
+		<br />
 		    {$tc_exec.name|escape}<br />
 		    {if $tc_exec.assigned_user eq ''}
 		      {$labels.has_no_assignment}
@@ -101,11 +116,9 @@ Rev:
 		{if $cfg->exec_cfg->show_last_exec_any_build && $gui->history_on==0}
         {if $abs_last_exec.status != '' and $abs_last_exec.status != $tlCfg->results.status_code.not_run}
 			    {assign var="status_code" value=$abs_last_exec.status}
-
      			<div class="{$tlCfg->results.code_status.$status_code}">
      			{$labels.date_time_run} {$title_sep} {localize_timestamp ts=$abs_last_exec.execution_ts}
      			{$title_sep_type3}
-          {* 20090525 - franciscom - avoid deleted user crash*}
      			{$labels.test_exec_by} {$title_sep} 
   				{if isset($users[$abs_last_exec.tester_id])}
   				  {$users[$abs_last_exec.tester_id]->getDisplayName()|escape}
@@ -128,6 +141,8 @@ Rev:
 
     {* -------------------------------------------------------------------------------------------------- *}
     {if $gui->other_execs.$tcversion_id}
+      {assign var="my_colspan" value=$attachment_model->num_cols}
+      
       {if $gui->history_on == 0 && $show_current_build}
    		   <div class="exec_history_title">
   			    {$labels.last_execution} {$labels.exec_current_build}
@@ -138,8 +153,13 @@ Rev:
 		  <table cellspacing="0" class="exec_history">
 			 <tr>
 				<th style="text-align:left">{$labels.date_time_run}</th>
+        
 				{if $gui->history_on == 0 || $cfg->exec_cfg->show_history_all_builds}
 				  <th style="text-align:left">{$labels.build}</th>
+				{/if}
+				{if $gui->has_platforms && 
+				    ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms) }
+				  <th style="text-align:left">{$labels.platform}</th>
 				{/if}
 				<th style="text-align:left">{$labels.test_exec_by}</th>
 				<th style="text-align:center">{$labels.exec_status}</th>
@@ -147,10 +167,11 @@ Rev:
 
 				{if $attachment_model->show_upload_column && !$att_download_only}
 						<th style="text-align:center">{$labels.attachment_mgmt}</th>
-            {assign var="my_colspan" value=$attachment_model->num_cols}
+				{else}		
+            {assign var="my_colspan" value=$my_colspan-1}
         {/if}
 
-				{if $g_bugInterfaceOn}
+				{if $gsmarty_bugInterfaceOn}
           <th style="text-align:left">{$labels.bug_mgmt}</th>
           {assign var="my_colspan" value=$my_colspan+1}
         {/if}
@@ -161,17 +182,22 @@ Rev:
         {/if}
 
         <th style="text-align:left">{$labels.run_mode}</th>
-        {assign var="my_colspan" value=$my_colspan+1}
-
+        {assign var="my_colspan" value=$my_colspan+2}
 			 </tr>
 
 			{* ----------------------------------------------------------------------------------- *}
 			{foreach item=tc_old_exec from=$gui->other_execs.$tcversion_id}
   	     {assign var="tc_status_code" value=$tc_old_exec.status}
-
    			<tr style="border-top:1px solid black; background-color:{cycle values='#eeeeee,#d0d0d0'}">
-  				<td>{localize_timestamp ts=$tc_old_exec.execution_ts}</td>
-
+  			  <td>
+          {* Check also that Build is Open *}
+  			  {if $gui->grants->edit_exec_notes && $tc_old_exec.build_is_open}
+  		      <img src="{$smarty.const.TL_THEME_IMG_DIR}/note_edit.png" title="{$labels.edit_execution}"
+  		           onclick="javascript: openExecEditWindow({$tc_old_exec.execution_id},{$tc_old_exec.id},
+  		                                                   {$gui->tplan_id},{$gui->tproject_id});">
+ 			    {/if}
+  			  {localize_timestamp ts=$tc_old_exec.execution_ts}
+  			  </td>
 				  {if $gui->history_on == 0 || $cfg->exec_cfg->show_history_all_builds}
   				<td>{if !$tc_old_exec.build_is_open}
   				    <img src="{$smarty.const.TL_THEME_IMG_DIR}/lock.png" title="{$labels.closed_build}">{/if}
@@ -179,8 +205,14 @@ Rev:
   				</td>
   				{/if}
 
+				  {if $gui->has_platforms && 
+				      ($gui->history_on == 0 || $cfg->exec_cfg->show_history_all_platforms) }
+  				  <td>
+					  {$tc_old_exec.platform_name}
+  				  </td>
+  				{/if}
+
   				<td>
-  				{* 20090525 - franciscom - avoid deleted user crash  *}
   				{if isset($users[$tc_old_exec.tester_id]) }
   				  {$users[$tc_old_exec.tester_id]->getDisplayName()|escape}
   				{else}
@@ -208,7 +240,7 @@ Rev:
               </td>
   	      {/if}
 
-    			{if $g_bugInterfaceOn}
+    			{if $gsmarty_bugInterfaceOn}
        		  	<td align="center"><a href="javascript:open_bug_add_window({$tc_old_exec.execution_id})">
       			    <img src="{$smarty.const.TL_THEME_IMG_DIR}/bug1.gif" title="{$labels.img_title_bug_mgmt}"
       			         style="border:none" /></a>
@@ -260,18 +292,8 @@ Rev:
   			<tr>
   			 <td colspan="{$my_colspan}" id="exec_notes_container_{$tc_old_exec.execution_id}"
   			     style="padding:5px 5px 5px 5px;">
-  			</td>
+  			 </td>
    			</tr>
- 			  {/if}
-
-  			{* 20080322 - franciscom - edit execution notes *}
-  			{if $gui->grants->edit_exec_notes }
-  			<tr>
-  			<td colspan="{$my_colspan}">
-  		    <img src="{$smarty.const.TL_THEME_IMG_DIR}/note_edit.png" title="{$labels.edit_notes}"
-  		         onclick="javascript: openExecNotesWindow({$tc_old_exec.execution_id});">
-  			</td>
-  			</tr>
  			  {/if}
 
   			{* 20070105 - Custom field values  *}
@@ -325,16 +347,18 @@ Rev:
   <br />
   {* ----------------------------------------------------------------------------------- *}
   <div>
+    {* 20090526 - franciscom*}
     {include file="execute/inc_exec_test_spec.tpl"
              args_tc_exec=$tc_exec
              args_labels=$labels
              args_enable_custom_field=$enable_custom_fields
              args_execution_time_cf=$gui->execution_time_cfields
              args_design_time_cf=$gui->design_time_cfields
+             args_testplan_design_time_cf=$gui->testplan_design_time_cfields
              args_execution_types=$gui->execution_types
              args_tcAttachments=$gui->tcAttachments
-	           args_req_details=$gui->req_details}
-
+	           args_req_details=$gui->req_details
+	           args_cfg=$cfg}
     {if $tc_exec.can_be_executed}
       {include file="execute/inc_exec_controls.tpl"
                args_save_type='single'

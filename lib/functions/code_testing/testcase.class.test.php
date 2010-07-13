@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: testcase.class.test.php,v $
  *
- * @version $Revision: 1.5 $
- * @modified $Date: 2009/01/17 08:31:00 $ by $Author: franciscom $
+ * @version $Revision: 1.8 $
+ * @modified $Date: 2009/11/29 19:18:42 $ by $Author: franciscom $
  * @author Francisco Mancardi
  *
  * With this page you can launch a set of available methods, to understand
@@ -26,6 +26,58 @@ testlinkInitPage($db);
 echo "<pre> testcase - constructor - testcase(&\$db)";echo "</pre>";
 $tcase_mgr=new testcase($db);
 // new dBug($tcase_mgr);
+
+
+// $old_article = file_get_contents('./old_article.txt');
+// $new_article = $_REQUEST['article']; /* Let's say that someone pasted a new article to html form */
+// 
+// $diff = xdiff_string_diff($old_article, $new_article, 1);
+// if (is_string($diff)) {
+//    echo "Differences between two articles:\n";
+//    echo $diff;
+// }
+   
+$version_a=1;
+$version_b=2;
+
+$tcase_id=88;   
+$va = $tcase_mgr->get_by_id($tcase_id,null,'ALL','ALL',$version_a);
+$vb = $tcase_mgr->get_by_id($tcase_id,null,'ALL','ALL',$version_b);
+
+new dBug($va);
+new dBug($vb);
+$diff = xdiff_string_diff($va[0]['summary'], $vb[0]['summary'], 1);
+echo "Differences between two articles:\n";
+echo $diff;
+die();
+
+   
+
+// getByPathName
+// function getByPathName($pathName,$pathSeparator='::')
+$pathName='ZATHURA::Holodeck::Apollo 10 Simulation::Unload::Full speed unload';
+$fname = 'getByPathName';
+echo "<pre> testcase - $fname(\$pathName,\$pathSeparator='::')";echo "</pre>";
+echo "<pre>            $fname($pathName)";echo "</pre>";
+$result=$tcase_mgr->$fname($pathName);
+new dBug($result);
+die();
+
+
+$tcase_id=318;
+$tplan_id=389;
+$build_id=21;
+$platform_id=5;
+$version_id=testcase::ALL_VERSIONS;
+// $options = array('getNoExecutions' => true);
+$options = null;
+
+// function get_last_execution($id,$version_id,$tplan_id,$build_id,$platform_id,$options=null)
+echo "<pre> testcase - get_last_execution(\$id,\$version_id,\$tplan_id,\$build_id,\$platform_id\$options=null)";echo "</pre>";
+echo "<pre>            get_last_execution($tcase_id,$version_id,$tplan_id,$build_id,$platform_id,$options)";echo "</pre>";
+$last_execution=$tcase_mgr->get_last_execution($tcase_id,$version_id,$tplan_id,$build_id,$platform_id,$options);
+new dBug($last_execution);
+die();
 
 $tcase_id=4;
 echo "<pre> testcase - get_by_id(\$id,\$version_id = TC_ALL_VERSIONS, \$active_status='ALL',\$open_status='ALL')";echo "</pre>";

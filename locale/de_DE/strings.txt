@@ -4,14 +4,14 @@
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: strings.txt,v $
- * @version $Revision: 1.111.2.6 $
- * @modified $Date: 2009/07/08 18:20:16 $ by $Author: schlundus $
+ * @version $Revision: 1.127 $
+ * @modified $Date: 2009/11/19 20:05:39 $ by $Author: schlundus $
  *
  * @copyright Copyright (c) 2008, TestLink community
  * @author Francisco Mancardi
  * --------------------------------------------------------------------------------------
  * 
- * English (en_GB) strings
+ * German (de_DE) strings
  *
  * This list of labels is defined as GLOBAL string variables. The first sections is general 
  * for strings used over all GUI. Next sections are related to particular pages.
@@ -65,8 +65,8 @@ $TLS_Keyword = "Stichwort";
 $TLS_test_case = "Testfall";
 $TLS_testcase = $TLS_test_case;
 $TLS_testcaseversion = $TLS_test_case . 'Version';
-$TLS_tester = "Tester";
 $TLS_test_plan = "Testplan";
+$TLS_tester = "Tester";
 $TLS_testplan = $TLS_test_plan;
 $TLS_testproject 	= "Testprojekt";
 $TLS_test_report 	= "Testreport";
@@ -77,7 +77,7 @@ $TLS_urgency = "Dringlichkeit";
 $TLS_not_imported = "Nicht importiert";
 $TLS_imported = "Importiert";
 $TLS_nobody = "Niemand";
-
+$TLS_container = "Container";
 
 // Actions (used wide) 
 $TLS_add = "Hinzufügen";
@@ -89,6 +89,7 @@ $TLS_th_delete = "Löschen?";
 // Buttons (used wide)
 $TLS_btn_apply = "Anwenden";
 $TLS_btn_add = "Hinzufügen";
+$TLS_btn_add_to_testplans = "Zu Testplänen hinzufügen";
 $TLS_btn_assign = "Hinzufügen";
 $TLS_btn_cancel = "Abbrechen";
 $TLS_btn_close = "Schließen";
@@ -143,6 +144,7 @@ $TLS_th_name = "Name";
 $TLS_th_notes = "Notizen";
 $TLS_th_testcase = $TLS_test_case;
 $TLS_th_requirement_feature = "Anforderungsverwaltung";
+$TLS_th_platform = "Plattform";
 
 $TLS_import_file_type = "Import Dateiart";
 $TLS_max_file_size_is = "Max. Dateigröße ";
@@ -154,6 +156,7 @@ $TLS_no_permissions_for_action = "Sie haben keine Berechtigung diese Aktion ausz
 $TLS_warning_numeric_cf = "Das Benutzerdefinierte Feld %s erlaubt nur numerische Werte";
 $TLS_warning_float_cf = "Das Benutzerdefinierte Feld %s erlaubt nur numerische oder Fließkomma Werte";
 $TLS_warning_email_cf = "Das Benutzerdefinierte Feld %s erlaubt nur Email-Adressen";
+$TLS_warning_text_area_cf = "Das Benutzerdefinierte Feld %s erlaubt nur 255 Zeichen";
 
 
 // Installation/Migration
@@ -210,7 +213,7 @@ $TLS_wrong_keywords_file = "Fehlerhafte Stichwort-Datei (falsches Format)";
 
 // ----- lostPassword.php -----
 $TLS_bad_user = "Der angegebene Benutzer konnte nicht gefunden werden. Versuchen Sie es bitte nochmal.";
-$TLS_contact_admin = "<br>Bei weiteren Probleme kontaktieren Sie bitte Ihren Systemadministrator.";
+$TLS_contact_admin = "<br />Bei weiteren Probleme kontaktieren Sie bitte Ihren Systemadministrator.";
 $TLS_mail_empty_address = "Sie haben in Ihrem Benutzerprofil keine Email-Adresse angegeben!  Bitte kontaktieren Sie Ihren Administrator, um Ihr Passwort zurückzusetzen!";
 $TLS_mail_passwd_subject = "Ihr neues TestLink Passwort";
 $TLS_mail_problems = "Das Emailsystem wurde nicht korrekt installiert. Bitte informieren Sie Ihren Administrator über dieses Problem";
@@ -279,10 +282,10 @@ $TLS_title_delete_attachment = "Anhang löschen";
 $TLS_btn_yes_del_comp = "Testsuite löschen?";
 $TLS_container_title_testsuite = $TLS_test_suite;
 $TLS_linked_but_not_executed = "Verknüpft mit einem oder mehreren Testplänen, aber noch nicht ausgeführt";
-$TLS_question_del = "Löschen?";
+$TLS_question_del_testsuite = "Wollen Sie die Testsuite löschen?";
 $TLS_th_link_exec_status = "Verknüpfung- und Ausführungs-Status";
 $TLS_no_links = "Keine Verknüpfungen";
-
+$TLS_testsuite_successfully_deleted = "Die Testsuite wurde erfolgreich gelöscht";
 
 // ----- gui/templates/containerNew.tpl -----
 $TLS_btn_create_testsuite = "Erstellen";
@@ -407,14 +410,13 @@ $TLS_include_unassigned_testcases = "Inklusive nicht zugewiesene ";
 $TLS_keyword = "Stichwort";
 $TLS_test_status_all_status = $TLS_test_status_all;
 $TLS_filter_result_all_prev_builds = "Ergebnis ALLER vorangegangener Builds";
-$TLS_In = "In";
-$TLS_Out = "Out";
+
 
 // gui/templates/mainPage.tpl
 $TLS_th_my_perc_completed = "Mein Erledigungsgrad [%]";
 $TLS_th_perc_completed = "Abgearbeitet [%]";
 $TLS_title_your_tp_metrics = "Ihre Testplan Metriken";
-$TLS_error_no_testprojects_present = "Es existieren keine Testprojekte!";
+$TLS_error_no_testprojects_present = "There are currently no testproject defined!";
 
 // gui/templates/metrics_dashbord.tpl
 $TLS_th_total_tc = "Testfall-Nummer";
@@ -466,7 +468,7 @@ $TLS_attached_files = "Angehängte Dateien";
 $TLS_attachment_feature_disabled = "Anhang deaktiviert";
 $TLS_button_upload = "Hochladen";
 $TLS_upload_file_new_file = "Anhang hochladen";
-$TLS_warning_delete_attachment = "Wollen Sie diesen Anhang wirklich löschen?";
+$TLS_warning_delete_attachment = "Wollen Sie den Anhang '%s' wirklich löschen?";
 
 
 
@@ -628,7 +630,7 @@ $TLS_action_create_srs = "Anforderungen spezifieren";
 $TLS_Author = "Autor";
 $TLS_last_edit = "Zuletzt geändert durch ";
 $TLS_warning_delete_requirement = "Sind Sie sicher, dass Sie die Anforderung: %s löschen wollen?";
-
+$TLS_review_status_valid = "Gültig";
 
 // gui/templates/inc_res_by_comp.tpl
 $TLS_title_res_by_top_level_suites = "Ergebnisse nach Top-Level Suites";
@@ -967,6 +969,8 @@ $TLS_check_uncheck_all_checkboxes_for_add = "alle an-/abwählen (zum Hinuzufügen)
 $TLS_check_uncheck_all_checkboxes_for_rm = "alle an-/abwählen (zum Entfernen)";
 $TLS_executed_can_not_be_removed = "Bereits ausgeführte Testfälle können nicht entfernt werden";
 $TLS_execution_order = "Ausführungsreihenfolge";
+$TLS_select_all_to_add = "Alle TestFälle zum Hinzufügen aus- oder abwählen";
+$TLS_select_all_to_remove = "Alle TestFälle zum Entfernen aus- oder abwählen";
 
 $TLS_has_been_executed = "wurde ausgeführt";
 $TLS_inactive_testcase = "inaktiv";
@@ -1526,7 +1530,6 @@ $TLS_href_my_testcase_assignments = "Mir zugewiesene Testfälle";
 
 
 // ----- gui/templates/mainPage_right.tpl -----
-$TLS_filter_tp_by_product = "Testpläne nach Testprojekt filtern";
 $TLS_href_add_remove_test_cases = "Testfälle hinzufügen / entfernen";
 $TLS_href_build_new = "Builds verwalten";
 $TLS_href_execute_test = "Test ausführen";
@@ -1639,7 +1642,8 @@ $TLS_error_role_no_rights = "Sie können keine Rolle ohne Rechte abspeichern!";
 $TLS_error_role_no_rolename = "Sie müssen der Rolle einen Namen vergeben!";
 $TLS_inherited_role = "<geerbt>";
 $TLS_mgt_testplan_create = "Erstellen von Testplänen";
-
+$TLS_inherited = "geerbt";
+$TLS_no_rights = "keine Rechte";
 
 
 // lib/functions/testproject.class.php
@@ -1714,7 +1718,7 @@ $TLS_Unknown = "Unbekannt";
 $TLS_duplicate_login = "Es gibt schon einen Benutzer mit diesem Benutzernamen!";
 $TLS_login_must_not_be_empty = "Der Benutzername darf nicht leer sein!";
 $TLS_wrong_old_password = "Das alte Passwort stimmt nicht!";
-
+$TLS_tag_for_inactive_users = "*";
 
 
 // lib/functions/email_api.php
@@ -1732,7 +1736,7 @@ $TLS_XMLRPC_error_number = "XML-RPC Fehlercode:- ";
 $TLS_attachments_dir = "Verzeichnis für Anhänge:";
 $TLS_bts_connection_problems = "Verbindung zum Bug Traking System ist fehlgeschlagen:<br> 
                                 Bitte überprüfen Sie die Konfiguration.<br>
-                                Bitte beachten Sie, dieses Problem verringert die Testlink Performance.";
+                                Bitte beachten Sie, dieses Problem verringert die TestLink Performance.";
 $TLS_but_directory_is_not_writable = "Das Verzeichnis ist nicht beschreibbar!";
 $TLS_check_email_config="Check following parameters of email feature:";
 $TLS_directory_is_writable = "das Verzeichnis ist beschreibbar";

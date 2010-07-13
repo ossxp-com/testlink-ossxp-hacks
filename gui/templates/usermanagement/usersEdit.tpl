@@ -1,6 +1,6 @@
 {*
 Testlink: smarty template -
-$Id: usersEdit.tpl,v 1.21.2.2 2009/08/29 23:17:58 havlat Exp $
+$Id: usersEdit.tpl,v 1.25 2009/08/29 23:18:02 havlat Exp $
 
 20080419 - franciscom - BUGID 1496
          -  bug 1000  - Testplan User Role Assignments
@@ -146,7 +146,7 @@ function validateForm(f,check_password)
 {include file="inc_update.tpl" result=$result item="user" action="$action" user_feedback=$user_feedback}
 
 <div class="workBack">
-<form method="post" action="lib/usermanagement/usersEdit.php" class="x-form" name="useredit"
+<form method="post" action="lib/usermanagement/usersEdit.php" class="x-form" name="useredit" 
 	{if $tlCfg->demoMode}
 		onsubmit="alert('{lang_get s="warn_demo"}'); return false;">
 	{else}
@@ -218,7 +218,7 @@ function validateForm(f,check_password)
 				<select name="rights_id">
 				{foreach key=role_id item=role from=$optRights}
 		        <option value="{$role_id}" {if $role_id == $selected_role} selected="selected" {/if}>
-					{$role->name|escape}
+					{$role->getDisplayName()|escape}
 				</option>
 				{/foreach}
 				</select>
@@ -242,7 +242,7 @@ function validateForm(f,check_password)
 		<tr>
 			<th style="background:none;">{$labels.th_active}</th>
 			<td>
-			  <input type="checkbox"  name="user_is_active" {if $userData->bActive eq 1} checked {/if} />
+			  <input type="checkbox"  name="user_is_active" {if $userData->isActive eq 1} checked {/if} />
 			</td>
 		</tr>
 

@@ -4,8 +4,8 @@
  *
  * Filename $RCSfile: README.TXT,v $
  *
- * @version $Revision: 1.1.2.2 $
- * @modified $Date: 2009/05/02 09:05:40 $ by $Author: franciscom $
+ * @version $Revision: 1.2 $
+ * @modified $Date: 2009/05/03 14:37:59 $ by $Author: franciscom $
  * @Author: francisco.mancardi@gmail.com
  *
  * rev: 

@@ -3,8 +3,8 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * 
  * Filename $RCSfile: description.php,v $
- * @version $Revision: 1.1.2.2 $
- * @modified $Date: 2009/06/01 21:41:33 $ $Author: havlat $
+ * @version $Revision: 1.1 $
+ * @modified $Date: 2009/06/01 21:41:06 $ $Author: havlat $
  * @author Martin Havlat
  *
  * LOCALIZATION:

@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: strings.txt,v $
- * @version $Revision: 1.19.2.3 $
- * @modified $Date: 2009/06/22 12:19:12 $ by $Author: havlat $
+ * @version $Revision: 1.22 $
+ * @modified $Date: 2009/06/22 12:19:09 $ by $Author: havlat $
  *
  * @copyright Copyright (c) 2003-9, TestLink community
  * @author Milton Campos

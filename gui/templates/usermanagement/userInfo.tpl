@@ -1,6 +1,6 @@
 {* 
 Testlink: smarty template - Edit own account 
-$Id: userInfo.tpl,v 1.15.2.1 2009/08/29 23:17:58 havlat Exp $
+$Id: userInfo.tpl,v 1.19 2010/01/11 20:27:52 franciscom Exp $
 
 rev: 20080908 - franciscom - email validity check
 *}
@@ -125,7 +125,7 @@ function checkPasswords(oldp,newp,newp_check)
 	{else}
 		onsubmit="return validatePersonalData(this)">
 	{/if}
-	<input type="hidden" name="id" value="{$user->dbID}" />
+	<input type="hidden" name="doAction" value="editUser" />
 	<table class="common">
 		<tr>
 			<th>{$labels.th_login}</th>
@@ -162,7 +162,7 @@ function checkPasswords(oldp,newp,newp_check)
 		</tr>
 	</table>
 	<div class="groupBtn">
-		<input type="submit" name="editUser" value="{$labels.btn_save}" />
+		<input type="submit" value="{$labels.btn_save}" />
 	</div>
 </form>
 
@@ -175,7 +175,7 @@ function checkPasswords(oldp,newp,newp_check)
 		{else}
 		onsubmit="return checkPasswords('oldpassword','newpassword','newpassword_check');">
 		{/if}
-		<input type="hidden" name="id" value="{$user->dbID}" />
+		<input type="hidden" name="doAction" value="changePassword" />
 		<table class="common">
 			<tr><th>{$labels.th_old_passwd}</th>
 				<td><input type="password" name="oldpassword"  id="oldpassword"
@@ -188,23 +188,23 @@ function checkPasswords(oldp,newp,newp_check)
 				           size="{#PASSWD_SIZE#}" maxlength="{#PASSWD_SIZE#}" /></td></tr>
 		</table>
 		<div class="groupBtn">
-			<input type="submit" name="changePassword" value="{$labels.btn_change_passwd}" />
+			<input type="submit" value="{$labels.btn_change_passwd}" />
 		</div>
 	</form>
 {else}
    <p>{$labels.your_password_is_external}<p>
 {/if}
 
-{if $tlCfg->api->enabled eq TRUE}
+{if $tlCfg->api->enabled}
 <hr />
 <h2>{lang_get s="title_api_interface"}</h2>
 <div>
 	<form name="genApi" method="post" action="{$action_mgmt}">
-	<input type="hidden" name="id" value="{$user->dbID}" />
-	<p>{$labels.user_api_key} = {$user->userApiKey|escape}</p>
-	<div class="groupBtn">
-		<input type="submit" name="genApiKey" value="{$labels.btn_apikey_generate}" />
-	</div>
+		<input type="hidden" name="doAction" value="genAPIKey" />
+		<p>{$labels.user_api_key} = {$user->userApiKey|escape}</p>
+		<div class="groupBtn">
+			<input type="submit" value="{$labels.btn_apikey_generate}" />
+		</div>
 	</form>
 </div>
 {/if}
@@ -212,7 +212,7 @@ function checkPasswords(oldp,newp,newp_check)
 
 <hr />
 <h2>{$labels.audit_login_history}
-	{if $mgt_view_events eq "yes"}
+	{if $mgt_view_events == "yes"}
 	<img style="margin-left:5px;" class="clickable" src="{$smarty.const.TL_THEME_IMG_DIR}/question.gif" onclick="showEventHistoryFor('{$user->dbID}','users')" alt="{$labels.show_event_history}" title="{$labels.show_event_history}"/>
 </h2>
 {/if}

@@ -3,21 +3,19 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
- * @filesource $RCSfile: email_api.php,v $
- * @version $Revision: 1.8.2.1 $
- * @modified $Date: 2009/08/31 20:10:16 $ by $Author: schlundus $
- * @author franciscom
- * @author Mantis Team (the code is based on mantis BT project code)
+ * Email API (adapted from third party code)
  *
- * rev:
+ * @package 	TestLink
+ * @author 		franciscom
+ * @author 		2002 - 2004 Mantis Team (the code is based on mantis BT project code)
+ * @copyright 	2003-2009, TestLink community 
+ * @version    	CVS: $Id: email_api.php,v 1.11 2009/07/10 21:21:44 havlat Exp $
+ * @link 		http://www.teamst.org/
  *
- *
-**/
+ */
 
-// This piece of sowftare is based on work belonging to:
-// Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-// Copyright (C) 2002 - 2004  Mantis Team   - mantisbt-dev@lists.sourceforge.net
 
+/** @uses class.phpmailer.php */
 define( 'PHPMAILER_PATH', dirname(__FILE__). '/../../third_party/phpmailer' . DIRECTORY_SEPARATOR );
 require_once( PHPMAILER_PATH . 'class.phpmailer.php' );
 
@@ -26,16 +24,13 @@ require_once( 'common.php');
 require_once( 'string_api.php');
 
 
-# reusable object of class SMTP
+/** @var mixed reusable object of class SMTP */
 $g_phpMailer_smtp = null;
-
-###########################################################################
-# Email API
-###########################################################################
 
 
 /** 
  * sends the actual email 
+ * 
  * @param boolean $p_exit_on_error == true - calls exit() on errors, else - returns true 
  * 		on success and false on errors
  * @param boolean $htmlFormat specify text type true = html, false (default) = plain text
@@ -67,16 +62,6 @@ function email_send( $p_from, $p_recipient, $p_subject, $p_message, $p_cc='',
 
 	# short-circuit if no recipient is defined, or email disabled
 	# note that this may cause signup messages not to be sent
-
-	# for debugging only
-	#PRINT $t_recipient.'<br />'.$t_subject.'<br />'.$t_message.'<br />'.$t_headers;
-	#exit;
-	#PRINT '<br />xxxRecipient ='.$t_recipient.'<br />';
-	#PRINT 'Headers ='.nl2br($t_headers).'<br />';
-	#PRINT $t_subject.'<br />';
-	#PRINT nl2br($t_message).'<br />';
-	#exit;
-
 
 	# Visit http://phpmailer.sourceforge.net
 	# if you have problems with phpMailer

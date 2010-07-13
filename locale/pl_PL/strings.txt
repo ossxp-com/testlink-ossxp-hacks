@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: strings.txt,v $
  *
- * @version $Revision: 1.15.2.1 $
- * @modified $Date: 2009/05/19 02:28:32 $ by $Author: havlat $
+ * @version $Revision: 1.16 $
+ * @modified $Date: 2009/05/19 02:29:53 $ by $Author: havlat $
  *
  * @author Micha&#322; Wujas
  *

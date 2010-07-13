@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_exec_controls.tpl,v 1.7 2008/12/31 15:06:00 franciscom Exp $
+$Id: inc_exec_controls.tpl,v 1.10 2009/12/07 20:12:18 franciscom Exp $
 Purpose: draw execution controls (input for notes and results)
 Author : franciscom
 
@@ -13,7 +13,7 @@ Rev: 20080503 - franciscom - use of tlCfg
       {else}
         {assign var="radio_id_prefix" value="status"}
       {/if}
-      
+
   		<table class="invisible">
   		<tr>
   			<th rowspan="2" style="text-align: center;">
@@ -44,6 +44,11 @@ Rev: 20080503 - franciscom - use of tlCfg
                           onclick="document.getElementById('save_button_clicked').value={$args_tcversion_id};return checkSubmitForStatus('{$ResultsStatusCode.not_run}')"
     		 			            value="{$args_labels.btn_save_tc_exec_results}" />
     		 			         
+    		 			      <input type="submit" name="save_and_next[{$args_tcversion_id}]" 
+    		 			            {$args_input_enable_mgmt}
+                          onclick="document.getElementById('save_button_clicked').value={$args_tcversion_id};return checkSubmitForStatus('{$ResultsStatusCode.not_run}')"
+    		 			            value="{$args_labels.btn_save_exec_and_movetonext}" />
+
     		 			  {else}
      	    	        <input type="submit" id="do_bulk_save" name="do_bulk_save"
       	    	             value="{$args_labels.btn_save_tc_exec_results}"/>
@@ -52,3 +57,6 @@ Rev: 20080503 - franciscom - use of tlCfg
     			</td>
     		</tr>
   		</table>
+      <div class="messages" style="align:center;">
+      {$labels.exec_not_run_result_note}
+      </div>

@@ -2,7 +2,7 @@
 /** 
 * 	TestLink Open Source Project - http://testlink.sourceforge.net/
 * 
-* 	@version 	$Id: getrequirementnodes.php,v 1.4 2008/09/21 19:35:47 schlundus Exp $
+* 	@version 	$Id: getrequirementnodes.php,v 1.10 2009/12/08 18:08:30 franciscom Exp $
 * 	@author 	Francisco Mancardi
 * 
 *   **** IMPORTANT *****   
@@ -18,7 +18,11 @@
 *   - Assign keywords to test cases
 *   - Assign requirements to test cases
 *
-*   rev: 
+*	@internal revision
+*	20091208 - franciscom - added management of new attribute 'forbbiden_parent'
+*                           to manage req spec movement when child req spec management is ENABLED.  
+*	20091122 - franciscom - manage rep spec doc id
+*	20090502 - franciscom - BUGID 2309 - display requirement doc id
 *        
 */
 require_once('../../config.inc.php');
@@ -33,7 +37,7 @@ $show_children=isset($_REQUEST['show_children']) ? $_REQUEST['show_children'] : 
 $operation=isset($_REQUEST['operation']) ? $_REQUEST['operation']: 'manage';
 
 // for debug - file_put_contents('d:\request.txt', serialize($_REQUEST));                            
-$nodes=display_children($db,$root_node,$node,$filter_node,$show_children,$operation);
+$nodes = display_children($db,$root_node,$node,$filter_node,$show_children,$operation);
 echo json_encode($nodes);
 
 /*
@@ -42,6 +46,16 @@ echo json_encode($nodes);
 function display_children($dbHandler,$root_node,$parent,$filter_node,
                           $show_children=ON,$operation='manage') 
 {             
+    $tables = tlObjectWithDB::getDBTables(array('requirements','nodes_hierarchy','node_types','req_specs'));
+	$cfg = config_get('req_cfg');
+	$forbbiden_parent['testproject'] = 'none';
+	$forbbiden_parent['requirement'] = 'testproject';
+	$forbbiden_parent['requirement_spec'] = 'requirement_spec';
+	if($cfg->child_requirements_mgmt)
+	{
+		$forbbiden_parent['requirement_spec'] = 'none';
+	} 
+    
     switch($operation)
     {
         // case 'print':
@@ -51,37 +65,49 @@ function display_children($dbHandler,$root_node,$parent,$filter_node,
         
         case 'manage':
         default:
-            $js_function=array('testproject' => 'TPROJECT_REQ_SPEC_MGMT',
-                               'requirement_spec' =>'REQ_SPEC_MGMT', 'requirement' => 'REQ_MGMT');
-        break;  
+            $js_function = array('testproject' => 'TPROJECT_REQ_SPEC_MGMT',
+                                 'requirement_spec' =>'REQ_SPEC_MGMT', 'requirement' => 'REQ_MGMT');
+        	break;  
     }
     
     $nodes = null;
     $filter_node_type = $show_children ? '' : ",'requirement'";
 
-    $sql = " SELECT NHA.*, NT.description AS node_type " . 
-           " FROM nodes_hierarchy NHA, node_types NT " .
-           " WHERE NHA.node_type_id=NT.id " .
-           " AND parent_id = {$parent} " .
-           " AND NT.description NOT IN " .
-           " ('testcase','testsuite','testcase_version','testplan'{$filter_node_type}) ";
+    // $sql = " SELECT NHA.*, NT.description AS node_type " . 
+    //        " FROM {$tables['nodes_hierarchy']} NHA, {$tables['node_types']}  NT " .
+    //        " WHERE NHA.node_type_id=NT.id " .
+    //        " AND parent_id = {$parent} " .
+    //        " AND NT.description NOT IN " .
+    //        " ('testcase','testsuite','testcase_version','testplan'{$filter_node_type}) ";
+
+
+    $sql = " SELECT NHA.*, NT.description AS node_type, RSPEC.doc_id " . 
+           " FROM {$tables['nodes_hierarchy']} NHA JOIN {$tables['node_types']}  NT " .
+           " ON NHA.node_type_id=NT.id " .
+           " AND NT.description NOT IN ('testcase','testsuite','testcase_version','testplan'{$filter_node_type}) " .
+           " LEFT OUTER JOIN {$tables['req_specs']} RSPEC " .
+           " ON RSPEC.id = NHA.id " . 
+           " WHERE parent_id = {$parent} ";
+    
+    // file_put_contents('c:\getrequirementnodes.php.txt', $sql);                            
 
     if(!is_null($filter_node) && $filter_node > 0 && $parent == $root_node)
     {
-       $sql .=" AND NHA.id = {$filter_node} ";  
+       $sql .= " AND NHA.id = {$filter_node} ";  
     }
     $sql .= " ORDER BY NHA.node_order ";    
-    
-    
-    // for debug 
-    //file_put_contents('d:\sql_display_node.txt', $sql); 
+
     $nodeSet = $dbHandler->get_recordset($sql);
-    //file_put_contents('d:\nodeSet.txt', serialize($nodeSet)); 
-    
-    // print_r(array_values($nodeSet));
-    // file_put_contents('d:\sql_display_node.txt', serialize(array_values($nodeSet))); 
-	if( !is_null($nodeSet) ) 
+	if(!is_null($nodeSet)) 
 	{
+        // BUGID 2309
+        $sql =  " SELECT DISTINCT req_doc_id AS doc_id,NHA.id" .
+                " FROM {$tables['requirements']} REQ JOIN {$tables['nodes_hierarchy']} NHA ON NHA.id = REQ.id  " .
+                " JOIN {$tables['nodes_hierarchy']}  NHB ON NHA.parent_id = NHB.id " . 
+                " JOIN {$tables['node_types']} NT ON NT.id = NHA.node_type_id " .
+                " WHERE NHB.id = {$parent} AND NT.description = 'requirement'";
+        $requirements = $dbHandler->fetchRowsIntoMap($sql,'id');
+
 	    $tproject_mgr = new testproject($dbHandler);
 	    foreach($nodeSet as $key => $row)
 	    {
@@ -98,26 +124,27 @@ function display_children($dbHandler,$root_node,$parent,$filter_node,
  	        // public property 'attributes' of object of Class Ext.tree.TreeNode 
  	        // 
  	        $path['testlink_node_type']	= $row['node_type'];		                                 
-	                                 
-	        $tcase_qty = null;
+            $path['forbbiden_parent'] = 'none';
             switch($row['node_type'])
             {
                 case 'testproject':
-                $path['href'] = "javascript:EP({$path['id']})";
-                break;
-                
+	                $path['href'] = "javascript:EP({$path['id']})";
+                    $path['forbbiden_parent'] = $forbbiden_parent[$row['node_type']];
+	                break;
+
                 case 'requirement_spec':
-                $path['href'] = "javascript:" . $js_function[$row['node_type']]. "({$path['id']})";
-                break;
-                
+	                $path['href'] = "javascript:" . $js_function[$row['node_type']]. "({$path['id']})";
+	                $path['text'] = htmlspecialchars($row['doc_id'] . "::") . $path['text'];
+                    $path['forbbiden_parent'] = $forbbiden_parent[$row['node_type']];
+	                break;
+
                 case 'requirement':
-                $path['href'] = "javascript:" . $js_function[$row['node_type']]. "({$path['id']})";
-                $path['leaf']	= true;
-                break;
+	                $path['href'] = "javascript:" . $js_function[$row['node_type']]. "({$path['id']})";
+	                $path['text'] = htmlspecialchars($requirements[$row['id']]['doc_id'] . ":") . $path['text'];
+	                $path['leaf']	= true;
+                    $path['forbbiden_parent'] = $forbbiden_parent[$row['node_type']];
+	                break;
             }
-            if(!is_null($tcase_qty))
-                $path['text'] .= "({$tcase_qty})";   
-            
             $nodes[] = $path;                                                                        
 	    }	// foreach	
     }

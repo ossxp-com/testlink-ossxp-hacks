@@ -2,16 +2,20 @@
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
- *
- * @filesource $RCSfile: requirements.inc.php,v $
- * @version $Revision: 1.78.2.4 $
- * @modified $Date: 2009/04/10 10:32:53 $ by $Author: amkhullar $
- *
- * @author Martin Havlat <havlat@users.sourceforge.net>
- *
+ * 
  * Functions for support requirement based testing
  *
- * Revisions:
+ * @package 	TestLink
+ * @author 		Martin Havlat
+ * @copyright 	2007-2009, TestLink community 
+ * @version    	CVS: $Id: requirements.inc.php,v 1.92 2010/03/01 13:03:46 asimon83 Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ * @internal Revisions:
+ *
+ * 20100301 - asimon - modified req_link_replace()
+ * 20091202 - franciscom - added contribution req_link_replace()
+ * 20090815 - franciscom - get_last_execution() call changes
  * 20090402 - amitkhullar - added TC version while displaying the Req -> TC Mapping 
  * 20090331 - amitkhullar - BUGFIX 2292
  * 20090304 - franciscom - BUGID 2171
@@ -22,58 +26,56 @@
  * 20070310 - franciscom - changed return type createRequirement()
  */
 
+/** inlude basic functions for printing Test Specification document */
 require_once("print.inc.php");
-$g_reqFormatStrings = array (
-							"csv" => lang_get('req_import_format_description1'),
-							"csv_doors" => lang_get('req_import_format_description2'),
-							"XML" => lang_get('the_format_req_xml_import'),
-							"DocBook" => lang_get('req_import_format_docbook')
-							);
 
 /**
  * render Requirement Specification
- *
- * @param integer $srs_id
- * @param string $tproject_name
+ * @author Martin Havlat
+ * 
+ * @param resource &$db reference to database handler
+ * @param integer $srs_id requirements specification identifier
  * @param string $tproject_id
  * @param string $user_id
  * @param string $base_href
+ * 
+ * @return string complete HTML source
  *
- * @author Martin Havlat
- *
+ * @uses print.inc.php 
+ * @todo havlatm: refactore and move to other printing functions
+ *  
  **/
-function renderSRS(&$db,&$tproject_mgr,$srs_id, $tproject_name, $tproject_id, $user_id, $base_href)
+function renderSRS(&$db,$srs_id, $tproject_id, $user_id, $base_href)
 {
-  
-  $tprojectInfo = $tproject_mgr->get_by_id($tproject_id);
-  
-  $doc_info = new stdClass(); 
-  $doc_info->tproject_name = htmlspecialchars($tproject_name);
-  $doc_info->tproject_scope = $tprojectInfo['notes'];
-  $doc_info->author='';
-  $doc_info->title='';
-  $doc_info->type_name='';
-  
-  
+	$tproject_mgr = new testproject($db);
+	$tprojectInfo = $tproject_mgr->get_by_id($tproject_id);
+	
+	$doc_info = new stdClass(); 
+	$doc_info->tproject_name = htmlspecialchars($tprojectInfo["name"]);
+	$doc_info->tproject_scope = $tprojectInfo['notes'];
+	$doc_info->title = '';
+	$doc_info->type_name = '';
+	
 	$arrSpec = $tproject_mgr->getReqSpec($tproject_id,$srs_id);
+	$doc_info->author =  gendocGetUserName($db, $arrSpec[0]['author_id']);
+	
 	$output =  renderHTMLHeader($arrSpec[0]['title'],$base_href);
 	$output .= renderFirstPage($doc_info);
 	
 	$output .= "<h2>" . lang_get('scope') . "</h2>\n<div>" . $arrSpec[0]['scope'] . "</div>\n";
 	$output .= renderRequirements($db,$srs_id);
 	$output .= "\n</body>\n</html>";
-
+	
 	return $output;
 }
 
 /**
  * render Requirement for SRS
  *
+ * @param resource &$db reference to database handler
  * @param integer $srs_id
  *
  * @author Martin Havlat
- * 20051125 - scs - added escaping of req names
- * 20051202 - scs - fixed 241
  **/
 function renderRequirements(&$db,$srs_id)
 {
@@ -91,9 +93,7 @@ function renderRequirements(&$db,$srs_id)
 		}
 	}
 	else
-	{
 		$output .= '<p>' . lang_get('none') . '</p>';
-  }
 	$output .= "\n</div>";
 
 	return $output;
@@ -240,6 +240,7 @@ function getReqDocIDs(&$db,$srs_id)
  */
 function loadImportedReq($CSVfile, $importType)
 {
+	$data = null;
 	$fileName = $CSVfile;
 	switch($importType)
 	{
@@ -254,8 +255,7 @@ function loadImportedReq($CSVfile, $importType)
 		case 'XML':
 			$pfn = "importReqDataFromXML";
 			break;
-			
-		// 20081103 - sisajr
+
 		case 'DocBook':
 			$pfn = "importReqDataFromDocBook";
 			break;
@@ -263,9 +263,10 @@ function loadImportedReq($CSVfile, $importType)
 	if ($pfn)
 	{
 		$data = $pfn($fileName);
-		return $data;
 	}
-	return;
+	new dBug($data);
+	die();
+	return $data;
 
 }
 
@@ -308,9 +309,9 @@ function importReqDataFromCSV($fileName)
  */
 function importReqDataFromCSVDoors($fileName)
 {
-  $delimiter=',';
-  $bWithHeader = true;
-  $bDontSkipHeader = false;
+	$delimiter = ',';
+  	$bWithHeader = true;
+  	$bDontSkipHeader = false;
 
 	$destKeys = array("Object Identifier" => "title","Object Text" => "description",
 					          "Created By","Created On","Last Modified By","Last Modified On");
@@ -326,29 +327,31 @@ function importReqDataFromCSVDoors($fileName)
 */
 function importReqDataFromXML($fileName)
 {
-	$dom = domxml_open_file($fileName);
-	$xmlReqs = null;
-	$xmlData = null;
-  $field_size=config_get('field_size');
-
-	if ($dom)
-	{
-		$xmlReqs = $dom->get_elements_by_tagname("requirement");
-  }
-  
-	$num_elem=sizeof($xmlReqs);
-
-	for($i = 0;$i < $num_elem ;$i++)
-	{
-		$xmlReq = $xmlReqs[$i];
-		if ($xmlReq->node_type() != XML_ELEMENT_NODE)
-			continue;
-		$xmlData[$i]['req_doc_id'] = trim_and_limit(getNodeContent($xmlReq,"docid"),$field_size->req_docid);
-		$xmlData[$i]['title'] = trim_and_limit(getNodeContent($xmlReq,"title"),$field_size->req_title);
-		$xmlData[$i]['description'] = getNodeContent($xmlReq,"description");
-	}
-
-	return $xmlData;
+	// NEED TO BE REFACTORED TO:
+	// 1. support Nested Req Spec
+	// 2. use only simpleXML functions
+	//
+	// $dom = domxml_open_file($fileName);
+	// $xmlReqs = null;
+	// $xmlData = null;
+  	// $field_size = config_get('field_size');
+    // 
+	// if ($dom)
+	// 	$xmlReqs = $dom->get_elements_by_tagname("requirement");
+    // 
+	// $num_elem = sizeof($xmlReqs);
+    // 
+	// for($i = 0;$i < $num_elem ;$i++)
+	// {
+	// 	$xmlReq = $xmlReqs[$i];
+	// 	if ($xmlReq->node_type() != XML_ELEMENT_NODE)
+	// 		continue;
+	// 	$xmlData[$i]['req_doc_id'] = trim_and_limit(getNodeContent($xmlReq,"docid"),$field_size->req_docid);
+	// 	$xmlData[$i]['title'] = trim_and_limit(getNodeContent($xmlReq,"title"),$field_size->req_title);
+	// 	$xmlData[$i]['description'] = getNodeContent($xmlReq,"description");
+	// }
+    // 
+	// return $xmlData;
 }
 
 
@@ -638,7 +641,7 @@ function getReqCoverage(&$dbHandler,$reqs,&$execMap)
 		{
 			  $first_key=key($req_tcase_set);
 			  $item_qty = count($req_tcase_set);
-			  $req = array("id" => $requirement_id, "title" => $req_tcase_set[$first_key]['req_title']);
+			  $req = array("id" => $requirement_id, "title" => $req_tcase_set[$first_key]['req_title'],"req_doc_id" => $req_tcase_set[$first_key]["req_doc_id"]);
 			  foreach($status_counters as $key => $value)
 			  {
 			      $status_counters[$key]=0;
@@ -762,6 +765,7 @@ function getReqCoverage(&$dbHandler,$reqs,&$execMap)
   
   returns: 
 
+  rev: 20090716 - franciscom - get_last_execution() interface changes
 */
 function getLastExecutions(&$db,$tcaseSet,$tplanId)
 {
@@ -769,19 +773,21 @@ function getLastExecutions(&$db,$tcaseSet,$tplanId)
 	if (sizeof($tcaseSet))
 	{
 		$tcase_mgr = new testcase($db);
-    $items=array_keys($tcaseSet);
-    $path_info=$tcase_mgr->tree_manager->get_full_path_verbose($items);
-
+    	$items=array_keys($tcaseSet);
+    	$path_info=$tcase_mgr->tree_manager->get_full_path_verbose($items);
+		$options=array('getNoExecutions' => 1, 'groupByBuild' => 0);
 		foreach($tcaseSet as $tcaseId => $tcInfo)
 		{
 		    $execMap[$tcaseId] = $tcase_mgr->get_last_execution($tcaseId,$tcInfo['tcversion_id'],
-		                                                         $tplanId,ANY_BUILD,GET_NO_EXEC);
-        unset($path_info[$tcaseId][0]); // remove test project name
-        $path_info[$tcaseId][]='';
+		                                                         $tplanId,testcase::ANY_BUILD,
+		                                                         testcase::ANY_PLATFORM,$options);
+		                                                         
+        	unset($path_info[$tcaseId][0]); // remove test project name
+        	$path_info[$tcaseId][]='';
 		    $execMap[$tcaseId][$tcInfo['tcversion_id']]['tcase_path']=implode(' / ',$path_info[$tcaseId]);
 		}
 
-    unset($tcase_mgr); 
+    	unset($tcase_mgr); 
 	}
 	return $execMap;
 }
@@ -858,8 +864,6 @@ function check_syntax_csv($fileName)
   return($ret);
 }
 
-
-
 // Must be implemented !!!
 function check_syntax_csv_doors($fileName)
 {
@@ -870,14 +874,137 @@ function check_syntax_csv_doors($fileName)
   return($ret);
 }
 
-
-// 20061224 - francisco.mancardi@gruppotesi.com
-function get_srs_by_id(&$db,$srs_id)
+/**
+ * replace BBCode-link tagged links in req/reqspec scope with actual links
+ *
+ * @internal revisions:
+ * 20100301 - asimon - added anchor and tproj parameters to tags
+ * 
+ * @param resource $dbHandler database handle
+ * @param string $scope text in which to replace tags with links
+ * @param integer $tprojectID ID of testproject to which req/reqspec belongs
+ * @return string $scope text with generated links
+ */
+function req_link_replace($dbHandler, $scope, $tprojectID) 
 {
-	$output=null;
+	$tree_mgr = new tree($dbHandler);
+	$tproject_mgr = new testproject($dbHandler);
+	$prefix = $tproject_mgr->getTestCasePrefix($tprojectID);
+	$tables = tlObjectWithDB::getDBTables(array('requirements', 'req_specs'));
+	$cfg = config_get('internal_links');
 
-	$sql = "SELECT * FROM req_specs WHERE id={$srs_id}";
-	$output = $db->fetchRowsIntoMap($sql,'id');
-	return($output);
+	/*
+	 * configure target in which link shall open
+	 */
+	if (!isset($cfg->target)) {
+		$cfg->target = 'popup'; // use a reasonable default value if nothing is set in config
+	}
+
+	$string2replace = array();
+	if ($cfg->target == 'popup') {
+		// use javascript to open popup window
+		$string2replace['req'] = '<a href="javascript:openLinkedReqWindow(%s,\'%s\')">%s%s</a>';
+		$string2replace['req_spec'] = '<a href="javascript:openLinkedReqSpecWindow(%s,\'%s\')">%s%s</a>';
+	} else if ($cfg->target == 'window') {
+		$target = 'target="_blank"';
+		$string2replace['req'] = '<a ' . $target . ' href="lib/requirements/reqView.php?' .
+					'item=requirement&requirement_id=%s#%s">%s%s</a>';
+		$string2replace['req_spec'] = '<a ' . $target . ' href="lib/requirements/reqSpecView.php?' .
+					'item=req_spec&req_spec_id=%s#%s">%s%s</a>';
+	} else if ($cfg->target == 'frame') {
+		// open in same frame
+		$target = 'target="_self"';
+		$string2replace['req'] = '<a ' . $target . ' href="lib/requirements/reqView.php?' .
+					'item=requirement&requirement_id=%s#%s">%s%s</a>';
+		$string2replace['req_spec'] = '<a ' . $target . ' href="lib/requirements/reqSpecView.php?' .
+					'item=req_spec&req_spec_id=%s#%s">%s%s</a>';
+	}
+
+	/*
+	 * configure link title (first part of the generated link)
+	 */
+	$title = array();
+	// first for reqs
+	if ($cfg->req_link_title->type == 'string' && $cfg->req_link_title->value != '') {
+		// use user-configured string as link title
+		$title['req'] = lang_get($cfg->req_link_title->value);
+	} else if ($cfg->req_link_title->type == 'none') {
+		$title['req'] = '';
+	} else {
+		// default: use item type as name (localized name for req)
+		$title['req'] = lang_get('requirement') . ": ";
+	}
+	// now for the req specs
+	if ($cfg->req_spec_link_title->type == 'string' && $cfg->req_spec_link_title->value != '') {
+		// use user-configured string as link title
+		$title['req_spec'] = lang_get($cfg->req_spec_link_title->value);
+	} else if ($cfg->req_spec_link_title->type == 'none') {
+		$title['req_spec'] = '';
+	} else {
+		// default: use short item type as name (localized name for req spec)
+		$title['req_spec'] = lang_get('req_spec_short') . ": ";
+	}
+
+	/*
+	 * now the actual replacing
+	 */
+	$patterns2search = array();
+	$patterns2search['req'] =
+		"#\[req[\s]*(tproj=([\w]+))*[\s]*(anchor=([\w]+))*[\s]*(tproj=([\w]+))*\](.*)\[/req\]#iU";
+	$patterns2search['req_spec'] =
+		"#\[req_spec[\s]*(tproj=([\w]+))*[\s]*(anchor=([\w]+))*[\s]*(tproj=([\w]+))*\](.*)\[/req_spec\]#iU";
+
+	$sql2exec = array();
+	$sql2exec['req'] = " SELECT id, req_doc_id AS doc_id " .
+	                   " FROM {$tables['requirements']} WHERE req_doc_id=";
+	 
+	$sql2exec['req_spec'] = " SELECT id, doc_id FROM {$tables['req_specs']} " .
+	                        " WHERE doc_id=" ;
+
+	foreach($patterns2search as $accessKey => $pattern )
+	{
+		$matches = array();
+		preg_match_all($pattern, $scope, $matches);
+
+		if( count($matches[7]) == 0 )
+		{
+			continue;
+		}
+
+		foreach ($matches[0] as $key => $matched_string) {
+
+			// get testproject prefix, if that was found with regex
+			// if not, get prefix of current project
+			if ($matches[2][$key] != '') {
+				$matched_prefix = $matches[2][$key];
+			} else if ($matches[6][$key] != '') {
+				$matched_prefix = $matches[6][$key];
+			} else {
+				$matched_prefix = $prefix;
+			}
+			
+			$matched_anchor = $matches[4][$key];
+			$matched_doc_id = $matches[7][$key];
+			
+			$sql = $sql2exec[$accessKey] . "'{$matched_doc_id}'";
+			$rs = $dbHandler->get_recordset($sql);
+			
+			if (count($rs)) {
+				// get root of linked node and check
+				$real_root = $tree_mgr->getTreeRoot($rs[0]['id']);
+				$matched_root_info = $tproject_mgr->get_by_prefix($matched_prefix);
+				if ($real_root != $matched_root_info['id']) {
+					continue;
+				}
+				
+				$urlString = sprintf($string2replace[$accessKey], $rs[0]['id'],
+									$matched_anchor, $title[$accessKey], $rs[0]['doc_id']);
+				$scope = str_replace($matched_string,$urlString,$scope);
+			}
+		}
+	}
+	
+	return $scope;
 }
+
 ?>

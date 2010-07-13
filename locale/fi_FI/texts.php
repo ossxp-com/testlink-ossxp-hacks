@@ -18,7 +18,7 @@
  * @package 	TestLink
  * @author 		Kirsi Mäkinen, Jan-Erik Finlander, Juho Kauppi, Heikki Alonen, Jari Ahonen, Otto Moilanen
  * @copyright 	2003-2009, TestLink community 
- * @version    	CVS: $Id: texts.php,v 1.1.2.2 2009/06/17 21:19:27 havlat Exp $
+ * @version    	CVS: $Id: texts.php,v 1.1 2009/06/17 21:19:23 havlat Exp $
  * @link 		http://www.teamst.org/index.php
  *
  **/

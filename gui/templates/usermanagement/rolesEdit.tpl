@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: rolesEdit.tpl,v 1.18.2.1 2009/08/29 23:17:58 havlat Exp $
+$Id: rolesEdit.tpl,v 1.20 2009/08/29 23:18:02 havlat Exp $
 Purpose: smarty template - create/edit user role
 
 rev :
@@ -30,6 +30,7 @@ rev :
              error_role_no_rights,caption_possible_affected_users,enter_role_notes,
              title_user_mgmt,caption_define_role,th_mgttc_rights,th_req_rights,
              th_product_rights,th_user_rights,th_kw_rights,th_cf_rights,th_system_rights,
+             th_platform_rights,
              th_rolename,th_tp_rights,btn_cancel'}
 
 var alert_box_title = "{$labels.warning}";
@@ -156,6 +157,15 @@ function validateForm(f)
 						</fieldset>
 					</td>
 				</tr>
+				<tr>
+					<td><fieldset class="x-fieldset x-form-label-left"><legend >{$labels.th_platform_rights}</legend>
+							{foreach from=$gui->rightsCfg->platform_mgmt item=id key=k}
+							<input class="tl-input" type="checkbox" name="grant[{$k}]" {$gui->checkboxStatus[$k]} />{$id}<br />
+							{/foreach}
+						</fieldset>
+					</td>
+				</tr>
+
 			</table>
 			</td>
 		</tr>

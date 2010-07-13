@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: texts.php,v $
- * @version $Revision: 1.2.2.1 $
- * @modified $Date: 2009/04/04 22:35:16 $ by $Author: havlat $
+ * @version $Revision: 1.3 $
+ * @modified $Date: 2009/04/04 22:35:13 $ by $Author: havlat $
  * @author Martin Havlat and reviewers from TestLink Community
  *
  * --------------------------------------------------------------------------------------

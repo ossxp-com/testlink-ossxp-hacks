@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.2.8.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.2 $
+$Date: 2005/10/14 06:44:45 $
+$Author: franciscom $
+$Name: testlink_1_9_beta3 $
 
 Migration from 1.0.4 to 1.6 POST RC1 - 20050925 - fm
 bug correction - missing join conditions found by am

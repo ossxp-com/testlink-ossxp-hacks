@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.1.4.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.1 $
+$Date: 2007/08/28 23:06:34 $
+$Author: asielb $
+$Name: testlink_1_9_beta3 $
 */
 
 # already have a unique index for these fields

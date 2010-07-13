@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: keywordsEdit.php,v $
  *
- * @version $Revision: 1.28.2.1 $
- * @modified $Date: 2010/01/20 20:54:10 $ by $Author: havlat $
+ * @version $Revision: 1.32 $
+ * @modified $Date: 2010/02/03 20:22:13 $ by $Author: franciscom $
  *
  * allows users to manage keywords. 
  *
@@ -19,7 +19,6 @@ require_once("../../config.inc.php");
 require_once("common.php");
 require_once("csv.inc.php");
 require_once("xml.inc.php");
-require_once("keyword.class.php");
 testlinkInitPage($db,false,false,"checkRights");
 
 $smarty = new TLSmarty();
@@ -48,13 +47,14 @@ switch ($action)
 		$op = $action($smarty,$args,$tprojectMgr);
 	break;
 }
-
 if($op->status == 1)
 	$default_template = $op->template;
 else
 	$msg = getKeywordErrorMessage($op->status);
 
-$keywords = $tprojectMgr->getKeywords($args->testproject_id);
+$keywords = null;
+if ($default_template == 'keywordsView.tpl')
+	$keywords = $tprojectMgr->getKeywords($args->testproject_id);
 
 $smarty->assign('user_feedback',$msg);
 $smarty->assign('canManage',$canManage);
@@ -63,42 +63,48 @@ $smarty->assign('name',$args->keyword);
 $smarty->assign('keyword',$args->keyword);
 $smarty->assign('notes',$args->notes);
 $smarty->assign('keywordID',$args->keyword_id);
-$smarty->assign('mgt_view_events',$_SESSION['currentUser']->hasRight($db,"mgt_view_events"));
+$smarty->assign('mgt_view_events',has_rights($db,"mgt_view_events"));
 $smarty->display($template_dir . $default_template);
 
 
-/*
-  function: init_args
-
-  args:
-  
-  returns: 
-
-*/
+/**
+ * @return object returns the arguments for the page
+ */
 function init_args()
 {
-	$_REQUEST = strings_stripSlashes($_REQUEST);
+	$args = new stdClass();
+	
+	$bPostBack = sizeof($_POST);
+	$source = $bPostBack ? "POST" : "GET";
+	$iParams = array(
+			"doAction" => array($source,tlInputParameter::STRING_N,0,50),
+			"id" => array($source, tlInputParameter::INT_N),
+			"keyword" => array($source, tlInputParameter::STRING_N,0,100),
+			"notes" => array($source, tlInputParameter::STRING_N),
+		);
+		
+	$pParams = I_PARAMS($iParams);
 
 	$args = new stdClass();
-	$args->doAction = isset($_REQUEST['doAction']) ? $_REQUEST['doAction'] : null;
-	$args->keyword_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
-	$args->keyword = isset($_REQUEST['keyword']) ? $_REQUEST['keyword'] : null;
-	$args->notes = isset($_REQUEST['notes']) ? $_REQUEST['notes'] : null;
+	$args->doAction = $pParams["doAction"];
+	$args->keyword_id = $pParams["id"];
+	$args->keyword = $pParams["keyword"];
+	$args->notes = $pParams["notes"];
+
+	if ($args->doAction == "edit")
+		$_SESSION['s_keyword_id'] = $args->keyword_id;
+	else if($args->doAction == "do_update")
+		$args->keyword_id = $_SESSION['s_keyword_id'];
+	
 	$args->testproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 	$args->testproject_name = isset($_SESSION['testprojectName']) ? $_SESSION['testprojectName'] : 0;
-
+	
 	return $args;
 }
 
 /*
-  function: create
-            initialize variables to launch user interface (smarty template)
-            to get information to accomplish create task.
-
-  args:
-  
-  returns: - 
-
+ *	initialize variables to launch user interface (smarty template)
+ *	to get information to accomplish create task.
 */
 function create(&$smarty,&$args)
 {
@@ -116,14 +122,8 @@ function create(&$smarty,&$args)
 
 
 /*
-  function: edit
-            initialize variables to launch user interface (smarty template)
-            to get information to accomplish edit task.
-
-  args:
-  
-  returns: - 
-
+ *	initialize variables to launch user interface (smarty template)
+ *  to get information to accomplish edit task.
 */
 function edit(&$smarty,&$args,&$tproject_mgr)
 {
@@ -149,14 +149,8 @@ function edit(&$smarty,&$args,&$tproject_mgr)
 }
 
 /*
-  function: do_create 
-            do operations on db
-
-  args :
-  
-  returns: 
-
-*/
+ * Creates the keyword
+ */
 function do_create(&$smarty,&$args,&$tproject_mgr)
 {
 	$smarty->assign('main_descr',lang_get('keyword_management'));
@@ -164,20 +158,15 @@ function do_create(&$smarty,&$args,&$tproject_mgr)
 	$smarty->assign('submit_button_label',lang_get('btn_save'));
 	$smarty->assign('submit_button_action','do_create');
 
+	$op = $tproject_mgr->addKeyword($args->testproject_id,$args->keyword,$args->notes);
 	$ret = new stdClass();
 	$ret->template = 'keywordsView.tpl';
-	$ret->status = $tproject_mgr->addKeyword($args->testproject_id,$args->keyword,$args->notes);
+	$ret->status = $op['status'];
 	return $ret;
 }
 
 /*
-  function: do_update
-            do operations on db
-
-  args :
-  
-  returns: 
-
+ * Updates the keyword
 */
 function do_update(&$smarty,&$args,&$tproject_mgr)
 {
@@ -200,13 +189,7 @@ function do_update(&$smarty,&$args,&$tproject_mgr)
 }
 
 /*
-  function: do_delete
-            do operations on db
-
-  args :
-  
-  returns: 
-
+ * Deletes the keyword 
 */
 function do_delete(&$smarty,&$args,&$tproject_mgr)
 {
@@ -224,14 +207,7 @@ function do_delete(&$smarty,&$args,&$tproject_mgr)
 	return $ret;
 }
 
-/*
-  function: getKeywordErrorMessage
 
-  args:
-  
-  returns: 
-
-*/
 function getKeywordErrorMessage($code)
 {
 	switch($code)
@@ -259,6 +235,12 @@ function getKeywordErrorMessage($code)
   return $msg;
 }
 
+/**
+ * @param $db resource the database connection handle
+ * @param $user the current active user
+ * 
+ * @return boolean returns true if the page can be accessed
+ */
 function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'mgt_modify_key') && $user->hasRight($db,'mgt_view_key');

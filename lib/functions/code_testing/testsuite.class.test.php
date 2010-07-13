@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: testsuite.class.test.php,v $
  *
- * @version $Revision: 1.4 $
- * @modified $Date: 2007/10/29 14:03:58 $ by $Author: franciscom $
+ * @version $Revision: 1.6 $
+ * @modified $Date: 2010/02/02 20:40:37 $ by $Author: franciscom $
  * @author Francisco Mancardi
  *
  * With this page you can launch a set of available methods, to understand
@@ -18,8 +18,6 @@
 
 require_once('../../../config.inc.php');
 require_once('common.php');
-require_once('dBug.php');
-
 testlinkInitPage($db);
 
 echo "<pre> testsuite - constructor - testsuite(&\$db)";echo "</pre>";
@@ -31,7 +29,7 @@ echo "<pre>             get_all()";echo "</pre>";
 $all_tsuites_in_my_tl=$tsuite_mgr->get_all();
 new dBug($all_tsuites_in_my_tl);
 
-$tsuite_id=3;
+$tsuite_id=1229;
 echo "<pre> testsuite - get_by_id(\$id)";echo "</pre>";
 echo "<pre>             get_by_id($tsuite_id)";echo "</pre>";
 $tsuite_info=$tsuite_mgr->get_by_id($tsuite_id);
@@ -45,16 +43,15 @@ echo "<pre>             get_by_name($tsuite_name)";echo "</pre>";
 $tsuite_info=$tsuite_mgr->get_by_name($tsuite_name);
 new dBug($tsuite_info);
 
-echo "<pre> testsuite - get_testcases_deep(\$id,\$bIdsOnly=0)";echo "</pre>";
-echo "<pre>             get_testcases_deep($tsuite_id)";echo "</pre>";
+echo "<pre> testsuite - get_testcases_deep(\$id,\$details='simple')";echo "</pre>";
+echo "<pre>             get_testcases_deep($tsuite_id,'simple')";echo "</pre>";
 $testcases_deep=$tsuite_mgr->get_testcases_deep($tsuite_id);
 new dBug($testcases_deep);
 
 define("GET_ONLY_TESTCASE_ID",1);
-echo "<pre>             get_testcases_deep(\$tsuite_id,GET_ONLY_TESTCASE_ID)";echo "</pre>";
-$testcases_deep=$tsuite_mgr->get_testcases_deep($tsuite_id,GET_ONLY_TESTCASE_ID);
+echo "<pre>             get_testcases_deep(\$tsuite_id,\$details='full')";echo "</pre>";
+$testcases_deep=$tsuite_mgr->get_testcases_deep($tsuite_id,'full');
 new dBug($testcases_deep);
-
 
 echo "<pre> testsuite - getKeywords(\$tcID,\$kwID = null)";echo "</pre>";
 echo "<pre>            getKeywords($tsuite_id)";echo "</pre>";
