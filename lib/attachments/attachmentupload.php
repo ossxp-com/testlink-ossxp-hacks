@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: attachmentupload.php,v $
  *
- * @version $Revision: 1.18 $
- * @modified $Date: 2009/01/13 20:21:23 $ by $Author: schlundus $
+ * @version $Revision: 1.23 $
+ * @modified $Date: 2009/12/28 08:52:06 $ by $Author: franciscom $
  *
  * Upload dialog for attachments
  *
@@ -14,51 +14,79 @@
 require_once('../../config.inc.php');
 require_once('../functions/common.php');
 require_once('../functions/attachments.inc.php');
-testlinkInitPage($db);
-
-if (!config_get("attachments")->enabled)
-	exit();
+testlinkInitPage($db,false,false,"checkRights");
 	
-//the id (attachments.fk_id) of the object, to which the attachment belongs to 
-$id = isset($_GET['id'])? intval($_GET['id']) : 0;
+$args = init_args();
+$gui = new stdClass();
+$gui->uploaded = false;
+$gui->msg = null;
+$gui->tableName = $args->tableName;
+$gui->import_limit = TL_REPOSITORY_MAXFILESIZE;
+$gui->id = $args->id;
 
-//the table to which the fk_id refers to (attachments.fk_table) of the attachment 
-$tableName = isset($_GET['tableName'])? $_GET['tableName'] : null;
-
-$bUploaded = false;
-$msg = null;
-$bPostBack = sizeof($_POST);
-if ($bPostBack > 2)
+if ($args->bPostBack)
 {
 	$fInfo  = isset($_FILES['uploadedFile']) ? $_FILES['uploadedFile'] : null;
-	//the title of the attachment (attachments.title) 
-	$title = isset($_POST['title']) ? $_POST['title'] : "";
-	//the id (attachments.fk_id) of the object, to which the attachment belongs to 
-	$id = isset($_POST['id'])? intval($_POST['id']) : 0;
-	//the table to which the fk_id refers to (attachments.fk_table) of the attachment 
-	$tableName = isset($_POST['tableName'])? $_POST['tableName'] : null;
-	if ($fInfo)
+	$id = $_SESSION['s_upload_id'];
+	$gui->tableName = $_SESSION['s_upload_tableName'];
+	
+	if ($fInfo && $id && $gui->tableName != "")
 	{
 		$fSize = isset($fInfo['size']) ? $fInfo['size'] : 0;
 		$fTmpName = isset($fInfo['tmp_name']) ? $fInfo['tmp_name'] : '';
-		if ($fSize && strlen($fTmpName))
+		if ($fSize && $fTmpName != "")
 		{
 			$attachmentRepository = tlAttachmentRepository::create($db);
-			$bUploaded = $attachmentRepository->insertAttachment($id,$tableName,$title,$fInfo);
-			if ($bUploaded)
-				logAuditEvent(TLS("audit_attachment_created",$title,$fInfo['name']),"CREATE",$id,"attachments");
+			$gui->uploaded = $attachmentRepository->insertAttachment($id,$gui->tableName,$args->title,$fInfo);
+			if ($gui->uploaded)
+			{
+				logAuditEvent(TLS("audit_attachment_created",$args->title,$fInfo['name']),"CREATE",$id,"attachments");
+			}	
 		}
 		else
-			$msg  = getFileUploadErrorMessage($fInfo);
+		{
+			$gui->msg  = getFileUploadErrorMessage($fInfo);
+		}	
 	}
+}
+else
+{
+	$_SESSION['s_upload_tableName'] = $args->tableName;
+	$_SESSION['s_upload_id'] = $args->id;
 }
 
 $smarty = new TLSmarty();
-$smarty->assign('import_limit',TL_REPOSITORY_MAXFILESIZE);
-$smarty->assign('id',$id);
-$smarty->assign('tableName',$tableName);
-$smarty->assign('bUploaded',$bUploaded);
-$smarty->assign('bPostBack',$bPostBack);
-$smarty->assign('msg',$msg);
+$smarty->assign('gui',$gui);
 $smarty->display('attachmentupload.tpl');
+
+/**
+ * @return object returns the arguments for the page
+ */
+function init_args()
+{
+	$iParams = array(
+		//the id (attachments.fk_id) of the object, to which the attachment belongs to 
+		"id" => array("GET",tlInputParameter::INT_N),
+		//the table to which the fk_id refers to (attachments.fk_table) of the attachment 
+		"tableName" => array("GET",tlInputParameter::STRING_N,0,250),
+		//the title of the attachment (attachments.title) 
+		"title" => array("POST",tlInputParameter::STRING_N,0,250),
+	);
+	$args = new stdClass();
+	I_PARAMS($iParams,$args);
+	
+	$args->bPostBack = sizeof($_POST);
+	
+	return $args;
+}
+
+/**
+ * @param $db resource the database connection handle
+ * @param $user the current active user
+ * @return boolean returns true if the page can be accessed
+ */
+function checkRights(&$db,&$user)
+{
+	return (config_get("attachments")->enabled);
+}
 ?>

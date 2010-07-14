@@ -1,7 +1,7 @@
 <?php
 /*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: migrate_16_to_17.php,v 1.22.2.1 2009/06/30 10:59:26 havlat Exp $ 
+$Id: migrate_16_to_17.php,v 1.23 2009/06/30 10:59:23 havlat Exp $ 
 
 20070515 - franciscom - 
 improved controls on source db version

@@ -4,34 +4,48 @@
  *
  * Filename $RCSfile: execSetResults.php,v $
  *
- * @version $Revision: 1.114.2.9 $
- * @modified $Date: 2009/05/25 20:39:37 $ $Author: franciscom $
+ * @version $Revision: 1.162 $
+ * @modified $Date: 2010/07/01 13:35:31 $ $Author: mx-julian $
  *
  * rev:
- *     20090525 - franciscom - changes to avoid crash on getDisplayName() calls
- *     20090409 - amkhullar - updated code not written properly.
- *     20090330 - franciscom - fixed bug on test plan custom field get.
- *     20090325 - amkhullar - BUGID 2267
- *     20090210 - amkhullar - BUGID 2068
- *     20081230 - franciscom - display full path on test suite name
- *     20081217 - franciscom - initializeExecMode() - algorithm changed.
- *     20081122 - franciscom - added some comments
- *     20080827 - franciscom - BUGID 1692
- *     20080811 - franciscom - BUGID 1650 (REQ)
- *     20080224 - franciscom - to avoid performance problems
- *                             clicking on root node will NOT try to display
- *                             all testcases in testplan.
- *     
- *     20080104 - franciscom - REQ 1232 - web editor on execution notes
- *                             added createExecNotesWebEditor()
- *     20071224 - franciscom - refactoring
- *     20071113 - franciscom - added contribution History for all builds.
- *     20071006 - franciscom - changes on exec_cfield_mgr() call
- *     20071002 - jbarchibald - BUGID 1051
- *     20070707 - franciscom - BUGID 921
- *     20070519 - franciscom - BUGID 856
- *     20070306 - franciscom - BUGID 705
- *     20070222 - franciscom - BUGID 647
+ *  20100628 - asimon - removal of constants from filter control class
+ *  20100625 - asimon - added parameters $bugInterfaceOn, $bugInterface to exec_additional_info()
+ *                      to avoid warnings in event log,
+ *                      fixed a little bug in platform id initializing in init_args()
+ *                      (now number 0 instead of value null)
+ *  20100624 - asimon - CVS merge (experimental branch to HEAD)
+ *  20100624 - asimon - refactoring for new filters
+ *	20100527 - franciscom - BUGID 3479: Bulk Execution - Custom Fields Bulk Assignment
+ *  20100527 - Julian - platform description is now shown/hidden according to setting on config
+ *	20100520 - franciscom - BUGID 3478  Testcase ID not updated when using save and move next
+ *  20100428 - asimon - BUGID 3301 and related, added logic to refresh tree after tc execution
+ *  20100313 - franciscom - BUGID 3276
+ *  20100204 - asimon - BUGID 2455 & 3026, little changes for filtering
+ *  20100121 - franciscom - missing platform feature refactoring
+ *	20091205 - franciscom - BUGID 0002469: CFG-Parameters to show notes/details on test-execution
+ *  20091111 - franciscom - BUGID 2938 - Feature: Save and Go to next test case in test suite.
+ *  20090922 - franciscom - added contribution idea, when using bulk operation
+ *                          display last execution status.
+ *
+ *	20090913 - franciscom - fixed bug on filter_status initialization
+ *                          fixed bug on bulk execution due to bad option
+ *                          on get_linked_tcversions() call.
+ *                         
+ *	20090815 - franciscom - platform feature	
+ *  20090808 - franciscom - gen_spec_view call refactoring
+ *  20090526 - franciscom - now custom fields for testplan_design are managed
+ *
+ *  20090419 - franciscom - BUGID 2364 - added management of refreshTree
+ *                          initializeRights() refactored
+ *  20090409 - amkhullar - updated code not written properly.
+ *  20090330 - franciscom - fixed bug on test plan custom field get.
+ *  20090325 - amkhullar - BUGID 2267
+ *  20090210 - amkhullar - BUGID 2068
+ *  20080827 - franciscom - BUGID 1692
+ *  20080811 - franciscom - BUGID 1650 (REQ)
+ *  
+ *  20080104 - franciscom - REQ 1232 - web editor on execution notes
+ *                          added createExecNotesWebEditor()
  *
 **/
 require_once('../../config.inc.php');
@@ -40,15 +54,27 @@ require_once('exec.inc.php');
 require_once("attachments.inc.php");
 require_once("specview.php");
 require_once("web_editor.php");
+
 $cfg=getCfg();
 require_once(require_web_editor($cfg->editorCfg['type']));
 
+// BUGID 3276
+// CRITIC:
+// If call to testlinkInitPage() is done AFTER require_once for BTS
+// log to event viewer fails, but log to file works ok
 testlinkInitPage($db);
+if($cfg->bts_type != 'NO')
+{
+  require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' . 
+               DIRECTORY_SEPARATOR . 'int_bugtracking.php');
+}
+
+
 $templateCfg = templateConfiguration();
 
 $tcversion_id = null;
 $submitResult = null;
-$args = init_args();
+$args = init_args($cfg);
 
 $smarty = new TLSmarty();
 $tree_mgr = new tree($db);
@@ -60,26 +86,22 @@ $req_mgr = new requirement_mgr($db);
 
 $gui = initializeGui($db,$args,$cfg,$tplan_mgr,$tcase_mgr);
 $_SESSION['history_on'] = $gui->history_on;
+$attachmentInfos = null;
 
-$do_show_instructions=(strlen($args->level) == 0 || $args->level=='testproject') ? 1 : 0;
+$do_show_instructions = ($args->level == "" || $args->level == 'testproject') ? 1 : 0;
 if ($do_show_instructions)
 {
     show_instructions('executeTest');
-	  exit();
+    exit();
 }
 
-$attachmentInfos = null;
-
-$get_mode = GET_ONLY_EXECUTED;
-if(is_null($args->filter_status) || in_array($cfg->tc_status['not_run'],$args->filter_status))
-	$get_mode = GET_ALSO_NOT_EXECUTED;
 
 // ---------------------------------------------------------
 // Testplan executions and result archiving. Checks whether execute cases button was clicked
 //
 if($args->doExec == 1)
 {
-	/** @note Retrive testcase ids in an array */
+	/** @note get testcase ids in an array */
 	if(!is_null($args->tc_versions) && count($args->tc_versions))
 	{
 		$status_and_notes=do_remote_execution($db,$args->tc_versions);
@@ -93,8 +115,8 @@ if($args->doExec == 1)
 		{
 			foreach($status_map as $key => $value)
 			{
-				$_REQUEST['status'][$key]=$value;  
-				$_REQUEST['notes'][$key]=$notes_map[$key];  
+				$_REQUEST['status'][$key] = $value;  
+				$_REQUEST['notes'][$key] = $notes_map[$key];  
 			} 
 		}
 	   
@@ -129,20 +151,33 @@ if($args->doExec == 1)
 // 20070914 - jbarchibald - added $cf_selected parameter
 //
 
-// 20081221 - franciscom
-$linked_tcversions = $tplan_mgr->get_linked_tcversions($args->tplan_id,$args->tc_id,$args->keyword_id,$get_mode,
-                                                       $args->filter_assigned_to,
-                                                       $args->filter_status,$args->build_id,
-                                                       $args->cf_selected,$args->include_unassigned);
+// 20081221 - franciscom                              
+$options = array('only_executed' => true, 'output' => 'mapOfArray',
+                 'include_unassigned' => $args->include_unassigned);
+if(is_null($args->filter_status) || in_array($cfg->tc_status['not_run'],$args->filter_status))
+{
+    $options['only_executed'] = false;
+}
+
+// Added platform_id filter
+$filters = array('tcase_id' => $args->tc_id,  'keyword_id' => $args->keyword_id,
+                 'assigned_to' => $args->filter_assigned_to, 'exec_status' => $args->filter_status,
+                 'build_id' => $args->build_id, 'cf_hash' => $args->cf_selected,
+                 'platform_id' => $args->platform_id);
+
+$linked_tcversions = $tplan_mgr->get_linked_tcversions($args->tplan_id,$filters,$options);
 $tcase_id = 0;
 $userid_array = null;
+
 if(!is_null($linked_tcversions))
 {
-	  $items_to_exec = array();
-	  $_SESSION['s_lastAttachmentInfos'] = null;
-	  if($args->level == 'testcase')
+	$items_to_exec = array();
+	$_SESSION['s_lastAttachmentInfos'] = null;
+    if($args->level == 'testcase')
     {
-        list($tcase_id,$tcversion_id) = processTestCase($gui,$args,$cfg,$linked_tcversions,
+    	// Warning!!! - $gui is passed by reference to be updated inside function
+    	$tcase = null;
+        list($tcase_id,$tcversion_id) = processTestCase($tcase,$gui,$args,$cfg,$linked_tcversions,
                                                         $tree_mgr,$tcase_mgr,$attachmentRepository);
     }
     else
@@ -150,16 +185,32 @@ if(!is_null($linked_tcversions))
         list($tcase_id,$tcversion_id) = processTestSuite($db,$gui,$args,$linked_tcversions,
                                                          $tree_mgr,$tcase_mgr,$attachmentRepository);
     }
-    
     // will create a record even if the testcase version has not been executed (GET_NO_EXEC)
-    $gui->map_last_exec=getLastExecution($db,$tcase_id,$tcversion_id,$gui,$args,$tcase_mgr);
+    $gui->map_last_exec = getLastExecution($db,$tcase_id,$tcversion_id,$gui,$args,$tcase_mgr);
     
     // --------------------------------------------------------------------------------------------
     // Results to DB
-    if ($args->save_results || $args->do_bulk_save )
+    if ($args->save_results || $args->do_bulk_save || $args->save_and_next)
     {
-    	$submitResult = write_execution($db,$args->user->dbID,$_REQUEST,$args->tproject_id,
-    	                                $args->tplan_id,$args->build_id,$gui->map_last_exec);
+    	// this has to be done to do not break logic present on write_execution()
+    	$args->save_results = $args->save_and_next ? $args->save_and_next : $args->save_results;
+    	$_REQUEST['save_results'] = $args->save_results;
+    	$submitResult = write_execution($db,$args,$_REQUEST,$gui->map_last_exec);
+        
+        // Need to re-read to update test case status
+        if ($args->save_and_next) 
+        {
+			$nextItem = $tplan_mgr->getTestCaseNextSibling($args->tplan_id,$tcversion_id,$args->platform_id);
+			if( !is_null($nextItem) )
+			{
+				$tcase_id = $nextItem['tcase_id'];
+				$tcversion_id = $nextItem['tcversion_id'];
+				// BUGID 3478
+         		processTestCase($nextItem,$gui,$args,$cfg,$linked_tcversions,$tree_mgr,$tcase_mgr,$attachmentRepository);
+			}
+			
+        }
+        $gui->map_last_exec=getLastExecution($db,$tcase_id,$tcversion_id,$gui,$args,$tcase_mgr);
     }
 
     if ($args->doDelete)
@@ -169,57 +220,67 @@ if(!is_null($linked_tcversions))
     // --------------------------------------------------------------------------------------------
     
     $gui->map_last_exec_any_build = null;
+    $gui->other_execs=null;
     $testerid = null;
-    if( $cfg->exec_cfg->show_last_exec_any_build )
+    
+    
+    if($args->level == 'testcase')
     {
-        $gui->map_last_exec_any_build = $tcase_mgr->get_last_execution($tcase_id,$tcversion_id,$args->tplan_id,
-                                                                       ANY_BUILD,GET_NO_EXEC);
-                                                                           
-        //Get UserID and Updater ID for current Version
-        $tc_current = $gui->map_last_exec_any_build;
-
-        	foreach ($tc_current as $key => $value)
-        	{
-		    	$testerid = $value['tester_id'];
+    	// @TODO 20090815 - franciscom check what to do with platform
+    	if( $cfg->exec_cfg->show_last_exec_any_build )
+    	{
+    		// 20090716 - franciscom - get_last_execution() interface changes
+			$options=array('getNoExecutions' => 1, 'groupByBuild' => 0);
+    	    $gui->map_last_exec_any_build = $tcase_mgr->get_last_execution($tcase_id,$tcversion_id,$args->tplan_id,
+    	                                                                   testcase::ANY_BUILD,
+    	                                                                   $args->platform_id,$options);
+    	    
+    	    //Get UserID and Updater ID for current Version
+    	    $tc_current = $gui->map_last_exec_any_build;
+    	    foreach ($tc_current as $key => $value)
+    	    {
+				$testerid = $value['tester_id'];
 			    $userid_array[$testerid] = $testerid;
-        	}	    
-    }
-
-    $gui->req_details = $req_mgr->get_all_for_tcase($tcase_id); //Bug 2068
-    $gui->other_execs=getOtherExecutions($db,$tcase_id,$tcversion_id,$gui,$args,$cfg,$tcase_mgr);
-
-    // Get attachment,bugs, etc
-    if(!is_null($gui->other_execs))
-    {
-    	//Get the Tester ID for all previous executions
-		  foreach ($gui->other_execs as $key => $execution)
-		  {    	
-	      	foreach ($execution as $singleExecution)
-	      	{    			  
-		  	      $testerid = $singleExecution['tester_id'];
-		  	      $userid_array[$testerid] = $testerid;
-	      	}    	
-		  }
-
-      $other_info=exec_additional_info($db,$attachmentRepository,$tcase_mgr,$gui->other_execs,$args->tplan_id,$args->tproject_id);
-      $gui->attachments=$other_info['attachment'];
-      $gui->bugs=$other_info['bugs'];
-      $gui->other_exec_cfields=$other_info['cfexec_values'];
-     
-      // this piece of code is useful to avoid error on smarty template due to undefined value   
-      if( is_array($tcversion_id) && 
-          (count($gui->other_execs) != count($gui->map_last_exec)) )
-      {
-        foreach($tcversion_id as $version_id)
-        {
-            if( !isset($gui->other_execs[$version_id]) )
-            {
-                $gui->other_execs[$version_id]=null;  
-            }  
-        }
-      }
-
-    } // if(!is_null($gui->other_execs))
+    	    }	    
+    	}
+    	
+    	$gui->req_details = $req_mgr->get_all_for_tcase($tcase_id); //Bug 2068
+    	$gui->other_execs=getOtherExecutions($db,$tcase_id,$tcversion_id,$gui,$args,$cfg,$tcase_mgr);
+    	// Get attachment,bugs, etc
+    	if(!is_null($gui->other_execs))
+    	{
+    		//Get the Tester ID for all previous executions
+			  foreach ($gui->other_execs as $key => $execution)
+			  {    	
+		      	foreach ($execution as $singleExecution)
+		      	{    			  
+			  	      $testerid = $singleExecution['tester_id'];
+			  	      $userid_array[$testerid] = $testerid;
+		      	}    	
+			  }
+    	
+		  // asimon - added $g_bugInterfaceOn, $g_bugInterface
+    	  $other_info=exec_additional_info($db,$attachmentRepository,$tcase_mgr,$gui->other_execs,
+    	  $args->tplan_id,$args->tproject_id, $g_bugInterfaceOn, $g_bugInterface);
+    	  $gui->attachments=$other_info['attachment'];
+    	  $gui->bugs=$other_info['bugs'];
+    	  $gui->other_exec_cfields=$other_info['cfexec_values'];
+    	 
+    	  // this piece of code is useful to avoid error on smarty template due to undefined value   
+    	  if( is_array($tcversion_id) && 
+    	      (count($gui->other_execs) != count($gui->map_last_exec)) )
+    	  {
+    	    foreach($tcversion_id as $version_id)
+    	    {
+    	        if( !isset($gui->other_execs[$version_id]) )
+    	        {
+    	            $gui->other_execs[$version_id]=null;  
+    	        }  
+    	    }
+    	  }
+    	
+    	} // if(!is_null($gui->other_execs))
+    } 	
 
 } // if(!is_null($linked_tcversions))
 
@@ -235,7 +296,23 @@ if ($userid_array)
 	}
 }
 smarty_assign_tsuite_info($smarty,$_REQUEST,$db,$tree_mgr,$tcase_id,$args->tproject_id);
-$gui->can_use_bulk_op=(!is_null($gui->map_last_exec) && count($gui->map_last_exec) > 1) ? 1 : 0;
+
+// BUGID 2455, BUGID 3026
+// BUGID 3516
+// remove testcases which shall not be displayed because they were filtered out
+if (isset($args->testcases_to_show) && $args->level == 'testsuite') {
+	foreach($gui->map_last_exec as $key => $tc) {
+		if (!in_array($tc['testcase_id'], $args->testcases_to_show)) {
+			//unset, tc shall not be displayed
+			unset($gui->map_last_exec[$key]);
+		}
+	}
+	//fix indexes for smarty
+	$gui->map_last_exec = array_values($gui->map_last_exec);
+}
+
+$gui->can_use_bulk_op=$args->level == 'testsuite' &&
+                      (!is_null($gui->map_last_exec) && count($gui->map_last_exec) > 1) ? 1 : 0;
 if( $gui->can_use_bulk_op )
 {
     $gui->execStatusValues=createResultsMenu();
@@ -245,7 +322,7 @@ if( $gui->can_use_bulk_op )
     }
 
     $of=web_editor("bulk_exec_notes",$_SESSION['basehref'],$cfg->editorCfg);
-    $of->Value = null;
+   	$of->Value = getItemTemplateContents('execution_template', $of->InstanceName, null);
     
     // Magic numbers that can be determined by trial and error
     $gui->bulk_exec_notes_editor=$of->CreateHTML(10,60);         
@@ -255,9 +332,9 @@ else
 {
     $gui->exec_notes_editors=createExecNotesWebEditor($gui->map_last_exec,$_SESSION['basehref'],$cfg->editorCfg);
 }
+
 // To silence smarty errors
 //  future must be initialized in a right way
-
 $smarty->assign('test_automation_enabled',0);
 $smarty->assign('cfg',$cfg);
 $smarty->assign('users',tlUser::getByIDs($db,$passeduserarray,'id'));
@@ -273,93 +350,209 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
   returns: 
   
   rev:
-      schlundus: changed the user_id to the currentUser of the session
+	20100625 - asimon - fixed a little bug in platform id initializing when no platform is used
+	                    (now number 0 instead of value null)
+	20090913 - franciscom - fixed bug on filter_status initialization
 */
-function init_args()
+function init_args($cfgObj)
 {
-  $args = new stdClass();
- 	$_REQUEST = strings_stripSlashes($_REQUEST);
-
+	$args = new stdClass();
+	$_REQUEST = strings_stripSlashes($_REQUEST);
+	
+    // BUGID 3516
+	$form_token = isset($_REQUEST['form_token']) ? $_REQUEST['form_token'] : 0;
+	
+	$mode = 'execution_mode';
+	
+	$session_data = isset($_SESSION[$mode]) && isset($_SESSION[$mode][$form_token])
+	                ? $_SESSION[$mode][$form_token] : null;
+	
 	$args->doExec = isset($_REQUEST['execute_cases']) ? 1 : 0;
-	$args->doDelete = isset($_REQUEST['do_delete']) ? 1 : 0;
+	$args->doDelete = isset($_REQUEST['do_delete']) ? $_REQUEST['do_delete'] : 0;
 	$args->cf_selected = isset($_REQUEST['cfields']) ? unserialize($_REQUEST['cfields']) : null;
+	
+	// can be a list, will arrive via form POST
 	$args->tc_versions = isset($_REQUEST['tc_version']) ? $_REQUEST['tc_version'] : null;  
   
-	$key2loop = array('level' => '','status' => null, 'do_bulk_save' => 0, 
-	                  'save_results' => 0, 'filter_status' => null,'filter_assigned_to' => null);
-
+	// BUGID 3516
+	$args->filter_status = isset($session_data['filter_result_result']) ? 
+	                       $session_data['filter_result_result']: null;
+	$args->filter_assigned_to = isset($session_data['filter_assigned_user']) ? 
+	                            $session_data['filter_assigned_user'] : null;
+	//$key2loop = array('level' => '','status' => null, 'do_bulk_save' => 0, 'save_results' => 0, 
+	//                  'save_and_next' => 0,'filter_status' => null,'filter_assigned_to' => null);
+	$key2loop = array('level' => '','status' => null, 'do_bulk_save' => 0, 'save_results' => 0, 
+	                  'save_and_next' => 0);
 	foreach($key2loop as $key => $value)
 	{
 		$args->$key = isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
 	}
 
-  // See details on: "When nullify filter_status - 20080504" in this file
-  if( strlen(trim($args->filter_status)) == 0 or $args->level == 'testcase')
-  {
-      $args->filter_status = null;  
-  }
-  else
-  {
-      $args->filter_status = unserialize($args->filter_status);
-  }
+    // See details on: "When nullify filter_status - 20080504" in this file
+    if(is_null($args->filter_status) || trim($args->filter_status) || $args->level == 'testcase')
+    {
+        $args->filter_status = null;  
+    }
+    else
+    {
+        $args->filter_status = unserialize($args->filter_status);
+    }
 
-  // 20081221 - franciscom
-  if( strlen(trim($args->filter_assigned_to)) == 0 )
-  {
-      $args->filter_assigned_to = null;  
-  }
-  else
-  {
-      $args->filter_assigned_to = unserialize($args->filter_assigned_to);
-  }
-  
-  switch($args->level)
-  {
-      case 'testcase':
-      $args->tc_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
-      $args->tsuite_id = null;
-      break;
-        
-      case 'testsuite':
-      $args->tsuite_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
-      $args->tc_id = null;
-      break;
-  }
+    // trim and unserialize not needed anymore, now is already array in session
+//    if(trim($args->filter_assigned_to) == "")
+//    {
+//        $args->filter_assigned_to = null;
+//    }
+//    else
+//    {
+//        $args->filter_assigned_to = unserialize($args->filter_assigned_to);
+//    }
 
+ 	$args->id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+    $cookiePrefix = 'TL_execSetResults_';
+    // $key4cookies = array('tpn_view_status' => array( 'cfg_key' => 'testplan_notes', 'suffix' => ''),
+    //                      'tsdetails_view_status' => array( 'cfg_key' => 'testsuite_details', 'suffix' => "_" . $args->id)
+    //                      'bn_view_status' => array( 'cfg_key' => 'build_description', 'suffix' => ''));
+       
+    // IMPORTANT: logic for test suite notes CAN NOT BE IMPLEMENTED HERE
+    //            see smarty_assign_tsuite_info() in this file.  
+    $key4cookies = array('tpn_view_status' => 'testplan_notes','bn_view_status' => 'build_description',
+                         'platform_notes_view_status' => 'platform_description');
+    
+	$key2loop = array('id' => 0,'build_id' => 0, 'exec_to_delete' => 0, 'version_id' => 0,
+	   	              'tpn_view_status' => 0, 'bn_view_status' => 0, 'bc_view_status' => 1,
+	   	              'platform_notes_view_status' => 0,'platform_id' => 0);
+			
+	foreach($key4cookies as $key => $cfgKey)
+	{
+		$cookieKey = $cookiePrefix . $key;
+		if( !isset($_REQUEST[$key]) )
+		{
+			// First time we are entered here => we can need to understand how to proceed
+		    switch($cfgObj->exec_cfg->expand_collapse->$cfgKey )
+		    {
+		    	case LAST_USER_CHOICE:
+					if (isset($_COOKIE[$cookieKey]) ) 
+    				{
+    					$key2loop[$key] = $_COOKIE[$cookieKey];
+					}
+				break;	
 
-
-	$key2loop = array('id' => 0,'build_id' =>0, 'exec_to_delete' => 0, 
-				            'tpn_view_status' => 0, 'bn_view_status' => 0, 'bc_view_status' => 1);
-				            
+				default:
+					$key2loop[$key] = $cfgObj->exec_cfg->expand_collapse->$cfgKey;
+				break;
+		    } 
+		}
+    }
+    				            
 	foreach($key2loop as $key => $value)
 	{
-		$args->$key = isset($_REQUEST[$key]) ? intval($_REQUEST[$key]) : $value;
+ 		$args->$key = isset($_REQUEST[$key]) ? intval($_REQUEST[$key]) : $value;
+        if( isset($key4cookies[$key]) )
+		{
+			setcookie($cookiePrefix . $key,$args->$key,TL_COOKIE_KEEPTIME, '/');
+		}
 	}
 
-  // 20080428 - franciscom
-  if( isset($_REQUEST['keyword_id']) )
-  {
-     // can be a list
-     $args->keyword_id=explode(',',$_REQUEST['keyword_id']);
-     if( count($args->keyword_id) == 1)
-     {
-         $args->keyword_id=$args->keyword_id[0]; 
-     }
-  }
-  else
-  {
-      $args->keyword_id=0;  
-  }
+	// 3516
+	$args->build_id = isset($session_data['setting_build']) ? 
+	                  intval($session_data['setting_build']) : null;
+	$args->platform_id = isset($session_data['setting_platform']) ? 
+	                  intval($session_data['setting_platform']) : 0;
+	
+    switch($args->level)
+    {
+        case 'testcase':
+        $args->tc_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
+        // some problems with $_GET that has impact on logic 'Save and Go to next test case';
+        if( !is_null($args->tc_versions) )
+        {
+        	$args->tc_id = current($args->tc_versions);
+        	$args->id = $args->tc_id;
+        	$args->version_id = key($args->tc_versions);
+        } 
+        $args->tsuite_id = null;
+        break;
+          
+        case 'testsuite':
+        $args->tsuite_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
+        $args->tc_id = null;
+        break;
+    }
 
-  // Checkbox
-  $args->include_unassigned=isset($_REQUEST['include_unassigned']) ? $_REQUEST['include_unassigned'] : 0;
 
-	$args->tproject_id = $_SESSION['testprojectID'];
+	// BUGID 3516
+//    if( isset($_REQUEST['keyword_id']) )
+//    {
+//       // can be a list
+//       $args->keyword_id=explode(',',$_REQUEST['keyword_id']);
+//       if( count($args->keyword_id) == 1)
+//       {
+//           $args->keyword_id=$args->keyword_id[0]; 
+//       }
+//    }
+//    else
+//    {
+//        $args->keyword_id=0;  
+//    }
+	$args->keyword_id = 0;
+	$fk = 'filter_keywords';
+	if (isset($session_data[$fk])) {
+		$args->keyword_id = $session_data[$fk];
+		if (is_array($args->keyword_id) && count($args->keyword_id) == 1) {
+			$args->keyword_id = $args->keyword_id[0];
+		}
+	}
+	
+	$args->keywordsFilterType = null;
+	$ft = 'filter_keywords_filter_type';
+	if (isset($session_data[$ft])) {
+		$args->keywordsFilterType = $session_data[$ft];
+	}
+    
+    // Checkbox
+    //$args->include_unassigned=isset($_REQUEST['include_unassigned']) ? $_REQUEST['include_unassigned'] : 0;
+    $args->include_unassigned = isset($session_data['filter_assigned_user_include_unassigned']) 
+                                && $session_data['filter_assigned_user_include_unassigned'] != 0 ? 1 : 0;
+	
+	
+    // 20090419 - franciscom - BUGID
+    // BUGID 3301 and related - asimon - changed refresh tree logic 
+    // to adapt behavior of other forms (like tc edit)
+    // additionally modified to only refresh on saving of test results, not on every click
+//    if(isset($_SESSION['setting_refresh_tree_on_action']))
+//	{
+//		$args->refreshTree = $_SESSION['setting_refresh_tree_on_action'] == 'yes' ? 1 : 0;
+//    }
+//    else
+//    {
+//    	// use default from config
+//    	$args->refreshTree = $cfgObj->spec_cfg->automatic_tree_refresh ? 1 : 0;
+//    }
+//    // if nothing has been executed (no status sent), don't refresh tree, ignore settings
+//    if (is_null($args->status)) {
+//    	$args->refreshTree = 0; 
+//    }
+    $args->refreshTree = isset($session_data['setting_refresh_tree_on_action'])
+                         ? $session_data['setting_refresh_tree_on_action'] : 0;
+	
+	$args->tproject_id = isset($_REQUEST['tproject_id']) ? $_REQUEST['tproject_id'] : $_SESSION['testprojectID'];
+	
 	//BUGID 2267
-	$args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : $_SESSION['testPlanId'];
+	$args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : $_SESSION['testplanID'];
 	$args->user = $_SESSION['currentUser'];
+    $args->user_id = $args->user->dbID;
 
-	return $args;  
+    // BUGID 3516
+   	// BUGID 2455,BUGID 3026
+//	if (isset($_REQUEST['show_only_tcs']) && isset($_REQUEST['show_only_tcs']) != '') {
+//		$args->tcids_to_show = explode(",", $_REQUEST['show_only_tcs']);
+//	}
+	if (isset($session_data['testcases_to_show'])) {
+		$args->testcases_to_show = $session_data['testcases_to_show'];
+	}
+	
+	return $args;
 }
 
 
@@ -409,21 +602,26 @@ function manage_history_on($hash_REQUEST,$hash_SESSION,
 */
 function get_ts_name_details(&$db,$tcase_id)
 {
+    $tables['testsuites'] = DB_TABLE_PREFIX . 'testsuites';
+    $tables['nodes_hierarchy'] = DB_TABLE_PREFIX . 'nodes_hierarchy';
+
+    
 	$rs = '';
 	$do_query = true;
-	$sql = "Select ts.id as tsuite_id, ts.details, 
-	             nha.id as tc_id, nhb.name as tsuite_name 
-	      FROM testsuites ts, nodes_hierarchy nha, nodes_hierarchy nhb
-	      WHERE ts.id=nha.parent_id
-	      AND   nhb.id=nha.parent_id ";
+	$sql = "SELECT TS.id AS tsuite_id, TS.details, 
+	             NHA.id AS tc_id, NHB.name AS tsuite_name 
+	      FROM {$tables['testsuites']} TS, {$tables['nodes_hierarchy']} NHA, 
+	           {$tables['nodes_hierarchy']} NHB
+	      WHERE TS.id=NHA.parent_id
+	      AND   NHB.id=NHA.parent_id ";
 	if( is_array($tcase_id) && count($tcase_id) > 0)
 	{
 		$in_list = implode(",",$tcase_id);
-		$sql .= "AND nha.id IN (" . $in_list . ")";
+		$sql .= "AND NHA.id IN (" . $in_list . ")";
 	}
 	else if(!is_null($tcase_id))
 	{
-		$sql .= "AND nha.id={$tcase_id}";
+		$sql .= "AND NHA.id={$tcase_id}";
 	}
 	else
 	{
@@ -446,48 +644,77 @@ function get_ts_name_details(&$db,$tcase_id)
 */
 function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tcase_id,$tproject_id)
 {
-  $fpath=$tree_mgr->get_full_path_verbose($tcase_id);
+  $fpath=$tree_mgr->get_full_path_verbose($tcase_id, array('output_format' => 'id_name'));
   $tsuite_info = get_ts_name_details($db,$tcase_id);
   foreach($fpath as $key => $value)
   {
-      unset($value[0]);  // Remove test plan name
-      $tsuite_info[$key]['tsuite_name']=implode('/',$value);  
+      unset($value['name'][0]);  // Remove test plan name
+      unset($value['node_id'][0]);  // Remove test plan name
+      $str='';
+      foreach($value['name'] as $jdx => $elem)
+      {
+      	$str .= "<a href=\"javascript:openTestSuiteWindow(" . $value['node_id'][$jdx] . ")\"> ";
+      	$str .= htmlentities($elem) . '</a>/';
+      }
+      $tsuite_info[$key]['tsuite_name']=$str;  
   }
-  
   $smarty->assign('tsuite_info',$tsuite_info);
   
   // --------------------------------------------------------------------------------
-  if(!is_null($tsuite_info))
-  {
-    $a_tsvw=array();
-    $a_ts=array();
-    $a_tsval=array();
-   
-    $tsuite_mgr = New testsuite($db);
-    
-    foreach($tsuite_info as $key => $elem)
-    {
-      $main_k = 'tsdetails_view_status_' . $key;
-      $a_tsvw[] = $main_k;
-      $a_ts[] = 'tsdetails_' . $key;
-      $a_tsval[] = isset($request_hash[$main_k]) ? $request_hash[$main_k] : 0;
-   
-      $tsuite_id = $elem['tsuite_id'];
-      $tc_id = $elem['tc_id'];
-      if(!isset($cached_cf[$tsuite_id]))
-      {
-      	$cached_cf[$tsuite_id] = $tsuite_mgr->html_table_of_custom_field_values($tsuite_id,'design',null,$tproject_id);
-      }
-      $ts_cf_smarty[$tc_id] = $cached_cf[$tsuite_id];
-   
-    }
-   
-    $smarty->assign('tsd_div_id_list',implode(",",$a_ts));
-    $smarty->assign('tsd_hidden_id_list',implode(",",$a_tsvw));
-    $smarty->assign('tsd_val_for_hidden_list',implode(",",$a_tsval));
- 
-	  $smarty->assign('ts_cf_smarty',$ts_cf_smarty);
-  }
+	if(!is_null($tsuite_info))
+  	{
+        $cookieKey = 'TL_execSetResults_tsdetails_view_status';
+		$exec_cfg = config_get('exec_cfg');
+
+    	$a_tsvw=array();
+    	$a_ts=array();
+    	$a_tsval=array();
+    	
+    	$tsuite_mgr = New testsuite($db);
+    	
+    	foreach($tsuite_info as $key => $elem)
+    	{
+    	  	$main_k = 'tsdetails_view_status_' . $key;
+    	  	$a_tsvw[] = $main_k;
+    	  	$a_ts[] = 'tsdetails_' . $key;
+            $expand_collapse = 0;
+			if( !isset($request_hash[$main_k]) )
+			{
+				// First time we are entered here => we can need to understand how to proceed
+			    switch($exec_cfg->expand_collapse->testsuite_details)
+			    {
+			    	case LAST_USER_CHOICE:
+						if (isset($_COOKIE[$cookieKey]) ) 
+    					{
+    						$expand_collapse = $_COOKIE[$cookieKey];
+						}
+					break;	
+        	
+					default:
+						$expand_collapse = $exec_cfg->expand_collapse->testsuite_details;
+					break;
+			    } 
+			}
+    	  	$a_tsval[] = isset($request_hash[$main_k]) ? $request_hash[$main_k] : $expand_collapse;
+    	  	$tsuite_id = $elem['tsuite_id'];
+    	  	$tc_id = $elem['tc_id'];
+    	  	if(!isset($cached_cf[$tsuite_id]))
+    	  	{
+    	  		$cached_cf[$tsuite_id] = $tsuite_mgr->html_table_of_custom_field_values($tsuite_id,'design',null,$tproject_id);
+    	  	}
+    	  	$ts_cf_smarty[$tc_id] = $cached_cf[$tsuite_id];
+    	}
+    	if( count($a_tsval) > 0 )
+    	{
+			setcookie($cookieKey,$a_tsval[0],TL_COOKIE_KEEPTIME, '/');
+    	}
+    	
+    	$smarty->assign('tsd_div_id_list',implode(",",$a_ts));
+    	$smarty->assign('tsd_hidden_id_list',implode(",",$a_tsvw));
+    	$smarty->assign('tsd_val_for_hidden_list',implode(",",$a_tsval));
+    	
+		$smarty->assign('ts_cf_smarty',$ts_cf_smarty);
+	}
 
 }  
 // --------------------------------------------------------------------------------
@@ -500,11 +727,16 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
   
   returns: 
 
+@internal revisions:
+  20100625 - asimon - added parameters $bugInterfaceOn, $bugInterface 
+                      to get rid of warning in event log
+
 */
-function exec_additional_info(&$db,$attachmentRepository,&$tcase_mgr,$other_execs,$tplan_id,$tproject_id)
+function exec_additional_info(&$db, $attachmentRepository, &$tcase_mgr, $other_execs, 
+                              $tplan_id, $tproject_id, $bugInterfaceOn, $bugInterface)
 {
-  $bugInterfaceOn = config_get('bugInterfaceOn');
-  $bugInterface = config_get('bugInterface');
+//  $bugInterfaceOn = config_get('bugInterfaceOn');
+//  $bugInterface = config_get('bugInterface');
   $attachmentInfos = null;
   $bugs = null;
   $cfexec_values = null;
@@ -553,15 +785,13 @@ function exec_additional_info(&$db,$attachmentRepository,&$tcase_mgr,$other_exec
 */
 function do_remote_execution(&$db,$tc_versions)
 {
-  $resultsCfg = config_get('results');
-  $tc_status = $resultsCfg['status_code'];
- 
-  
-  $tree_mgr = new tree($db);
-  $cfield_mgr = new cfield_mgr($db);
+    $resultsCfg = config_get('results');
+    $tc_status = $resultsCfg['status_code'];
+    $tree_mgr = new tree($db);
+    $cfield_mgr = new cfield_mgr($db);
   
 	$ret=array();
-  $ret["status"]=array();
+    $ret["status"]=array();
 	$ret["notes"]=array();
 
 	$executionResults = array();
@@ -574,7 +804,7 @@ function do_remote_execution(&$db,$tc_versions)
 		if($executionResults){
 			$myResult = $executionResults[$tcase_id]['result'];
 			$myNotes = $executionResults[$tcase_id]['notes'];
-			if ($myResult != -1 and $myNotes != -1) {
+			if ($myResult != -1 && $myNotes != -1) {
 				$db_now = $db->db_now();
 				$my_notes = $db->prepare_string(trim($myNotes));
 				$my_result = strtolower($myResult);
@@ -615,26 +845,27 @@ function initializeExecMode(&$db,$exec_cfg,$userObj,$tproject_id,$tplan_id)
     $simple_tester_roles=array_flip($exec_cfg->simple_tester_roles);
     $effective_role = $userObj->getEffectiveRole($db,$tproject_id,$tplan_id);
     
-	  // SCHLUNDUS: hmm, for user defined roles, this wont work correctly
-	  // 20080104 - franciscom - Please explain why do you think will not work ok ?
-	  //                         do you prefer to check for exec right ?
-	  //
-	  // SCHLUNDUS: jep, exactly. If a user defines it own roles than a check for the tester
-	  // role will not do the desired effect of putting the logged in user in tester-view-mode
-	  // instead we must check for presence (and or absence) the right(s) which mades a user a tester 
-	  //
-	  // 20080310 - franciscom - 
-	  // Role is considered tester if:
-	  // role == TL_ROLES_TESTER OR Role has Test Plan execute but not Test Plan planning
-	  //
-	  //
-	  $can_execute = $effective_role->hasRight('testplan_execute');
-	  $can_manage = $effective_role->hasRight('testplan_planning');
-
-	  // 20081217 - franciscom
-	  // $use_exec_cfg = $effective_role->dbID == TL_ROLES_TESTER || ($can_execute && !$can_manage);
+	// SCHLUNDUS: hmm, for user defined roles, this wont work correctly
+	// 20080104 - franciscom - Please explain why do you think will not work ok ?
+	//                         do you prefer to check for exec right ?
+	//
+	// SCHLUNDUS: jep, exactly. If a user defines it own roles than a check for the tester
+	// role will not do the desired effect of putting the logged in user in tester-view-mode
+	// instead we must check for presence (and or absence) the right(s) which mades a user a tester 
+	//
+	// 20080310 - franciscom - 
+	// Role is considered tester if:
+	// role == TL_ROLES_TESTER OR Role has Test Plan execute but not Test Plan planning
+	//
+	//
+	$can_execute = $effective_role->hasRight('testplan_execute');
+	$can_manage = $effective_role->hasRight('testplan_planning');
+    
+	// 20081217 - franciscom
+	// $use_exec_cfg = $effective_role->dbID == TL_ROLES_TESTER || ($can_execute && !$can_manage);
     $use_exec_cfg = isset($simple_tester_roles[$effective_role->dbID]) || ($can_execute && !$can_manage);
-	  return  $use_exec_cfg ? $exec_cfg->exec_mode->tester : 'all';
+    
+    return  $use_exec_cfg ? $exec_cfg->exec_mode->tester : 'all';
 } // function end
 
 
@@ -644,17 +875,20 @@ function initializeExecMode(&$db,$exec_cfg,$userObj,$tproject_id,$tplan_id)
   args:
   
   returns: 
+  
+  rev: 20100121 - franciscom - platform refactoring
 
 */
-function setTesterAssignment(&$db,$exec_info,&$tcase_mgr,$tplan_id)
+function setTesterAssignment(&$db,$exec_info,&$tcase_mgr,$tplan_id,$platform_id)
 {     
 	foreach($exec_info as $version_id => $value)
 	{
 		$exec_info[$version_id]['assigned_user'] = '';
 		$exec_info[$version_id]['assigned_user_id'] = 0;
-		$p3 = $tcase_mgr->get_version_exec_assignment($version_id,$tplan_id);
 		
-		$assignedTesterId = intval($p3[$version_id]['user_id']);
+		// map of map: main key version_id, secondary key: platform_id
+		$p3 = $tcase_mgr->get_version_exec_assignment($version_id,$tplan_id);
+		$assignedTesterId = intval($p3[$version_id][$platform_id]['user_id']);
 		
 		if($assignedTesterId)
 		{
@@ -662,10 +896,6 @@ function setTesterAssignment(&$db,$exec_info,&$tcase_mgr,$tplan_id)
 			if ($user)
 			{
 				$exec_info[$version_id]['assigned_user']= $user->getDisplayName();  
-			}
-			else
-			{
-			    $exec_info[$version_id]['assigned_user']= sprintf(lang_get('deleted_user'),$assignedTesterId);
 			}
 			$exec_info[$version_id]['assigned_user_id'] = $assignedTesterId;
 		}  
@@ -768,14 +998,15 @@ function createExecNotesWebEditor(&$tcversions,$basehref,$editorCfg)
     //
     // Rows and Cols values are useless for FCKeditor.
     //
+    $itemTemplateValue = getItemTemplateContents('execution_template', 'notes', null);
     foreach($tcversions as $key => $tcv)
     {
         $tcversion_id=$tcv['id'];
         $tcase_id=$tcv['testcase_id'];
 
         $of=web_editor("notes[{$tcversion_id}]",$basehref,$editorCfg) ;
-        $of->Value = null;
-        
+        $of->Value = $itemTemplateValue;
+       
         // Magic numbers that can be determined by trial and error
         $editors[$tcase_id]=$of->CreateHTML(10,60);         
         unset($of);
@@ -798,6 +1029,7 @@ function getCfg()
     $cfg = new stdClass();
     $cfg->exec_cfg = config_get('exec_cfg');
     $cfg->gui_cfg = config_get('gui');
+    $cfg->bts_type = config_get('interface_bugs');
     
     $results = config_get('results');
     $cfg->tc_status = $results['status_code'];
@@ -814,7 +1046,7 @@ function getCfg()
   
   args:
        dbHandler: reference to db object
-       user_id:
+       $userObj: reference to current user object
        tproject_id:
        tplan_id
   
@@ -825,11 +1057,13 @@ function getCfg()
   returns: 
 
 */
-function initializeRights(&$dbHandler,$user_id,$tproject_id,$tplan_id)
+function initializeRights(&$dbHandler,&$userObj,$tproject_id,$tplan_id)
 {
-    $exec_cfg=config_get('exec_cfg');
+    $exec_cfg = config_get('exec_cfg');
     $grants = new stdClass();
-    $grants->execute = (has_rights($dbHandler,"testplan_execute")=="yes" ? 1 : 0);
+    
+    $grants->execute = $userObj->hasRight($dbHandler,"testplan_execute",$tproject_id,$tplan_id);
+    $grants->execute = $grants->execute=="yes" ? 1 : 0;
     
     // may be in the future this can be converted to a role right
     $grants->delete_execution=$exec_cfg->can_delete_execution;
@@ -838,8 +1072,11 @@ function initializeRights(&$dbHandler,$user_id,$tproject_id,$tplan_id)
     // may be in the future this can be converted to a role right
     // Important:
     // Execution right must be present to consider this configuration option.
-    $grants->edit_exec_notes=$grants->execute && $exec_cfg->edit_notes;
+    $grants->edit_exec_notes = $grants->execute && $exec_cfg->edit_notes;
     
+    // 20090419 - franciscom - BUGID 
+    $grants->edit_testcase = $userObj->hasRight($dbHandler,"mgt_modify_tc",$tproject_id,$tplan_id);
+    $grants->edit_testcase = $grants->edit_testcase=="yes" ? 1 : 0;
     return $grants;
 }
 
@@ -856,24 +1093,39 @@ function initializeRights(&$dbHandler,$user_id,$tproject_id,$tplan_id)
 function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
 {
     $buildMgr = new build_mgr($dbHandler);
+    $platformMgr = new tlPlatform($dbHandler,$argsObj->tproject_id);
+    
     $gui = new stdClass();
+    $gui->tplan_id=$argsObj->tplan_id;
+    $gui->tproject_id=$argsObj->tproject_id;
+    
     $gui->execStatusValues=null;
     $gui->can_use_bulk_op=0;
     $gui->exec_notes_editors=null;
     $gui->bulk_exec_notes_editor=null;
     $gui->req_details=null;
-
-    $gui->editorType=$cfgObj->editorCfg['type'];
-    $gui->ownerDisplayName = null;
-    $gui->filter_assigned_to=$argsObj->filter_assigned_to;
-    $gui->tester_id=$argsObj->user->dbID;
-    $gui->include_unassigned=$argsObj->include_unassigned;
- 		$gui->attachmentInfos=null;
+    $gui->attachmentInfos=null;
     $gui->bugs=null;
     $gui->other_exec_cfields=null;
+    $gui->ownerDisplayName = null;
+    
+    $gui->editorType=$cfgObj->editorCfg['type'];
+    $gui->filter_assigned_to=$argsObj->filter_assigned_to;
+    $gui->tester_id=$argsObj->user_id;
+    $gui->include_unassigned=$argsObj->include_unassigned;
     $gui->tpn_view_status=$argsObj->tpn_view_status;
     $gui->bn_view_status=$argsObj->bn_view_status;
     $gui->bc_view_status=$argsObj->bc_view_status;
+    $gui->platform_notes_view_status=$argsObj->platform_notes_view_status;
+
+    $gui->refreshTree = $argsObj->refreshTree;
+    if (!$argsObj->status || $argsObj->status == $cfgObj->tc_status['not_run']) {
+    	$gui->refreshTree = 0;
+    }
+    
+    $gui->map_last_exec_any_build=null;
+    $gui->map_last_exec=null;
+
     	
     // 20081122 - franciscom
     // Just for the record:	
@@ -894,14 +1146,7 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
     	{
     	    foreach($userSet as $key => $userObj) 
     	    {
-    	        if($userObj)
-    	        { 
-    	            $gui->ownerDisplayName[$key] = $userObj->getDisplayName();
-    	        }
-    	        else
-    	        {
-    	            $gui->ownerDisplayName[$key] = sprintf(lang_get('deleted_user'),$key);
-    	        }    
+    	        $gui->ownerDisplayName[$key] = $userObj->getDisplayName();
     	    }    
     	}    
     }
@@ -911,7 +1156,8 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
     $gui->build_name = isset($the_builds[$argsObj->build_id]) ? $the_builds[$argsObj->build_id] : '';
 
 
-    $gui->grants = initializeRights($dbHandler,$argsObj->user->dbID,$argsObj->tproject_id,$argsObj->tplan_id);
+    // 20090419 - franciscom
+    $gui->grants = initializeRights($dbHandler,$argsObj->user,$argsObj->tproject_id,$argsObj->tplan_id);
     $gui->exec_mode = initializeExecMode($dbHandler,$cfgObj->exec_cfg,
                                          $argsObj->user,$argsObj->tproject_id,$argsObj->tplan_id);
 
@@ -925,7 +1171,7 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
     // scope = 'design' instead of 'execution'
     $gui->testplan_cfields = $tplanMgr->html_table_of_custom_field_values($argsObj->tplan_id,'design',
                                                                           array('show_on_execution' => 1));
-
+    
     $gui->history_on = manage_history_on($_REQUEST,$_SESSION,$cfgObj->exec_cfg,
                                          'btn_history_on','btn_history_off','history_on');
     $gui->history_status_btn_name = $gui->history_on ? 'btn_history_off' : 'btn_history_on';
@@ -935,8 +1181,16 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
     //                                        'btn_advanced','btn_simple','filterMode');
     // 
     // $gui->filter_mode_name = 
-
-
+    
+    $dummy = $platformMgr->getLinkedToTestplan($argsObj->tplan_id);
+    $gui->has_platforms = !is_null($dummy) ? 1 : 0;
+    
+    $gui->platform_info['id']=0;
+    $gui->platform_info['name']='';
+    if(!is_null($argsObj->platform_id) && $argsObj->platform_id > 0 )
+    { 
+    	$gui->platform_info = $platformMgr->getByID($argsObj->platform_id);
+    }
     return $gui;
 }
 
@@ -948,32 +1202,58 @@ function initializeGui(&$dbHandler,&$argsObj,&$cfgObj,&$tplanMgr,&$tcaseMgr)
   
   returns: 
 
-  rev: 20080811 - franciscom - BUGID 1650 (REQ)
+  rev: 
+    20090913 - franciscom - changes due to platform feature
+  	20090718 - franciscom - cfield location management
+  	20080811 - franciscom - BUGID 1650 (REQ)
   
 */
-function processTestCase(&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,&$treeMgr,&$tcaseMgr,&$docRepository)
+function processTestCase($tcase,&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,
+                         &$treeMgr,&$tcaseMgr,&$docRepository)
 {     
+
+  	// IMPORTANT due  to platform feature
+  	// every element on linked_tcversions will be an array.
     $cf_filters=array('show_on_execution' => 1); // BUGID 1650 (REQ)
+    $locationFilters=$tcaseMgr->buildCFLocationMap();
     $guiObj->design_time_cfields='';
+  	$guiObj->testplan_design_time_cfields='';
   	
-  	$items_to_exec[$argsObj->id] = $linked_tcversions[$argsObj->id]['tcversion_id'];    
-  	$tcase_id = $argsObj->id;
-  	$tcversion_id = $linked_tcversions[$argsObj->id]['tcversion_id'];
-  	$guiObj->tcAttachments[$argsObj->id] = getAttachmentInfos($docRepository,$argsObj->id,'nodes_hierarchy',1);
-    
-    $guiObj->design_time_cfields[$argsObj->id] = 
-  	         $tcaseMgr->html_table_of_custom_field_values($argsObj->id,'design',$cf_filters,null,null,$argsObj->tproject_id);
-    
+  	$tcase_id = isset($tcase['tcase_id']) ? $tcase['tcase_id'] : $argsObj->id;
+
+  	$items_to_exec[$tcase_id] = $linked_tcversions[$tcase_id][0]['tcversion_id'];    
+  	// $tcversion_id = $linked_tcversions[$tcase_id][0]['tcversion_id'];
+  	$tcversion_id = isset($tcase['tcversion_id']) ? $tcase['tcversion_id'] : $items_to_exec[$tcase_id];
+  	
+  	$link_id = $linked_tcversions[$tcase_id][0]['feature_id'];
+  	$guiObj->tcAttachments[$tcase_id] = getAttachmentInfos($docRepository,$tcase_id,'nodes_hierarchy',1);
+
+	foreach($locationFilters as $locationKey => $filterValue)
+	{
+		// 20090718 - franciscom
+		$finalFilters=$cf_filters+$filterValue;
+    	$guiObj->design_time_cfields[$tcase_id][$locationKey] = 
+  		         $tcaseMgr->html_table_of_custom_field_values($tcase_id,'design',$finalFilters,
+  		                                                      null,null,$argsObj->tproject_id);
+    	
+    	// 20090718 - franciscom - TO BE refactored
+    	$guiObj->testplan_design_time_cfields[$tcase_id] = 
+  		         $tcaseMgr->html_table_of_custom_field_values($tcversion_id,'testplan_design',$cf_filters,
+  		                                                      null,null,$argsObj->tproject_id,null,$link_id);
+
+    }
+
     // BUGID 856: Guest user can execute test case
   	if($guiObj->grants->execute)
   	{
-  	   $guiObj->execution_time_cfields[$argsObj->id] = 
-  	            $tcaseMgr->html_table_of_custom_field_inputs($argsObj->id,null,'execution',"_{$argsObj->id}",null,$argsObj->tproject_id);
+  	   $guiObj->execution_time_cfields[$tcase_id] = 
+  	            $tcaseMgr->html_table_of_custom_field_inputs($tcase_id,null,'execution',"_{$tcase_id}",null,
+  	                                                         null,$argsObj->tproject_id);
   	}
-  	// 20070405 - BUGID 766
-    $tc_info=$treeMgr->get_node_hierachy_info($tcase_id);
+    $tc_info=$treeMgr->get_node_hierarchy_info($tcase_id);
 	$guiObj->tSuiteAttachments[$tc_info['parent_id']] = getAttachmentInfos($docRepository,$tc_info['parent_id'],
-		                                                                      'nodes_hierarchy',true,1);
+		                                                                   'nodes_hierarchy',true,1);
+
 		                                                                      
     return array($tcase_id,$tcversion_id);
 }
@@ -992,18 +1272,20 @@ function processTestCase(&$guiObj,&$argsObj,&$cfgObj,$linked_tcversions,&$treeMg
 */
 function getLastExecution(&$dbHandler,$tcase_id,$tcversion_id,$guiObj,$argsObj,&$tcaseMgr)
 {      
+	// 20090716 - franciscom - get_last_execution() interface changes
+	$options=array('getNoExecutions' => 1, 'groupByBuild' => 0);
     $last_exec = $tcaseMgr->get_last_execution($tcase_id,$tcversion_id,$argsObj->tplan_id,
-                                               $argsObj->build_id,GET_NO_EXEC);
-
+                                               $argsObj->build_id,$argsObj->platform_id,$options);
+    
     if( !is_null($last_exec) )
     {
-      $last_exec=setTesterAssignment($dbHandler,$last_exec,
-                                     $tcaseMgr,$argsObj->tplan_id);
-    
-      // Warning: setCanExecute() must be called AFTER setTesterAssignment()  
-      $can_execute=$guiObj->grants->execute && ($guiObj->build_is_open);
-      $last_exec=setCanExecute($last_exec,$guiObj->exec_mode,
-                               $can_execute,$argsObj->user->dbID);
+        $last_exec=setTesterAssignment($dbHandler,$last_exec,$tcaseMgr,
+                                       $argsObj->tplan_id,$argsObj->platform_id);
+        
+        // Warning: setCanExecute() must be called AFTER setTesterAssignment()  
+        $can_execute=$guiObj->grants->execute && ($guiObj->build_is_open);
+        $last_exec=setCanExecute($last_exec,$guiObj->exec_mode,
+                                 $can_execute,$argsObj->user_id);
     }
     
     // Reorder executions to mantaing correct visualization order.
@@ -1030,22 +1312,28 @@ function getOtherExecutions(&$dbHandler,$tcase_id,$tcversion_id,$guiObj,$argsObj
     $other_execs = null;
     if($guiObj->history_on)
     {
-      // 20071113 - Contribution
-      $build_id_filter=$argsObj->build_id;
-      if($cfgObj->exec_cfg->show_history_all_builds )
-      {
-        $build_id_filter=ANY_BUILD;
-      }  
-      $other_execs = $tcaseMgr->get_executions($tcase_id,$tcversion_id,
-                                               $argsObj->tplan_id,$build_id_filter,
-                                               $cfgObj->exec_cfg->history_order);
+		$filters['build_id'] = $argsObj->build_id;
+      	$filters['platform_id'] = $argsObj->platform_id;
+      	
+      	if($cfgObj->exec_cfg->show_history_all_builds )
+      	{
+      	  $filters['build_id'] = ANY_BUILD;
+      	}  
+      	if($cfgObj->exec_cfg->show_history_all_platforms )
+      	{
+      	  $filters['platform_id'] = null;
+      	}  
+      	$options = array('exec_id_order' => $cfgObj->exec_cfg->history_order);
+      	$other_execs = $tcaseMgr->get_executions($tcase_id,$tcversion_id,$argsObj->tplan_id,
+      	                                         $filters['build_id'],$filters['platform_id'],$options);
     }    
     else
     {
         // Warning!!!:
         // we can't use the data we have got with previous call to get_last_execution()
         // because if user have asked to save results last execution data may be has changed
-        $aux_map = $tcaseMgr->get_last_execution($tcase_id,$tcversion_id,$argsObj->tplan_id,$argsObj->build_id);
+        $aux_map = $tcaseMgr->get_last_execution($tcase_id,$tcversion_id,$argsObj->tplan_id,
+                                                 $argsObj->build_id,$argsObj->platform_id);
 
         if(!is_null($aux_map))
         {
@@ -1074,23 +1362,21 @@ function getOtherExecutions(&$dbHandler,$tcase_id,$tcversion_id,$guiObj,$argsObj
 function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
                           &$treeMgr,&$tcaseMgr,&$docRepository)
 {
+    $locationFilters=$tcaseMgr->buildCFLocationMap();
     $testSet=new stdClass();
     $cf_filters=array('show_on_execution' => 1); // BUGID 1650 (REQ)    
     
     $tsuite_mgr=new testsuite($dbHandler); 
     $tsuite_data = $tsuite_mgr->get_by_id($argsObj->id);
-    
+    $opt = array('write_button_only_if_linked' => 1, 'prune_unlinked_tcversions' => 1);
+
+    // @TODO - 20090815 - franciscom
+    // why here we do not have filtered by tester ?
+    // same for platform_id
+    $filters = array('keywords' => $argsObj->keyword_id);
     $out = gen_spec_view($dbHandler,'testplan',$argsObj->tplan_id,$argsObj->id,$tsuite_data['name'],
-                         $linked_tcversions,null,$argsObj->keyword_id,
-                         FILTER_BY_TC_OFF,WRITE_BUTTON_ONLY_IF_LINKED,DO_PRUNE);
+                         $linked_tcversions,null,$filters,$opt);
        
-    // $filters['keyword_id']=$argsObj->keyword_id;   
-    // $options['writeButtons']=1;
-    // $options['pruneUnliked']=1;
-    // 
-    // $out = gen_spec_view($dbHandler,'testplan',$argsObj->tplan_id,$argsObj->id,$tsuite_data['name'],
-    //                      $linked_tcversions,null,$filters,$options);
-                         
     $testSet->tcase_id = array();
     $testSet->tcversion_id = array();
     foreach($out['spec_view'] as $key => $value)
@@ -1107,8 +1393,25 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
     // ---------------------------------------------------------------------------------
    
     // Get the path for every test case, grouping test cases that have same parent.
-    if( count($testSet->tcase_id) > 0 )
+    $testCaseQty = count($testSet->tcase_id);
+    if( $testCaseQty > 0 )
     {
+		$dummy = $tcaseMgr->cfield_mgr->getLocations();
+		$verboseLocationCode = array_flip($dummy['testcase']);
+		$filters=null;
+    	foreach($verboseLocationCode as $key => $value)
+    	{
+    		$filters[$key]['location']=$value;
+    	}	     
+
+		$dummy_id = current($testSet->tcase_id);
+		$index = $testCaseQty == 1 ? $dummy_id : 0;  // 0 => BULK
+		$suffix = '_' . $index;
+		$execution_time_cfields = 
+				$tcaseMgr->html_table_of_custom_field_inputs($dummy_id,$argsObj->tproject_id,'execution',$suffix,
+	            	                               			 null,null,$argsObj->tproject_id);
+		
+		$guiObj->execution_time_cfields[$index] = $execution_time_cfields;
         foreach($testSet->tcase_id as $testcase_id)
         {
             $path_f = $treeMgr->get_path($testcase_id,null,'full');
@@ -1116,33 +1419,40 @@ function processTestSuite(&$dbHandler,&$guiObj,&$argsObj,$linked_tcversions,
             {
             	if( $path_elem['parent_id'] == $argsObj->id )
             	{
-            	 // Can be added because is present in the branch the user wants to view
-            	 // ID of branch starting node is in $argsObj->id
-            	 $guiObj->tcAttachments[$testcase_id] = getAttachmentInfos($docRepository,$testcase_id,
-            	                                                             'nodes_hierarchy',true,1);
-            
-                // --------------------------------------------------------------------------------------
-                //@TODO: schlundus, can this be speed up with tprojectID?
-            	 $guiObj->design_time_cfields[$testcase_id] = $tcaseMgr->html_table_of_custom_field_values($testcase_id,
-            			                                                                       'design',$cf_filters);
+            		// Can be added because is present in the branch the user wants to view
+            		// ID of branch starting node is in $argsObj->id
+            		$guiObj->tcAttachments[$testcase_id] = getAttachmentInfos($docRepository,$testcase_id,
+            		                                                            'nodes_hierarchy',true,1);
+                	
+	            	foreach($locationFilters as $locationKey => $filterValue)
+	            	{
+                        $finalFilters=$cf_filters+$filterValue;
+            			$guiObj->design_time_cfields[$testcase_id][$locationKey] = 
+            				$tcaseMgr->html_table_of_custom_field_values($testcase_id,'design',$finalFilters);
+                		$guiObj->testplan_design_time_cfields[$testcase_id] = 
+  	            		        $tcaseMgr->html_table_of_custom_field_values($testcase_id,'testplan_design',$cf_filters,
+  	            		                                                     null,null,$argsObj->tproject_id);
             			                                                                        
-                // BUGID 856: Guest user can execute test case
-            	 if($guiObj->grants->execute)
-               {
-            			$guiObj->execution_time_cfields[$testcase_id] = 
-            			         $tcaseMgr->html_table_of_custom_field_inputs($testcase_id, null,'execution',
-            			                                                      "_".$testcase_id,null,$argsObj->tproject_id);
-                }
+            		}	                     
+
+                	// BUGID 856: Guest user can execute test case
+                	if($guiObj->grants->execute)
+                	{
+            				$guiObj->execution_time_cfields[$testcase_id] = 
+            				$tcaseMgr->html_table_of_custom_field_inputs($testcase_id, null,'execution',   
+            				                                             "_".$testcase_id,null,null,
+            				                                             $argsObj->tproject_id);
+                	}
             	} // if( $path_elem['parent_id'] == $argsObj->id )
             	
-              // We do this because do not know if some test case not yet analised will be direct
-              // child of this test suite, then we get this info in advance.
-              // In situations where only last test suite on branch have test cases, we are colleting
-              // info we will never use.
-              if($path_elem['node_table'] == 'testsuites' && !isset($guiObj->tSuiteAttachments[$path_elem['id']]))
-              {
-            	   $guiObj->tSuiteAttachments[$path_elem['id']] = getAttachmentInfos($docRepository,$path_elem['id'],
-            	                                                                     'nodes_hierarchy',true,1);
+              	// We do this because do not know if some test case not yet analised will be direct
+              	// child of this test suite, then we get this info in advance.
+              	// In situations where only last test suite on branch have test cases, we are colleting
+              	// info we will never use.
+              	if($path_elem['node_table'] == 'testsuites' && !isset($guiObj->tSuiteAttachments[$path_elem['id']]))
+              	{
+              		$guiObj->tSuiteAttachments[$path_elem['id']] = 
+            	   		getAttachmentInfos($docRepository,$path_elem['id'],'nodes_hierarchy',true,1);
             	}
             	   
              } //foreach($path_f as $key => $path_elem) 

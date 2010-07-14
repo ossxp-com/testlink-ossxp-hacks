@@ -4,8 +4,8 @@
  *
  * Filename $RCSfile: int_gforge.php,v $
  *
- * @version $Revision: 1.1 $
- * @modified $Date: 2008/11/03 07:32:10 $ $Author: franciscom $
+ * @version $Revision: 1.3 $
+ * @modified $Date: 2009/08/18 19:58:14 $ $Author: schlundus $
  *
  * @author John Wanke - 20080825 - initial revision.
  *
@@ -43,7 +43,7 @@ class gforgeInterface extends bugtrackingInterface
 	 **/
 	function buildViewBugURL($id)
 	{
-    $URLsubstring_to_replace = BUG_TRACK_PROJECT;
+    	$URLsubstring_to_replace = BUG_TRACK_PROJECT;
 		if ($this->isConnected())
 		{
 			$gfproject = null;
@@ -130,24 +130,22 @@ class gforgeInterface extends bugtrackingInterface
 	function getBugSummaryString($id)
 	{
 		if (!$this->isConnected())
-		{
 			return null;
-                }
-    
+        
 		$status = null;
-		$query = "SELECT summary FROM tracker_item WHERE tracker_item_id='" . $id."'";
-
-		$result = $this->dbConnection->exec_query($query);
 		$summary = null;
+
+		$query = "SELECT summary FROM tracker_item WHERE tracker_item_id='" . $id."'";
+		$result = $this->dbConnection->exec_query($query);
 		if ($result)
 		{
 			$summary = $this->dbConnection->fetch_array($result);
 			if ($summary)
 			{
 				$summary = $summary['summary'];
-				if(strlen($summary) > 45)
+				if(tlStringLen($summary) > 45)
 				{
-					$summary = substr($summary, 0, 42) . "...";
+					$summary = tlSubStr($summary, 0, 42) . "...";
 				}
 			}
 			else
@@ -198,18 +196,15 @@ class gforgeInterface extends bugtrackingInterface
 	 **/
 	function checkBugID_existence($id)
 	{
-	  $status_ok=0;	
-		// $query = "SELECT status FROM mantis_bug_table WHERE id='" . $id."'";
+	  	$status_ok = false;	
 		$query = " SELECT tracker_id FROM tracker_item " .
 		         " WHERE tracker_item_id = {$id}" ;
 		$result = $this->dbConnection->exec_query($query);
-		if ($result && ($this->dbConnection->num_rows($result) == 1) )
+		if ($result && ($this->dbConnection->num_rows($result) == 1))
 		{
-      $status_ok=1;    
-    }
+      		$status_ok = true;    
+    	}
 		return $status_ok;
 	}	
-
-
 }
 ?>

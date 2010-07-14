@@ -5,11 +5,13 @@
  *
  * Filename $RCSfile: rolesEdit.php,v $
  *
- * @version $Revision: 1.26 $
- * @modified $Date: 2009/01/05 21:38:57 $ by $Author: schlundus $
+ * @version $Revision: 1.34 $
+ * @modified $Date: 2009/11/24 19:40:15 $ by $Author: franciscom $
  *
- * rev: 20081030 - franciscom - added system_mgmt member on getRightsCfg()
- *      20080827 - franciscom - BUGID 1692
+ * @internal revision 
+ *	20091124 - franciscom - added contribution item template
+ *	20081030 - franciscom - added system_mgmt member on getRightsCfg()
+ *	20080827 - franciscom - BUGID 1692
 **/
 require_once("../../config.inc.php");
 require_once("common.php");
@@ -21,14 +23,13 @@ require_once(require_web_editor($editorCfg['type']));
 
 testlinkInitPage($db,false,false,"checkRights");
 init_global_rights_maps();
-
 $templateCfg = templateConfiguration();
 $args = init_args();
 $gui = initialize_gui($editorCfg['type']);
 $op = initialize_op();
 
-$owebeditor = web_editor('notes',$_SESSION['basehref'],$editorCfg) ;
-$owebeditor->Value = null;
+$owebeditor = web_editor('notes',$args->basehref,$editorCfg) ;
+$owebeditor->Value = getItemTemplateContents('role_template', $owebeditor->InstanceName, null);
 $canManage = has_rights($db,"role_management") ? true : false;
 
 switch($args->doAction)
@@ -53,6 +54,7 @@ switch($args->doAction)
 }
 
 $gui = complete_gui($db,$gui,$args,$op->role,$owebeditor);
+
 $gui->userFeedback = $op->userFeedback;
 
 $smarty = new TLSmarty();
@@ -60,36 +62,25 @@ $smarty->assign('gui',$gui);
 $smarty->assign('highlight',$gui->highlight);
 renderGui($smarty,$args,$templateCfg);
 
-/*
-  function: init_args
-
-  args:
-
-  returns:
-
-*/
 function init_args()
 {
+	$iParams = array(
+			"rolename" => array("POST",tlInputParameter::STRING_N,0,100),
+			"roleid" => array("REQUEST",tlInputParameter::INT_N),
+			"doAction" => array("REQUEST",tlInputParameter::STRING_N,0,100),
+			"notes" => array("POST",tlInputParameter::STRING_N),
+			"grant" => array("POST",tlInputParameter::ARRAY_STRING_N),
+		);
+
 	$args = new stdClass();
-	$_REQUEST = strings_stripSlashes($_REQUEST);
+	$pParams = I_PARAMS($iParams,$args);
 	
-	$key2loop = array('doAction' => null,'rolename' => null , 'roleid' => 0, 'notes' => '', 'grant' => null);
-	foreach($key2loop as $key => $value)
-	{
-		$args->$key = isset($_REQUEST[$key]) ? $_REQUEST[$key] : $value;
-	}
+	$args->basehref = $_SESSION['basehref'];
+	
 	return $args;
 }
 
 
-/*
-  function: doOperation
-
-  args:
-
-  returns:
-
-*/
 function doOperation(&$dbHandler,$argsObj,$operation)
 {
 	$rights = implode("','",array_keys($argsObj->grant));
@@ -115,7 +106,7 @@ function doOperation(&$dbHandler,$argsObj,$operation)
 				break;
 	
 			case 'doUpdate':
-	      $auditCfg['msg'] = "audit_role_saved";
+	      		$auditCfg['msg'] = "audit_role_saved";
 				$auditCfg['activity'] = "SAVE";
 				break;
 		}
@@ -131,14 +122,7 @@ function doOperation(&$dbHandler,$argsObj,$operation)
 	return $op;
 }
 
-/*
-  function: renderGui
 
-  args :
-
-  returns:
-
-*/
 function renderGui(&$smartyObj,&$argsObj,$templateCfg)
 {
     $doRender = false;
@@ -193,19 +177,11 @@ function getRightsCfg()
     $cfg->req_mgmt = config_get('rights_req');
     $cfg->cfield_mgmt = config_get('rights_cf');
     $cfg->system_mgmt = config_get('rights_system');
-    
+    $cfg->platform_mgmt = config_get('rights_platforms');
     return $cfg;
 }
 
 
-/*
-  function: initialize_gui
-
-  args : -
-
-  returns:
-
-*/
 function initialize_gui($editorType)
 {
     $gui = new stdClass();
@@ -218,14 +194,7 @@ function initialize_gui($editorType)
     return $gui;
 }
 
-/*
-  function: initialize_op
 
-  args : -
-
-  returns:
-
-*/
 function initialize_op()
 {
     $op = new stdClass();
@@ -235,20 +204,12 @@ function initialize_op()
     return $op;
 }
 
-/*
-  function: complete_gui
-
-  args :
-
-  returns:
-
-*/
 function complete_gui(&$dbHandler,&$guiObj,&$argsObj,&$roleObj,&$webEditorObj)
 {
-    $actionCfg['operation']=array('create' => 'doCreate', 'edit' => 'doUpdate',
+    $actionCfg['operation'] = array('create' => 'doCreate', 'edit' => 'doUpdate',
                                   'doCreate' => 'doCreate', 'doUpdate' => 'doUpdate');
 
-    $actionCfg['highlight']=array('create' => 'create_role', 'edit' => 'edit_role',
+    $actionCfg['highlight'] = array('create' => 'create_role', 'edit' => 'edit_role',
                                   'doCreate' => 'create_role', 'doUpdate' => 'edit_role');
 
 
@@ -262,7 +223,7 @@ function complete_gui(&$dbHandler,&$guiObj,&$argsObj,&$roleObj,&$webEditorObj)
     // Create status for all checkboxes and set to unchecked
     foreach($guiObj->rightsCfg as $grantDetails)
     {
-        foreach( $grantDetails as $grantCode => $grantDescription )
+        foreach($grantDetails as $grantCode => $grantDescription)
         {
 			$guiObj->checkboxStatus[$grantCode] = "";
         }

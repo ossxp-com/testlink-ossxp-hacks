@@ -2,7 +2,7 @@
 /** 
 * 	TestLink Open Source Project - http://testlink.sourceforge.net/
 * 
-* 	@version 	$Id: dragdroprequirementnodes.php,v 1.1 2008/09/02 16:44:29 franciscom Exp $
+* 	@version 	$Id: dragdroprequirementnodes.php,v 1.3 2009/12/08 14:41:57 franciscom Exp $
 * 	@author 	Francisco Mancardi
 * 
 *   manage drag and drop on test project tree
@@ -27,7 +27,7 @@ switch($args->doAction)
         // This will be removed in future, when parent / child relationship
         // will be manage only on nodes_hierarchy table
         // NEED to talk Martin ASAP
-        $sql=" UPDATE requirements " .
+        $sql=" UPDATE " . DB_TABLE_PREFIX . "requirements " .
              " SET srs_id={$args->newparentid} " .
              " WHERE id={$args->nodeid}";
         //file_put_contents('d:\dragdroprequirementnodes.php.txt', $sql);                                 
@@ -57,6 +57,4 @@ function init_args()
     }
     return $args;
 }
-?>
-
-                                                                                              
+?>                                                                                              

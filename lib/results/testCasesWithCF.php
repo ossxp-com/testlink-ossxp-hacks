@@ -4,8 +4,8 @@
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * @filesource $RCSfile: testCasesWithCF.php,v $
- * @version $Revision: 1.1.2.3 $
- * @modified $Date: 2009/05/04 05:12:36 $ by $Author: amkhullar $
+ * @version $Revision: 1.7 $
+ * @modified $Date: 2009/06/10 19:36:00 $ by $Author: franciscom $
  * @author Amit Khullar - amkhullar@gmail.com
  *
  * For a test plan, list test cases with Execution Custom Field Data
@@ -14,28 +14,27 @@
  */
 require_once("../../config.inc.php");
 require_once("common.php");
+testlinkInitPage($db,false,false,"checkRights");
+
 $cfield_mgr = new cfield_mgr($db);
-testlinkInitPage($db);
 $templateCfg = templateConfiguration();
 
-$tplan_mgr=new testplan($db);
-
-$args=init_args($tplan_mgr);
+$tplan_mgr = new testplan($db);
+$args = init_args($tplan_mgr);
 
 $gui = new stdClass();
-$gui->pageTitle=lang_get('caption_testCasesWithCF');
-$gui->warning_msg='';
-$gui->tcasePrefix='';
-$gui->path_info=null;
-$gui->resultSet=null;
-$gui->tproject_name=$args->tproject_name;
-$gui->tplan_name=$args->tplan_name;
-$gui->tplan_id=$args->tplan_id;
+$gui->pageTitle = lang_get('caption_testCasesWithCF');
+$gui->warning_msg = '';
+$gui->tcasePrefix = '';
+$gui->path_info = null;
+$gui->resultSet = null;
+$gui->tproject_name = $args->tproject_name;
+$gui->tplan_name = $args->tplan_name;
+$gui->tplan_id = $args->tplan_id;
 $testCaseSet = array();
-$msg_key='no_linked_tc_cf';
-if( $tplan_mgr->count_testcases($args->tplan_id) > 0 )
+$msg_key = 'no_linked_tc_cf';
+if($tplan_mgr->count_testcases($args->tplan_id) > 0)
 {
-
     $resultsCfg = config_get('results');
     $tcase_cfg = config_get('testcase_cfg');
 
@@ -43,26 +42,24 @@ if( $tplan_mgr->count_testcases($args->tplan_id) > 0 )
     // Get the mapping for the Verbose Status Description of Test Case Status
     $map_tc_status_verbose_code = $resultsCfg['code_status'];
     $map_tc_status_verbose_label = $resultsCfg['status_label'];
-    foreach($map_tc_status_verbose_code as $code => $verbose )
+    foreach($map_tc_status_verbose_code as $code => $verbose)
     {
-        if( isset($map_tc_status_verbose_label[$verbose]) )
+        if(isset($map_tc_status_verbose_label[$verbose]))
         {
             $label = $map_tc_status_verbose_label[$verbose];
-            $gui->status_code_labels[$code]=lang_get($label);
-            // $map_label_css[$map_tc_status_code_langet[$code]]=$resultsCfg['code_status'][$code];
+            $gui->status_code_labels[$code] = lang_get($label);
         }
     }
-    // $not_run_label=lang_get('test_status_not_run');
     // -----------------------------------------------------------------------------------
-    $gui->code_status=$resultsCfg['code_status'];
+    $gui->code_status = $resultsCfg['code_status'];
     $tproject_mgr = new testproject($db);
-    $gui->tcasePrefix=$tproject_mgr->getTestCasePrefix($args->tproject_id);
+    $gui->tcasePrefix = $tproject_mgr->getTestCasePrefix($args->tproject_id);
     $gui->tcasePrefix .= $tcase_cfg->glue_character;
 
     // Get the custom fields linked/enabled on execution to a test project
     // This will be used on report to give name to header of columns that hold custom field value
     $gui->cfields = $cfield_mgr->get_linked_cfields_at_execution($args->tproject_id,1,'testcase',
-    null,null,null,'name');
+                                                                 null,null,null,'name');
     
     if(!is_null($gui->cfields))
     {
@@ -71,17 +68,15 @@ if( $tplan_mgr->count_testcases($args->tplan_id) > 0 )
            $cf_place_holder['cfields'][$key]='';
         }
     }
-   	//
-
    	// Now get exeutions with custom field values
     $cf_map = $cfield_mgr->get_linked_cfields_at_execution($args->tproject_id,1,'testcase',
-    null,null,$args->tplan_id,'exec_id');
+                                                           null,null,$args->tplan_id,'exec_id');
      
     // need to transform in structure that allow easy display
     // Every row is an execution with exec data plus a column that contains following map:
     // 'cfields' => CFNAME1 => value
     //              CFNAME2 => value
-    $result=array();
+    $result = array();
     if(!is_null($cf_map))
     {
         foreach($cf_map as $exec_id => $exec_info)
@@ -105,7 +100,7 @@ if( $tplan_mgr->count_testcases($args->tplan_id) > 0 )
 
     if(($gui->row_qty=count($cf_map)) > 0 )
     {
-        $msg_key='';
+        $msg_key = '';
         $gui->pageTitle .= " - " . lang_get('match_count') . ":" . $gui->row_qty;
         $gui->resultSet=$result;
     }
@@ -114,8 +109,6 @@ if( $tplan_mgr->count_testcases($args->tplan_id) > 0 )
 $smarty = new TLSmarty();
 $smarty->assign('gui',$gui);
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
-
-
 
 /*
  function:
@@ -134,12 +127,12 @@ function init_args(&$tplan_mgr)
 
     $args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : 0;
     $args->tplan_name = '';
-    if( $args->tplan_id == 0 )
+    if($args->tplan_id == 0)
     {
-        $args->tplan_id = isset($_SESSION['testPlanId']) ? $_SESSION['testPlanId'] : 0;
+        $args->tplan_id = isset($_SESSION['testplanID']) ? $_SESSION['testplanID'] : 0;
     }
 
-    if( $args->tplan_id > 0 )
+    if($args->tplan_id > 0)
     {
         $tplan_info = $tplan_mgr->get_by_id($args->tplan_id);
         $args->tplan_name = $tplan_info['name'];
@@ -147,6 +140,10 @@ function init_args(&$tplan_mgr)
 
     return $args;
 }
+
+
+function checkRights(&$db,&$user)
+{
+	return $user->hasRight($db,'testplan_metrics');
+}
 ?>
-
-
