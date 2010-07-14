@@ -1,8 +1,12 @@
 {*
 Testlink Open Source Project - http://testlink.sourceforge.net/
-$Id: usersView.tpl,v 1.13.2.2 2009/05/20 03:10:08 havlat Exp $
+$Id: usersView.tpl,v 1.23 2010/05/02 15:26:59 franciscom Exp $
 
 Purpose: smarty template - users overview
+
+20100426 - asimon - removed forgotten comment end sign (template syntax error)
+20100419 - franciscom - BUGID 3355: A user can not be deleted from the list
+20100326 - franciscom - BUGID 3324
 *}
 {include file="inc_head.tpl" openHead="yes"}
 {include file="inc_del_onclick.tpl"}
@@ -11,19 +15,54 @@ Purpose: smarty template - users overview
 {assign var="createUserAction" value="$userActionMgr?doAction=create"}
 {assign var="editUserAction" value="$userActionMgr?doAction=edit&amp;user_id="}
 
-{lang_get s='warning_delete_user' var="warning_msg"}
-{lang_get s='delete' var="del_msgbox_title" }
+{lang_get s='warning_disable_user' var="warning_msg"}
+{lang_get s='disable' var="del_msgbox_title"}
+
 <script type="text/javascript">
-	var del_action=fRoot+"lib/usermanagement/usersView.php?operation=delete&user=";
+	var del_action=fRoot+"lib/usermanagement/usersView.php?operation=disable&user=";
 </script>
+
+{literal}
+<script type="text/javascript">
+function toggleRowByClass(oid,className,displayValue)
+{
+  var trTags = document.getElementsByTagName("tr");
+  var cbox = document.getElementById(oid);
+  
+  for( idx=0; idx < trTags.length; idx++ ) 
+  {
+    if( trTags[idx].className == className ) 
+    {
+      if( displayValue == undefined )
+      {
+        if( cbox.checked )
+        {
+          trTags[idx].style.display = 'none';
+        }
+        else
+        {
+          trTags[idx].style.display = 'table-row';
+        }
+      } 
+      else
+      {
+        trTags[idx].style.display = displayValue;
+      }
+    }
+  }
+
+}
+</script>
+{/literal}
+
 </head>
 
 
 {lang_get var="labels"
           s="title_user_mgmt,th_login,title_user_mgmt,th_login,th_first_name,th_last_name,th_email,
              th_role,order_by_role_descr,order_by_role_dir,th_locale,th_active,th_api,th_delete,
-             alt_edit_user,Yes,No,alt_delete_user,no_permissions_for_action,btn_create,
-             order_by_login,order_by_login_dir,alt_active_user"}
+             disable,alt_edit_user,Yes,No,alt_delete_user,no_permissions_for_action,btn_create,
+             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user"}
 
 <body {$body_onload}>
 
@@ -42,7 +81,9 @@ Purpose: smarty template - users overview
 		<input type="hidden" id="user_order_by" name="user_order_by" value="{$user_order_by}" />
 
 	  {include file="inc_update.tpl" result=$result item="user" action="$action" user_feedback=$user_feedback}
-
+    {$labels.hide_inactive_users}
+    <input name="hide_inactive_users" id="hide_inactive_users" type="checkbox" {$checked_hide_inactive_users} 
+           value="on" onclick="toggleRowByClass('hide_inactive_users','inactive_user')">
 		<table class="simple" width="95%">
 			<tr>
 				<th {if $user_order_by == 'order_by_login'}style="background-color: #c8dce8;color: black;"{/if}>
@@ -71,53 +112,51 @@ Purpose: smarty template - users overview
 
 				<th>{$labels.th_locale}</th>
 				<th style="width:50px;">{$labels.th_active}</th>
-{*	#2376				<th style="width:50px;">{$labels.th_delete}</th> *}
+				<th style="width:50px;">{$labels.disable}</th>
 			</tr>
 
-			{section name=row loop=$users start=0}
-				{assign var="user" value="$users[row]"}
-				{assign var="userLocale" value=$user->locale}
-				{assign var="r_d" value=$user->globalRole->name}
-				{assign var="userID" value=$user->dbID}
-
-				<tr {if $role_colour[$r_d] neq ''} style="background-color: {$role_colour[$r_d]};" {/if}>
-				<td><a href="{$editUserAction}{$user->dbID}">
-				    {$user->login|escape}
+      {foreach from=$users item=userObj}
+ 			  {assign var="r_n" value=$userObj->globalRole->name}
+				{assign var="r_d" value=$userObj->globalRole->getDisplayName()}
+        {if $userObj->isActive eq 1}
+          {assign var="user_row_class" value=''}
+        {else}
+          {assign var="user_row_class" value='class="inactive_user"'}
+        {/if}
+				<tr {$user_row_class} {if $role_colour[$r_n] neq ''} style="background-color: {$role_colour[$r_n]};" {/if}>
+				<td><a href="{$editUserAction}{$userObj->dbID}">
+				    {$userObj->login|escape}
 			      {if $gsmarty_gui->show_icon_edit}
 				      <img title="{$labels.alt_edit_user}"
 				           alt="{$labels.alt_edit_user}" src="{$smarty.const.TL_THEME_IMG_DIR}/icon_edit.png"/>
 				    {/if}
 				    </a>
 				</td>
-				<td>{$user->firstName|escape}</td>
-				<td>{$user->lastName|escape}</td>
-				<td>{$user->emailAddress|escape}</td>
+				<td>{$userObj->firstName|escape}</td>
+				<td>{$userObj->lastName|escape}</td>
+				<td>{$userObj->emailAddress|escape}</td>
 				<td>{$r_d|escape}</td>
 				<td>
-				 {$optLocale[$userLocale]|escape}
+				 {$optLocale[$userObj->locale]|escape}
 				</td>
 				<td align="center">
-					{if $user->bActive eq 1}
+					{if $userObj->isActive eq 1}
 				  		<img style="border:none" title="{$labels.alt_active_user}"
   				                             alt="{$labels.alt_active_user}"  src="{$checked_img}"/>
-  			  		{else}
-				  		<img style="border:none" title="{$labels.alt_delete_user}"
-  				                             alt="{$labels.alt_delete_user}"
-						       src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
-        			{/if}
+  			  {else}
+  				    &nbsp;
+        	{/if}
 				</td>
-{*	#2376
 				<td align="center">
 				  <img style="border:none;cursor: pointer;"
-               alt="{$labels.alt_delete_user}"
-					     title="{$labels.alt_delete_user}"
-					     onclick="delete_confirmation({$user->dbID},'{$user->login|escape:'javascript'|escape}',
+               alt="{$labels.alt_disable_user}"
+					     title="{$labels.alt_disable_user}"
+					     onclick="delete_confirmation({$userObj->dbID},'{$userObj->login|escape:'javascript'|escape}',
 					                                  '{$del_msgbox_title}','{$warning_msg}');"
 				       src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
 				</td>
-*}
 			</tr>
-			{/section}
+			{/foreach}
 		</table>
 		</form>
 	</div>

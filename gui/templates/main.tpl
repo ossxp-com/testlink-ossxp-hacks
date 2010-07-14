@@ -1,5 +1,5 @@
 {* Testlink Open Source Project - http://testlink.sourceforge.net/ *}
-{* $Id: main.tpl,v 1.6.4.2 2009/06/29 10:45:26 havlat Exp $ *}
+{* $Id: main.tpl,v 1.8 2009/06/29 10:45:24 havlat Exp $ *}
 {* Purpose: smarty template - main frame *}
 {*******************************************************************}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">

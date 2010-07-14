@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: charts.tpl,v 1.2.2.1 2009/04/16 11:12:04 havlat Exp $
+$Id: charts.tpl,v 1.3 2009/04/16 11:11:59 havlat Exp $
 Purpose: show graphical charts 
 
 rev: 20081122 - franciscom - added new message when charts can not be displayed

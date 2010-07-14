@@ -1,27 +1,33 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: tcExport.tpl,v 1.7 2009/01/06 15:34:05 franciscom Exp $ 
-Purpose: smarty template - keyword export initial page 
+$Id: tcExport.tpl,v 1.13 2010/05/01 19:15:20 franciscom Exp $ 
+
+test case export initial page 
+
 Revisions:
-       20071013 - franciscom - file name management
-       20070113 - franciscom - added message when there is nothing to export 
+20100315 - franciscom - improvements on goback management
+20100315 - amitkhullar - Added checkboxes options for Requirements and CFields for Export.
+20091122 - franciscom - refacoting to use alert_message()
+
 * ----------------------------------------------------------------- *}
 {lang_get var="labels" 
-          s='export_filename,warning_empty_filename,file_type,
+          s='export_filename,warning_empty_filename,file_type,warning,export_cfields,title_req_export,
              view_file_format_doc,export_with_keywords,btn_export,btn_cancel'} 
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 {include file="inc_head.tpl" openHead="yes" jsValidate="yes"}
+{include file="inc_del_onclick.tpl"}
 
 <script type="text/javascript">
+var alert_box_title = "{$labels.warning}";
 var warning_empty_filename = "{$labels.warning_empty_filename}";
 {literal}
 function validateForm(f)
 {
   if (isWhitespace(f.export_filename.value)) 
   {
-      alert(warning_empty_filename);
+      alert_message(alert_box_title,warning_empty_filename);
       selectField(f, 'export_filename');
       return false;
   }
@@ -61,8 +67,16 @@ function validateForm(f)
   	</td>
   	</tr>
     <tr>
+    <td>{$labels.title_req_export}</td>
+    <td><input type="checkbox" name="exportReqs" value="1" checked /></td>
+    </tr>  	
+    <tr>
+    <td>{$labels.export_cfields}</td>
+    <td><input type="checkbox" name="exportCFields" value="1" checked /></td>
+    </tr>
+    <tr>
     <td>{$labels.export_with_keywords}</td>
-    <td><input type="checkbox" name="bKeywords" value="0" /></td>
+    <td><input type="checkbox" name="exportKeywords" value="0" /></td>
     </tr>
 
   	</table>
@@ -71,10 +85,11 @@ function validateForm(f)
   		<input type="hidden" name="testcase_id" value="{$gui->tcID}" />
   		<input type="hidden" name="tcversion_id" value="{$gui->tcVersionID}" />
   		<input type="hidden" name="containerID" value="{$gui->containerID}" />
-  		<input type="hidden" name="bRecursive" value="{$gui->bRecursive}" />
+  		<input type="hidden" name="useRecursion" value="{$gui->useRecursion}" />
   		<input type="submit" name="export" value="{$labels.btn_export}" />
-  		<input type="button" name="cancel" value="{$labels.btn_cancel}" 
-  			                   onclick="javascript:history.back();" />
+  		<input type="button" name="cancel" value="{$labels.btn_cancel}"
+    		     {if $gui->goback_url != ''}  onclick="location='{$gui->goback_url}'"
+    		     {else}  onclick="javascript:history.back();" {/if} />
   	</div>
   </form>
 {else}

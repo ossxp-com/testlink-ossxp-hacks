@@ -1,6 +1,6 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: rolesView.tpl,v 1.13 2008/09/21 19:02:48 schlundus Exp $
+$Id: rolesView.tpl,v 1.15 2009/12/07 20:12:19 franciscom Exp $
 Purpose: smarty template - View defined roles
 
 rev:
@@ -19,11 +19,11 @@ rev:
              warning_users_will_be_reset,btn_confirm_delete,btn_cancel,no_roles,
              th_roles,th_role_description,th_delete,alt_edit_role,alt_delete_role,N_A"}
 
-{assign var="cfg_section" value=$smarty.template|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
-{lang_get s='warning_delete_role' var="warning_msg" }
-{lang_get s='delete' var="del_msgbox_title" }
+{lang_get s='warning_delete_role' var="warning_msg"}
+{lang_get s='delete' var="del_msgbox_title"}
 
 {include file="inc_head.tpl" openHead="yes" jsValidate="yes" enableTableSorting="yes"}
 {include file="inc_del_onclick.tpl"}
@@ -82,7 +82,7 @@ var del_action=fRoot+'lib/usermanagement/rolesView.php?doAction=delete&roleid=';
 			<tr>
 				<td>
 					<a href="{$editRoleAction}{$role->dbID}">
-						{$role->name|escape}
+						{$role->getDisplayName()|escape}
 						{if $gsmarty_gui->show_icon_edit}
  						  <img title="{$labels.alt_edit_role}"
  						       alt="{$labels.alt_edit_role}"
@@ -99,7 +99,7 @@ var del_action=fRoot+'lib/usermanagement/rolesView.php?doAction=delete&roleid=';
 				       <img style="border:none;cursor: pointer;"
 		  				            title="{$labels.alt_delete_role}"
 		  				            alt="{$labels.alt_delete_role}"
-		 					            onclick="delete_confirmation({$role->dbID},'{$role->name|escape:'javascript'|escape}',
+		 					            onclick="delete_confirmation({$role->dbID},'{$role->getDisplayName()|escape:'javascript'|escape}',
 		 					                                         '{$del_msgbox_title}','{$warning_msg}');"
 		  				            src="{$smarty.const.TL_THEME_IMG_DIR}/trash.png"/>
 					{else}
