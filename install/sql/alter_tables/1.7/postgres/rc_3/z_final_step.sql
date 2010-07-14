@@ -1,7 +1,7 @@
 /* 
-$Revision: 1.1.4.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.1 $
+$Date: 2007/08/18 14:07:07 $
+$Author: franciscom $
+$Name:  $
 */
 INSERT INTO db_version VALUES('1.7.0 RC 3', CURRENT_TIMESTAMP());

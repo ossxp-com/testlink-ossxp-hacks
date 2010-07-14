@@ -29,7 +29,7 @@
  * @package Smarty
  */
 
-/* $Id: Config_File.class.php 3149 2009-05-23 20:59:25Z monte.ohrt $ */
+/* $Id: Config_File.class.php,v 1.3 2010/01/29 19:33:21 franciscom Exp $ */
 
 /**
  * Config file reading class

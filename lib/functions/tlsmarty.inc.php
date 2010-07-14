@@ -1,53 +1,128 @@
 <?php
 /**
- * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+ * This script is distributed under the GNU General Public License 2 or later.
+ * 
+ * TLSmarty class is TestLink wraper for GUI templates processing. 
+ * The class is loaded via common.php to all pages.
+ * 
+ * @package 	TestLink
+ * @author 		Martin Havlat
+ * @copyright 	2005-2009, TestLink community 
+ * @version    	CVS: $Id: tlsmarty.inc.php,v 1.25 2010/06/24 17:25:53 asimon83 Exp $
+ * @link 		http://www.teamst.org/index.php
+ * @link 		http://www.smarty.net/ 
  *
- * Filename $RCSfile: tlsmarty.inc.php,v $
+ * @internal Revisions:
  *
- * @version $Revision: 1.6 $
- * @modified $Date: 2009/03/05 07:32:37 $ $Author: franciscom $
- *
- * @author Martin Havlat
- *
- * SCOPE:
- * TLSmarty class implementation used in all templates
- *
- * Revisions:
- * 20090304 - franciscom - removed some MAGIC NUMBERS 
- * 20081027 - havlatm - moved to include Smarty library
- * 20080424 - havlatm - added $tlCfg
- * ----------------------------------------------------------------------------------- */
+ *	20100621 - eloff - added guard_header_smarty() function
+ * 	20100121 - franciscom - added show_help_icon to remove error on event viewer
+ * 	20090304 - franciscom - removed some MAGIC NUMBERS 
+ * 	20081027 - havlatm - moved to include Smarty library
+ * 	20080424 - havlatm - added $tlCfg
+ */
 
-require_once( TL_ABS_PATH . 'third_party'. DIRECTORY_SEPARATOR . 'smarty'.  
-	            DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Smarty.class.php');
+define('SMARTY_DIR', TL_ABS_PATH . 'third_party'. DIRECTORY_SEPARATOR . 'smarty'.  
+	            DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR);
+define('SMARTY_CORE_DIR', SMARTY_DIR . 'internals' . DIRECTORY_SEPARATOR);
+
+/** include parent extrenal component */
+require_once( SMARTY_DIR . 'Smarty.class.php');
+
+/** in this way you can switch ext js version in easy way */
+if( !defined('TL_EXTJS_RELATIVE_PATH') )
+{
+    define('TL_EXTJS_RELATIVE_PATH','third_party/ext-js' );
+}
 
 
+/** @TODO martin: refactore + describe 
+ * The next two functions was moved here from common.php */
+function translate_tc_status($status_code)
+{
+	$resultsCfg = config_get('results'); 
+	$verbose = lang_get('test_status_not_run');
+	if( $status_code != '')
+	{
+		$suffix = $resultsCfg['code_status'][$status_code];
+		$verbose = lang_get('test_status_' . $suffix);
+	}
+	return $verbose;
+}
+
+/** 
+ * function is registered in tlSmarty class
+ * @uses function translate_tc_status
+ * @todo should be moved to tlSmarty class
+ */
+function translate_tc_status_smarty($params, &$smarty)
+{
+	$the_ret = translate_tc_status($params['s']);
+	if(	isset($params['var']) )
+	{
+		$smarty->assign($params['var'], $the_ret);
+	}
+	else
+	{
+		return $the_ret;
+	}
+}
+
+/**
+ * This function should be used to prevent certain templates to only
+ * get included once per page load. For example javascript includes, such
+ * as ext-js.
+ *
+ * Usage (in template):
+ * <code>
+ * {if guard_header_smarty(__FILE__)}
+ *     template code
+ *     <script src="big-library.js type="text/javascript"></script>
+ * {/if}
+ * </code>
+ */
+function guard_header_smarty($file)
+{
+	static $guarded = array();
+
+	if (!isset($guarded[$file]))
+	{
+		$guarded[$file] = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * TestLink wrapper for external Smarty class
+ * @package 	TestLink
+ */
 class TLSmarty extends Smarty
 {
     function TLSmarty()
     {
         global $tlCfg;
-        global $g_attachments;
-        global $g_spec_cfg;
-        global $g_bugInterfaceOn;
-        global $g_interface_bugs;
-        global $g_locales;
         global $g_locales_html_select_date_field_order;
         global $g_locales_date_format;
         global $g_locales_timestamp_format;
         
         
-        $this->Smarty();
+        // $this->Smarty();
+        parent::__construct();
         $this->template_dir = TL_ABS_PATH . 'gui/templates/';
         $this->compile_dir = TL_TEMP_PATH;
         $this->config_dir = TL_ABS_PATH . 'gui/templates/';
         
-        $testproject_coloring=$tlCfg->gui->testproject_coloring;
+        $testproject_coloring = $tlCfg->gui->testproject_coloring;
         $testprojectColor = $tlCfg->gui->background_color ; //TL_BACKGROUND_DEFAULT;
+        
         if (isset($_SESSION['testprojectColor']))
         {
             $testprojectColor =  $_SESSION['testprojectColor'];
-            if (!strlen($testprojectColor))
+            if ($testprojectColor == "")
             {
                 $testprojectColor = $tlCfg->gui->background_color;
             }    
@@ -75,6 +150,7 @@ class TLSmarty extends Smarty
         $this->assign('SP_html_help_file',null);
         $this->assign('menuUrl',null);
         $this->assign('args',null);
+        $this->assign('additionalArgs',null);
         $this->assign('pageTitle',null);
         
         $this->assign('css_only',null);
@@ -92,7 +168,8 @@ class TLSmarty extends Smarty
         $this->assign('inc_help_alt',null);
         $this->assign('inc_help_title',null);
         $this->assign('inc_help_style',null);
-        
+        $this->assign('show_help_icon',true);
+                
         $this->assign('tplan_name',null);
         $this->assign('name',null);
         // -----------------------------------------------------------------------------
@@ -109,19 +186,13 @@ class TLSmarty extends Smarty
         // load configuration
         $this->assign('tlCfg',$tlCfg);
         $this->assign('gsmarty_gui',$tlCfg->gui);
-        $this->assign('gsmarty_spec_cfg',$g_spec_cfg);
-        $this->assign('gsmarty_attachments',$g_attachments);
+        $this->assign('gsmarty_spec_cfg',config_get('spec_cfg'));
+        $this->assign('gsmarty_attachments',config_get('attachments'));
         
         $this->assign('pageCharset',$tlCfg->charset);
         $this->assign('tlVersion',TL_VERSION);
         
-        // $this->assign('gsmarty_tc_status',$tlCfg->results['status_code']);
-        // $this->assign('gsmarty_tc_status_css',$tlCfg->results['code_status']);
-        // $this->assign('gsmarty_tc_status_for_ui',$tlCfg->results['status_label_for_exec_ui']);
-        // $this->assign('gsmarty_tc_status_verbose_labels',$tlCfg->results['status_label']);
-        
-        $this->assign('g_bugInterfaceOn', $g_bugInterfaceOn);
-        $this->assign('gsmarty_interface_bugs',$g_interface_bugs);
+        $this->assign('gsmarty_bugInterfaceOn',config_get('bugInterfaceOn'));
         $this->assign('testproject_coloring',null);
         
         	
@@ -136,7 +207,6 @@ class TLSmarty extends Smarty
                                                          MEDIUM => lang_get('medium_importance'), 
                                                          LOW => lang_get('low_importance')));
            
-        
         // this allows unclosed <head> tag to add more information and link; see inc_head.tpl
         $this->assign('openHead', 'no');
         
@@ -157,7 +227,7 @@ class TLSmarty extends Smarty
         $this->assign('refresh', 'no');
         $this->assign('result', null);
         
-        $this->assign('optLocale',$g_locales);
+        $this->assign('optLocale',config_get('locales'));
         
         $this->assign('gsmarty_href_keywordsView',
         ' "lib/keywords/keywordsView.php" ' .
@@ -171,19 +241,35 @@ class TLSmarty extends Smarty
         
         // -----------------------------------------------------------------------------
         // Images
+        $tlImages = array('info' => TL_THEME_IMG_DIR . "/question.gif",
+                          'reorder' => TL_THEME_IMG_DIR . "/arrow_switch.png",
+                          'sort' => TL_THEME_IMG_DIR . "/sort_hint.png",
+                          'api_info' => TL_THEME_IMG_DIR . "/brick.png",
+        	              'direct_link' => TL_THEME_IMG_DIR . "/world_link.png",
+                          'checked' => TL_THEME_IMG_DIR . "/apply_f2_16.png",
+                          'delete' =>TL_THEME_IMG_DIR . "/trash.png");
+
+        $this->assign("tlImages",$tlImages);
+        
         $sort_img = TL_THEME_IMG_DIR . "/sort_hint.png";
         $api_info_img = TL_THEME_IMG_DIR . "/brick.png";
+        $direct_link_img = TL_THEME_IMG_DIR . "/world_link.png";
         
         $this->assign("sort_img",$sort_img);
         $this->assign("checked_img",TL_THEME_IMG_DIR . "/apply_f2_16.png");
         $this->assign("delete_img",TL_THEME_IMG_DIR . "/trash.png");
         
         $msg = lang_get('show_hide_api_info');
-        $toggle_api_info_img="<img title=\"{$msg}\" alt=\"{$msg}\" " .
+        $toggle_api_info_img="<img class=\"clickable\" title=\"{$msg}\" alt=\"{$msg}\" " .
         " onclick=\"showHideByClass('span','api_info');event.stopPropagation();\" " .
         " src=\"{$api_info_img}\" align=\"left\" />";
         $this->assign("toggle_api_info_img",$toggle_api_info_img);
-        
+
+        $msg = lang_get('show_hide_direct_link');
+        $toggle_direct_link_img="<img class=\"clickable\" title=\"{$msg}\" alt=\"{$msg}\" " .
+        " onclick=\"showHideByClass('div','direct_link');event.stopPropagation();\" " .
+        " src=\"{$direct_link_img}\" align=\"left\" />";
+        $this->assign("toggle_direct_link_img",$toggle_direct_link_img);
         
         // Some useful values for Sort Table Engine
         switch (TL_SORT_TABLE_ENGINE)
@@ -216,4 +302,5 @@ class TLSmarty extends Smarty
     } // end of function TLSmarty()
 
 } // end of class TLSmarty
+
 ?>

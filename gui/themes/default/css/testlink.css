@@ -1,9 +1,12 @@
 /*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: testlink.css,v 1.18.2.3 2009/09/04 12:18:20 havlat Exp $
+$Id: testlink.css,v 1.29 2010/05/03 16:59:38 franciscom Exp $
 
 Purpose: Default TestLink CSS
 
+20100503 - franciscom - BUGID 3419 - add classes (*_text) to be used to change text color according to status
+20100409 - eloff - add styles for help headings to show structure better
+20100225 - eloff - BUGID 3217 - Ext removes bullets from all lists, re-add bullets to our lists
 20080517 - franciscom - auto width in simple table creates an ugly effect
                         on test suite and test case view, on test spec feature.
                         Reset to original class.
@@ -38,6 +41,12 @@ body, body.testlink {
 	font-size: 		small;
 	margin:			0px;
 	padding:		0px;
+}
+
+/** use together with #header-wrap */
+body.fixedheader {
+	padding-top:	97px !important;
+	padding-top:	0; /* IE 6 does not understand fixed */
 }
 
 img {
@@ -85,6 +94,17 @@ form
 	padding: 		0px;
 } 
 
+/* 20100225 - eloff - BUGID 3217 - Ext removes bullets from all lists, re-add bullets to our lists */
+.workBack ol {
+    margin: 1em 40px;
+    list-style-type: decimal;
+}
+.workBack ul {
+    margin: 1em 40px;
+    list-style-type: disc;
+    list-style-position: outside;
+}
+
 /* ***** Links ***** */
 /* A Visited link is still blue */
 a:visited, a:link, a:active {
@@ -111,6 +131,7 @@ div.menu_bar {
 	border-width:	thin;
 	padding: 		1px 5px;
 	margin:			0px 3px;
+	
 }
 
 select.menu_combo {
@@ -135,6 +156,15 @@ div.testproject_title{
 
 /* **** general classes ************************************* */
 
+#header-wrap {
+	background:		#eee;
+	border-bottom:	1px solid #000;
+	height:			100px;
+	position:		fixed;
+	top:			0;
+	width:			100%;
+}
+
 /* background for working area (tables and forms) */
 div.workBack {
 	text-align: 	left;
@@ -155,9 +185,14 @@ div.workBack {
 }
 
 .onright {
-	float: 	right;
+	float: 			right;
 }
 
+span.form_label {
+	font-weight:    bold;
+	width:			200px; 
+	float:			left;
+}
 
 /* **** Navigation, menu and buttons ************************************* */
 
@@ -235,6 +270,17 @@ span.help
 	border: 		medium solid #808080;
 }
 
+#tlhelp h2 {
+	font-weight: bold;
+	font-size: 120%;
+	margin: 0;
+	padding: 0;
+	border-bottom: 1px solid #aaa;
+}
+
+#tlhelp p {
+	margin: 0 0 1em 0.5em;
+}
 
 
 /* ***** Messages ******************************************************* */
@@ -274,13 +320,6 @@ div.messages {
 	margin: 			3px;
 	padding:			3px;
 }
-
-/* TODO havlatm: consider to remove (used only in probably obsolete show_exec_notes.tpl) */
-textarea.tcDesc {
-	background: 	white;
-	border: 		medium solid #808080;
-}
-
 
 /***** tabbed menu ******************************************************************* */
 /* TODO havlatm: remove tabbed menu to be compliant with other design */
@@ -340,6 +379,10 @@ table.common th, table.simple th{
   	border:			1px solid #99bbe8;
   	line-height:	15px;
   	background:		transparent url(../images/white-top-bottom.gif) repeat-x 0 -1px;
+}
+
+table.common td,th{
+	padding:		3px;
 }
 
 table.common td, table.simple td, th{
@@ -511,7 +554,7 @@ span.light_unknown {
 	background: 		#DDFFFF; /* cyan; */
 }
 
-/* ***** render test result status ************************* */
+/* ***** render test result status (coloring background) ************************* */
 .passed {
 	color: 			white;
 	background:		#006400; /* darkgreen */
@@ -542,6 +585,36 @@ span.light_unknown {
 	background:		#00FFFF; /* cyan; */
 }
 
+/* ***** render test result status (coloring text) ************************* */
+.passed_text {
+	color:    #006400; /* darkgreen */
+  font-weight: bold;
+}
+
+.failed_text {
+	color:		#B22222; /* firebrick (red) */
+  font-weight: bold;
+}
+
+.blocked_text {
+	color:		#00008B; /* darkblue */
+  font-weight: bold;
+}
+
+.not_run_text {
+	color:    black;
+  font-weight: bold;
+}
+
+.not_available_text {
+	color:    black;
+  font-weight: bold;
+}
+
+.unknown_text {
+	color: 			#00FFFF; /* cyan; */
+  font-weight: bold;
+}
 
 
 /* ***** MISC ************************************************************************ */
