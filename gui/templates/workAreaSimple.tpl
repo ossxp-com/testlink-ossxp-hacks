@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: workAreaSimple.tpl,v 1.4.2.1 2009/05/20 21:33:00 schlundus Exp $
+$Id: workAreaSimple.tpl,v 1.5 2009/05/18 20:22:10 schlundus Exp $
 Purpose: show workarea with simple structure title + content + link
 *}
 {include file="inc_head.tpl"}

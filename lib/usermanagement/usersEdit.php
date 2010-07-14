@@ -1,24 +1,25 @@
 <?php
 /**
-* TestLink Open Source Project - http://testlink.sourceforge.net/
-* This script is distributed under the GNU General Public License 2 or later.
-*
-* Filename $RCSfile: usersEdit.php,v $
-*
-* @version $Revision: 1.32 $
-* @modified $Date: 2009/02/22 18:49:25 $ $Author: franciscom $
-*
-* rev:
-*     fixed missing checks on doCreate()
-*     BUGID 918
-*     20070829 - jbarchibald - fix bug 1000 - Testplan role assignments
-*
-* Allows editing a user
-*/
+ * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * This script is distributed under the GNU General Public License 2 or later.
+ *
+ * Allows editing a user
+ *
+ * @package 	TestLink
+ * @copyright 	2005-2010, TestLink community
+ * @version    	CVS: $Id: usersEdit.php,v 1.39 2010/05/02 16:54:28 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ * @internal Revisions:
+ *	20100502 - franciscom - BUGID 3417
+ *
+ */
 require_once('../../config.inc.php');
 require_once('testproject.class.php');
 require_once('users.inc.php');
 require_once('email_api.php');
+require_once('Zend/Validate/Hostname.php');
+
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
@@ -69,7 +70,6 @@ switch($args->doAction)
 }
 
 $op->operation = $actionOperation[$args->doAction];
-
 $roles = tlRole::getAll($db,null,null,null,tlRole::TLOBJ_O_GET_DETAIL_MINIMUM);
 unset($roles[TL_ROLES_UNDEFINED]);
 
@@ -85,40 +85,34 @@ $smarty->assign('userData', $user);
 renderGui($smarty,$args,$templateCfg);
 
 
-/*
-  function:
-
-  args:
-
-  returns:
-
-*/
+/**
+ * 
+ *
+ */
 function init_args()
 {
-  	$args = new stdClass();
-	$_REQUEST = strings_stripSlashes($_REQUEST);
+	$iParams = array(
+			"delete" => array(tlInputParameter::INT_N),
+			"user" => array(tlInputParameter::INT_N),
+			"user_id" => array(tlInputParameter::INT_N),
+			"rights_id" => array(tlInputParameter::INT_N),
+	
+			"doAction" => array(tlInputParameter::STRING_N,0,30),
+			"firstName" => array(tlInputParameter::STRING_N,0,30),
+			"lastName" => array(tlInputParameter::STRING_N,0,100),
+			"emailAddress" => array(tlInputParameter::STRING_N,0,100),
+			"locale" => array(tlInputParameter::STRING_N,0,10),
+			"login" => array(tlInputParameter::STRING_N,0,30),
+			"password" => array(tlInputParameter::STRING_N,0,32),
+	
+			"user_is_active" => array(tlInputParameter::CB_BOOL),
+	);
 
-	$intval_keys = array('delete' => 0, 'user' => 0,'user_id' => 0, 'rights_id' => TL_ROLES_GUEST);
-	foreach ($intval_keys as $key => $value)
-	{
-		$args->$key = isset($_REQUEST[$key]) ? intval($_REQUEST[$key]) : $value;
-	}
-
-	$nullable_keys = array('doAction','firstName','lastName','emailAddress','locale','login','password');
-	foreach ($nullable_keys as $value)
-	{
-		$args->$value = isset($_REQUEST[$value]) ? trim($_REQUEST[$value]) : null;
-	}
-
- 	$checkbox_keys = array('user_is_active');
-	foreach ($checkbox_keys as $value)
-	{
-		$args->$value = isset($_REQUEST[$value]) ? 1 : 0;
-	}
-
-	return $args;
+	$args = new stdClass();
+  	R_PARAMS($iParams,$args);
+ 	
+  	return $args;
 }
-
 
 /*
   function: doCreate
@@ -167,14 +161,6 @@ function doCreate(&$dbHandler,&$argsObj)
 }
 
 
-/*
-  function: doUpdate
-
-  args:
-
-  returns:
-
-*/
 function doUpdate(&$dbHandler,&$argsObj,$sessionUserID)
 {
     $op = new stdClass();
@@ -183,19 +169,12 @@ function doUpdate(&$dbHandler,&$argsObj,$sessionUserID)
 	$op->status = $op->user->readFromDB($dbHandler);
 	if ($op->status >= tl::OK)
 	{
-		//$changes = checkUserPropertiesChanges($dbHandler,$op->user,$argsObj);
-
 		initializeUserProperties($op->user,$argsObj);
 		$op->status = $op->user->writeToDB($dbHandler);
 		if ($op->status >= tl::OK)
 		{
 			logAuditEvent(TLS("audit_user_saved",$op->user->login),"SAVE",$op->user->dbID,"users");
-			/*
-		  	foreach($changes as $key => $value)
-			{
-			    logAuditEvent($value['msg'],$value['activity'],$op->user->dbID,"users");
-			}
-			*/
+
 			if ($sessionUserID == $argsObj->user_id)
 			{
 				$_SESSION['currentUser'] = $op->user;
@@ -214,97 +193,49 @@ function doUpdate(&$dbHandler,&$argsObj,$sessionUserID)
     return $op;
 }
 
-
-/*
-  function: createNewPassword
-
-  args :
-
-  returns: -
-
-*/
+/**
+ * 
+ *
+ * @internal revisions
+ *	20100502 - franciscom - BUGID 3417
+ */
 function createNewPassword(&$dbHandler,&$argsObj,&$userObj)
 {
 	$op = new stdClass();
 	$op->user_feedback = '';
-	$op->status = resetPassword($dbHandler,$argsObj->user_id,$op->user_feedback);
-	if ($op->status >= tl::OK)
+	
+	// Try to validate mail configuration
+	//
+	// From Zend Documentation
+	// You may find you also want to match IP addresses, Local hostnames, or a combination of all allowed types. 
+	// This can be done by passing a parameter to Zend_Validate_Hostname when you instantiate it. 
+	// The paramter should be an integer which determines what types of hostnames are allowed. 
+	// You are encouraged to use the Zend_Validate_Hostname constants to do this.
+    // The Zend_Validate_Hostname constants are: ALLOW_DNS to allow only DNS hostnames, ALLOW_IP to allow IP addresses, 
+    // ALLOW_LOCAL to allow local network names, and ALLOW_ALL to allow all three types. 
+	// 
+	$validator = new Zend_Validate_Hostname(Zend_Validate_Hostname::ALLOW_ALL);
+	$smtp_host = config_get( 'smtp_host' );
+	if( $validator->isValid($smtp_host) )
 	{
-		logAuditEvent(TLS("audit_pwd_reset_requested",$userObj->login),"PWD_RESET",$argsObj->user_id,"users");
-		$op->user_feedback = lang_get('password_reseted');
+		$op->status = resetPassword($dbHandler,$argsObj->user_id,$op->user_feedback);
+		if ($op->status >= tl::OK)
+		{
+			logAuditEvent(TLS("audit_pwd_reset_requested",$userObj->login),"PWD_RESET",$argsObj->user_id,"users");
+			$op->user_feedback = lang_get('password_reseted');
+		}
+		else
+		{
+			$op->user_feedback = sprintf(lang_get('password_cannot_be_reseted_reason'),$op->user_feedback);
+		}
 	}
-
+	else
+	{
+		$op->status = tl::ERROR;
+		$op->user_feedback = lang_get('password_cannot_be_reseted_invalid_smtp_hostname');
+	}
 	return $op;
 }
-
-
-
-
-
-/*
-  function: checkUserPropertiesChanges
-            do checks on selected properties and return information
-            about changed members useful for audit log porpuses.
-
-  args: dbHandler
-        userObj: data read from DB
-        argsObj: data entry from User Interface
-
-  returns: null or array where each element is a map with following structure:
-
-           ['property']= property name, just for debug usage
-           ['msg']= message for logAudit call
-           ['activity']= activityCode for logAudit call
-
-*/
-function checkUserPropertiesChanges(&$dbHandler,&$userObj,&$argsObj)
-{
-
-  $idx=0;
-  $key2compare=array();
-  $key2compare['numeric'][]=array('old' => 'globalRoleID',
-                                  'new' => 'rights_id',
-                                  'decode' => 'decodeRoleId',
-                                  'label' => 'audit_user_role_changed');
-
-  $key2compare['numeric'][]=array('old' => 'bActive',
-                                  'new' => 'user_is_active',
-                                  'label' => 'audit_user_active_status_changed');
-
-
-  foreach($key2compare['numeric'] as $key => $value)
-  {
-      $old=$value['old'];
-      $new=$value['new'];
-      $oldValue=$userObj->$old;
-      $newValue=$argsObj->$new;
-
-      if( $oldValue != $newValue )
-      {
-          if( isset($value['decode']) )
-          {
-              $oldValue=$value['decode']($dbHandler,$userObj->$old);
-              $newValue=$value['decode']($dbHandler,$argsObj->$new);
-          }
-          $changes[$idx]['property']=$old;
-          $changes[$idx]['msg']=TLS($value['label'],$userObj->login,$oldValue,$newValue);
-          $changes[$idx]['activity']='CHANGE';
-          $idx++;
-      }
-  }
-
-	// Add general message only if no important change registered
-	if($idx == 0)
-	{
-		$changes[$idx]['property']='general';
-		$changes[$idx]['msg']=TLS('audit_user_saved',$userObj->login);
-		$changes[$idx]['activity']='SAVE';
-	}
-
-	return $changes;
-}
-
-
 
 /*
   function: initializeUserProperties
@@ -319,39 +250,23 @@ function checkUserPropertiesChanges(&$dbHandler,&$userObj,&$argsObj)
 function initializeUserProperties(&$userObj,&$argsObj)
 {
 	if (!is_null($argsObj->login))
+	{
     	$userObj->login = $argsObj->login;
-
+	}
 	$userObj->emailAddress = $argsObj->emailAddress;
 	$userObj->firstName = $argsObj->firstName;
 	$userObj->lastName = $argsObj->lastName;
 	$userObj->globalRoleID = $argsObj->rights_id;
 	$userObj->locale = $argsObj->locale;
-	$userObj->bActive = $argsObj->user_is_active;
+	$userObj->isActive = $argsObj->user_is_active;
 }
 
-
-/*
-  function:
-
-  args:
-
-  returns:
-
-*/
 function decodeRoleId(&$dbHandler,$roleID)
 {
     $roleInfo = tlRole::getByID($dbHandler,$roleID);
     return $roleInfo->name;
 }
 
-/*
-  function: renderGui
-
-  args :
-
-  returns:
-
-*/
 function renderGui(&$smartyObj,&$argsObj,$templateCfg)
 {
     $doRender = false;
@@ -381,7 +296,9 @@ function renderGui(&$smartyObj,&$argsObj,$templateCfg)
     }
 
     if($doRender)
+    {
         $smartyObj->display($templateCfg->template_dir . $tpl);
+    }    
 }
 
 function checkRights(&$db,&$user)
