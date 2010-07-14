@@ -4,13 +4,14 @@
  * This script is distributed under the GNU General Public License 2 or later.
  *
  * Filename $RCSfile: frmWorkArea.php,v $
- * @version $Revision: 1.33.2.1 $
- * @modified $Date: 2009/05/25 18:39:05 $ by $Author: schlundus $
+ * @version $Revision: 1.41 $
+ * @modified $Date: 2010/04/08 15:11:33 $ by $Author: asimon83 $
  * @author Martin Havlat
  *
  * This page is window for navigation and working area (eg tree + edit page).
  *
  * rev: 
+ *  20100106 - asimon - contribution for 2976 req/reqspec search
  * 	20080620 - havlatm - urgency support
  * 	20080501 - franciscom -
  *  20060809 - franciscom - changes in validateBuildAvailability()
@@ -20,6 +21,7 @@ require_once('../../config.inc.php');
 require_once("common.php");
 testlinkInitPage($db);
 
+$args = init_args();
 // --------------------------------------------------------------------------------------
 // Important Notes for Developers
 // --------------------------------------------------------------------------------------
@@ -40,8 +42,14 @@ $req_cfg = config_get('req_cfg');
 $aa_tfp = array( 
      'editTc' => 'lib/testcases/listTestCases.php?feature=edit_tc',
      'assignReqs' => 'lib/testcases/listTestCases.php?feature=assignReqs',
-     'searchTc' => 'lib/testcases/searchForm.php',
+     'searchTc' => 'lib/testcases/tcSearchForm.php',
+	 
+	 /* contribution for 2976 req/reqspec search */
+     'searchReq' => 'lib/requirements/reqSearchForm.php',
+     'searchReqSpec' => 'lib/requirements/reqSpecSearchForm.php',
+	 
      'printTestSpec' => 'lib/results/printDocOptions.php?type=testspec',
+     'printReqSpec' => 'lib/results/printDocOptions.php?type=reqspec',
      'keywordsAssign' => 'lib/testcases/listTestCases.php?feature=keywordsAssign',
      'planAddTC'    => 'lib/plan/planAddTCNavigator.php',
      'planRemoveTC' => 'lib/plan/planTCNavigator.php?feature=removeTC&help_topic=planRemoveTC',
@@ -59,8 +67,9 @@ $aa_tfp = array(
 $full_screen = array('newest_tcversions' => 1);
 //cleanup session var
 $_SESSION['currentSrsId'] = null;
+
 /** feature to display */
-$showFeature = isset($_GET['feature']) ? $_GET['feature'] : null;
+$showFeature = $args->feature;
 if (isset($aa_tfp[$showFeature]) === FALSE)
 {
 	// argument is wrong
@@ -72,10 +81,10 @@ if (isset($aa_tfp[$showFeature]) === FALSE)
 if (in_array($showFeature,array('executeTest','showMetrics')))
 {
 	// Check if for test project selected at least a test plan exist (BUGID 623)
-	if( isset($_SESSION['testPlanId']) )
+	if( isset($_SESSION['testplanID']) )
 	{
-  		validateBuildAvailability($db,$_SESSION['testPlanId'],
-	    		$_SESSION['testPlanName'], $_SESSION['testprojectName']);
+  		validateBuildAvailability($db,$_SESSION['testplanID'],
+	    		$_SESSION['testplanName'], $_SESSION['testprojectName']);
 	}
   	else
 	{
@@ -90,16 +99,16 @@ if (in_array($showFeature,array('executeTest','showMetrics')))
 /// </enhancement>
 $smarty = new TLSmarty();
 
-if( isset($full_screen[$showFeature]) )
+if(isset($full_screen[$showFeature]))
 {
-  redirect($aa_tfp[$showFeature]);
+	redirect($aa_tfp[$showFeature]);
 }
 else
 {
-  $smarty->assign('treewidth', TL_FRMWORKAREA_LEFT_FRAME_WIDTH);
-  $smarty->assign('treeframe', $aa_tfp[$showFeature]);
-  $smarty->assign('workframe', 'lib/general/staticPage.php?key='.$showFeature);
-  $smarty->display('frmInner.tpl');
+	$smarty->assign('treewidth', TL_FRMWORKAREA_LEFT_FRAME_WIDTH);
+	$smarty->assign('treeframe', $aa_tfp[$showFeature]);
+	$smarty->assign('workframe', 'lib/general/staticPage.php?key='.$showFeature);
+	$smarty->display('frmInner.tpl');
 }
 
 
@@ -115,29 +124,26 @@ else
  **/
 function validateBuildAvailability(&$db,$tpID, $tpName, $prodName)
 {
-	require_once("exec.inc.php");
-	
-	$can_create_build=has_rights($db,"testplan_create_build");
-	
-	$message='<p>'  . lang_get('no_build_warning_part1') . 
-	          "<b> " . htmlspecialchars($tpName) . "</b>";
-
-	if (!buildsNumber($db,$tpID))
+	$tp = new testplan($db);
+	if (!$tp->getNumberOfBuilds($tpID))
 	{	           
-	  $link_to_op='';
-	  $hint_text='';
-	  if($can_create_build=='yes')
-	  {
-	     // final url will be composed adding to $basehref 
-	     // (one TL variable available on smarty templates) to $link_to_op
-	     $link_to_op="lib/plan/buildEdit.php?do_action=create";
-	     $hint_text=lang_get('create_a_build');
-	  }  
-	  else
-	  {
-	     $message .= '</p><p>' . lang_get('no_build_warning_part2') . '</p>';
-	  }
-	  
+		$message = '<p>'  . lang_get('no_build_warning_part1') . 
+	          "<b> " . htmlspecialchars($tpName) . "</b>";
+		
+		$link_to_op = '';
+		$hint_text = '';
+		if(has_rights($db,"testplan_create_build") == 'yes')
+		{	
+			// final url will be composed adding to $basehref 
+			// (one TL variable available on smarty templates) to $link_to_op
+			$link_to_op = "lib/plan/buildEdit.php?do_action=create";
+			$hint_text = lang_get('create_a_build');
+		}  
+  		else
+  		{
+     		$message .= '</p><p>' . lang_get('no_build_warning_part2') . '</p>';
+  		}
+  		
 		// show info and exit
 		$smarty = new TLSmarty;
 		$smarty->assign('content', $message);
@@ -148,4 +154,14 @@ function validateBuildAvailability(&$db,$tpID, $tpName, $prodName)
 	}
 }
 
+function init_args()
+{
+	$iParams = array(
+		"feature" => array(tlInputParameter::STRING_N),
+	);
+	$args = new stdClass();
+	$pParams = G_PARAMS($iParams,$args);
+	
+	return $args;
+}
 ?>

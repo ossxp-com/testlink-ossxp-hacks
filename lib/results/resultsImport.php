@@ -3,74 +3,87 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later. 
  *
- * Filename $RCSfile: resultsImport.php,v $
- *
- * @version $Revision: 1.6 $
- * @modified $Date: 2008/09/09 10:22:55 $  by $Author: franciscom $
-
- * @author - Kevin Levy
- *
- * rev :
- *      20080906 - franciscom - must be refactored to accept both type of test case id:
- *                              - internal (nodes_hierarchy)
- *                              - external
+ * Results import from XML file
  * 
- *      20071101 - franciscom - added manish contribution
- *      20070904 - franciscom - refactoring
-*/
+ * @package 	TestLink
+ * @author 		Kevin Levy
+ * @copyright 	2010, TestLink community 
+ * @version    	CVS: $Id: resultsImport.php,v 1.18 2010/05/18 20:58:16 franciscom Exp $
+ *
+ * @internal Revisions:
+ * 20100328 - franciscom - BUGID 3470, BUGID 3475
+ * 20100328 - franciscom - BUGID 3331 add bug id management
+ * 20100214 - franciscom - xml managed using simpleXML
+ *
+ **/
+
 require('../../config.inc.php');
 require_once('common.php');
-require_once('import.inc.php');
 require_once('csv.inc.php');
 require_once('xml.inc.php');
 testlinkInitPage($db);
 
-$template_dir='results/';
+$templateCfg = templateConfiguration();
 
 $args=init_args();
+$gui = new stdClass();
 
 $ref=$_SERVER['HTTP_REFERER'];
-$url_array=split('[?=&]',$ref);
-if( in_array('build_id',$url_array) ) 
+$url_array=preg_split('/[?=&]/',$ref);
+
+$key2extract = array('build_id' => 'buildID','platform_id' => 'platformID');
+
+foreach($key2extract as $accessKey => $memberKey)
 {
-	$buildIdIndex=array_search('build_id',$url_array) + 1;
-	$args->buildID=$url_array[$buildIdIndex];
+	if( in_array($accessKey,$url_array) ) 
+	{
+		$dummyIndex=array_search($accessKey,$url_array) + 1;
+		$args->$memberKey=$url_array[$dummyIndex];
+	}
+
 }
+
+
+$gui->import_title=lang_get('title_results_import_to');
+$gui->buildID=$args->buildID;
+$gui->platformID=$args->platformID;
+$gui->file_check=array('status_ok' => 1, 'msg' => 'ok');
+$gui->importTypes=array("XML" => "XML");
+$gui->importLimit = config_get('import_file_max_size_bytes');
+$gui->doImport = ($args->importType != "");
+$gui->testprojectName=$args->testprojectName;
 
 $resultMap=null;
 $dest=TL_TEMP_PATH . session_id()."-results.import";
-$file_check=array('status_ok' => 1, 'msg' => 'ok');
 
-$import_title=lang_get('title_results_import_to');
-$container_description=lang_get('import_results');
+$container_description=lang_get('import_xml_results');
 
 if ($args->doUpload)
 {
 	// check the uploaded file
-	$source=isset($_FILES['uploadedFile']['tmp_name']) ? $_FILES['uploadedFile']['tmp_name'] : null;
-		
+	$source = isset($_FILES['uploadedFile']['tmp_name']) ? $_FILES['uploadedFile']['tmp_name'] : null;
 	if (($source != 'none') && ($source != ''))
 	{ 
-		$file_check['status_ok']=1;
-		if($file_check['status_ok'])
+		$gui->file_check['status_ok']=1;
+		if($gui->file_check['status_ok'])
 		{
 			if (move_uploaded_file($source, $dest))
 			{
 				switch($args->importType)
 				{
 					case 'XML':
-					$pcheck_fn="check_xml_execution_results";
-					$pimport_fn="importExecutionResultsFromXML";
+						$pcheck_fn="check_xml_execution_results";
+						$pimport_fn="importExecutionResultsFromXML";
 					break;
 				}
 				if ($pcheck_fn)
 				{
-					$file_check=$pcheck_fn($dest);
-					if($file_check['status_ok'])
+					$gui->file_check=$pcheck_fn($dest);
+					if($gui->file_check['status_ok'])
 					{
 						if ($pimport_fn)
 						{
-							$resultMap=$pimport_fn($db,$dest,$args->tplan_id,$args->userID,$args->buildID);
+							$resultMap=$pimport_fn($db,$dest,$args);
 						}
 					}
 				}
@@ -79,24 +92,15 @@ if ($args->doUpload)
 	}
 	else
 	{
-		$file_check=array('status_ok' => 0, 'msg' => lang_get('please_choose_file_to_import'));
+		$gui->file_check=array('status_ok' => 0, 'msg' => lang_get('please_choose_file_to_import'));
 		$args->importType=null;
 	}
 }
 
-$import_file_types=array("XML" => "XML");
-
-
+$gui->resultMap=$resultMap;
 $smarty=new TLSmarty();
-$smarty->assign('import_title',$import_title);  
-$smarty->assign('buildID', $args->buildID);
-$smarty->assign('file_check',$file_check);  
-$smarty->assign('resultMap',$resultMap); 
-$smarty->assign('importTypes',$import_file_types);
-$smarty->assign('testprojectName', $args->testprojectName);
-$smarty->assign('importLimitKB',TL_IMPORT_LIMIT / 1024);
-$smarty->assign('bImport',strlen($args->importType));
-$smarty->display($template_dir .'resultsImport.tpl');
+$smarty->assign('gui',$gui);  
+$smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 ?>
 
 <?php
@@ -108,17 +112,17 @@ $smarty->display($template_dir .'resultsImport.tpl');
   returns: 
 
 */
-function importExecutionResultsFromXML(&$db,$fileName,&$tplan_id,$userID, $buildID)
+function importExecutionResultsFromXML(&$db,$fileName,$context)
 {	
 	$resultMap=null;
-	$dom=domxml_open_file($fileName);
-	if ($dom)
+	$xml = @simplexml_load_file($fileName);
+	if($xml !== FALSE)
 	{
-		$root=$dom->document_element();
-		$resultMap=importResults($db,$root,$tplan_id,$userID, $buildID);
+		$resultMap=importResults($db,$xml,$context);
 	}
 	return $resultMap;
 }
+
 
 /*
   function: 
@@ -128,20 +132,38 @@ function importExecutionResultsFromXML(&$db,$fileName,&$tplan_id,$userID, $build
   returns: 
 
 */
-function importResults(&$db, &$node,&$tplan_id, &$userID, $buildID) 
+function importResults(&$db,&$xml,$context)
 {
-	$resultMap=null;
-	if($node->tagname == 'results')
+	$resultMap = null;
+	if($xml->getName() == 'results')
 	{
-		$xmlTCExec=$node->get_elements_by_tagname("testcase");
-		$resultData=importExecutionsFromXML($xmlTCExec);
-		if ($resultData) {
-			$resultMap=saveImportedResultData($db,$resultData,$tplan_id,$userID,$buildID);
+		// check if additional data (context execution) has been provided,
+		// if yes overwrite GUI selection with value get from file
+		//
+		$executionContext = $context;
+		$contextKeys = array('testplan' => 'tplan_id', 'build' => 'build_id',
+							 'platform' => 'platform_id');
+		foreach( $contextKeys as $xmlkey => $execkey)
+		{
+			if( ($joker = $xml->$xmlkey) )
+			{
+				$executionContext->$execkey = (int) $joker['id'];
+			}
+		} 				
+			 
+		$xmlTCExec = $xml->xpath("//testcase");
+		$resultData = importExecutionsFromXML($xmlTCExec);
+		if ($resultData) 
+		{
+			$resultMap=saveImportedResultData($db,$resultData,$executionContext);
 		}
 	}
 	return $resultMap;
 }
 
+
+
+
 /*
   function: 
 
@@ -149,14 +171,32 @@ function importResults(&$db, &$node,&$tplan_id, &$userID, $buildID)
   
   returns: 
 
+  20100328 - franciscom - BUGID 3331 manage bug id	
 */
-function saveImportedResultData(&$db,$resultData,&$tplan_id,$userID,$buildID)
+function saveImportedResultData(&$db,$resultData,$context)
 {
 	if (!$resultData)
+	{
 		return;
+	}
+	$debugMsg = ' FUNCTION: ' . __FUNCTION__;
+	$tables = tlObjectWithDB::getDBTables(array('executions','execution_bugs'));
 	
-	$user=new tlUser($userID);
-  $user->readFromDB($db);
+	// Get Column definitions to get size dinamically instead of create constants
+	$columnDef = array();
+	$adodbObj = $db->get_dbmgr_object();
+    $columnDef['execution_bugs'] = $adodbObj->MetaColumns($tables['execution_bugs']);
+    $keySet = array_keys($columnDef['execution_bugs']);
+    foreach($keySet as $keyName)
+    {
+    	if( ($keylow=strtolower($keyName)) != $keyName )
+    	{ 
+    		$columnDef['execution_bugs'][$keylow] = $columnDef['execution_bugs'][$keyName];
+    		unset($columnDef['execution_bugs'][$keyName]);
+    	}
+    } 
+	$user=new tlUser($context->userID);
+  	$user->readFromDB($db);
   
 	$tcase_mgr=new testcase($db);
 	$resulstCfg=config_get('results');
@@ -165,6 +205,7 @@ function saveImportedResultData(&$db,$resultData,&$tplan_id,$userID,$buildID)
 	$resultMap=array();
 	$tplan_mgr=null;
 	$tc_qty=sizeof($resultData);
+
 	if($tc_qty)
 	{
 		$tplan_mgr=new testplan($db);
@@ -172,47 +213,50 @@ function saveImportedResultData(&$db,$resultData,&$tplan_id,$userID,$buildID)
 	
 	for($idx=0; $idx < $tc_qty ;$idx++)
 	{
-	  $tester_id=0;
-	  $tester_name='';	
-	  $using_external_id=false;
-    $message=null;
-	  $status_ok=true;
+		$tester_id=0;
+	  	$tester_name='';	
+	  	$using_external_id=false;
+    	$message=null;
+	  	$status_ok=true;
 		$tcase_exec=$resultData[$idx];
 		
-		$checks=check_exec_values($db,$tcase_mgr,$user_mgr,$tcaseCfg,$tcase_exec);
-    $status_ok=$checks['status_ok'];		
+		$checks=check_exec_values($db,$tcase_mgr,$user_mgr,$tcaseCfg,$tcase_exec,$columnDef['execution_bugs']);
+    	$status_ok=$checks['status_ok'];		
 		if($status_ok)
 		{
-	      $tcase_id=$checks['tcase_id'];
-		    $tcase_external_id=trim($tcase_exec['tcase_external_id']);
-        $tester_id=$checks['tester_id'];
+			$tcase_id=$checks['tcase_id'];
+			$tcase_external_id=trim($tcase_exec['tcase_external_id']);
+        	$tester_id=$checks['tester_id'];
 		    
-        // external_id has precedence over internal id
-        $using_external_id=(strlen($tcase_external_id) > 0);
-	  } 
-	  else
-	  {
-        foreach($checks['msg'] as $warning )
-        {
-            $resultMap[]=array($warning);
-	      }
-	  }
+	        // external_id has precedence over internal id
+        	$using_external_id = ($tcase_external_id != "");
+		} 
+	  	else
+	  	{
+        	foreach($checks['msg'] as $warning )
+        	{
+            	$resultMap[]=array($warning);
+	      	}
+	  	}
    		
-	  if( $status_ok) 
-	  {
-	      $tcase_identity=$using_external_id ? $tcase_external_id : $tcase_id; 
+	  	if( $status_ok) 
+	  	{
+	  		$tcase_identity=$using_external_id ? $tcase_external_id : $tcase_id; 
 		    $result_code=strtolower($tcase_exec['result']);
 		    $result_is_acceptable=isset($resulstCfg['code_status'][$result_code]) ? true : false;
 		    		
 		    $notes=$tcase_exec['notes'];
 		    $message=null;
-		    $linked_cases=$tplan_mgr->get_linked_tcversions($tplan_id, $tcase_id);
+			$filters = array('tcase_id' => $tcase_id, 'build_id' => $context->buildID,
+		    			 	 'platform_id' => $context->platformID);
+
+		    $linked_cases=$tplan_mgr->get_linked_tcversions($context->tplan_id,$filters);
 		    $info_on_case=$linked_cases[$tcase_id];
 
 		    if (!$linked_cases)
 		    {
 		    	$message=sprintf(lang_get('import_results_tc_not_found'),$tcase_identity);
-  	    }
+  	    	}
 		    else if (!$result_is_acceptable) 
 		    {
 		    	$message=sprintf(lang_get('import_results_invalid_result'),$tcase_identity,$tcase_exec['result']);
@@ -221,38 +265,57 @@ function saveImportedResultData(&$db,$resultData,&$tplan_id,$userID,$buildID)
 		    {
 		    	$tcversion_id=$info_on_case['tcversion_id'];
 		    	$version=$info_on_case['version'];
-		    	
-          $notes=$db->prepare_string(trim($notes));
+          		$notes=$db->prepare_string(trim($notes));
           		
-          // N.B.: db_now() returns an string ready to be used in an SQL insert
-          //       example '2008-09-04', while $tcase_exec["timestamp"] => 2008-09-04
-          //
-          $execution_ts=($tcase_exec['timestamp'] != '') ? "'" . $tcase_exec["timestamp"] . "'": $db->db_now();
+          		// N.B.: db_now() returns an string ready to be used in an SQL insert
+          		//       example '2008-09-04', while $tcase_exec["timestamp"] => 2008-09-04
+          		//
+          		$execution_ts=($tcase_exec['timestamp'] != '') ? "'" . $tcase_exec["timestamp"] . "'": $db->db_now();
           
-          if($tester_id != 0)
-          {
-              $tester_name=$tcase_exec['tester'];
-          } 
-          else
-          {
-              $tester_name=$user->login;
-              $tester_id=$userID;
-          }
-          
-		      $sql="INSERT INTO executions (build_id,tester_id,status,testplan_id," .
-		           "tcversion_id,execution_ts,notes,tcversion_number)" .
-	          	 "VALUES ({$buildID}, {$tester_id},'{$result_code}',{$tplan_id}, ".
-	          	 "{$tcversion_id},{$execution_ts},'{$notes}', {$version})";
-	        $db->exec_query($sql); 
+          		if($tester_id != 0)
+          		{
+              		$tester_name=$tcase_exec['tester'];
+          		} 
+          		else
+          		{
+              		$tester_name=$user->login;
+              		$tester_id=$context->userID;
+          		}
+          		$sql = " /* $debugMsg */ " .
+		      	       " INSERT INTO {$tables['executions']} (build_id,tester_id,status,testplan_id," .
+		               " tcversion_id,execution_ts,notes,tcversion_number,platform_id)" .
+	          	       " VALUES ({$context->buildID}, {$tester_id},'{$result_code}',{$context->tplan_id}, ".
+	          	       " {$tcversion_id},{$execution_ts},'{$notes}', {$version}, {$context->platformID})";
+	          	$db->exec_query($sql); 
 
+				// BUGID 3331 
+				if( isset($tcase_exec['bug_id']) )
+				{ 
+					$execution_id = $db->insert_id($tables['executions']);
+					foreach($tcase_exec['bug_id'] as $bug_id)
+					{
+						$bug_id = trim($bug_id);
+						$sql = " /* $debugMsg */ " .						
+							   " SELECT execution_id AS check_qty FROM  {$tables['execution_bugs']} " .
+							   " WHERE bug_id = '{$bug_id}' AND execution_id={$execution_id} ";
+						$rs = $db->get_recordset($sql); 
+						if( is_null($rs) )
+						{
+          					$sql = " /* $debugMsg */ " .
+		      				       " INSERT INTO {$tables['execution_bugs']} (bug_id,execution_id)" .
+	          				       " VALUES ('" . $db->prepare_string($bug_id) . "', {$execution_id} )";
+	          				$db->exec_query($sql); 
+	          			}
+	          		}
+				}
 		    	$message=sprintf(lang_get('import_results_ok'),$tcase_identity,$version,$tester_name,
 		    	                 $resulstCfg['code_status'][$result_code],$execution_ts);
 
 		    }
 		}
 	
-	  if( !is_null($message) )
-	  { 	    
+	  	if( !is_null($message) )
+	  	{ 	    
 		    $resultMap[]=array($message);
 		}   
 	}
@@ -274,17 +337,14 @@ function importExecutionsFromXML($xmlTCExecSet)
 	{ 
 	    $jdx=0;
 	    $exec_qty=sizeof($xmlTCExecSet);
-	    for($idx=0;$idx <$exec_qty ;$idx++)
+	    for($idx=0; $idx <$exec_qty ; $idx++)
 	    {
-	    	  $xmlTCExec=$xmlTCExecSet[$idx];
-	    	  if ($xmlTCExec->node_type() != XML_ELEMENT_NODE)
-	    	  	continue;
-	    	  	
-	    	  $execInfo=importExecutionFromXML($xmlTCExec);
-	    	  if ($execInfo)
-	    	  {
-	    	  	$execInfoSet[$jdx++]=$execInfo;
-	    	  }
+	    	$xmlTCExec=$xmlTCExecSet[$idx];
+	    	$execInfo = importExecutionFromXML($xmlTCExec);
+	    	if ($execInfo)
+	    	{
+	    		$execInfoSet[$jdx++]=$execInfo;
+	    	}
 	    }
 	}
 	return $execInfoSet;
@@ -301,61 +361,33 @@ function importExecutionsFromXML($xmlTCExecSet)
 function importExecutionFromXML(&$xmlTCExec)
 {
 	if (!$xmlTCExec)
-		return null;
-  
-	$execInfo=array();;
-	$execInfo['tcase_id']=$xmlTCExec->get_attribute("id");
-	$execInfo['tcase_external_id']=$xmlTCExec->get_attribute("external_id");
-  $execInfo['tcase_name']=$xmlTCExec->get_attribute("name");
-	$execInfo['result']=trim(getNodeContent($xmlTCExec,"result"));
-	$execInfo['notes']=trim(getNodeContent($xmlTCExec,"notes"));
-  $execInfo['timestamp']=trim(getNodeContent($xmlTCExec,"timestamp"));
-  $execInfo['tester']=trim(getNodeContent($xmlTCExec,"tester"));
-	return $execInfo; 		
-}
-
-
-/*
-  function: check_valid_ftype()
-
-  args :
-  
-  returns: 
-
-*/
-function check_valid_ftype($upload_info,$import_type)
-{
-	$ret=array();
-	$ret['status_ok']=0;
-	$ret['msg']='ok';
-	
-	$mime_types=array();
-	$import_type=strtoupper($import_type);
-	
-	$mime_import_types['text/xml']=array('XML' => 'XML');
-	
-	if(isset($mime_import_types[$upload_info['type']])) 
 	{
-		if(isset($mime_import_types[$upload_info['type']][$import_type]))
+		return null;
+    }
+    
+	$execInfo=array();;
+	$execInfo['tcase_id'] = isset($xmlTCExec["id"]) ? (int)$xmlTCExec["id"] : 0;
+	$execInfo['tcase_external_id'] = (string) $xmlTCExec["external_id"];
+
+	// Developer Note - 20100328 - franciscom: 
+	// seems that no PHP error is generated when trying to access an undefined
+	// property. Do not know if will not be better anyway to use property_exists()
+	//    
+  	$execInfo['tcase_name'] = (string) $xmlTCExec->name;
+	$execInfo['result'] = (string) trim($xmlTCExec->result);
+	$execInfo['notes'] = (string) trim($xmlTCExec->notes);
+  	$execInfo['timestamp'] = (string) trim($xmlTCExec->timestamp);
+  	$execInfo['tester'] = (string) trim($xmlTCExec->tester);
+
+	$bugQty = count($xmlTCExec->bug_id);
+	if( ($bugQty = count($xmlTCExec->bug_id)) > 0 )
+	{
+		foreach($xmlTCExec->bug_id as $bug)
 		{
-			$ret['status_ok']=1;
-			if( isset($mime_types['check_ext'][$upload_info['type']]))
-			{
-				$path_parts=pathinfo($upload_info['name']);
-				if($path_parts['extension'] != $mime_types['check_ext'][$upload_info['type']])
-				{
-					$status_ok=0;    
-					$ret['msg']=lang_get('file_is_not_text');
-				}
-			}
+			$execInfo['bug_id'][] = (string) $bug; // BUGID 3331  
 		}
-		else
-			$ret['msg']=lang_get('file_is_not_ok_for_import_type');
 	}
-	else
-		$ret['msg']=lang_get('file_is_not_xml');
-	
-	return $ret;
+	return $execInfo; 		
 }
 
 
@@ -367,14 +399,16 @@ function check_valid_ftype($upload_info,$import_type)
 */
 function check_xml_execution_results($fileName)
 {
-	$dom=domxml_open_file($fileName);
-	$file_check=array('status_ok' => 0, 'msg' => 'dom_ko');    		  
-	if ($dom)
+	
+	$file_check=array('status_ok' => 0, 'msg' => 'xml_ko');    		  
+	$xml = @simplexml_load_file($fileName);
+	if($xml !== FALSE)
 	{
 		$file_check=array('status_ok' => 1, 'msg' => 'ok');    		  
-		$root=$dom->document_element();
-		if($root->tagname != 'results') {
-			$file_check=array('status_ok' => 0, 'msg' => lang_get('wrong format for results file'));
+		$elementName = $xml->getName();
+		if($elementName != 'results') 
+		{
+			$file_check=array('status_ok' => 0, 'msg' => lang_get('wrong_results_import_format'));
 		}
 	}
 	return $file_check;
@@ -392,17 +426,18 @@ function check_xml_execution_results($fileName)
 function init_args()
 {
 	$args=new stdClass();
-  $_REQUEST=strings_stripSlashes($_REQUEST);
+  	$_REQUEST=strings_stripSlashes($_REQUEST);
 
-  $args->importType=isset($_REQUEST['importType']) ? $_REQUEST['importType'] : null;
-  $args->buildID=isset($_REQUEST['build']) ? intval($_REQUEST['build']) : null;
-  
-  $args->doUpload=isset($_REQUEST['UploadFile']) ? 1 : 0;
-  $args->userID=$_SESSION['userID'];
-  $args->tplan_id=$_SESSION['testPlanId'];
-  $args->testprojectName=$_SESSION['testprojectName'];
-
-  return $args;
+  	$args->importType=isset($_REQUEST['importType']) ? $_REQUEST['importType'] : null;
+  	$args->buildID=isset($_REQUEST['build']) ? intval($_REQUEST['build']) : null;
+  	$args->platformID=isset($_REQUEST['platform']) ? intval($_REQUEST['platform']) : null;
+  	
+  	$args->doUpload=isset($_REQUEST['UploadFile']) ? 1 : 0;
+  	$args->userID=$_SESSION['userID'];
+  	$args->tplan_id=$_SESSION['testplanID'];
+  	$args->testprojectName=$_SESSION['testprojectName'];
+  	
+  	return $args;
 }
 
 /*
@@ -418,16 +453,18 @@ function init_args()
            msg -> array with localized messages  
 
 */
-function check_exec_values(&$db,&$tcase_mgr,&$user_mgr,$tcaseCfg,$execValues)
+function check_exec_values(&$db,&$tcase_mgr,&$user_mgr,$tcaseCfg,$execValues,&$columnDef)
 {
+	$tables = tlObjectWithDB::getDBTables(array('users','execution_bugs'));
+
     $checks=array('status_ok' => false, 'tcase_id' => 0, 'tester_id' => 0, 
                   'msg' => array()); 
-
-		$tcase_id=$execValues['tcase_id'];
-		$tcase_external_id=trim($execValues['tcase_external_id']);
+	
+	$tcase_id=$execValues['tcase_id'];
+	$tcase_external_id=trim($execValues['tcase_external_id']);
 		
     // external_id has precedence over internal id
-    $using_external_id=(strlen($tcase_external_id) > 0);
+    $using_external_id = ($tcase_external_id != "");
     if($using_external_id)
     {
         // need to get internal id  
@@ -465,19 +502,31 @@ function check_exec_values(&$db,&$tcase_mgr,&$user_mgr,$tcaseCfg,$execValues)
 
     if($checks['status_ok'] && $execValues['tester'] != '' )
     {
-      $sql="SELECT id,login FROM users WHERE login ='" . $db->prepare_string($execValues['tester']) . "'";
-		  $userInfo=$db->get_recordset($sql);
+		$sql = "SELECT id,login FROM {$tables['users']} WHERE login ='" . 
+		       $db->prepare_string($execValues['tester']) . "'";
+		$userInfo=$db->get_recordset($sql);
 		  
-		  if(!is_null($userInfo) && isset($userInfo[0]['id']) )
-		  {
-		      $checks['tester_id']=$userInfo[0]['id'];
-		  }
-		  else
-		  {
-		      $checks['status_ok']=false;
-		      $checks['msg'][]=sprintf(lang_get('invalid_tester'),$identity,$execValues['tester']); 
-		  }
+		if(!is_null($userInfo) && isset($userInfo[0]['id']) )
+		{
+		    $checks['tester_id']=$userInfo[0]['id'];
+		}
+		else
+		{
+		    $checks['status_ok']=false;
+		    $checks['msg'][]=sprintf(lang_get('invalid_tester'),$identity,$execValues['tester']); 
+		}
     }
+    // BUGID 3331
+    $execValues['bug_id'] = isset($execValues['bug_id']) ? trim((string) $execValues['bug_id']) : '';
+    if($checks['status_ok'] && $execValues['bug_id'] != '' )
+    {
+		if( ($field_len = strlen($execValues['bug_id'])) > $columnDef['bug_id']->max_length )
+		{
+		    $checks['status_ok']=false;
+		    $checks['msg'][]=sprintf(lang_get('bug_id_invalid_len'),$field_len,$columnDef['bug_id']->max_length); 
+		}
+		
+	}
     return $checks;
 }
 ?>

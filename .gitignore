@@ -1,5 +1,7 @@
 config_db.inc.php
 custom_config.inc.php
+gui/template_c/*
+.project
 logs
 gui/templates_c/*.php
 upload_area/executions

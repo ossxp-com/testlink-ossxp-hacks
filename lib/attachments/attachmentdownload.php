@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: attachmentdownload.php,v $
  *
- * @version $Revision: 1.13 $
- * @modified $Date: 2009/02/05 19:42:40 $ by $Author: schlundus $
+ * @version $Revision: 1.17 $
+ * @modified $Date: 2009/08/14 20:58:03 $ by $Author: schlundus $
  *
  * Downloads the attachment by a given id
  */
@@ -14,21 +14,17 @@
 require_once('../../config.inc.php');
 require_once('../functions/common.php');
 require_once('../functions/attachments.inc.php');
-testlinkInitPage($db);
+testlinkInitPage($db,false,false,"checkRights");
 
-if (!config_get("attachments")->enabled)
-	exit();
-
-//the id (attachments.id) of the attachment to be downloaded
-$id = isset($_GET['id'])? intval($_GET['id']) : 0;
-if ($id)
+$args = init_args();
+if ($args->id)
 {
 	$attachmentRepository = tlAttachmentRepository::create($db);
-	$attachmentInfo = $attachmentRepository->getAttachmentInfo($id);
-	if ($attachmentInfo && checkAttachmentID($db,$id,$attachmentInfo))
+	$attachmentInfo = $attachmentRepository->getAttachmentInfo($args->id);
+	if ($attachmentInfo && checkAttachmentID($db,$args->id,$attachmentInfo))
 	{
-		$content = $attachmentRepository->getAttachmentContent($id,$attachmentInfo);
-		if (strlen($content))
+		$content = $attachmentRepository->getAttachmentContent($args->id,$attachmentInfo);
+		if ($content != "")
 		{
 			@ob_end_clean();
 			header('Pragma: public');
@@ -46,4 +42,29 @@ if ($id)
 }
 $smarty = new TLSmarty();
 $smarty->display('attachment404.tpl');
+
+/**
+ * @return object returns the arguments for the page
+ */
+function init_args()
+{
+	//the id (attachments.id) of the attachment to be downloaded
+	$iParams = array(
+		"id" => array(tlInputParameter::INT_N),
+	);
+	$args = new stdClass();
+	G_PARAMS($iParams,$args);
+	
+	return $args;
+}
+
+/**
+ * @param $db resource the database connection handle
+ * @param $user the current active user
+ * @return boolean returns true if the page can be accessed
+ */
+function checkRights(&$db,&$user)
+{
+	return (config_get("attachments")->enabled);
+}
 ?>
