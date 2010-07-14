@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.1.4.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.1 $
+$Date: 2007/01/22 08:31:14 $
+$Author: franciscom $
+$Name:  $
 */
 ALTER TABLE builds ADD COLUMN active TINYINT NOT NULL DEFAULT 1 AFTER notes;
 ALTER TABLE builds ADD COLUMN open TINYINT NOT NULL DEFAULT 1 AFTER active;

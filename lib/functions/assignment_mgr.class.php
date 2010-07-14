@@ -3,23 +3,26 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later. 
  *
- * Filename $RCSfile: assignment_mgr.class.php,v $
- *
- * @version $Revision: 1.5 $
- * @modified $Date: 2008/10/21 17:23:53 $ by $Author: schlundus $
- * @author Francisco Mancardi
- *
  * Manager for assignment activities
  *
- * 20060908 - franciscom - 
-*/
-class assignment_mgr 
+ * @package 	TestLink
+ * @author 		Francisco Mancardi
+ * @copyright 	2007-2009, TestLink community 
+ * @version    	CVS: $Id: assignment_mgr.class.php,v 1.9 2009/07/19 19:24:14 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ */
+ 
+/**
+ * class manage assignment users for testing
+ * @package 	TestLink
+ */ 
+class assignment_mgr extends tlObjectWithDB
 {
-	var $db;
 
 	function assignment_mgr(&$db) 
 	{
-		$this->db = &$db;
+	    parent::__construct($db);
 	}
 
 	/*
@@ -28,13 +31,13 @@ class assignment_mgr
 	*/
 	function get_available_types($key_field='description') 
 	{
-		static $s_hash_types;
-		if (!$s_hash_types)
+		static $hash_types;
+		if (!$hash_types)
 		{
-			$sql = "SELECT * FROM assignment_types";
-			$s_hash_types = $this->db->fetchRowsIntoMap($sql,$key_field);
+	    	$sql = "SELECT * FROM {$this->tables['assignment_types']}";
+			$hash_types = $this->db->fetchRowsIntoMap($sql,$key_field);
 		}
-		return $s_hash_types;
+		return $hash_types;
 	}
 
   /*
@@ -43,14 +46,14 @@ class assignment_mgr
   */
 	function get_available_status($key_field='description') 
 	{
-		static $s_hash_types;
-		if (!$s_hash_types)
+		static $hash_types;
+		if (!$hash_types)
 		{
-			$sql = " SELECT * FROM assignment_status "; 
-			$s_hash_types = $this->db->fetchRowsIntoMap($sql,$key_field);
+			$sql = " SELECT * FROM {$this->tables['assignment_status']} "; 
+			$hash_types = $this->db->fetchRowsIntoMap($sql,$key_field);
 		}
 		
-		return $s_hash_types;
+		return $hash_types;
 	}
 
 	// $feature_id can be an scalar or an array
@@ -66,21 +69,19 @@ class assignment_mgr
 	    {
 			$where_clause = " WHERE feature_id={$feature_id}";
 	    }
-		$sql = " DELETE FROM user_assignments {$where_clause}"; 
+		$sql = " DELETE FROM {$this->tables['user_assignments']}  {$where_clause}"; 
 		$result = $this->db->exec_query($sql);
 	}
 
-  // $feature_map['feature_id']['user_id']
-  // $feature_map['feature_id']['type']
-  // $feature_map['feature_id']['status']
-  // $feature_map['feature_id']['assigner_id']
-  //
-  //
+  	// $feature_map['feature_id']['user_id']
+  	// $feature_map['feature_id']['type']
+  	// $feature_map['feature_id']['status']
+  	// $feature_map['feature_id']['assigner_id']
 	function assign($feature_map) 
 	{
 		foreach($feature_map as $feature_id => $elem)
 		{
-			$sql = "INSERT INTO user_assignments " .
+			$sql = "INSERT INTO {$this->tables['user_assignments']} " .
 					"(feature_id,user_id,assigner_id," .
 					"type,status,creation_ts";
 			
@@ -99,19 +100,19 @@ class assignment_mgr
 	}
 	
 
-  // 
-  // $feature_map: key   => feature_id
-  //               value => hash with optional keys 
-  //                        that have the same name of user_assignment fields
-  //
-  //
+  	// 
+  	// $feature_map: key   => feature_id
+  	//               value => hash with optional keys 
+  	//                        that have the same name of user_assignment fields
+  	//
+  	//
 	function update($feature_map) 
 	{
 	  
 		foreach($feature_map as $feature_id => $elem)
 		{
 			$sepa = "";
-			$sql = "UPDATE user_assignments SET ";
+			$sql = "UPDATE {$this->tables['user_assignments']} SET ";
 			$simple_fields = array('user_id','assigner_id','type','status');
 			$date_fields = array('deadline_ts','creation_ts');  
 		
