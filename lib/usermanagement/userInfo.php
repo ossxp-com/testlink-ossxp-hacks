@@ -1,16 +1,22 @@
 <?php
 /**
-* TestLink Open Source Project - http://testlink.sourceforge.net/
-* This script is distributed under the GNU General Public License 2 or later.
-*
-* Filename $RCSfile: userInfo.php,v $
-*
-* @version $Revision: 1.26.2.1 $
-* @modified $Date: 2010/01/20 22:04:57 $
-*
-* Displays the users' information and allows users to change
-* their passwords and user info.
-*/
+ * TestLink Open Source Project - http://testlink.sourceforge.net/
+ * This script is distributed under the GNU General Public License 2 or later. 
+ *
+ * Displays the users' information and allows users to change their passwords and user info.
+ *
+ * @package 	TestLink
+ * @author 		-
+ * @copyright 	2007-2009, TestLink community 
+ * @version    	CVS: $Id: userInfo.php,v 1.31 2010/01/11 19:16:30 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ *
+ * @internal Revisions:
+ *
+ *	20100106 - franciscom - security improvement - checkDoAction()
+ *                        - BUGID 3043 -  genApiKey -> genAPIKey
+ */
 require_once('../../config.inc.php');
 require_once('users.inc.php');
 require_once('../../lib/api/APIKey.php');
@@ -27,11 +33,11 @@ $op->auditMsg = null;
 $op->user_feedback = null;
 $op->status = tl::OK;
 
-$doUpdate = 0;
+$doUpdate = false;
 switch($args->doAction)
 {
     case 'editUser':
-		$doUpdate = 1;
+		$doUpdate = true;
 		foreach($args->user as $key => $value)
 		{
 			$user->$key = $value;
@@ -43,11 +49,11 @@ switch($args->doAction)
 
     case 'changePassword':
 	    $op = changePassword($args,$user);
-	    $doUpdate = ($op->status >= tl::OK) ? 1 : 0;
+	    $doUpdate = ($op->status >= tl::OK);
 	    break;
 
-    case 'genApiKey':
-	    $op = generateApiKey($args,$user);
+    case 'genAPIKey':
+	    $op = generateAPIKey($args,$user);
 	    break;
 }
 
@@ -67,13 +73,16 @@ $loginHistory->failed = $g_tlLogger->getAuditEventsFor($args->userID,"users","LO
 $loginHistory->ok = $g_tlLogger->getAuditEventsFor($args->userID,"users","LOGIN",10);
 
 if ($op->status != tl::OK)
+{
 	$op->user_feedback = getUserErrorMessage($op->status);
-
+}
 $user->readFromDB($db);
 
 // set a string if not generated key yet
 if (null == $user->userApiKey)
+{
 	$user->userApiKey = TLS('none');
+}
 
 $smarty = new TLSmarty();
 $smarty->assign('external_password_mgmt',tlUser::isPasswordMgtExternal());
@@ -85,45 +94,31 @@ $smarty->assign('user_feedback', $op->user_feedback);
 $smarty->assign('update_title_bar',0);
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
-/*
-  function:
 
-  args :
-
-  returns:
-
-*/
 function init_args()
 {
-    $_REQUEST = strings_stripSlashes($_REQUEST);
+	$iParams = array("firstName" => array("POST",tlInputParameter::STRING_N,0,30),
+			         "lastName" => array("REQUEST",tlInputParameter::STRING_N,0,30),
+			         "emailAddress" => array("REQUEST",tlInputParameter::STRING_N,0,100),
+			         "locale" => array("POST",tlInputParameter::STRING_N,0,10),
+			         "oldpassword" => array("POST",tlInputParameter::STRING_N,0,32),
+			         "newpassword" => array("POST",tlInputParameter::STRING_N,0,32),
+			         "doAction" => array("POST",tlInputParameter::STRING_N,0,15,null,'checkDoAction'));
 
-    $args = new stdClass();
-    $args->id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
-
+	$pParams = I_PARAMS($iParams);
+	
+	$args = new stdClass();
     $args->user = new stdClass();
-	$args->user->locale = isset($_REQUEST['id']) && isset($_REQUEST['locale']) ? substr(trim($_REQUEST['locale']),0,10) : 'en_GB';
-    $key2loop = array('firstName','lastName','emailAddress');
-	foreach($key2loop as $key)
-    {
-       $args->user->$key = isset($_REQUEST[$key]) ? trim($_REQUEST[$key]) : null;
-    }
+ 	$args->user->firstName = $pParams["firstName"];
+	$args->user->lastName = $pParams["lastName"];
+	$args->user->emailAddress = $pParams["emailAddress"];
+	$args->user->locale = $pParams["locale"];
+	$args->oldpassword = $pParams["oldpassword"];
+	$args->newpassword = $pParams["newpassword"];
+	$args->doAction = $pParams["doAction"];
 
-    $args->oldpassword = isset($_REQUEST['oldpassword']) ? $_REQUEST['oldpassword'] : null;
-    $args->newpassword = isset($_REQUEST['newpassword']) ? $_REQUEST['newpassword'] : null;
-    $args->doAction = null;
-
-    $key2loop = array('editUser','genApiKey','changePassword');
-    foreach($key2loop as $key)
-    {
-       if(isset($_REQUEST[$key]))
-       {
-           $args->doAction = $key;
-           break;
-       }
-    }
-    $args->userID = isset($_SESSION['currentUser']) ? $_SESSION['currentUser']->dbID : 0;
-
-
+	$args->userID = isset($_SESSION['currentUser']) ? $_SESSION['currentUser']->dbID : 0;
+        
     return $args;
 }
 
@@ -153,15 +148,8 @@ function changePassword(&$argsObj,&$userMgr)
     return $op;
 }
 
-/*
-  function: generateApiKey
 
-  args :
-
-  returns:
-
-*/
-function generateApiKey(&$argsObj,&$user)
+function generateAPIKey(&$argsObj,&$user)
 {
 	$op = new stdClass();
     $op->status = tl::OK;
@@ -170,8 +158,7 @@ function generateApiKey(&$argsObj,&$user)
     if ($user)
     {
 	    $APIKey = new APIKey();
-	    $api_key = $APIKey->addKeyForUser($argsObj->userID);
-		if (strlen($api_key))
+	    if ($APIKey->addKeyForUser($argsObj->userID) < tl::OK)
 		{
 			logAuditEvent(TLS("audit_user_apikey_set",$user->login),"CREATE",$user->login,"users");
 			$op->user_feedback = lang_get('result_apikey_create_ok');
@@ -179,4 +166,16 @@ function generateApiKey(&$argsObj,&$user)
     }
     return $op;
 }
+
+/**
+ * check function for tlInputParameter doAction
+ *
+ */
+function checkDoAction($input)
+{
+	$domain = array_flip(array('editUser','changePassword','genAPIKey'));
+	$status_ok = isset($domain[$input]) ? true : false;
+	return $status_ok;
+}
+
 ?>

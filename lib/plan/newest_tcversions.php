@@ -1,7 +1,7 @@
 <?php
 /** 
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
- * @version $Id: newest_tcversions.php,v 1.11 2009/02/28 17:21:24 franciscom Exp $ 
+ * @version $Id: newest_tcversions.php,v 1.15 2010/05/06 20:30:26 franciscom Exp $ 
  * 
  *
  * rev :
@@ -24,7 +24,7 @@ $tcase_mgr = new testcase($db);
 
 $args = init_args();
 $gui = new stdClass();
-$gui->can_manage_testplans=has_rights($db,"mgt_testplan_create");
+$gui->can_manage_testplans=$_SESSION['currentUser']->hasRight($db,"mgt_testplan_create");
 $gui->tplans = array();
 $gui->show_details = 0;
 $gui->user_feedback = '';
@@ -36,7 +36,8 @@ $gui->tplan_name = $tplan_info['name'];
 $gui->tplan_id=$args->tplan_id;
 $gui->tproject_name = $args->tproject_name;
 
-$linked_tcases = $tplan_mgr->get_linked_tcversions($args->tplan_id);
+// $linked_tcases = $tplan_mgr->get_linked_tcversions($args->tplan_id);
+$linked_tcases = $tplan_mgr->get_linked_items_id($args->tplan_id);
 $qty_linked = count($linked_tcases);
 $gui->testcases = $tplan_mgr->get_linked_and_newest_tcversions($args->tplan_id);
 
@@ -68,7 +69,7 @@ else
     $gui->user_feedback = lang_get('no_linked_tcversions');  
 }
 
-$tplans = getAccessibleTestPlans($db,$args->tproject_id,$args->user_id);
+$tplans = $_SESSION['currentUser']->getAccessibleTestPlans($db,$args->tproject_id);
 foreach($tplans as $key => $value)
 {
 	$gui->tplans[$value['id']] = $value['name'];
@@ -76,16 +77,6 @@ foreach($tplans as $key => $value)
 
 $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
-
-// $smarty->assign('tcasePrefix',$tcasePrefix . $testcase_cfg->glue_character);
-// $smarty->assign('tplans', $map_tplans);
-// $smarty->assign('tplan_id', $args->tplan_id);
-// $smarty->assign('can_manage_testplans', has_rights($db,"mgt_testplan_create"));
-// $smarty->assign('show_details', $show_details );
-// $smarty->assign('user_feedback', $user_feedback);
-// $smarty->assign('testPlanName', $tplan_name);
-// $smarty->assign('tproject_name', $args->tproject_name);
-// $smarty->assign('testcases', $tcases);
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
 
@@ -103,7 +94,7 @@ function init_args()
     $args->tproject_id = $_SESSION['testprojectID'];
     $args->tproject_name = $_SESSION['testprojectName'];
     
-    $args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : $_SESSION['testPlanId'];
+    $args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : $_SESSION['testplanID'];
     
     $args->id = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
     $args->version_id = isset($_REQUEST['version_id']) ? $_REQUEST['version_id'] : 0;
