@@ -1,16 +1,13 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: tcSearchResults.tpl,v 1.1 2008/11/15 18:04:59 franciscom Exp $
+$Id: tcSearchResults.tpl,v 1.3 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: smarty template - view test case in test specification
 rev: 20080322 - franciscom - php errors clean up
 *}
 
 {include file="inc_head.tpl" openHead='yes'}
 <script language="JavaScript" src="gui/javascript/expandAndCollapseFunctions.js" type="text/javascript"></script>
-
-{if $smarty.const.USE_EXT_JS_LIBRARY}
-  {include file="inc_ext_js.tpl" css_only=1}
-{/if}
+{include file="inc_ext_js.tpl" css_only=1}
 
 </head>
 

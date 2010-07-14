@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.1.4.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.1 $
+$Date: 2007/01/31 14:14:56 $
+$Author: franciscom $
+$Name:  $
 */
 ALTER TABLE requirements MODIFY req_doc_id varchar(32) default NULL;
 ALTER TABLE requirements DROP INDEX req_doc_id; 

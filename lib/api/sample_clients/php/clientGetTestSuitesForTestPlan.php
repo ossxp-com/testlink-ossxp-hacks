@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: clientGetTestSuitesForTestPlan.php,v $
  *
- * @version $Revision: 1.1.2.2 $
- * @modified $Date: 2009/05/02 09:08:13 $ by $Author: franciscom $
+ * @version $Revision: 1.1 $
+ * @modified $Date: 2009/05/01 20:36:56 $ by $Author: franciscom $
  *
  *
  * A sample client implementation in php

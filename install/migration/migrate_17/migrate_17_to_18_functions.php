@@ -1,46 +1,31 @@
 <?php
-/*
-TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: migrate_17_to_18_functions.php,v 1.9.2.2 2009/08/30 00:56:03 havlat Exp $ 
+/**
+ * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+ * This script is distributed under the GNU General Public License 2 or later. 
+ *
+ * Support functions for migration from 1.7.2 to 1.8.0
+ * 
+ * @package 	TestLink
+ * @author 		franciscom
+ * @copyright 	2008, TestLink community 
+ * @version    	CVS: $Id: migrate_17_to_18_functions.php,v 1.10 2009/08/30 00:56:06 havlat Exp $
+ *
+ * @internal 
+ * rev: 20090127 - franciscom - added checkTableFields()
+ *    20081210 - BUGID 1921 - missing update of attachment table
+ *    	added updateExecutionsTCVersionInfo()
+ */
 
-Support function for migration from 1.7.2 to 1.8.0
-
-Author: Francisco Mancardi (francisco.mancardi@gmail.com)
-
-rev: 
-     20090717 - franciscom - updateTestCaseExternalID() - now external ID will
-                             be aligned with internal ID.
-                             There is code commented to allow users to use old method
-                             where external ID was computed fresh from scratch.
-                             Some times users do not like this solution because
-                             breaks links done with other applications.
-                              
-     20090714 - franciscom - refactoring of updateTestCaseExternalID() to improve
-                             speed and memory usage (issue SubQuery).
-     20090127 - franciscom - added checkTableFields()
-     20081210 - BUGID 1921 - missing update of attachment table
-     added updateExecutionsTCVersionInfo()
-*/
-?>
-
-<?php
-/*
-  function: 
-
-  args:
-  
-  returns: 
-
-*/
 function reqSpecMigration(&$source_db,&$treeMgr)
 {
+	$mapping_old_new = null;
 	$hhmmss=date("H:i:s");
 	$msg_click_to_show="click to show";
 	echo "<a onclick=\"return DetailController.toggle('details-req_spec_table')\" href=\"tplan/\">
 	<img src='../../img/icon-foldout.gif' align='top' title='show/hide'> Requirement Specification: {$msg_click_to_show} {$hhmmss}</a>";
 	echo '<div class="detail-container" id="details-req_spec_table" style="display: none;">';
 	
-  $sql="SELECT * from req_specs";
+	$sql="SELECT * from req_specs";
 	$rspec=$source_db->fetchRowsIntoMap($sql,'id');
 	if(is_null($rspec)) 
 	{
@@ -78,17 +63,9 @@ function migrateReqSpecs(&$source_db,&$treeMgr,&$rspec)
     }
     
     return $oldNewMapping;  
-} // end function
+}
 
 
-/*
-  function: requirementsMigration
-
-  args:
-  
-  returns: 
-
-*/
 function requirementsMigration(&$source_db,&$treeMgr,&$oldNewMapping)
 {
   	$msg_click_to_show="click to show";
@@ -112,14 +89,7 @@ function requirementsMigration(&$source_db,&$treeMgr,&$oldNewMapping)
 	  return $oldNewMapping;
 }
 
-/*
-  function: migrateRequirements
 
-  args:
-  
-  returns: 
-
-*/
 function migrateRequirements(&$source_db,&$treeMgr,&$req,&$oldNewMapping)
 {
   
@@ -136,17 +106,9 @@ function migrateRequirements(&$source_db,&$treeMgr,&$req,&$oldNewMapping)
         $oldNewMapping->req[$req_id]=$nodeID;
     }
     return $oldNewMapping;  
-} // end function
+}
 
 
-/*
-  function: updateReqInfo
-
-  args:
-  
-  returns: 
-
-*/
 function updateReqInfo(&$source_db,&$treeMgr,&$oldNewMapping)
 {
 
@@ -192,14 +154,6 @@ function updateReqInfo(&$source_db,&$treeMgr,&$oldNewMapping)
 }
 
 
-/*
-  function: updateTProjectInfo
-
-  args:
-  
-  returns: 
-
-*/
 function updateTProjectInfo(&$source_db,&$tprojectMgr)
 {
     $all_tprojects=$tprojectMgr->get_all();
@@ -212,14 +166,6 @@ function updateTProjectInfo(&$source_db,&$tprojectMgr)
 }
 
 
-/*
-  function: initNewTProjectProperties
-
-  args:
-  
-  returns: 
-
-*/
 function initNewTProjectProperties(&$db,&$tprojectMap,&$tprojectMgr)
 {
     if( !is_null($tprojectMap) )
@@ -227,10 +173,7 @@ function initNewTProjectProperties(&$db,&$tprojectMap,&$tprojectMgr)
         // test case prefix
         foreach($tprojectMap as $key => $value)
         {
-            // More human friendly
-            // $tcPrefix=trim(substr($value['name'],0,5) . " (ID={$value['id']})"); 
-            // 16 -> maxsize for prefix
-            $tcPrefix=trim(substr($value['name'],0,8));
+            $tcPrefix=trim(substr($value['name'],0,5) . " (ID={$value['id']})"); 
             $sql="UPDATE testprojects " .
                  "SET prefix='" . $db->prepare_string($tcPrefix) ."', " . 
                  "    tc_counter=0 " .
@@ -241,20 +184,9 @@ function initNewTProjectProperties(&$db,&$tprojectMap,&$tprojectMgr)
 }
 
 
-/*
-  function: updateTestCaseExternalID
-
-  args:
-  
-  returns: 
-
-*/ 
 function updateTestCaseExternalID(&$db,&$all_tprojects,&$tprojectMgr)
 {
-    echo "Update Test Case ExternalID <br>";
-    $CUMULATIVE=1;
-    
-    $show_memory=true && function_exists('memory_get_usage') && function_exists('memory_get_peak_usage');
+    $show_memory=true;
     if( !is_null($all_tprojects) )
     {
         $numtproject=count($all_tprojects);
@@ -265,13 +197,12 @@ function updateTestCaseExternalID(&$db,&$all_tprojects,&$tprojectMgr)
         
         foreach($all_tprojects as $tproject_key => $tproject_value)
         {
-            $eid=0;
             $feedback_counter=0;
             $tproject_counter++;
             $tcaseSet = array();
             $tprojectMgr->get_all_testcases_id($tproject_value['id'],$tcaseSet);
             echo "Working on Test Project ({$tproject_counter}/{$numtproject}) : {$tproject_value['name']}<br>";
-            if( $show_memory)
+            if( function_exists('memory_get_usage') && function_exists('memory_get_peak_usage') && $show_memory)
             {
                echo "(Memory Usage: ".memory_get_usage() . " | Peak: " . memory_get_peak_usage() . ")<br><br>";
             }
@@ -283,31 +214,14 @@ function updateTestCaseExternalID(&$db,&$all_tprojects,&$tprojectMgr)
                echo "Test Cases to process: {$numtc}<br><br>";
                ob_flush();flush();
 
-               // Now get test case children => tcase version
-               // Added order by clause
-               $inClause=implode(",",$tcaseSet);
-               $sql="SELECT id,parent_id AS testcase FROM nodes_hierarchy " . 
-                    " WHERE parent_id IN ({$inClause}) ORDER BY testcase";
-               $rs=$db->fetchColumnsIntoMap($sql,'testcase','id',$CUMULATIVE);
-               foreach($rs as $tcaseID => $tcversionSet)
+               foreach($tcaseSet as $tckey => $tcvalue)
                {
                    $feedback_counter++;
-                   $eid++;
-                   $inClause=implode(",",$tcversionSet);
-                   
-                   // SOLUTION 1
-                   // with this sql external ID will be a new number, but will be
-                   // progressive
-                   // $sql="UPDATE tcversions SET tc_external_id={$eid} " .
-                   //      "WHERE id IN ($inClause)";
-                   //
-                   // SOLUTION 2
-                   // With this sql external ID will be setted to internal ID     
-                   $sql="UPDATE tcversions SET tc_external_id={$tcaseID} " .
-                        "WHERE id IN ($inClause)";
-                        
-                        
-                   $db->exec_query($sql);
+                   $eid=$tckey+1;
+                   $sql="UPDATE tcversions " .
+                        "SET tc_external_id={$eid} " .
+                        "WHERE id IN (SELECT id FROM nodes_hierarchy WHERE parent_id={$tcvalue})";
+                    $db->exec_query($sql);
                    
                    if( $do_feedback && $feedback_counter%100 == 0)
                    {
@@ -317,35 +231,17 @@ function updateTestCaseExternalID(&$db,&$all_tprojects,&$tprojectMgr)
                }         
                echo "ALL Test Cases Processed: {$feedback_counter} - " . date("H:i:s") ."<br><br>";
  
-  
-               // SOLUTION 1
-               // $sql="UPDATE testprojects " .
-               //      "SET tc_counter={$eid} " .
-               //      "WHERE id={$tproject_value['id']}";
-               // 
-               // SOLUTION 2
-               $testCaseIdentity=array_keys($rs);
-               asort($testCaseIdentity);
-               $maxTestCaseNumber = end($testCaseIdentity)+1 ;
-               $sql = " UPDATE testprojects SET tc_counter = {$maxTestCaseNumber} " .
-                      " WHERE id = {$tproject_value['id']} ";
-
+               $sql="UPDATE testprojects " .
+                    "SET tc_counter={$eid} " .
+                    "WHERE id={$tproject_value['id']}";
                $db->exec_query($sql);
-            }
-           unset($tcaseSet);
+			}
+			unset($tcaseSet);
         }
     }
-  
 }
 
-/*
-  function: updateExecutionsTCVersionInfo
 
-  args:
-  
-  returns: 
-
-*/ 
 function updateExecutionsTCVersionInfo(&$db)
 {
 	if (!isset($cfg['db_type']) || strtolower($cfg['db_type']) == 'postgres') 
