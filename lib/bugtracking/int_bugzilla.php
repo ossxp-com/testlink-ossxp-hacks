@@ -4,8 +4,8 @@
  *
  * Filename $RCSfile: int_bugzilla.php,v $
  *
- * @version $Revision: 1.14 $
- * @modified $Date: 2008/09/29 19:48:06 $ $Author: schlundus $
+ * @version $Revision: 1.17 $
+ * @modified $Date: 2010/03/08 13:39:57 $ $Author: asimon83 $
  *
  * @author Arjen van Summeren - 20051010 - inserted function getBugSummary($id) again, 
  *                                         corrected getBugStatusString($id)
@@ -16,6 +16,7 @@
  * they should be changed for your environment
  *
  * rev: 
+ * 20100308 - Julian - added function checkBugID_existence()
  * 20080321 - franciscom - BUGID 1444 - user contribution pvmeerbe
  * 20051202 - scs - added returning null in some cases
  * 20051229 - scs - added ADOdb support
@@ -116,13 +117,11 @@ class bugzillaInterface extends bugtrackingInterface
 			$summary = $this->dbConnection->fetch_array($result);
 			if ($summary)
 			{
-                // BUGID 1444
-				// $summary = $summary[0];
 				$summary = array_pop ($summary);
 			
-				if(strlen($summary) > 45)
+				if(tlStringLen($summary) > 45)
 				{
-					$summary = substr($summary, 0, 42) . "...";
+					$summary = tlSubStr($summary, 0, 42) . "...";
 				}
 			}
 			else
@@ -148,7 +147,7 @@ class bugzillaInterface extends bugtrackingInterface
 	 **/
 	function getBugStatusString($id)
 	{
-		$status = $this->getBUGStatus($id);
+		$status = $this->getBugStatus($id);
 		
 		//if the bug wasn't found the status is null and we simply display the bugID
 		$str = htmlspecialchars($id);
@@ -159,6 +158,23 @@ class bugzillaInterface extends bugtrackingInterface
 				$str = "<del>" . htmlspecialchars($id). "</del>";
 		}
 		return $str;
+	}
+	
+	/**
+	 * checks is bug id is present on BTS
+	 * 
+	 * @return bool 
+	 **/
+	function checkBugID_existence($id)
+	{
+		$status_ok=0;	
+		$query = "SELECT bug_status FROM {$this->dbSchema}.bugs WHERE bug_id=".$id."";
+		$result = $this->dbConnection->exec_query($query);
+		if ($result && ($this->dbConnection->num_rows($result) == 1) )
+		{
+			$status_ok=1;   
+		}
+		return $status_ok;
 	}
 }
 ?>

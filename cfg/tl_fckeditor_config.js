@@ -1,6 +1,6 @@
 /*  
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: tl_fckeditor_config.js,v 1.2.2.1 2009/06/07 22:03:54 havlat Exp $
+$Id: tl_fckeditor_config.js,v 1.3 2009/06/07 22:03:51 havlat Exp $
 
 Configure FCKEditor
 See: http://docs.fckeditor.net/ for more information
