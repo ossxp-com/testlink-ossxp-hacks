@@ -29,6 +29,9 @@
  * @uses 	config.inc.php
  * @since 	1.7
  */ 
+
+require_once("ldap_api.php");
+
 class tlUser extends tlDBObject
 {
 	/**
@@ -97,6 +100,8 @@ class tlUser extends tlDBObject
 	 */
 	public $userApiKey;
 
+	public $ldap_update;
+
 	/**
 	 * @var string the password of the user
 	 * @access protected
@@ -155,6 +160,7 @@ class tlUser extends tlDBObject
 		$this->isActive = 1;
 		$this->tprojectRoles = null;
 		$this->tplanRoles = null;
+		$this->ldap_update = false;
 	}
 	
 	/** 
@@ -228,7 +234,24 @@ class tlUser extends tlDBObject
 	function create()
 	{
 	}
-	
+
+	public function updateFromLDAP($change=true)
+	{
+		$account = ldap_fetch_account( $this->login );
+		foreach(array("firstName", "lastName", "emailAddress") as $attr)
+		{
+			if ( $this->$attr != $account[$attr] )
+			{
+				$this->ldap_update = true;
+				if ($change)
+					$this->$attr = $account[$attr];
+				else
+					break;
+			}
+		}
+		return $account;
+	}
+
 	//----- BEGIN interface iDBSerialization -----
 	/** 
 	 * Reads an user object identified by its database id from the given database
