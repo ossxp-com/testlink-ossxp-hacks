@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: planMilestonesEdit.tpl,v 1.4.2.1 2009/05/26 18:43:00 schlundus Exp $
+$Id: planMilestonesEdit.tpl,v 1.8 2010/05/01 19:39:55 franciscom Exp $
 
 Rev:
 *}
@@ -8,11 +8,11 @@ Rev:
                           warning_empty_low_priority_tcases,warning_empty_medium_priority_tcases,
                           warning_empty_high_priority_tcases,info_milestones_date,
                           warning_invalid_percentage_value,warning_must_be_number,
-                          btn_cancel,warning,
+                          btn_cancel,warning,start_date,info_milestones_start_date,
                           th_name,th_date_format,th_perc_a_prio,th_perc_b_prio,th_perc_c_prio,
                           th_perc_testcases,th_delete,alt_delete_milestone'}
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {* Configure Actions *}
@@ -150,8 +150,24 @@ function validateForm(f)
              		<span class="italic">{$labels.info_milestones_date}</span>
 		      	</td>
 		      </tr>
+ 	    		<tr>
 
-          {if $session['testprojectOptPriority']}
+			    <th style="background:none;">{$labels.start_date}</th>
+			        <td>
+	           {assign var="selected_start_date" value="0000-00-00"}
+             {if $gui->milestone != null && $gui->milestone.start_date != '' }
+              {assign var="selected_start_date" value=$gui->milestone.start_date}
+             {/if}
+             {html_select_date prefix="start_date_"  time=$selected_start_date
+                               month_format='%m' end_year="+1"
+                               day_value_format="%02d"
+                               all_empty=' '
+                               field_order=$gsmarty_html_select_date_field_order}
+             		<span class="italic">{$labels.info_milestones_start_date}</span>
+		      	</td>
+		      </tr>
+
+          {if $session['testprojectOptions']->testPriorityEnabled}
 		          <tr>
 		          	<th style="background:none;">{$labels.th_perc_a_prio}:</th>
 		          	<td>

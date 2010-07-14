@@ -2,8 +2,8 @@
 /** TestLink Open Source Project - http://testlink.sourceforge.net/
  *
  * @filesource $RCSfile: tcAssignedToUser.php,v $
- * @version $Revision: 1.1 $
- * @modified $Date: 2009/01/31 19:54:17 $  $Author: franciscom $
+ * @version $Revision: 1.3 $
+ * @modified $Date: 2009/08/03 08:15:43 $  $Author: franciscom $
  * @author Francisco Mancardi - francisco.mancardi@gmail.com
  *
 */
@@ -31,8 +31,12 @@ $gui->resultSet=$tcase_mgr->get_assigned_to_user($args->user_id,$args->tproject_
 
 if( !is_null($gui->resultSet) )
 {
+	
+	$tables = tlObjectWithDB::getDBTables(array('nodes_hierarchy'));
+
     $tplanSet=array_keys($gui->resultSet);
-    $sql="SELECT name,id FROM nodes_hierarchy WHERE id IN (" . implode(',',$tplanSet) . ")";
+    $sql="SELECT name,id FROM {$tables['nodes_hierarchy']} " .
+         "WHERE id IN (" . implode(',',$tplanSet) . ")";
     $gui->tplanNames=$db->fetchRowsIntoMap($sql,'id');
 }
 $gui->warning_msg='';
@@ -71,7 +75,7 @@ function init_args()
     $args->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : 0;
     if( $args->tplan_id == 0)
     {
-        $args->tplan_id = isset($_SESSION['testPlanId']) ? $_SESSION['testPlanId'] : 0;
+        $args->tplan_id = isset($_SESSION['testplanID']) ? $_SESSION['testplanID'] : 0;
     }
     
     $args->user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : 0;

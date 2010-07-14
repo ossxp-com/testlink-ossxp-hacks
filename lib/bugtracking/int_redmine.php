@@ -4,8 +4,8 @@
  *
  * Filename $RCSfile: int_redmine.php,v $
  *
- * @version $Revision: 1.3 $
- * @modified $Date: 2008/12/17 05:29:14 $ $Author: tosikawa $
+ * @version $Revision: 1.5 $
+ * @modified $Date: 2009/08/18 19:58:14 $ $Author: schlundus $
  * 
  * Constants used throughout TestLink are defined within this file
  * they should be changed for your environment
@@ -142,38 +142,18 @@ class redmineInterface extends bugtrackingInterface
 	}
 
   /**
-	 * checks a bug id for validity  
-	 * 
-	 * @return bool returns true if the bugid has the right format, false else
-	 **/
-	function checkBugID($id)
-	{
-		$status_ok=1;	
-		$ereg_forbidden_chars='[a-zA-Z,$-+]';
- 		if (eregi($ereg_forbidden_chars, $id))
-		{
-			$status_ok=0;	
-		} 	
-		else 
-		{
-			$status_ok=(intval($id) > 0);	
-		}
-		return $status_ok;
-	}	
-
-  /**
 	 * checks is bug id is present on BTS
 	 * 
 	 * @return bool 
 	 **/
 	function checkBugID_existence($id)
 	{
-		$status_ok=0;	
+		$status_ok = false;	
 		$query = "SELECT id FROM issues WHERE id='" . $id."'";
 		$query_results = $this->dbConnection->exec_query($query);
-		if ($query_results && ($this->dbConnection->num_rows($query_results) == 1) )
+		if ($query_results && ($this->dbConnection->num_rows($query_results) == 1))
 		{
-			$status_ok=1;    
+			$status_ok = true;    
 		}
 		return $status_ok;
 	}	

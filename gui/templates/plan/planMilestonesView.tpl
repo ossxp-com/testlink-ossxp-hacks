@@ -1,15 +1,17 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: planMilestonesView.tpl,v 1.5.2.1 2009/05/26 18:43:00 schlundus Exp $
+$Id: planMilestonesView.tpl,v 1.10 2010/05/01 19:39:55 franciscom Exp $
 
 Rev:
+  20100427 - franciscom - BUGID 3402 - missing refactoring of test project options
+  20090910 - franciscom - added start_date
 *}
 {lang_get var='labels' s='no_milestones,title_milestones,title_existing_milestones,th_name,
                          th_date_format,th_perc_a_prio,th_perc_b_prio,th_perc_c_prio,
-                         btn_new_milestone,
+                         btn_new_milestone,start_date,
                          th_perc_testcases,th_delete,alt_delete_milestone,no_milestones'}
 
-{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|basename|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
 {* Configure Actions *}
@@ -42,7 +44,8 @@ var del_action=fRoot+'{$deleteAction}';
 		<tr>
 			<th>{$labels.th_name}</th>
 			<th>{$labels.th_date_format}</th>
-			{if $session['testprojectOptPriority']}
+			<th>{$labels.start_date}</th>
+			{if $session['testprojectOptions']->testPriorityEnabled}
 				<th>{$labels.th_perc_a_prio}</th>
 				<th>{$labels.th_perc_b_prio}</th>
 				<th>{$labels.th_perc_c_prio}</th>
@@ -60,7 +63,12 @@ var del_action=fRoot+'{$deleteAction}';
 			<td>
 				{$milestone.target_date|date_format:$gsmarty_date_format}
 			</td>
-			{if $session['testprojectOptPriority']}
+			<td>
+			  {if $milestone.start_date != '' && $milestone.start_date != '0000-00-00' }
+				  {$milestone.start_date|date_format:$gsmarty_date_format}
+				{/if}
+			</td>
+			{if $session['testprojectOptions']->testPriorityEnabled}
 				<td style="text-align: right">{$milestone.high_percentage|escape}</td>
 				<td style="text-align: right">{$milestone.medium_percentage|escape}</td>
 				<td style="text-align: right">{$milestone.low_percentage|escape}</td>

@@ -1,44 +1,32 @@
 {*
 	Testlink Open Source Project - http://testlink.sourceforge.net/
-	$Id: navBar.tpl,v 1.39.2.2 2009/06/03 19:10:23 schlundus Exp $
+	$Id: navBar.tpl,v 1.52 2010/02/12 08:47:12 erikeloff Exp $
 	Purpose: smarty template - title bar + menu
 
 	rev :
-       20080504 - layout changes to add access to local documentation
-	     20080211 - changes action for user management
-	     20070331 - BUGID 760 - added truncate to fix
-*}
-
-{*******************************************************************}
+		20100212 - eloff - BUGID 3103 - remove js-timeout alert in favor of BUGID 3088
+		20100131 - franciscom - moved get_docs() to javascript library
+		20090902 - timeout warning 
+		20080504 - access to local documentation
+		20080211 - changes action for user management
+		20070331 - BUGID 760 - added truncate to fix
+* ----------------------------------------------------------------- *}
 {lang_get var="labels"
           s="title_events,event_viewer,home,testproject,title_specification,title_execute,
-             title_edit_personal_data,th_tcid,link_logout,navbar_user_management,
+             title_edit_personal_data,th_tcid,link_logout,title_admin,
              search_testcase,title_results,title_user_mgmt"}
-
-{include file="inc_head.tpl" openHead="yes"}
-{literal}
-<script type="text/javascript">
-    function get_docs(name, server_name){
-        if (name != 'leer') {
-            var w = window.open();
-            w.location = server_name + '/docs/' + name;
-        }
-    }
-</script>
-{/literal}
-</head>
-{assign var="cfg_section" value=$smarty.template|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 
-{assign var="action_users_view" value="lib/usermanagement/usersView.php"}
-{assign var="action_user_create" value="lib/usermanagement/usersEdit.php?doAction=create"}
-{assign var="action_user_mgmt" value=$action_users_view}
-
+{include file="inc_head.tpl" openHead="yes"}
+</head>
 <body style="min-width: 800px;">
-<div style="float:left; height: 100%;"><a href="index.php" target="_parent">
+<div style="float:left; height: 100%;">
+	<a href="index.php" target="_parent">
 	<img alt="Company logo"	title="logo" style="width: 115px; height: 53px;" 
-	src="{$smarty.const.TL_THEME_IMG_DIR}{$tlCfg->company_logo}" /></a></div>
-
+	src="{$smarty.const.TL_THEME_IMG_DIR}{$tlCfg->company_logo}" /></a>
+</div>
+	
 <div class="menu_title">
 
 	{if $gui->TestProjects != ""}
@@ -68,58 +56,26 @@
 	 | 	<a href="logout.php" target="_parent" accesskey="q">{$labels.link_logout}</a>
 	</span>
 
-	<a href="index.php" target="_parent" accesskey="h" tabindex="1">{$labels.home}</a> |
-   	{if $gui->tprojectID && $gui->grants->view_testcase_spec == "yes"}
-   	<a href="lib/general/frmWorkArea.php?feature=editTc" target="mainframe" accesskey="s"
-      		tabindex="2">{$labels.title_specification}</a> |
-   	{/if}
-   	{if $gui->grants->testplan_execute == "yes" and $gui->TestPlanCount > 0}
-   	<a href="lib/general/frmWorkArea.php?feature=executeTest" target="mainframe" accesskey="e"
-     		tabindex="3">{$labels.title_execute}</a> |
-   	{/if}
-   	{if $gui->grants->testplan_metrics == "yes" and $gui->TestPlanCount > 0}
-   	<a href="lib/general/frmWorkArea.php?feature=showMetrics" target="mainframe" accesskey="r"
-      		tabindex="3">{$labels.title_results}</a> |
-   	{/if}
-   	{if $gui->grants->user_mgmt == "yes"}
-   	<a href="{$action_user_mgmt}" target="mainframe" accesskey="u"
-      		tabindex="4">{$labels.navbar_user_management}</a> |
-   	{/if}
-	{if $gui->grants->view_events_mgmt eq "yes"}
-		<a href="lib/events/eventviewer.php" target="mainframe"
-		   accesskey="v" tabindex="5">{$labels.title_events}</a> |
-	{/if}
+	{$session.testprojectTopMenu}
 
-	{if $gui->tprojectID && $gui->grants->view_testcase_spec == "yes"}
+{if $gui->tprojectID}
+
+	{if $gui->grants->view_testcase_spec == "yes"}
 		<form style="display:inline" target="mainframe" name="searchTC" id="searchTC"
 		      action="lib/testcases/archiveData.php" method="get">
 		<span style="font-size: 80%">{$labels.th_tcid}: </span>
-		<input style="font-size: 80%; width: 50px;" type="text"
+		<input style="font-size: 80%;" type="text" size="{$gui->searchSize}"
 		       title="{$labels.search_testcase}" name="targetTestCase" value="{$gui->tcasePrefix}" />
-
-    {* useful to avoid a call to method to get test case prefix in called page*}
-		<input type="hidden" id="tcasePrefix" name="tcasePrefix" value="{$gui->tcasePrefix}">
-		       
+    	{* useful to avoid a call to method to get test case prefix in called page*}
+		<input type="hidden" id="tcasePrefix" name="tcasePrefix" value="{$gui->tcasePrefix}" />
 		<img src="{$smarty.const.TL_THEME_IMG_DIR}/magnifier.png"
 		     title="{$labels.search_testcase}" alt="{$labels.search_testcase}"
-		     onclick="document.getElementById('searchTC').submit()" class="clickable" /> |
+		     onclick="document.getElementById('searchTC').submit()" class="clickable" />
 		<input type="hidden" name="edit" value="testcase"/>
 		<input type="hidden" name="allow_edit" value="0"/>
 		</form>
 	{/if}
-  <form style="display:inline;">
-    <select class="menu_combo" style="font-weight:normal;" name="docs" size="1"
-            onchange="javascript:get_docs(this.form.docs.options[this.form.docs.selectedIndex].value, '{$basehref}');" >
-        <option value="leer"> -{lang_get s='access_doc'}-</option>
-        {if $gui->docs}
-            {foreach from=$gui->docs item=doc}
-                <option value="{$doc}">{$doc}</option>
-            {/foreach}
-        {/if}
-    </select>
-   </form>
- 
-
+{/if}
 </div>
 
 {if $gui->updateMainPage == 1}
