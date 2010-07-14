@@ -1,7 +1,7 @@
 /* 
-$Revision: 1.1.2.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.1 $
+$Date: 2008/01/02 18:55:52 $
+$Author: franciscom $
+$Name:  $
 */
 INSERT INTO db_version (version,upgrade_ts,notes) VALUES ('DB 1.2',GETDATE(),'first version with API feature');

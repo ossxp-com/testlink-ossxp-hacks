@@ -1,6 +1,6 @@
 {* 
  Testlink Open Source Project - http://testlink.sourceforge.net/ 
- $Id: mainPage.tpl,v 1.41 2009/02/15 22:23:29 havlat Exp $     
+ $Id: mainPage.tpl,v 1.45 2009/12/07 20:12:18 franciscom Exp $     
  Purpose: smarty template - main page / site map                 
                                                                  
  rev :                                                 
@@ -14,7 +14,7 @@
                                removed old comments
        
 -------------------------------------------------------------------------------------- *}
-{assign var="cfg_section" value=$smarty.template|replace:".tpl":"" }
+{assign var="cfg_section" value=$smarty.template|replace:".tpl":""}
 {config_load file="input_dimensions.conf" section=$cfg_section}
 {include file="inc_head.tpl" popup="yes" openHead="yes"}
 
@@ -46,6 +46,8 @@ window.onload=function()
         display_left_block_4();
     }
 
+    display_left_block_5();
+
     if( typeof display_right_block_1 != 'undefined')
     {
         display_right_block_1();
@@ -67,8 +69,8 @@ window.onload=function()
 </head>
 
 <body>
-{if $securityNotes}
-    {include file="inc_msg_from_array.tpl" array_of_msg=$securityNotes arg_css_class="warning"}
+{if $gui->securityNotes}
+    {include file="inc_msg_from_array.tpl" array_of_msg=$gui->securityNotes arg_css_class="warning"}
 {/if}
 
 {* ----- Right Column ------------- *}

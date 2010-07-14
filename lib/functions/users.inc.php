@@ -3,41 +3,56 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
  *
- * Filename $RCSfile: users.inc.php,v $
- *
- * @version $Revision: 1.85.2.1 $
- * @modified $Date: 2009/04/27 18:20:51 $ $Author: schlundus $
- *
  * Functions for usermanagement
+ * 
+ * @package 	TestLink
+ * @author 		Martin Havlat
+ * @copyright 	2006-2009, TestLink community 
+ * @version    	CVS: $Id: users.inc.php,v 1.107 2010/05/02 16:56:36 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
  *
- * rev: 20081221 - franciscom - buildUserMap() interface changes
- *      20081213 - franciscom - refactoring removing old config options 
- *      20080822 - franciscom - resetPassword() - added generatePassword()
- *      20080405 - franciscom - getGrantsForUserMgmt()
- *      20080315 - franciscom - added initalize_tabsmenu()
- *      20080210 - franciscom - fixed message for error tlUser::E_PWDDONTMATCH
+ * @internal Revision:
+ * 
+ *	20100502 - franciscom - resetPassword() - fixed bad comparison to set $errorMsg
+ *	20100427 - franciscom - BUGID 3396 
+ *	20091215 - eloff - read active testplan from cookie into session
+ *	20090817 - franciscom - getUsersForHtmlOptions() - implementation changes
+ *	20090517 - franciscom - getTestersForHtmlOptions() interface changes
+ *	                        buildUserMap() added prefix to tag inactive users
+ *	20081221 - franciscom - buildUserMap() interface changes
+ *	20081213 - franciscom - refactoring removing old config options 
+ *	20080822 - franciscom - resetPassword() - added generatePassword()
+ *	20080405 - franciscom - getGrantsForUserMgmt()
+ *	20080315 - franciscom - added initalize_tabsmenu()
+ *	20080210 - franciscom - fixed message for error tlUser::E_PWDDONTMATCH
  *
  */
+
+/** core functions */
 require_once("common.php");
-require_once("user.class.php");
+
 $authCfg = config_get('authentication');
 if( 'LDAP' == $authCfg['method'] )
 {
-	require_once(dirname(__FILE__) . "/ldap_api.php");
+	/** support for LDAP authentication */
+	require_once("ldap_api.php");
 }
 
 /**
  * set session data after modification or authorization
  *
- * @param type $db [ref] documentation
- * @param type $user
- * @param type $id
- * @param type $roleID documentation
- * @param type $email documentation
- * @param type $locale [default = null] documentation
- * @param type $active [default = null] documentation
- * @return type documentation
-
+ * @param resource &$db reference to DB identifier
+ * @param string $user
+ * @param integer $id
+ * @param integer $roleID 
+ * @param string $email 
+ * @param string $locale [default = null]
+ * @param boolean $active [default = null] documentation
+ * 
+ * @return integer status code
+ * 
+ * @TODO havlatm: move to tlSession class
+ * @TODO fix return functionality
  **/
 function setUserSession(&$db,$user, $id, $roleID, $email, $locale = null, $active = null)
 {
@@ -78,6 +93,13 @@ function setUserSession(&$db,$user, $id, $roleID, $email, $locale = null, $activ
     	}	
    		$_SESSION['testprojectID'] = $tpID;
 	}
+	// Validation is done in navBar.php
+	$tplan_cookie = 'TL_lastTestPlanForUserID_' . $id;
+	if (isset($_COOKIE[$tplan_cookie]))
+	{
+		$_SESSION['testplanID'] = $_COOKIE[$tplan_cookie];
+		tLog("Cookie: {$tplan_cookie}=".$_SESSION['testplanID']);
+	}
 
 	return 1;
 }
@@ -95,31 +117,36 @@ function setUserSession(&$db,$user, $id, $roleID, $email, $locale = null, $activ
   rev :
        20071228 - franciscom - added active_filter
 */
-// function getUsersForHtmlOptions(&$db,$whereClause = null,$add_blank_option = false, $active_filter=null,$users = null)
-function getUsersForHtmlOptions(&$db,$whereClause = null,$additional_users = null, $active_filter=null,$users = null)
+function getUsersForHtmlOptions(&$db,$whereClause = null,$additional_users = null, $active_filter = null,$users = null)
 {
 	$users_map = null;
 	if (!$users)
 	{
-		$users = tlUser::getAll($db,$whereClause,"id",null,tlUser::TLOBJ_O_GET_DETAIL_MINIMUM);
-  }
-  
-	$the_users=$users;
-	if ($users)
-	{
+		$sqlWhere = $whereClause;
 		if(!is_null($active_filter))
 		{
-			$the_users=array();
-			foreach($users as $id => $user)
-			{
-				if($user->bActive == $active_filter)
-				{
-					$the_users[$id] = $users[$id];
-				}	
-			}
+			$whereClause .= ' AND active =' . ($active_filter > 0 ? 1 : 0) . ' ';
 		}
+		$users = tlUser::getAll($db,$sqlWhere,"id",null,tlUser::TLOBJ_O_GET_DETAIL_MINIMUM);
 	}
-	return buildUserMap($the_users,!is_null($additional_users),$additional_users);
+  
+	//$the_users = $users;
+	
+	// if ($users)
+	// {
+	// 	if(!is_null($active_filter))
+	// 	{
+	// 		$the_users = array();
+	// 		foreach($users as $id => $user)
+	// 		{
+	// 			if($user->isActive == $active_filter)
+	// 			{
+	// 				$the_users[$id] = $users[$id];
+	// 			}	
+	// 		}
+	// 	}
+	// }
+	return buildUserMap($users,!is_null($additional_users),$additional_users);
 }
 
 /*
@@ -140,37 +167,51 @@ function getUsersForHtmlOptions(&$db,$whereClause = null,$additional_users = nul
 function buildUserMap($users,$add_options = false, $additional_options=null)
 {
 	$usersMap = null;
+	$inactivePrefix = lang_get('tag_for_inactive_users');
 	if ($users)
 	{
 		if($add_options)
 		{
-		  $my_options=is_null($additional_options) ? array( 0 => '') : $additional_options;
+		  $my_options = is_null($additional_options) ? array( 0 => '') : $additional_options;
 		  foreach($my_options as $code => $verbose_code)
 		  {
 			    $usersMap[$code] = $verbose_code;
 			}
 		}
-		foreach($users as $id => $user)
-		{
-			$usersMap[$id] = $user->getDisplayName();
-		}
+		$userSet = array_keys($users);
+		$loops2do = count($userSet);
+		
+		// foreach($users as $id => $user)
+		// {
+		// 	$usersMap[$id] = $user->getDisplayName();
+		// 	if($user->isActive == 0)
+		// 	{
+		// 	    $usersMap[$id] = $inactivePrefix . ' ' . $usersMap[$id];
+		// 	} 
+		// }
+        for( $idx=0; $idx < $loops2do ; $idx++)
+        {
+        	$userID = $userSet[$idx];
+			$usersMap[$userID] = $users[$userID]->getDisplayName();
+			if($users[$userID]->isActive == 0)
+			{
+			    $usersMap[$userID] = $inactivePrefix . ' ' . $usersMap[$userID];
+			} 
+        }
 	}
 	return $usersMap;
 }
 
-/*
-  function: resetPassword
 
-  args: db: dbHandler
-        userID:
-        reference to error string
-
-  returns:
-  
-  rev: 20080822 - franciscom
-       use generatePassword()
-
-*/
+/**
+ * reset user password in DB
+ * 
+ * @param resource &$db reference to database handler
+ * @param integer $userID 
+ * @param string &$errorMsg reference to error message
+ * 
+ * @return integer result status code
+ */
 function resetPassword(&$db,$userID,&$errorMsg)
 {
 
@@ -180,18 +221,21 @@ function resetPassword(&$db,$userID,&$errorMsg)
 	
 	if ($result >= tl::OK)
 	{
-		if (strlen($user->emailAddress))
+		$result = tlUser::E_EMAILLENGTH;
+		if ($user->emailAddress != "")
 		{
-			$newPassword = generatePassword(8,4); 
+			$newPassword = tlUser::generatePassword(8,4); 
 			$result = $user->setPassword($newPassword);
-
 			if ($result >= tl::OK)
 			{
-				$msgBody = lang_get('your_password_is') . $newPassword . lang_get('contact_admin');
-				$mail_op = @email_send(config_get('from_email'), $user->emailAddress,
-		                           lang_get('mail_passwd_subject'), $msgBody);
+				// BUGID 3396
+				$msgBody = lang_get('your_password_is') . "\n\n" . $newPassword . "\n\n" . lang_get('contact_admin');
+				$mail_op = @email_send(config_get('from_email'), $user->emailAddress,lang_get('mail_passwd_subject'), 
+									   $msgBody);
 				if ($mail_op->status_ok)
-					$result = $user->writeToDB($db);
+				{
+					$result = $user->writePasswordToDB($db); // BUGID 3396
+				}
 				else
 				{
 					$result = tl::ERROR;
@@ -199,12 +243,8 @@ function resetPassword(&$db,$userID,&$errorMsg)
 				}
 			}
 		}
-		else
-			$result = tlUser::E_EMAILLENGTH;
 	}
-	if (!strlen($errorMsg))
-		$errorMsg = getUserErrorMessage($result);
-
+	$errorMsg = ($errorMsg != "") ? $errorMsg : getUserErrorMessage($result) ;
 	return $result;
 }
 
@@ -279,14 +319,18 @@ function getUserErrorMessage($code)
   args:
 
   returns:
+  
 
 */
 function getAllUsersRoles(&$db,$order_by = null)
 {
-	$query = "SELECT users.id FROM users LEFT OUTER JOIN roles ON users.role_id = roles.id ";
-	$query .= is_null($order_by) ? " ORDER BY login " : $order_by;
+    $tables = tlObject::getDBTables(array('users','roles'));
+    
+	$sql = "SELECT users.id FROM {$tables['users']} users " .
+	         " LEFT OUTER JOIN {$tables['roles']} roles ON users.role_id = roles.id ";
+	$sql .= is_null($order_by) ? " ORDER BY login " : $order_by;
 
-	$users = tlDBObject::createObjectsFromDBbySQL($db,$query,"id","tlUser",false,tlUser::TLOBJ_O_GET_DETAIL_MINIMUM);
+	$users = tlDBObject::createObjectsFromDBbySQL($db,$sql,"id","tlUser",false,tlUser::TLOBJ_O_GET_DETAIL_MINIMUM);
 	return $users;
 }
 
@@ -298,29 +342,54 @@ function getAllUsersRoles(&$db,$order_by = null)
   returns:
 
 */
-function getTestersForHtmlOptions(&$db,$tplanID,$tprojectID,$users = null, $additional_testers=null)
+/**
+ * getTestersForHtmlOptions
+ * returns users that have role on ($tplanID,$tprojectID) with right
+ * to execute a test case.
+ *
+ * @param resource &$db reference to database handler
+ * @param integer $tplanID test plan id
+ * @param integer $tprojectID test project id
+ * @param $users UNUSED - remove
+ * @param $additional_testers TBD
+ * @param string $activeStatus. values: 'active','inactive','any'
+ * 
+ * @return array TBD  
+ */
+function getTestersForHtmlOptions(&$db,$tplanID,$tprojectID,$users = null, 
+                                  $additional_testers = null,$activeStatus = 'active')
 {
+	$orOperand = false;
+    $activeTarget = 1;
+    switch ($activeStatus)
+    {
+        case 'any':
+            $orOperand = true;
+        break;
+        
+        case 'inactive':
+            $activeTarget = 0;
+    	break;
+        
+        case 'active':
+        default:
+	    break;
+    }
+
     $users_roles = get_tplan_effective_role($db,$tplanID,$tprojectID,null,$users);
     $userFilter = array();
     foreach($users_roles as $keyUserID => $roleInfo)
     {
-		    if($roleInfo['effective_role']->hasRight('testplan_execute') && $roleInfo['user']->bActive)
-		    {
-			     $userFilter[$keyUserID] = $roleInfo['user'];
-			  }   
+        if($roleInfo['effective_role']->hasRight('testplan_execute') && 
+           ($orOperand || $roleInfo['user']->isActive == $activeTarget) )
+        {
+            
+             $userFilter[$keyUserID] = $roleInfo['user'];
+        }   
     }
-	  return buildUserMap($userFilter,true,$additional_testers);
+	return buildUserMap($userFilter,true,$additional_testers);
 }
 
-
-/*
-  function: initialize_tabsmenu
-
-  args:
-
-  returns:
-
-*/
 function initialize_tabsmenu()
 {
 	$hl = new stdClass();
@@ -341,18 +410,25 @@ function initialize_tabsmenu()
 /*
   function: getGrantsForUserMgmt 
             utility function used on all user and role pages
-            to pass grants to smarty templates
+            to pass grants to smarty templates.
+            Logic is:
+            if user has Global user management right => no control
+               on specific test project or test plan is done
+           
 
   args:
   
   returns: 
 
 */
-function getGrantsForUserMgmt(&$dbHandler,&$userObj)
+function getGrantsForUserMgmt(&$dbHandler,&$userObj,$tprojectID=null,$tplanID=null)
 {
+    $answers = new stdClass();
     $grants = new stdClass();
     $grants->user_mgmt = $userObj->hasRight($dbHandler,"mgt_users");
     $grants->role_mgmt = $userObj->hasRight($dbHandler,"role_management");
+    $grants->tproject_user_role_assignment = "no";
+    $grants->tplan_user_role_assignment = "no";
     
     if($grants->user_mgmt == 'yes')
     {
@@ -361,31 +437,23 @@ function getGrantsForUserMgmt(&$dbHandler,&$userObj)
     }
     else
     {
-        $grants->tplan_user_role_assignment = $userObj->hasRight($dbHandler,"testplan_user_role_assignment");
-        $grants->tproject_user_role_assignment = $userObj->hasRight($dbHandler,"user_role_assignment",null,-1);
+        
+        $grants->tplan_user_role_assignment = $userObj->hasRight($dbHandler,"testplan_user_role_assignment",
+                                                                 $tprojectID,$tplanID);
+        
+        
+        $answers->user_role_assignment = $userObj->hasRight($dbHandler,"user_role_assignment",null,-1);
+        $answers->testproject_user_role_assignment=$userObj->hasRight($dbHandler,"testproject_user_role_assignment",$tprojectID,-1);
+        if($answers->user_role_assignment == "yes" || $answers->testproject_user_role_assignment == "yes")
+        {    
+            $grants->tproject_user_role_assignment = "yes";
+        }
+    }    
+    foreach($grants as $key => $value)
+    {
+        $grants->$key = $value == "yes" ? "yes" : "no";       
     }
+    
     return $grants;
-}
-
-/*
-  function: generatePassword
-            code taken from PHP manual user's notes. 
-            you can choose the number of alphanumeric characters to add and 
-            the number of non-alphanumeric characters. 
-            You obtain a more secure password. 
-            You can add another characters to the non-alphanumeric list if you need.
-            
-  args:numAlpha
-       numNonAlpha
-  
-  returns: string
-
-*/
-function generatePassword($numAlpha=6,$numNonAlpha=2)
-{
-  $listAlpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  $listNonAlpha = ',;:!?.$/*-+&@_+;./*&?$-!,';
-  return str_shuffle( substr(str_shuffle($listAlpha),0,$numAlpha) .
-                      substr(str_shuffle($listNonAlpha),0,$numNonAlpha) );
 }
 ?>

@@ -3,28 +3,25 @@
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later.
  *  
- * Filename $RCSfile: xml.inc.php,v $
- *
- * @version $Revision: 1.10 $
- * @modified $Date: 2009/01/06 15:34:06 $ by $Author: franciscom $
- *
- * Scope: support for XML
+ * support for XML
  * 
- * Revisions:
- *	20081027 - martin - exportKeywordDataToXML moved here
+ * @package 	TestLink
+ * @copyright 	2004-2009, TestLink community 
+ * @version    	CVS: $Id: xml.inc.php,v 1.18 2010/02/20 19:37:49 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
  *
- * ----------------------------------------------------------------------------------- */
+ * @internal Revisions:
+ *	20100213 - franciscom - new function getItemsFromSimpleXMLObj() 
+ *
+ */
 
-/*
-  function: 
-
-  args:
-  
-  returns: 
-
-*/
+/**
+ * 
+ *
+ */
 function exportDataToXML($items,$rootTpl,$elemTpl,$elemInfo,$bNoXMLHeader = false)
 {
+    // echo __FUNCTION__; echo 'items <br>'; new dBug($items);
 	if (!$items)
 	{
 		return;
@@ -36,6 +33,11 @@ function exportDataToXML($items,$rootTpl,$elemTpl,$elemInfo,$bNoXMLHeader = fals
 	{
 		$item = $item[1];
 		$xmlElemCode = $elemTpl;
+		
+		// REMEMBER YOU NEED TO USE XMP TO DEBUG
+		// echo '$xmlElemCode'; echo "<xmp>$xmlElemCode)</xmp>";
+		// echo '$elemInfo'; new dBug($elemInfo);
+		
 		foreach($elemInfo as $subject => $replacement)
 		{
 			$fm = substr($subject,0,2);
@@ -52,6 +54,9 @@ function exportDataToXML($items,$rootTpl,$elemTpl,$elemInfo,$bNoXMLHeader = fals
 			}
 			
 			$xmlElemCode = str_replace($subject,$content,$xmlElemCode);
+			// echo '$subject:' . $subject . '<br>';
+			// echo '$replacement key:' . $replacement . '<br>';
+            // echo "<xmp>$xmlElemCode)</xmp>";
 		}
 		$xmlCode .= $xmlElemCode;
 	}
@@ -67,47 +72,63 @@ function exportDataToXML($items,$rootTpl,$elemTpl,$elemInfo,$bNoXMLHeader = fals
 	return $result;
 }
 
-/*
-  function: 
-
-  args:
-  
-  returns: 
-
-*/
-function getNodeContent(&$node,$tag)
-{
-	if (!$node)
-		return null;
-	$nodes = $node->get_elements_by_tagname($tag);
-	if ($nodes)
-	{
-		return $nodes[0]->get_content();
-	}
-	return null;
-}
 
 /**
- * Exports the given keywords to a XML file
- * 
- *
- * @param type $keywords the keywords to export in the form
- * 				 keywordData[$i]['keyword'] => the keyword itself
- * 				 keywordData[$i]['notes'] => the notes of keyword
- *
- * @return strings the generated XML Code
- **/
-//SCHLUNDUS: will soon be removed
-// martin: moved from deleted keywords.inc.php; not used anywhere; I guess it could be removed
-function exportKeywordDataToXML($keywords,$bNoHeader = false)
+ * $simpleXMLItems
+ * $itemStructure: keys elements, attributes
+ */
+function getItemsFromSimpleXMLObj($simpleXMLItems,$itemStructure)
 {
-	$keywordRootElem = "<keywords>{{XMLCODE}}</keywords>";
-	$keywordElemTpl = "\t".'<keyword name="{{NAME}}"><notes><![CDATA['."\n||NOTES||\n]]>".'</notes></keyword>'."\n";
-	$keywordInfo = array (
-							"{{NAME}}" => "keyword",
-							"||NOTES||" => "notes",
-						);
-	return exportDataToXML($keywords,$keywordRootElem,$keywordElemTpl,$keywordInfo,$bNoHeader);
+	// new dBug(__FUNCTION__);
+	// new dBug($simpleXMLItems);
+	// new dBug($itemStructure);
+
+	$items = null;
+	if($simpleXMLItems)
+	{
+  		$items_counter=0;
+  		$loop_qty = count($simpleXMLItems);
+
+        // new dBug($loop_qty);
+  		for($idx=0; $idx < $loop_qty; $idx++)
+  		{
+  			// echo "DEBUG - " . __FUNCTION__ . " \$idx:$idx<br>";
+			foreach($itemStructure['elements'] as $castType => $keyValues)
+  			{
+  				// new dBug($castType);	new dBug($keyValues); 
+				foreach($keyValues as $key)
+  				{
+  					$dummy[$key] = null;
+  					if( property_exists($simpleXMLItems[$idx],$key) )
+  					{
+  						$dummy[$key] = $simpleXMLItems[$idx]->$key;
+  				    	settype($dummy[$key],$castType);
+  				    }
+  				}
+  			}	
+
+			if( isset($itemStructure['attributes']) && !is_null($itemStructure['attributes']) )
+			{
+				foreach($itemStructure['attributes'] as $castType => $keyValues)
+  				{
+					foreach($keyValues as $key)
+  					{
+  						$dummy[$key] = null;
+  						if( isset($simpleXMLItems[$idx],$key) )
+  						{
+  							$dummy[$key] = $simpleXMLItems[$idx][$key];
+  					    	settype($dummy[$key],$castType);
+  					    }
+  					}
+  				}	
+
+			}
+			$items[$items_counter++] = $dummy;
+  		}
+  	}	
+	return $items;
 }
+
+
 
 ?>

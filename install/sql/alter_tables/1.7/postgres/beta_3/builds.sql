@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.2.4.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.2 $
+$Date: 2007/01/31 14:13:33 $
+$Author: franciscom $
+$Name:  $
 */
 ALTER TABLE builds ADD COLUMN active INT2 NOT NULL DEFAULT 1;
 ALTER TABLE builds ADD COLUMN open INT2 NOT NULL DEFAULT 1;
