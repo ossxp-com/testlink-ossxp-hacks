@@ -1,7 +1,7 @@
 <?php
 /*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: migrate_17_to_18.php,v 1.8.2.1 2009/06/30 10:59:26 havlat Exp $ 
+$Id: migrate_17_to_18.php,v 1.9 2009/06/30 10:59:23 havlat Exp $ 
 
 Migrate from 1.7.2 to 1.8.0
 

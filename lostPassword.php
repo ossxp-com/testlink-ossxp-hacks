@@ -5,21 +5,23 @@
  *
  * Filename $RCSfile: lostPassword.php,v $
  *
- * @version $Revision: 1.30 $
- * @modified $Date: 2009/01/13 19:34:01 $ $Author: schlundus $
+ * @version $Revision: 1.39 $
+ * @modified $Date: 2009/09/28 08:40:21 $ $Author: franciscom $
  *
- * rev: 20080212 - franciscom - fixed minor bug on call to logAuditEvent
 **/
 require_once('config.inc.php');
 require_once('common.php');
 require_once('users.inc.php');
 require_once('email_api.php');
+$templateCfg = templateConfiguration();
 
-$_POST = strings_stripSlashes($_POST);
-$login = isset($_POST['login']) ? $_POST['login']: null;
+$args = init_args();
+$gui = new stdClass();
+$gui->external_password_mgmt = tlUser::isPasswordMgtExternal();
+$gui->page_title = lang_get('page_title_lost_passwd');
+$gui->note = lang_get('your_info_for_passwd');
 
 $op = doDBConnect($db);
-//@TODO: schlundus, this kind of code should be contained within doDBConnect!
 if ($op['status'] == 0)
 {
 	$smarty = new TLSmarty();
@@ -29,34 +31,48 @@ if ($op['status'] == 0)
 	exit();
 }
 
-$bPasswordMgtExternal = tlUser::isPasswordMgtExternal();
-$note = lang_get('your_info_for_passwd');
-if (strlen($login) && !$bPasswordMgtExternal)
+if ($args->login != "" && !$gui->external_password_mgmt)
 {
-	$userID = tlUser::doesUserExist($db,$login);
+	$userID = tlUser::doesUserExist($db,$args->login);
 	if (!$userID)
-		$note = lang_get('bad_user');
+	{
+		$gui->note = lang_get('bad_user');
+	}
 	else
 	{
-		$result = resetPassword($db,$userID,$note);
+		$result = resetPassword($db,$userID,$gui->note);
 		if ($result >= tl::OK)
 		{
 		  	$user = new tlUser($userID);
 		  	if ($user->readFromDB($db) >= tl::OK)
+		  	{
 		  		logAuditEvent(TLS("audit_pwd_reset_requested",$user->login),"PWD_RESET",$userID,"users");
+			}
 			redirect(TL_BASE_HREF ."login.php?note=lost");
 			exit();
 		}
 		else if ($result == tlUser::E_EMAILLENGTH)
-			$note = lang_get('mail_empty_address');
-		else if (!strlen($note))
-			$note = getUserErrorMessage($result);
+		{
+			$gui->note = lang_get('mail_empty_address');
+		}	
+		else if ($note != "")
+		{
+			$gui->note = getUserErrorMessage($result);
+		}	
 	}
 }
 
 $smarty = new TLSmarty();
-$smarty->assign('note',$note);
-$smarty->assign('external_password_mgmt',$bPasswordMgtExternal);
-$smarty->assign('page_title',lang_get('page_title_lost_passwd'));
-$smarty->display('loginLost.tpl');
+$smarty->assign('gui',$gui);
+$smarty->display($templateCfg->default_template);
+
+
+function init_args()
+{
+	$iParams = array("login" => array(tlInputParameter::STRING_N,0,30));
+	
+	$args = new stdClass();
+    P_PARAMS($iParams,$args);
+	return $args;
+}
 ?>

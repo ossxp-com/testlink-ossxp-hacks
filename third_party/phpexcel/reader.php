@@ -21,7 +21,7 @@
 * @package    Spreadsheet_Excel_Reader
 * @author     Vadim Tkachenko <vt@apachephp.com>
 * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
-* @version    CVS: $Id: reader.php,v 1.1.2.1 2009/04/09 20:48:12 schlundus Exp $
+* @version    CVS: $Id: reader.php,v 1.2 2009/04/09 20:47:07 schlundus Exp $
 * @link       http://pear.php.net/package/Spreadsheet_Excel_Reader
 * @see        OLE, Spreadsheet_Excel_Writer
 */
