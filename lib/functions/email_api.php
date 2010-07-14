@@ -121,7 +121,7 @@ function email_send( $p_from, $p_recipient, $p_subject, $p_message, $p_cc='',
 
 	$t_debug_to = '';
 	# add to the Recipient list
-	$t_recipient_list = split(',', $t_recipient);
+	$t_recipient_list = explode(',', $t_recipient);
 
 	while ( list( , $t_recipient ) = each( $t_recipient_list ) ) {
 		if ( !is_blank( $t_recipient ) ) {
@@ -130,7 +130,7 @@ function email_send( $p_from, $p_recipient, $p_subject, $p_message, $p_cc='',
 	}
 
   	// 20051106 - fm
-  	$t_cc_list = split(',', $p_cc);
+  	$t_cc_list = explode(',', $p_cc);
 	while(list(, $t_cc) = each($t_cc_list)) {
 		if ( !is_blank( $t_cc ) ) {
 				$mail->AddCC( $t_cc, '' );
