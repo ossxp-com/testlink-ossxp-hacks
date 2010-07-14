@@ -5,8 +5,8 @@
  *
  * Filename $RCSfile: clientGetTestCasesForTestPlan.php,v $
  *
- * @version $Revision: 1.2.2.1 $
- * @modified $Date: 2009/05/02 09:08:13 $ by $Author: franciscom $
+ * @version $Revision: 1.4 $
+ * @modified $Date: 2009/08/03 08:15:43 $ by $Author: franciscom $
  * @Author: francisco.mancardi@gmail.com
  *
  * rev: 
@@ -35,4 +35,24 @@ $client->debug=$debug;
 
 runTest($client,$method,$args);
 // ---------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------
+$test_num=2;
+
+$args=array();
+$args["devKey"]=DEV_KEY;
+$args["testplanid"]=446;
+$args["keywords"]='KU,UOL';
+$additionalInfo='Filter by Keyword name';
+
+$debug=true;
+echo $unitTestDescription;
+echo $additionalInfo;
+
+$client = new IXR_Client($server_url);
+$client->debug=$debug;
+
+runTest($client,$method,$args);
+// ---------------------------------------------------------------------------------
+
 ?>

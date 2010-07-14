@@ -1,16 +1,22 @@
 <?php
+
 /**
  * TestLink Open Source Project - http://testlink.sourceforge.net/
  * This script is distributed under the GNU General Public License 2 or later.
+ * 
+ * Define urgency of a Test Suite. 
+ * It requires "prioritization" feature enabled.
  *
- * @filesource $RCSfile: planMilestonesView.php,v $
- * @version $Revision: 1.5 $
- * @modified $Date: 2009/02/07 19:44:03 $ by $Author: schlundus $
+ * @package 	TestLink
  * @author Francisco Mancardi
- *
- * rev: 
- *
-**/
+ * @copyright 	2003-2009, TestLink community 
+ * @version    	CVS: $Id: planMilestonesView.php,v 1.9 2010/04/27 18:22:48 franciscom Exp $
+ * @link 		http://www.teamst.org/index.php
+ * 
+ * @internal Revisions:
+ *	20100427 - franciscom - added standard documentation file header
+ **/
+
 require_once("../../config.inc.php");
 require_once("common.php");
 require_once("testplan.class.php");
@@ -19,7 +25,6 @@ testlinkInitPage($db,false,false,"checkRights");
 $templateCfg = templateConfiguration();
 $args = init_args();
 $gui = initialize_gui($db,$args);
-
 $smarty = new TLSmarty();
 $smarty->assign('gui',$gui);
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
@@ -34,21 +39,14 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 */
 function init_args()
 {
-	$_REQUEST = strings_stripSlashes($_REQUEST);
 	$args = new stdClass();
-
-	$args->doAction = isset($_REQUEST['doAction']) ? $_REQUEST['doAction']:null;
-	$args->basehref=$_SESSION['basehref'];
-	
 	$args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 	$args->tproject_name = isset($_SESSION['testprojectName']) ? $_SESSION['testprojectName'] : "";
-
-	$args->tplan_id = isset($_SESSION['testPlanId']) ? $_SESSION['testPlanId'] : 0;
-	$args->tplan_name = isset($_SESSION['testPlanName']) ? $_SESSION['testPlanName'] : "";
+	$args->tplan_id = isset($_SESSION['testplanID']) ? $_SESSION['testplanID'] : 0;
+	$args->tplan_name = isset($_SESSION['testplanName']) ? $_SESSION['testplanName'] : "";
 
 	return $args;
 }
-
 
 /*
   function: initialize_gui
@@ -68,11 +66,13 @@ function initialize_gui(&$dbHandler,&$argsObj)
     $gui->action_descr = null;
     $gui->tplan_name = $argsObj->tplan_name;
     $gui->tplan_id = $argsObj->tplan_id;
-	  $gui->items = $manager->get_all_by_testplan($argsObj->tplan_id);
-    $gui->grants = new stdClass();
+	$gui->items = $manager->get_all_by_testplan($argsObj->tplan_id);
+	
+	$gui->grants = new stdClass();
     $gui->grants->milestone_mgmt = has_rights($dbHandler,"testplan_planning");
-	  $gui->grants->mgt_view_events = has_rights($dbHandler,"mgt_view_events");
-	  return $gui;
+	$gui->grants->mgt_view_events = has_rights($dbHandler,"mgt_view_events");
+	
+	return $gui;
 }
 
 

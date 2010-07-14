@@ -1,6 +1,6 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: login.tpl,v 1.25.2.1 2009/11/28 23:12:14 havlat Exp $
+$Id: login.tpl,v 1.27 2009/11/28 23:12:11 havlat Exp $
 Purpose: smarty template - login page 
 -------------------------------------------------------------------------------------- *}
 {lang_get var='labels' s='login_name,password,btn_login,new_user_q,lost_password_q'}
