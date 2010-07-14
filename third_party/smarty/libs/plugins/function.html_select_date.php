@@ -162,16 +162,6 @@ function smarty_function_html_select_date($params, &$smarty)
             $start_year = strftime('%Y') - $match[2];
         }
     }
-    if (strlen($time[0]) > 0) {
-        if ($start_year > $time[0] && !isset($params['start_year'])) {
-            // force start year to include given date if not explicitly set
-            $start_year = $time[0];
-        }
-        if($end_year < $time[0] && !isset($params['end_year'])) {
-            // force end year to include given date if not explicitly set
-            $end_year = $time[0];
-        }
-    }
 
     // BUGID 0003248: Date field is not appropriate for build
     // 20100306 - franciscom
