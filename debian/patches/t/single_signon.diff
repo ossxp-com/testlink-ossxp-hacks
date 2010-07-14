@@ -6,52 +6,48 @@ TestLink 单点登录支持
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- config.inc.php                |   12 ++++++-
- index.php                     |   12 ++++++-
- lib/functions/doAuthorize.php |   38 ++++++++++++++++++++---
- lib/functions/ldap_api.php    |   46 +++++++++++++++++++++++++++
- lib/functions/user.class.php  |   24 ++++++++++++++-
- login.php                     |   68 ++++++++++++++++++++++++++++++++++++++--
- logout.php                    |   17 ++++++++++
- 7 files changed, 204 insertions(+), 13 deletions(-)
+ config.inc.php                 |    8 ++++
+ index.php                      |   12 ++++++-
+ lib/functions/doAuthorize.php  |   36 ++++++++++++++++++--
+ lib/functions/ldap_api.php     |   46 ++++++++++++++++++++++++++
+ lib/functions/tlUser.class.php |   27 ++++++++++++++-
+ login.php                      |   71 +++++++++++++++++++++++++++++++++++++---
+ logout.php                     |   17 +++++++++
+ 7 files changed, 205 insertions(+), 12 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 4f20a54..8aead0d 100644
+index d93cc11..2bd6c7a 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -262,17 +262,25 @@ $g_smtp_password    = '';  # password
- /** 
+@@ -318,8 +318,12 @@ $g_smtp_password    = '';  # password
   * Login authentication method:
-  * 		'MD5' => use password stored on db
-- *    'LDAP' => use password from LDAP Server
-+ * 		'LDAP' => use password from LDAP Server
-+ * 		'COSIGN' => Cosign Single Sign-on V2 (with the ldap backends)
-+ * 		'COSIGN3' => Cosign Single Sign-on V3 (with the ldap backends)
-  */ 
+  * 	'MD5' => use password stored on db
+  *	'LDAP' => use password from LDAP Server
++ *	'COSIGN' => Cosign Single Sign-on V2 (with the ldap backends)
++ *	'COSIGN3' => Cosign Single Sign-on V3 (with the ldap backends)
+  */
  $tlCfg->authentication['method'] = 'MD5';
 +$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 +$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
  
  /** LDAP authentication credentials */
- $tlCfg->authentication['ldap_server']		= 'localhost';
- $tlCfg->authentication['ldap_port']			= '389';
- $tlCfg->authentication['ldap_version']		= '3'; // could be '2' in some cases
- $tlCfg->authentication['ldap_root_dn']		= 'dc=mycompany,dc=com';
--$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(organizationname=*Traffic)'
-+$tlCfg->authentication['ldap_organization']	= '';    // e.g. '(authorizedService=testlink)'
- $tlCfg->authentication['ldap_uid_field']	= 'uid'; // Use 'sAMAccountName' for Active Directory
+ $tlCfg->authentication['ldap_server'] = 'localhost';
+@@ -328,6 +332,10 @@ $tlCfg->authentication['ldap_version'] = '3'; // could be '2' in some cases
+ $tlCfg->authentication['ldap_root_dn'] = 'dc=mycompany,dc=com';
+ $tlCfg->authentication['ldap_organization']	= '';    // e.g. '(organizationname=*Traffic)'
+ $tlCfg->authentication['ldap_uid_field'] = 'uid'; // Use 'sAMAccountName' for Active Directory
 +$tlCfg->authentication['ldap_firstname_field']	= 'givenName';
 +$tlCfg->authentication['ldap_lastname_field']	= 'sn';
 +$tlCfg->authentication['ldap_fullname_field']	= 'cn';
 +$tlCfg->authentication['ldap_email_field']	    = 'mail';
- $tlCfg->authentication['ldap_bind_dn']		= ''; // Left empty for anonymous LDAP binding 
- $tlCfg->authentication['ldap_bind_passwd']	= ''; // Left empty for anonymous LDAP binding 
- 
+ $tlCfg->authentication['ldap_bind_dn'] = ''; // Left empty for anonymous LDAP binding
+ $tlCfg->authentication['ldap_bind_passwd'] = ''; // Left empty for anonymous LDAP binding
+ $tlCfg->authentication['ldap_tls'] = false; // true -> use tls
 diff --git a/index.php b/index.php
-index 0ed55ba..2777aab 100644
+index 9590480..7e634a3 100644
 --- a/index.php
 +++ b/index.php
-@@ -25,7 +25,17 @@ $reqURI = isset($_GET['reqURI']) ? $_GET['reqURI'] : 'lib/general/mainPage.php';
+@@ -25,7 +25,17 @@ $args = init_args();
  //verify the session during a work
  if (!isset($_SESSION['currentUser']))
  {
@@ -71,21 +67,25 @@ index 0ed55ba..2777aab 100644
  }
  $smarty = new TLSmarty();
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index 5f4e32e..f2bc055 100644
+index a555c6b..5112ed8 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
-@@ -19,25 +19,53 @@
-  * *********************************************************************************** */
+@@ -22,29 +22,57 @@
+ /** TBD */ 
  require_once("users.inc.php");
  require_once("roles.inc.php");
 +require_once('config.inc.php');
 +require_once('common.php');
  
- /** authorization function verifies login & password and set user session data */
--function doAuthorize(&$db,$login,$pwd,&$msg)
-+function doAuthorize(&$db,$login,$pwd,&$msg,$sso=0)
+ /** 
+  * authorization function verifies login & password and set user session data 
+  * return map
+  *
+  */
+-function doAuthorize(&$db,$login,$pwd)
++function doAuthorize(&$db,$login,$pwd,$sso=0)
  {
-     $result = tl::ERROR;
+ 	$result = array('status' => tl::ERROR, 'msg' => null);
  	$_SESSION['locale'] = TL_DEFAULT_LOCALE; 
 -	if (!is_null($pwd) && !is_null($login))
 +
@@ -111,9 +111,8 @@ index 5f4e32e..f2bc055 100644
 +			}
 +		}
  		if ($login_exists)
--	    {
+ 		{
 -			$password_check = auth_does_password_match($user,$pwd);
-+		{
 +			if ($sso)
 +			{
 +				$password_check = new stdClass();
@@ -124,20 +123,20 @@ index 5f4e32e..f2bc055 100644
 +			{
 +				$password_check = auth_does_password_match($user,$pwd);
 +			}
- 			if ($password_check->status_ok && $user->bActive)
+ 			if ($password_check->status_ok && $user->isActive)
  			{
  				// 20051007 MHT Solved  0000024 Session confusion 
  				// Disallow two sessions within one browser
 -				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']))
 +				if (isset($_SESSION['currentUser']) && !is_null($_SESSION['currentUser']) && !$sso)
  				{
- 					$msg = lang_get('login_msg_session_exists1') . ' <a style="color:white;" href="logout.php">' . 
- 							lang_get('logout_link') . '</a>' . lang_get('login_msg_session_exists2');
+ 					$result['msg'] = lang_get('login_msg_session_exists1') . 
+ 					                 ' <a style="color:white;" href="logout.php">' . 
 diff --git a/lib/functions/ldap_api.php b/lib/functions/ldap_api.php
-index 6145c2e..1a04588 100644
+index a653f3b..7a4a75d 100644
 --- a/lib/functions/ldap_api.php
 +++ b/lib/functions/ldap_api.php
-@@ -134,4 +134,50 @@
+@@ -140,4 +140,50 @@
      	return $t_authenticated;
  	}
  
@@ -188,40 +187,43 @@ index 6145c2e..1a04588 100644
 +	}
 +
  ?>
-diff --git a/lib/functions/user.class.php b/lib/functions/user.class.php
-index 84bd6b0..7084b70 100644
---- a/lib/functions/user.class.php
-+++ b/lib/functions/user.class.php
-@@ -11,6 +11,9 @@
-  * rev: 20090101 - franciscom - changes to deleteFromDB() due to Foreing Key constraints
-  *      20081213 - franciscom - removed global coupling to access config parameters
-  */
+diff --git a/lib/functions/tlUser.class.php b/lib/functions/tlUser.class.php
+index 800496e..1613755 100644
+--- a/lib/functions/tlUser.class.php
++++ b/lib/functions/tlUser.class.php
+@@ -29,6 +29,9 @@
+  * @uses 	config.inc.php
+  * @since 	1.7
+  */ 
 +
 +require_once("ldap_api.php");
 +
  class tlUser extends tlDBObject
  {
- 	private $object_table = "users";
-@@ -27,6 +30,7 @@ class tlUser extends tlDBObject
- 	public $tplanRoles;
- 	public $login;
+ 	/**
+@@ -97,6 +100,8 @@ class tlUser extends tlDBObject
+ 	 */
  	public $userApiKey;
+ 
 +	public $ldap_update;
- 	protected $password;
- 	
- 	//configuration options
-@@ -69,6 +73,7 @@ class tlUser extends tlDBObject
- 		$this->bActive = 1;
++
+ 	/**
+ 	 * @var string the password of the user
+ 	 * @access protected
+@@ -155,6 +160,7 @@ class tlUser extends tlDBObject
+ 		$this->isActive = 1;
  		$this->tprojectRoles = null;
  		$this->tplanRoles = null;
 +		$this->ldap_update = false;
  	}
  	
- 	protected function _clean($options = self::TLOBJ_O_SEARCH_BY_ID)
-@@ -107,6 +112,23 @@ class tlUser extends tlDBObject
+ 	/** 
+@@ -228,7 +234,24 @@ class tlUser extends tlDBObject
+ 	function create()
  	{
  	}
- 	//BEGIN interface iDBSerialization
+-	
++
 +	public function updateFromLDAP($change=true)
 +	{
 +		$account = ldap_fetch_account( $this->login );
@@ -239,25 +241,25 @@ index 84bd6b0..7084b70 100644
 +		return $account;
 +	}
 +
- 	public function readFromDB(&$db,$options = self::TLOBJ_O_SEARCH_BY_ID)
- 	{
- 		$this->_clean($options);
-@@ -518,4 +540,4 @@ class tlUser extends tlDBObject
- 		return tlDBObject::createObjectsFromDBbySQL($db,$query,'id',__CLASS__,true,$detailLevel);
- 	}
+ 	//----- BEGIN interface iDBSerialization -----
+ 	/** 
+ 	 * Reads an user object identified by its database id from the given database
+@@ -965,4 +988,4 @@ class tlUser extends tlDBObject
+ 	}	
+ 
  }
 -?>
 \ No newline at end of file
 +?>
 diff --git a/login.php b/login.php
-index 1ef2a62..153b9e4 100644
+index cd0877b..b8879cb 100644
 --- a/login.php
 +++ b/login.php
-@@ -37,13 +37,25 @@ if (!$op['status'])
+@@ -41,14 +41,27 @@ if (!$op['status'])
  $args = init_args();
  $gui = init_gui($db,$args);
  
--if(!is_null($args->login))
+-switch($args->action) 
 +$cosign_loggedin = 0;
 +// cosign v2 or cosign v3
 +if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
@@ -270,20 +272,21 @@ index 1ef2a62..153b9e4 100644
 +	}
 +}
 +
-+if(!is_null($args->login) || $cosign_loggedin)
++$login_switch = $cosign_loggedin ? 'doLogin' : $args->action;
++switch($login_switch) 
  {
- 	doSessionStart();
- 	unset($_SESSION['basehref']);
- 	setPaths();
--	
--	if(doAuthorize($db,$args->login,$args->pwd,$msg) < tl::OK)
-+
-+	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
- 	{
- 		if (!$msg)
- 		{
-@@ -63,6 +75,19 @@ if(!is_null($args->login))
- 	}
+ 	case 'doLogin':
+ 	case 'ajaxlogin':
+ 		 doSessionStart();
+ 		 unset($_SESSION['basehref']);
+ 		 setPaths();
+-		 $op = doAuthorize($db,$args->login,$args->pwd);
++		 $op = doAuthorize($db,$args->login,$args->pwd,$cosign_loggedin);
+ 		 
+ 		 if( $op['status'] < tl::OK)
+ 		 {
+@@ -93,6 +106,22 @@ switch($args->action)
+ 		 break;
  }
  
 +// cosign v2
@@ -299,19 +302,23 @@ index 1ef2a62..153b9e4 100644
 +	sso_redirect(3);
 +}
 +
- $logPeriodToDelete = config_get('removeEventsOlderThan');
- $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
++$logPeriodToDelete = config_get('removeEventsOlderThan');
++$g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
++
+ // BUGID 0003129
+ if( $doRender )
+ {
+@@ -104,11 +133,43 @@ if( $doRender )
+ 	$smarty->display($templateCfg->default_template);
+ }
  
-@@ -71,6 +96,41 @@ $smarty->assign('gui', $gui);
- $smarty->display('login.tpl');
- 
- /**
++/**
 + * Single Sign-on redirect
 + */
 +function sso_redirect($protocol=2)
 +{
 +	global $tlCfg;
-+
+ 
 +	$cosign_login_url    = $tlCfg->authentication['login_url'] ?
 +												 $tlCfg->authentication['login_url'] :
 +												 "https://weblogin.foo.bar/cgi-bin/login";
@@ -339,25 +346,28 @@ index 1ef2a62..153b9e4 100644
 +	header( "Location: $dest_url" );
 +	exit;
 +}
-+
-+/**
-  * Initialize input parameters
+ 
+ /**
+- * 
+- *
++ * Initialize input parameters
   */
  function init_args()
-@@ -94,7 +154,7 @@ function init_gui(&$db,$args)
+ {
+@@ -149,7 +210,7 @@ function init_gui(&$db,$args)
  	
  	$authCfg = config_get('authentication');
  	$gui->securityNotes = getSecurityNotes($db);
 -	$gui->external_password_mgmt = ('LDAP' == $authCfg['method']) ? 1 : 0;
 +	$gui->external_password_mgmt = strtolower($authCfg['method']) != 'md5' ? 1 : 0;
- 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1:0;
+ 	$gui->login_disabled = ($gui->external_password_mgmt && !checkForLDAPExtension()) ? 1 : 0;
  	$gui->user_self_signup = config_get('user_self_signup');
  
 diff --git a/logout.php b/logout.php
-index 7477012..9928b80 100644
+index 4c38572..941d4c6 100644
 --- a/logout.php
 +++ b/logout.php
-@@ -21,6 +21,23 @@ if ($userID)
+@@ -19,6 +19,23 @@ if ($args->userID)
  session_unset();
  session_destroy();
  
@@ -380,6 +390,6 @@ index 7477012..9928b80 100644
 +
  redirect("login.php");
  exit();
- ?>
+ 
 -- 
-tg: (4a1bc5f..) t/single_signon (depends on: master t/typos_no_last_eol)
+tg: (0b58b33..) t/single_signon (depends on: t/typos_no_last_eol)

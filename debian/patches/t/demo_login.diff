@@ -6,13 +6,13 @@ See #81: 在登录页面提供演示帐号。如果用户尚未注册帐号，�
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- gui/templates/login.tpl             |  139 ++++++++++++++++++++++++++++-------
+ gui/templates/login.tpl             |  142 ++++++++++++++++++++++++++++-------
  gui/themes/default/css/testlink.css |    5 +
- login.php                           |   61 ++++++++++++++-
- 3 files changed, 173 insertions(+), 32 deletions(-)
+ login.php                           |   60 ++++++++++++++-
+ 3 files changed, 175 insertions(+), 32 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
-index 77bdd48..28a9a14 100644
+index 4d64db4..1e2bc0a 100644
 --- a/gui/templates/login.tpl
 +++ b/gui/templates/login.tpl
 @@ -7,6 +7,8 @@ Purpose: smarty template - login page
@@ -46,7 +46,7 @@ index 77bdd48..28a9a14 100644
   
  	// set focus on login text box
  	focusInputField('login');
-@@ -26,36 +43,102 @@ window.onload=function()
+@@ -26,35 +43,102 @@ window.onload=function()
  <body>
  {include file="inc_login_title.tpl"}
  
@@ -54,8 +54,8 @@ index 77bdd48..28a9a14 100644
 -
 -	<form method="post" name="login_form" action="login.php">
 -    {if $gui->login_disabled eq 0}		
--  	  <div class="messages" style="text-align:center;">{$gui->note}</div>
--		  <input type="hidden" name="reqURI" value="{$gui->reqURI|escape:'url'}"/>
+-  		<div class="messages" style="width:100%;text-align:center;">{$gui->note}</div>
+-		<input type="hidden" name="reqURI" value="{$gui->reqURI|escape:'url'}"/>
 -  		<p class="label">{$labels.login_name}<br />
 -			<input type="text" name="tl_login" id="login" size="{#LOGIN_SIZE#}" maxlength="{#LOGIN_MAXLEN#}" />
 -		</p>
@@ -63,8 +63,23 @@ index 77bdd48..28a9a14 100644
 -			<input type="password" name="tl_password" size="{#PASSWD_SIZE#}" maxlength="{#PASSWD_SIZE#}" />
 -		</p>
 -		<input type="submit" name="login_submit" value="{$labels.btn_login}" />
+-	{/if}
+-	</form>
+-	
+-	<p>
+-	{if $gui->user_self_signup}
+-		<a href="firstLogin.php">{$labels.new_user_q}</a><br />
+-	{/if}
+-	
+-	{* the configured authentication method don't allow users to reset his/her password *}		
+-	{if $gui->external_password_mgmt eq 0}
+-		<a href="lostPassword.php">{$labels.lost_password_q}</a>
+-	</p>
+-	{/if}
+-	
+-	{include file="inc_copyrightnotice.tpl"}
 +<div id="login_div" style="text-align:left; margin:20%; margin-top:5px; padding:5px; border:1px;">
-+
+ 
 +	<script type="text/javascript">
 +		function display_login_block()
 +		{ldelim}
@@ -96,22 +111,8 @@ index 77bdd48..28a9a14 100644
 +			                       width:'100%'
 +			                       {rdelim});
 +		{rdelim}
- 		{/if}
--	</form>
--	
--	<p>
--	{if $gui->user_self_signup}
--		<a href="firstLogin.php">{$labels.new_user_q}</a><br />
--	{/if}
--	
--	{* the configured authentication method don't allow users to reset his/her password *}		
--	{if $gui->external_password_mgmt eq 0}
--		<a href="lostPassword.php">{$labels.lost_password_q}</a>
--	</p>
--	{/if}
- 
--	
--	{include file="inc_copyrightnotice.tpl"}
++		{/if}
++
 +		function display_footer_block()
 +		{ldelim}
 +			var p4 = new Ext.Panel({ldelim}
@@ -153,7 +154,7 @@ index 77bdd48..28a9a14 100644
 +					{$login_form_contents}
 +				</div>
 +			{/if}
- 
++
 +			{if $gui->user_self_signup}
 +				<div align="center"><a href="firstLogin.php">{$labels.new_user_q}</a></div><br />
 +			{/if}
@@ -176,7 +177,7 @@ index 77bdd48..28a9a14 100644
  	{if $gui->securityNotes}
      	{include file="inc_msg_from_array.tpl" array_of_msg=$gui->securityNotes arg_css_class="messages"}
  	{/if}
-@@ -66,4 +149,4 @@ window.onload=function()
+@@ -65,4 +149,4 @@ window.onload=function()
  
  </div>
  </body>
@@ -184,10 +185,10 @@ index 77bdd48..28a9a14 100644
 \ No newline at end of file
 +</html>
 diff --git a/gui/themes/default/css/testlink.css b/gui/themes/default/css/testlink.css
-index a945f26..1d22f8d 100644
+index fd3ce1f..4db0959 100644
 --- a/gui/themes/default/css/testlink.css
 +++ b/gui/themes/default/css/testlink.css
-@@ -761,4 +761,9 @@ th.testlink, td.testlink, tr.testlink td {
+@@ -834,4 +834,9 @@ th.testlink, td.testlink, tr.testlink td {
  .x-tl-panel-body{overflow:hidden;}
  .x-tl-panel-collapsed .x-resizable-handle{display:none;}
  
@@ -198,37 +199,30 @@ index a945f26..1d22f8d 100644
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
-index 153b9e4..cb86164 100644
+index b8879cb..0c0bad8 100644
 --- a/login.php
 +++ b/login.php
-@@ -49,12 +49,25 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
+@@ -53,6 +53,19 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
  	}
  }
  
--if(!is_null($args->login) || $cosign_loggedin)
-+if(!is_null($args->login) || $cosign_loggedin || $args->demo)
- {
- 	doSessionStart();
- 	unset($_SESSION['basehref']);
- 	setPaths();
- 
-+	if($args->demo)
++if($args->demo)
++{
++	if (array_key_exists($args->demo, $tlCfg->authentication['demo_users']))
 +	{
-+		if (array_key_exists($args->demo, $tlCfg->authentication['demo_users']))
-+		{
-+			$args->login = $args->demo;
-+			$cosign_loggedin = 1;
-+		}
-+		else
-+		{
-+			$args->demo = "";
-+			$gui->note = lang_get('bad_user_passwd');
-+		}
++		$args->login = $args->demo;
++		$cosign_loggedin = 1;
 +	}
- 	if(doAuthorize($db,$args->login,$args->pwd,$msg,$cosign_loggedin) < tl::OK)
- 	{
- 		if (!$msg)
-@@ -76,23 +89,60 @@ if(!is_null($args->login) || $cosign_loggedin)
++	else
++	{
++		$args->demo = "";
++		$gui->note = lang_get('bad_user_passwd');
++	}
++}
+ $login_switch = $cosign_loggedin ? 'doLogin' : $args->action;
+ switch($login_switch) 
+ {
+@@ -107,18 +120,51 @@ switch($login_switch)
  }
  
  // cosign v2
@@ -282,26 +276,36 @@ index 153b9e4..cb86164 100644
  $logPeriodToDelete = config_get('removeEventsOlderThan');
  $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
  
- $smarty = new TLSmarty();
- $smarty->assign('gui', $gui);
-+$smarty->assign('login_title', lang_get('please_login'));
-+$smarty->assign('demo_login_title', lang_get('demo_login_title'));
-+$smarty->assign('demo_login_contents', $demo_login_contents);
-+$smarty->assign('login_form_contents', $login_form_contents);
- $smarty->display('login.tpl');
- 
- /**
-@@ -145,6 +195,9 @@ function init_args()
-     $args->reqURI = isset($_REQUEST['req']) ? urlencode($_REQUEST['req']) : null;
-     $args->preqURI = (isset($_REQUEST['reqURI']) && strlen($_REQUEST['reqURI'])) ? urlencode($_REQUEST['reqURI']) : null;
-   
-+    $args->sso = isset($_REQUEST['sso']) ? 1 : 0;
-+    $args->demo = isset($_REQUEST['demo']) ? $_REQUEST['demo'] : '';
-+
-     return $args;
+@@ -130,6 +176,10 @@ if( $doRender )
+ 	
+ 	$smarty = new TLSmarty();
+ 	$smarty->assign('gui', $gui);
++	$smarty->assign('login_title', lang_get('please_login'));
++	$smarty->assign('demo_login_title', lang_get('demo_login_title'));
++	$smarty->assign('demo_login_contents', $demo_login_contents);
++	$smarty->assign('login_form_contents', $login_form_contents);
+ 	$smarty->display($templateCfg->default_template);
  }
  
-@@ -182,7 +235,7 @@ function init_gui(&$db,$args)
+@@ -179,6 +229,8 @@ function init_args()
+ 		             "req" => array(tlInputParameter::STRING_N,0,4000),
+ 		             "reqURI" => array(tlInputParameter::STRING_N,0,4000),
+ 		             "action" => array(tlInputParameter::STRING_N,0, 10),
++		             "sso" => array(tlInputParameter::STRING_N,0, 10),
++		             "demo" => array(tlInputParameter::STRING_N,0, 32),
+ 	);
+ 	$pParams = R_PARAMS($iParams);
+ 
+@@ -188,6 +240,8 @@ function init_args()
+     $args->pwd = $pParams['tl_password'];
+     $args->reqURI = urlencode($pParams['req']);
+     $args->preqURI = urlencode($pParams['reqURI']);
++    $args->demo = urlencode($pParams['demo']);
++    $args->sso = urlencode($pParams['sso']);
+ 
+ 	if ($pParams['action'] == 'ajaxcheck' || $pParams['action'] == 'ajaxlogin') {
+ 		$args->action = $pParams['action'];
+@@ -238,7 +292,7 @@ function init_gui(&$db,$args)
      		break;
      		
      	default:
@@ -311,4 +315,4 @@ index 153b9e4..cb86164 100644
      }
  	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
 -- 
-tg: (fe388a1..) t/demo_login (depends on: t/single_signon t/typos_no_last_eol)
+tg: (142dba4..) t/demo_login (depends on: t/single_signon)

@@ -11,7 +11,7 @@ third_party     /opt/testlink/web
 install         /opt/testlink/
 CHANGELOG       /opt/testlink/doc
 SCHEMA_CHANGES  /opt/testlink/doc
-readme          /opt/testlink/doc
+README          /opt/testlink/doc
 *.example       /opt/testlink/doc
-license         /opt/testlink/doc
+LICENSE         /opt/testlink/doc
 CODE_REUSE      /opt/testlink/doc

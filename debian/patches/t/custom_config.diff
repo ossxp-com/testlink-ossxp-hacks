@@ -6,60 +6,41 @@ Custom config files.
 Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 
 ---
- cfg/const.inc.php                                  |   14 +-
+ cfg/const.inc.php                                  |    2 +-
  config.inc.php                                     |    2 +-
- custom_config.inc.php.example                      |  127 ++++++++++++--------
- install/sql/mysql/testlink_create_default_data.sql |    2 +-
- 4 files changed, 85 insertions(+), 60 deletions(-)
+ custom_config.inc.php.example                      |  123 ++++++++++++--------
+ install/sql/mysql/testlink_create_default_data.sql |    4 +-
+ 4 files changed, 78 insertions(+), 53 deletions(-)
 
 diff --git a/cfg/const.inc.php b/cfg/const.inc.php
-index 837fee0..27160f9 100644
+index 9a6b5a9..f11a18b 100644
 --- a/cfg/const.inc.php
 +++ b/cfg/const.inc.php
-@@ -427,12 +427,12 @@ $tlCfg->reportsCfg=new stdClass();
- 
- // BUGID 1785
- // With this change configuration is simplified
--// $tlCfg->reportsCfg->exec_status = array(
--//     "passed"  => "test_status_passed",
--//     "failed"  => "test_status_failed",
--//     "blocked" => "test_status_blocked",
--//     "not_run" => "test_status_not_run"
--// );
-+$tlCfg->reportsCfg->exec_status = array(
-+    "passed"  => "test_status_passed",
-+    "failed"  => "test_status_failed",
-+    "blocked" => "test_status_blocked",
-+    "not_run" => "test_status_not_run"
-+);
- $tlCfg->reportsCfg->exec_status = $tlCfg->results['status_label_for_exec_ui'];
- 
- 
-@@ -651,4 +651,4 @@ $tlCfg->gui->custom_fields->time_format = "H:i:s";
-                                                        
+@@ -918,4 +918,4 @@ $tlCfg->guiTopMenu[7] = array(
+ define( 'PARTIAL_URL_TL_FILE_FORMATS_DOCUMENT',	'docs/tl-file-formats.pdf');
  
  // ----- END ----------------------------------------------------------------------------
 -?>
 \ No newline at end of file
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 4f20a54..0480918 100644
+index d93cc11..a64a70a 100644
 --- a/config.inc.php
 +++ b/config.inc.php
-@@ -112,7 +112,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
+@@ -149,7 +149,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
  // The value must be available in $g_locales (see cfg/const.inc.php).
- // Note: An attempt will be done to establish the default locale 
+ // Note: An attempt will be done to establish the default locale
  // automatically using $_SERVER['HTTP_ACCEPT_LANGUAGE']
--$tlCfg->default_language = 'en_GB'; 
+-$tlCfg->default_language = 'en_GB';
 +$tlCfg->default_language = 'zh_CN'; 
  
- /** 
-  * Charset 'UTF-8' is only officially supported charset (Require MySQL version >= 4.1)
+ /**
+  * @var string Charset 'UTF-8' is only officially supported charset (Require
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index 698ec68..b505480 100644
+index 2abaac4..b4b1a23 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
-@@ -40,55 +40,6 @@
+@@ -52,55 +52,6 @@
  // Your reports WILL BE ON TOP OF standard TL Reports on left frame
  //
  //
@@ -115,20 +96,10 @@ index 698ec68..b505480 100644
  
  // TRUE  -> the whole execution history for the choosen build will be showed
  // FALSE -> just last execution for the choosen build will be showed [STANDARD BEHAVIOUR]
-@@ -104,8 +55,6 @@
- // FALSE ->  Only history of the current build will be shown  [STANDARD BEHAVIOUR]
- //$tlCfg->exec_cfg->show_history_all_builds = TRUE;
+@@ -168,5 +119,79 @@
+ // $tlCfg->req_spec_template->scope->type = 'file';
+ // $tlCfg->req_spec_template->scope->value = 'c:\usr\local\xampp-1.7.2\xampp\htdocs\head-20090909\item_templates\req_spec.txt';
  
--//$tlCfg->treemenu_type='JTREE';
--
- // $tlCfg->gui->custom_fields->types = array(100 => 'radio head');
- // $tlCfg->gui->custom_fields->possible_values_cfg = array('radio head' => 1);
- 
-@@ -140,4 +89,80 @@
- // ); 
- // 
- // $tlCfg->results['default_status'] = "not_run"; 
-+
 +// ----------------------------------------------------------------------------
 +/** [User Authentication] */                 
 +
@@ -203,20 +174,27 @@ index 698ec68..b505480 100644
 + * 'SILENT': same that FILE, but user will not receive message on screen.
 + */
 +//$tlCfg->config_check_warning_mode = "SILENT";
-+
+ 
  ?>
 diff --git a/install/sql/mysql/testlink_create_default_data.sql b/install/sql/mysql/testlink_create_default_data.sql
-index fd0b246..345cf1f 100644
+index a0da420..52038ac 100644
 --- a/install/sql/mysql/testlink_create_default_data.sql
 +++ b/install/sql/mysql/testlink_create_default_data.sql
-@@ -134,7 +134,7 @@ INSERT INTO `role_rights` (role_id,right_id) VALUES (9,16);
+@@ -154,7 +154,7 @@ INSERT INTO /*prefix*/role_rights (role_id,right_id) VALUES (9,27);
  # admin account 
  # SECURITY: change password after first login
- INSERT INTO `users` (login,password,role_id,email,first,last,locale,active)
--             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'en_GB',1);
-+             VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'zh_CN',1);
+ INSERT INTO /*prefix*/users (login,password,role_id,email,first,last,locale,active)
+-            VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'en_GB',1);
++            VALUES ('admin','21232f297a57a5a743894a0e4a801fc3', 8,'', 'Testlink', 'Administrator', 'zh_CN',1);
  
  # Assignment types
- INSERT INTO assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
+ INSERT INTO /*prefix*/assignment_types (id,fk_table,description) VALUES(1,'testplan_tcversions','testcase_execution');
+@@ -165,4 +165,4 @@ INSERT INTO /*prefix*/assignment_status (id,description) VALUES(1,'open');
+ INSERT INTO /*prefix*/assignment_status (id,description) VALUES(2,'closed');
+ INSERT INTO /*prefix*/assignment_status (id,description) VALUES(3,'completed');
+ INSERT INTO /*prefix*/assignment_status (id,description) VALUES(4,'todo_urgent');
+-INSERT INTO /*prefix*/assignment_status (id,description) VALUES(5,'todo');
+\ No newline at end of file
++INSERT INTO /*prefix*/assignment_status (id,description) VALUES(5,'todo');
 -- 
-tg: (4a1bc5f..) t/custom_config (depends on: master t/typos_no_last_eol)
+tg: (038dad9..) t/custom_config (depends on: t/typos_no_last_eol)

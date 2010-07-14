@@ -6,55 +6,43 @@ Subject: [PATCH] t/typos_no_last_eol
 Signed-off-by: Jiang <jiangxin@ossxp.com>
 
 ---
- config.inc.php                |    2 +-
  custom_config.inc.php.example |    2 +-
  index.php                     |    2 +-
  logout.php                    |    2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/config.inc.php b/config.inc.php
-index 331a77a..4f20a54 100644
---- a/config.inc.php
-+++ b/config.inc.php
-@@ -948,4 +948,4 @@ $tlCfg->gui->title_separator_2 =  $tlCfg->gui_title_separator_2;
- $tlCfg->gui->role_separator_open =  $tlCfg->gui_separator_open;
- $tlCfg->gui->role_separator_close = $tlCfg->gui_separator_close;
- // ----- END OF FILE --------------------------------------------------------------------
--?>
-\ No newline at end of file
-+?>
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index f9b9203..698ec68 100644
+index 18ba787..2abaac4 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
-@@ -140,4 +140,4 @@
- // ); 
- // 
- // $tlCfg->results['default_status'] = "not_run"; 
+@@ -169,4 +169,4 @@
+ // $tlCfg->req_spec_template->scope->value = 'c:\usr\local\xampp-1.7.2\xampp\htdocs\head-20090909\item_templates\req_spec.txt';
+ 
+ 
 -?>
 \ No newline at end of file
 +?>
 diff --git a/index.php b/index.php
-index e1526b3..0ed55ba 100644
+index 561d9ae..9590480 100644
 --- a/index.php
 +++ b/index.php
-@@ -33,4 +33,4 @@ $smarty->assign('title', lang_get('main_page_title'));
- $smarty->assign('titleframe', 'lib/general/navBar.php');
- $smarty->assign('mainframe', $reqURI);
- $smarty->display('main.tpl');
+@@ -44,4 +44,4 @@ function init_args()
+ 	
+ 	return $args;
+ }
 -?>
 \ No newline at end of file
 +?>
 diff --git a/logout.php b/logout.php
-index 5e4d739..7477012 100644
+index f386ef2..4c38572 100644
 --- a/logout.php
 +++ b/logout.php
-@@ -23,4 +23,4 @@ session_destroy();
- 
- redirect("login.php");
- exit();
+@@ -31,4 +31,4 @@ function init_args()
+ 	
+ 	return $args;
+ }
 -?>
 \ No newline at end of file
 +?>
 -- 
-tg: (f865ee3..) t/typos_no_last_eol (depends on: master)
+tg: (d05c095..) t/typos_no_last_eol (depends on: master)

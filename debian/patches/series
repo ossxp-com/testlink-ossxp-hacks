@@ -1,4 +1,3 @@
-t/bugfix_loale_cannot_save.diff -p1
 t/typos_no_last_eol.diff -p1
 t/bugtrac_integration.diff -p1
 t/custom_config.diff -p1
@@ -6,9 +5,8 @@ t/charts_in_chinese.diff -p1
 t/single_signon.diff -p1
 t/demo_login.diff -p1
 t/login_page_msg.diff -p1
-t/php5_thirdparty_smarty.diff -p1
-t/php5_thirdparty_xmlrpc.diff -p1
-t/php5_thirdparty_adodb.diff -p1
 t/php5_deprecated.diff -p1
+t/php5_thirdparty_xmlrpc.diff -p1
 t/tl_bugfix.diff -p1
 t/zh_cn_l10n.diff -p1
+t/zh_cn_l10n_additional.diff -p1
