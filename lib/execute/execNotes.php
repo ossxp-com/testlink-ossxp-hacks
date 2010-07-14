@@ -5,10 +5,12 @@
  *
  * Filename $RCSfile: execNotes.php,v $
  *
- * @version $Revision: 1.3.2.1 $
- * @modified $Date: 2009/09/01 18:56:54 $ by $Author: schlundus $
+ * @version $Revision: 1.6 $
+ * @modified $Date: 2009/09/04 19:22:37 $ by $Author: schlundus $
  *
  * Edit an execution note
+ *
+ * @ TODO schlundus. seems to be no longer used
  *
  * rev: 20080827 - franciscom - BUGID 1692
 **/
@@ -17,26 +19,26 @@ require_once('common.php');
 require_once('exec.inc.php');
 require_once("web_editor.php");
 
-$editorCfg=getWebEditorCfg('execution');
+$editorCfg = getWebEditorCfg('execution');
 require_once(require_web_editor($editorCfg['type']));
 
 testlinkInitPage($db);
-$templateCfg=templateConfiguration();
+$templateCfg = templateConfiguration();
 
-$args=init_args();
+$args = init_args();
 $owebeditor = web_editor('notes',$_SESSION['basehref'],$editorCfg);
 
 switch ($args->doAction)
 {
     case 'edit':
-    break;
+	    break;
         
     case 'doUpdate':
-    doUpdate($db,$args);
-    break;  
+	    doUpdate($db,$args);
+	    break;  
 }
 $map = get_execution($db,$args->exec_id);
-$owebeditor->Value=$map[0]['notes'];
+$owebeditor->Value = $map[0]['notes'];
 
 $smarty = new TLSmarty();
 $smarty->assign('notes',$owebeditor->CreateHTML());
@@ -54,9 +56,10 @@ $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 */
 function doUpdate(&$dbHandler,&$argsObj)
 {
-    $sql="UPDATE executions " .
-         "SET notes='".$dbHandler->prepare_string($argsObj->notes)."'" .
-         "WHERE id={$argsObj->exec_id}";
+    $tables = tlObjectWithDB::getDBTables('executions');
+    $sql = "UPDATE {$tables['executions']} " .
+           " SET notes='" . $dbHandler->prepare_string($argsObj->notes) . "' " .
+           " WHERE id={$argsObj->exec_id} ";
     $dbHandler->exec_query($sql);     
 }
 
@@ -71,12 +74,11 @@ function doUpdate(&$dbHandler,&$argsObj)
 */
 function init_args()
 {
-    $args = new stdClass();
-    $_REQUEST = strings_stripSlashes($_REQUEST);
-    
-    $args->notes=isset($_REQUEST['notes']) ? trim($_REQUEST['notes']) : null;
-    $args->exec_id=$_REQUEST['exec_id'];
-    $args->doAction=isset($_REQUEST['doAction']) ? $_REQUEST['doAction'] : 'show';
+    $iParams = array("exec_id" => array(tlInputParameter::INT_N),
+		             "doAction" => array(tlInputParameter::STRING_N,0,100),
+   		             "notes" => array(tlInputParameter::STRING_N));
+	$args = new stdClass();
+    R_PARAMS($iParams,$args);
     return $args; 
 }
 

@@ -1,76 +1,100 @@
 <?php
-/** TestLink Open Source Project - http://testlink.sourceforge.net/
+/** 
+ * TestLink Open Source Project - http://testlink.sourceforge.net/ 
+ * This script is distributed under the GNU General Public License 2 or later. 
  *
- * @filesource $RCSfile: exec_cfield_mgr.class.php,v $
- * @version $Revision: 1.4.2.1 $
- * @modified $Date: 2009/09/10 09:10:44 $ $Author: havlat $
- * @author jbarchibald
+ * Custom fields for Test execution 
  *
- * rev :
+ * @package 	TestLink
+ * @author 		jbarchibald
+ * @copyright 	2006, TestLink community 
+ * @version    	CVS: $Id: exec_cfield_mgr.class.php,v 1.14 2010/04/29 14:56:25 asimon83 Exp $
+ * @link 		http://www.teamst.org/index.php
+ *
+ * @internal Revisions:
+ *      20100316 - Julian - cosmetical changes for input field sizes of custom fields
+ *      20090514 - franciscom - localize label
  *      20071006 - franciscom - exec_cfield_mgr() interface change
  *                              get_linked_cfields() interface change
  *                              solved bug on get_linked_cfields() when
  *                              no custom field is assigned to test project
-*/
+ */
 
+/**
+ * custom fields for execution assignment
+ * @package 	TestLink
+ */
 class exec_cfield_mgr extends cfield_mgr
 {
 	var $db;
-  var $cf_map;
+    var $cf_map;
 
-	function exec_cfield_mgr(&$db,$tproject_id)
+	/**
+	 * Class constructor
+	 * 
+	 * @param resource &$db reference to the database handler
+	 * @param integer project identifier
+	 */
+	function __construct(&$db,$tproject_id)
 	{
         // you would think we could inherit the parent $db declaration
         // but it fails to work without this.
         $this->db = &$db;
 
         // instantiate the parent constructor.
-        parent::cfield_mgr($this->db);
+        parent::__construct($this->db);
 
         $this->cf_map = $this->get_linked_cfields($tproject_id);
 
 	}
 
-     /*
-      function: html_table_of_custom_field_inputs
-
-      args: -
-
-      returns: html string
-
-      notes: string_custom_field_input is being called from the parent class.
-
-    */
-    function html_table_of_custom_field_inputs($htmlInputSize=0)
+/**
+ * generate HTML of table rows for list of custom field imput
+ * 
+ * @param integer $htmlInputSize (optional) size of input field [chars]
+ * @return string HTML 
+ * @uses function string_custom_field_input() from the parent class.
+ */
+function html_table_of_custom_field_inputs($htmlInputSize=0)
+{
+    $cf_smarty = '';
+	$inputSize = 0;
+	
+	$custom_field_types_id=array_flip($this->custom_field_types);
+	
+    if( !is_null($this->cf_map) )
     {
-      $cf_smarty = '';
-
-      if( !is_null($this->cf_map) )
-      {
         foreach($this->cf_map as $cf_id => $cf_info)
         {
-          $label = $cf_info['label'];
-          $cf_smarty .= '<tr><td class="labelHolder">' . htmlspecialchars($label) . "</td><td>" .
-                        $this->string_custom_field_input($cf_info,'',$htmlInputSize) .
-                        "</td></tr>\n";
+			// special input size for list and multiselect list
+			if ($cf_info['type'] == $custom_field_types_id['list']) { 
+				$inputSize = 3; 
+			} else if ($cf_info['type'] == $custom_field_types_id['multiselection list']) {
+				$inputSize = 3;
+			} else { 
+				$inputSize = $htmlInputSize; 
+			}
+			
+            // true => do not create input in audit log
+            $label=str_replace(TL_LOCALIZE_TAG,'',lang_get($cf_info['label'],null,true));
+            $cf_smarty .= '<tr><td class="labelHolder">' . htmlspecialchars($label) . "</td><td>" .
+                          $this->string_custom_field_input($cf_info,'',$inputSize) . "</td></tr>\n";
         }
-      }
-
-      return($cf_smarty);
     }
+    
+    return($cf_smarty);
+}
 
-    /*
-      function: get_linked_cfields
-
-      args: tproject_id
-
-      returns: array
-
-      rev :
-           20080811 - franciscom - BUGID 1650 (REQ)
-           20071006 - franciscom - interface changed
-
-    */
+    /**
+     *      function: get_linked_cfields
+     * 
+     * @param integer $tproject_id
+     * @return array
+     * 
+     * @internal rev :
+     *      20080811 - franciscom - BUGID 1650 (REQ)
+     *      20071006 - franciscom - interface changed
+     */
     function get_linked_cfields($tproject_id)
     {
 
@@ -97,11 +121,18 @@ class exec_cfield_mgr extends cfield_mgr
             if ($value['type'] == $custom_field_types_id['date'] ) {
                 unset($cf[$key]);
             }
-
-            // Need to debug how this will work as well.. there is always something selected by default.
-            if ($value['type'] == $custom_field_types_id['list'] ) {
+			
+			if ($value['type'] == $custom_field_types_id['datetime'] ) {
                 unset($cf[$key]);
             }
+
+            // the following is commented out because the custom field lists 
+            // don't have something preselected anymore
+            //
+            // Need to debug how this will work as well.. there is always something selected by default.
+            // if ($value['type'] == $custom_field_types_id['list'] ) {
+                // unset($cf[$key]);
+            //}
         }
       } // if( !is_null($cf) and count($cf) > 0 )
       return($cf);
@@ -195,7 +226,9 @@ class exec_cfield_mgr extends cfield_mgr
             case 'float':
             case 'email':
             case 'string':
-                $cf_tmp = isset($_POST[$cf_name]) ? $_POST[$cf_name] : null;
+                // BUGID 3301 - replaced POST with REQUEST
+            	// $cf_tmp = isset($_POST[$cf_name]) ? $_POST[$cf_name] : null;
+                $cf_tmp = isset($_REQUEST[$cf_name]) ? $_REQUEST[$cf_name] : null;
 
                 if ($cf_tmp) {
                     $cf_selected[$id] = $cf_tmp;

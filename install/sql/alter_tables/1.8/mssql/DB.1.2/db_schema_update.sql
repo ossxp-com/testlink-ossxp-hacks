@@ -1,5 +1,5 @@
--- $Revision: 1.5.2.1 $
--- $Date: 2009/04/15 12:50:05 $
+-- $Revision: 1.6 $
+-- $Date: 2009/04/15 12:51:01 $
 -- $Author: havlat $
 -- $RCSfile: db_schema_update.sql,v $
 -- DB: MSSQL

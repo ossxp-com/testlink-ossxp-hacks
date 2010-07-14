@@ -1,7 +1,7 @@
 <?php
 /** 
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
- * $Id: charts.inc.php,v 1.1.2.2 2009/12/08 16:11:09 havlat Exp $ 
+ * $Id: charts.inc.php,v 1.3 2009/12/08 16:11:05 havlat Exp $ 
  *
  * @author	Francisco Mancardi - francisco.mancardi@gmail.com
  *
@@ -30,7 +30,7 @@ function createChart(&$info,&$cfg)
     $chartCfg->YSize=$info->canDraw ? $cfg->YSize : 50;                    
     
     $chartCfg->border = new stdClass();
-    $chartCfg->border->width = 2;
+    $chartCfg->border->width = 1;
     $chartCfg->border->color = array('R' => 0, 'G' => 0, 'B' => 0);
 
     $chartCfg->graphArea = new stdClass();

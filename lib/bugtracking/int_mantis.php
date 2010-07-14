@@ -4,14 +4,16 @@
  *
  * Filename $RCSfile: int_mantis.php,v $
  *
- * @version $Revision: 1.14 $
- * @modified $Date: 2008/05/24 14:20:14 $ $Author: franciscom $
+ * @version $Revision: 1.18 $
+ * @modified $Date: 2010/03/13 14:51:23 $ $Author: franciscom $
  *
  * @author Andreas Morsing
  *
  * Constants used throughout TestLink are defined within this file
  * they should be changed for your environment
  *
+ * 20100313 - franciscom - BUGID 3195
+ * 
  * 20080523 - franciscom - 
  * Contribution Peter Rooms - BUGID 1534 -
  * Bug coloring and labeling according status using same colors than Mantis.
@@ -43,24 +45,24 @@ class mantisInterface extends bugtrackingInterface
 	var $showBugURL = BUG_TRACK_HREF;
 	var $enterBugURL = BUG_TRACK_ENTER_BUG_HREF;
 
-  // Contribution 
-  // Copied from mantis configuration
-  //
-  private $code_status = array(10 => 'new',
-                               20 => 'feedback',
-                               30 => 'acknowledged',
-                               40 => 'confirmed',
-                               50 => 'assigned',
-                               80 => 'resolved',
-                               90 => 'closed');
+	// Contribution 
+	// Copied from mantis configuration
+	//
+  	private $code_status = array(10 => 'new',
+                                 20 => 'feedback',
+                                 30 => 'acknowledged',
+                                 40 => 'confirmed',
+                                 50 => 'assigned',
+                                 80 => 'resolved',
+                                 90 => 'closed');
                               
-  private $status_color = array('new'          => '#ffa0a0', # red,
-                                'feedback'     => '#ff50a8', # purple
-                                'acknowledged' => '#ffd850', # orange
-                                'confirmed'    => '#ffffb0', # yellow
-                                'assigned'     => '#c8c8ff', # blue
-                                'resolved'     => '#cceedd', # buish-green
-                                'closed'       => '#e8e8e8'); # light gray
+	private $status_color = array('new'          => '#ffa0a0', # red,
+                                  'feedback'     => '#ff50a8', # purple
+                                  'acknowledged' => '#ffd850', # orange
+                                  'confirmed'    => '#ffffb0', # yellow
+                                  'assigned'     => '#c8c8ff', # blue
+                                  'resolved'     => '#cceedd', # buish-green
+                                  'closed'       => '#e8e8e8'); # light gray
 	
 	/**
 	 * Return the URL to the bugtracking page for viewing 
@@ -84,25 +86,35 @@ class mantisInterface extends bugtrackingInterface
 	function getBugStatus($id)
 	{
 		if (!$this->isConnected())
+		{
 			return false;
-
-		$status = false;
+		}
 		
-		// 20070302 - {$this->dbName}.mantis_bug_table -> mantis_bug_table
-		// Problems with MS-SQL
+		$status = false;
 		$query = "SELECT status FROM mantis_bug_table WHERE id='" . $id."'";
 		
 		$result = $this->dbConnection->exec_query($query);
 		if ($result)
 		{
 			$status_rs = $this->dbConnection->fetch_array($result);
+			$status = null;
 			if ($status_rs)
 			{
-			  // 20080523 - franciscom - BUGID 1534
-				$status = $this->code_status[$status_rs['status']];
+				// BUGID 3195
+				if( isset($this->code_status[$status_rs['status']]) )
+				{
+			  		$status = $this->code_status[$status_rs['status']];
+			  	}
+			  	else
+			  	{
+			  		// give info to user on Event Viewer
+			  		$msg = lang_get('MANTIS_status_not_configured');
+			  		$msg = sprintf($msg,$status_rs['status']);
+			  		logWarningEvent($msg,"MANTIS INTEGRATION");
+			  		
+			  		$status = 'custom_undefined_on_tl';
+			  	}	
 			}	
-			else
-				$status = null;
 		}
 		return $status;
 		
@@ -134,8 +146,8 @@ class mantisInterface extends bugtrackingInterface
 			// 	$str = "<del>" . $id . "</del>";
 			// 	
 			// }
-      // 20080523 - franciscom - BUGID 1534
-      $status_i18n=lang_get('issue_status_' . $status);
+      		// 20080523 - franciscom - BUGID 1534
+     		$status_i18n = lang_get('issue_status_' . $status);
 			$str = "[" . $status_i18n . "] " . $id . "";	
 		}
 		return $str;
@@ -153,7 +165,6 @@ class mantisInterface extends bugtrackingInterface
 			return false;
 
 		$status = null;
-		// 20070302 - {$this->dbName}.mantis_bug_table -> mantis_bug_table
 		// Problems with MS-SQL
 		$query = "SELECT summary FROM mantis_bug_table WHERE id='" . $id."'";
 		
@@ -172,56 +183,34 @@ class mantisInterface extends bugtrackingInterface
 		return $summary;
 	}
 
-  /**
-	 * checks a bug id for validity  
-	 * 
-	 * @return bool returns true if the bugid has the right format, false else
-	 **/
-	function checkBugID($id)
-	{
-	  $status_ok=1;	
-	  $ereg_forbidden_chars='[a-zA-Z,$-+]';
- 		if (eregi($ereg_forbidden_chars, $id))
-		{
-			$status_ok=0;	
-		} 	
-    else 
-    {
-      $status_ok=(intval($id) > 0);	
-    }
-		return $status_ok;
-	}	
-
-  /**
+ 
+  	/**
 	 * checks is bug id is present on BTS
 	 * 
-	 * @return bool 
+	 * @return integer returns 1 if the bug with the given id exists 
 	 **/
 	function checkBugID_existence($id)
 	{
-	  $status_ok=0;	
-		$query = "SELECT status FROM mantis_bug_table WHERE id='" . $id."'";
+		$status_ok = 0;	
+		$query = "SELECT status FROM mantis_bug_table WHERE id='" . $id ."'";
 		$result = $this->dbConnection->exec_query($query);
-		if ($result && ($this->dbConnection->num_rows($result) == 1) )
+		if ($result && ($this->dbConnection->num_rows($result) == 1))
 		{
-      $status_ok=1;    
-    }
+      		$status_ok = 1;    
+    	}
 		return $status_ok;
 	}	
 	
 	// Contribution
-  function buildViewBugLink($bugID,$bWithSummary = false)
-  {
+	function buildViewBugLink($bugID,$bWithSummary = false)
+  	{
       $s = parent::buildViewBugLink($bugID, $bWithSummary);
-  
       $status = $this->getBugStatus($bugID);
-      $color = $this->status_color[$status];
-        
-      $title=lang_get('access_to_bts');  
+
+      // BUGID 3195
+      $color = isset($this->status_color[$status]) ? $this->status_color[$status] : 'white';
+      $title = lang_get('access_to_bts');  
       return "<div  title=\"{$title}\" style=\"display: inline; background: $color;\">$s</div>";
-  }
-
-
-
+  	}
 }
 ?>

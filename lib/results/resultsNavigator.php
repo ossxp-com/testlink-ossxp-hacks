@@ -2,47 +2,45 @@
 /** 
  * TestLink Open Source Project - http://testlink.sourceforge.net/ 
  * This script is distributed under the GNU General Public License 2 or later. 
- * @version $Id: resultsNavigator.php,v 1.50.2.3 2009/06/02 09:50:09 havlat Exp $ 
+ * @version $Id: resultsNavigator.php,v 1.61 2010/06/24 17:25:52 asimon83 Exp $ 
  * @author	Martin Havlat <havlat@users.sourceforge.net>
  * 
  * Scope: Launcher for Test Results and Metrics.
  *
  * rev :
- *      20071109,11 - havlatm - move data to config + refactorization; removed obsolete build list
- * 							 move functions into class  
- *      20070930 - franciscom - 
- *      20070916 - franciscom - added logic to choose test plan
- *      20070826 - franciscom - disable resultsImport
+ *  20100616 - eloff - BUGID 3255 - Fix bug interface check
+ *  20100410 - franciscom - BUGID 3370
+ *  20071109,11 - havlatm - move data to config + refactorization;
+                            removed obsolete build list, move functions into class
+ *  20070930 - franciscom -
+ *  20070916 - franciscom - added logic to choose test plan
+ *  20070826 - franciscom - disable resultsImport
  * 
  **/
- 
- 
 require('../../config.inc.php');
 require_once('common.php');
 require_once('reports.class.php');
-testlinkInitPage($db);
-tLog('resultsNavigator.php called');
+testlinkInitPage($db,true,false,"checkRights");
 
 $templateCfg = templateConfiguration();
 
+$args = init_args();
 $gui = new stdClass();
 $gui->workframe = $_SESSION['basehref'] . "lib/general/staticPage.php?key=showMetrics";
-
 $gui->do_report = array('status_ok' => 1, 'msg' => '');
-$selectedReportType = null;
+$gui->tplan_id = $args->tplan_id;
+$gui->checked_show_inactive_tplans = $args->checked_show_inactive_tplans;
 
-$tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
-$gui->tplan_id = isset($_REQUEST['tplan_id']) ? $_REQUEST['tplan_id'] : $_SESSION['testPlanId'];
-$btsEnabled = config_get('bugInterfaceOn');
+$btsEnabled = config_get('interface_bugs') != 'NO';
 
 $tplan_mgr = new testplan($db);
-$reports_magic = new tlReports($db, $gui->tplan_id);
+$reports_mgr = new tlReports($db, $gui->tplan_id);
 
 // -----------------------------------------------------------------------------
 // Do some checks to understand if reports make sense
 
 // Check if there are linked test cases to the choosen test plan.
-$tc4tp_count = $reports_magic->get_count_testcase4testplan();
+$tc4tp_count = $reports_mgr->get_count_testcase4testplan();
 tLog('TC in TP count = ' . $tc4tp_count);
 if( $tc4tp_count == 0)
 {
@@ -52,7 +50,7 @@ if( $tc4tp_count == 0)
 }
 
 // Build qty
-$build_count = $reports_magic->get_count_builds();
+$build_count = $reports_mgr->get_count_builds();
 tLog('Active Builds count = ' . $build_count);
 if( $build_count == 0)
 {
@@ -67,27 +65,64 @@ $gui->menuItems = array();
 $gui->tplans = array();
 if($gui->do_report['status_ok'])
 {
-  	if (isset($_GET['format']))
-  	{
-		    $selectedReportType = intval($_GET['format']);
-		}    
-  	else
-  	{
-		    $selectedReportType = sizeof($tlCfg->reports_formats) ? key($tlCfg->reports_formats) : null;
-    }
-    
-  	// create a list or reports
-	  $gui->menuItems = $reports_magic->get_list_reports($btsEnabled,$_SESSION['testprojectOptReqs'], 
-		                                                   $tlCfg->reports_formats[$selectedReportType]);
-
+	// create a list or reports
+	$gui->menuItems = $reports_mgr->get_list_reports($btsEnabled,$args->optReqs, 
+	                                                 $tlCfg->reports_formats[$args->format]);
 }
 
-$gui->tplans = $tplan_mgr->getTestPlanNamesById($tproject_id,FALSE);
+// BUGID 3370
+// get All test Plans for combobox
+$gui->tplans = $tplan_mgr->getTestPlanNamesById($args->tproject_id,$args->show_only_active_tplans);
 
 
 $smarty = new TLSmarty();
 $smarty->assign('gui', $gui);
 $smarty->assign('arrReportTypes', localize_array($tlCfg->reports_formats));
-$smarty->assign('selectedReportType', $selectedReportType);
+$smarty->assign('selectedReportType', $args->format);
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
+
+/**
+ * 
+ *
+ */
+function init_args()
+{
+	// BUGID 3370
+	$iParams = array("format" => array(tlInputParameter::INT_N),
+					 "tplan_id" => array(tlInputParameter::INT_N),
+					 "show_inactive_tplans" => array(tlInputParameter::CB_BOOL));
+	$args = new stdClass();
+	R_PARAMS($iParams,$args);
+	
+	if (is_null($args->format))
+	{
+		$reports_formats = config_get('reports_formats');
+		$args->format = sizeof($reports_formats) ? key($reports_formats) : null;
+	}
+	
+	if (is_null($args->tplan_id))
+	{
+		$args->tplan_id = $_SESSION['testplanID'];
+	}
+	
+	$_SESSION['resultsNavigator_testplanID'] = $args->tplan_id;
+	$_SESSION['resultsNavigator_format'] = $args->format;
+	
+	$args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
+   	$args->userID = $_SESSION['userID'];
+    $args->optReqs = $_SESSION['testprojectOptions']->requirementsEnabled;
+    $args->checked_show_inactive_tplans = $args->show_inactive_tplans ? 'checked="checked"' : 0;
+    $args->show_only_active_tplans = !$args->show_inactive_tplans;
+    
+    return $args;
+}
+
+/**
+ * 
+ *
+ */
+function checkRights(&$db,&$user)
+{
+	return $user->hasRight($db,'testplan_metrics');
+}
 ?>
