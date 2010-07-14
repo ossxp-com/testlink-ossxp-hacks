@@ -1,5 +1,5 @@
--- $Revision: 1.9.2.2 $
--- $Date: 2009/08/30 00:56:03 $
+-- $Revision: 1.12 $
+-- $Date: 2009/08/30 00:56:06 $
 -- $Author: havlat $
 -- $RCSfile: db_schema_update.sql,v $
 -- DB: Postgres

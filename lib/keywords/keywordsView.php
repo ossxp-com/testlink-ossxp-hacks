@@ -5,14 +5,13 @@
  *
  * Filename $RCSfile: keywordsView.php,v $
  *
- * @version $Revision: 1.27 $
- * @modified $Date: 2009/01/26 19:16:42 $ by $Author: schlundus $
+ * @version $Revision: 1.30 $
+ * @modified $Date: 2009/08/24 19:18:45 $ by $Author: schlundus $
  *
  * allows users to manage keywords. 
  */
 require_once("../../config.inc.php");
 require_once("common.php");
-require_once("keyword.class.php");
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
@@ -28,14 +27,9 @@ $smarty->assign('keywords', $keywords);
 $smarty->assign('canManage',has_rights($db,"mgt_modify_key"));
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
-/*
-  function: init_args
-
-  args:
-  
-  returns: 
-
-*/
+/**
+ * @return object returns the arguments for the page
+ */
 function init_args()
 {
 	$args = new stdClass();
@@ -44,6 +38,12 @@ function init_args()
 	return $args;
 }
 
+/**
+ * @param $db resource the database connection handle
+ * @param $user the current active user
+ * 
+ * @return boolean returns true if the page can be accessed
+ */
 function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'mgt_view_key');
