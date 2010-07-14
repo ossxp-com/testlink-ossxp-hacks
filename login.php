@@ -106,17 +106,6 @@ switch($login_switch)
 		 break;
 }
 
-// BUGID 0003129
-if( $doRender )
-{
-	$logPeriodToDelete = config_get('removeEventsOlderThan');
-	$g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
-	
-	$smarty = new TLSmarty();
-	$smarty->assign('gui', $gui);
-	$smarty->display($templateCfg->default_template);
-}
-
 // cosign v2
 if (strtolower($tlCfg->authentication['method']) == 'cosign')
 {
@@ -133,6 +122,16 @@ elseif (strtolower($tlCfg->authentication['method']) == 'cosign3')
 $logPeriodToDelete = config_get('removeEventsOlderThan');
 $g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
 
+// BUGID 0003129
+if( $doRender )
+{
+	$logPeriodToDelete = config_get('removeEventsOlderThan');
+	$g_tlLogger->deleteEventsFor(null, strtotime("-{$logPeriodToDelete} days UTC"));
+	
+	$smarty = new TLSmarty();
+	$smarty->assign('gui', $gui);
+	$smarty->display($templateCfg->default_template);
+}
 
 /**
  * Single Sign-on redirect
