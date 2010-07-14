@@ -1,18 +1,25 @@
 {*
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: project_req_spec_mgmt.tpl,v 1.11 2009/01/03 17:30:13 franciscom Exp $
+$Id: project_req_spec_mgmt.tpl,v 1.15 2010/02/20 14:08:06 franciscom Exp $
 
 rev: 20080415 - franciscom - refactoring
 *}
 {* ------------------------------------------------------------------------- *}
 
-{lang_get var="labels" s="btn_reorder_req_spec,btn_new_req_spec"}
+{lang_get var="labels" s="btn_reorder_req_spec,btn_new_req_spec,btn_import,btn_export_all_reqspec"}
 {assign var="req_module" value='lib/requirements/'}
 {assign var="url_args" value="reqSpecEdit.php?doAction=create&amp;tproject_id="}
 {assign var="req_spec_new_url" value="$basehref$req_module$url_args"}
 
 {assign var="url_args" value="reqSpecEdit.php?doAction=reorder&amp;tproject_id="}
 {assign var="req_spec_reorder_url" value="$basehref$req_module$url_args}
+
+{assign var="url_args" value="reqExport.php?scope=tree&tproject_id="}
+{assign var="req_export_url"  value="$basehref$req_module$url_args"}
+
+{assign var="url_args" value="reqImport.php?scope=tree&tproject_id="}
+{assign var="req_import_url"  value="$basehref$req_module$url_args"}
+
 
 {include file="inc_head.tpl"}
 
@@ -26,11 +33,13 @@ rev: 20080415 - franciscom - refactoring
 			       value="{$labels.btn_new_req_spec}"
 			       onclick="location='{$req_spec_new_url}{$gui->tproject_id}'" />
 
-      {if $tlCfg->treemenu_type != 'EXTJS'}
-		  <input type="button" id="reorder_req_spec" name="reorder_req_spec"
-		         value="{$labels.btn_reorder_req_spec}"
-		         onclick="location='{$req_spec_reorder_url}{$gui->tproject_id}'" />
-		  {/if}       
+			<input type="button" id="export_all" name="export_all"
+			       value="{$labels.btn_export_all_reqspec}"
+			       onclick="location='{$req_export_url}{$gui->tproject_id}'" />
+
+			<input type="button" id="import_all" name="import_all"
+			       value="{$labels.btn_import}"
+			       onclick="location='{$req_import_url}{$gui->tproject_id}'" />
 		</form>
 	</div>
 </div>

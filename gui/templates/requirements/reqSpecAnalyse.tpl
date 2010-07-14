@@ -1,5 +1,5 @@
 {* TestLink Open Source Project - http://testlink.sourceforge.net/ *}
-{* $Id: reqSpecAnalyse.tpl,v 1.8.2.1 2009/08/31 20:30:29 schlundus Exp $ *}
+{* $Id: reqSpecAnalyse.tpl,v 1.12 2010/03/11 21:18:23 franciscom Exp $ *}
 {* Purpose: smarty template - Analyse REQ coverage *}
 
 {lang_get var="labels"
@@ -17,7 +17,7 @@
 
 <h1 class="title">
 	{$labels.req_title_analyse}{$smarty.const.TITLE_SEP}{$reqSpec[$selectedReqSpec]|escape}
-	{include file="inc_help.tpl" helptopic="hlp_requirementsCoverage"}
+	{include file="inc_help.tpl" helptopic="hlp_requirementsCoverage" show_help_icon=true}
 </h1>
 
 
@@ -34,12 +34,12 @@
 
 {* METRICS *}
 <table class="invisible">
-<tr><td>{$labels.req_total_count}</td><td>{$metrics.expectedTotal}</td></tr>
-<tr><td>{$labels.req_title_in_tl}</td><td>{$metrics.total}</td></tr>
-<tr><td>{$labels.req_title_covered}</td><td>{$metrics.covered}</td></tr>
-<tr><td>{$labels.req_title_uncovered}</td><td>{$metrics.total-$metrics.notTestable-$metrics.covered}</td></tr>
-<tr><td>{$labels.req_title_not_in_tl}</td><td>{$metrics.uncovered}</td></tr>
-<tr><td>{$labels.req_title_nottestable}</td><td>{$metrics.notTestable}</td></tr>
+<tr><td>{$labels.req_total_count}</td><td align="right">{$metrics.expectedTotal}</td></tr>
+<tr><td>{$labels.req_title_in_tl}</td><td align="right">{$metrics.total}</td></tr>
+<tr><td>{$labels.req_title_covered}</td><td align="right">{$metrics.covered}</td></tr>
+<tr><td>{$labels.req_title_uncovered}</td><td align="right">{$metrics.total-$metrics.notTestable-$metrics.covered}</td></tr>
+<tr><td>{$labels.req_title_not_in_tl}</td><td align="right">{$metrics.uncovered}</td></tr>
+<tr><td>{$labels.req_title_nottestable}</td><td align="right">{$metrics.notTestable}</td></tr>
 </table>
 
 </div>

@@ -1,9 +1,13 @@
 {*
 Testlink Open Source Project - http://testlink.sourceforge.net/
-$Id: inc_head.tpl,v 1.26.2.1 2009/06/29 10:45:26 havlat Exp $
+$Id: inc_head.tpl,v 1.35 2010/06/24 17:25:52 asimon83 Exp $
 Purpose: smarty template - HTML Common Header
 
 rev :
+     20100212 - eloff - BUGID 3103 - remove js-timeout alert in favor of BUGID 3088
+     20090801 - franciscom - moved include of prototype.js here because
+                             is not anymore included on EXT-JS distribution
+                             
      20080326 - franciscom - restored $testproject_coloring logic
      20080109 - franciscom - added sort table engine management
      20071201 - franciscom - tinymce support
@@ -34,16 +38,13 @@ rev :
 {* ----- load javascripts libraries -------------------------------------------------- *} 
 	<script type="text/javascript" src="{$basehref}gui/javascript/testlink_library.js" language="javascript"></script>
 	<script type="text/javascript" src="{$basehref}gui/javascript/test_automation.js" language="javascript"></script>
-	
+	<script type="text/javascript" src="{$basehref}third_party/prototype/prototype.js" language="javascript"></script>
 	{if $jsValidate == "yes"} 
 	<script type="text/javascript" src="{$basehref}gui/javascript/validate.js" language="javascript"></script>
     {include file="inc_jsCfieldsValidation.tpl"}
 	{/if}
    
-	{if $jsTree == "yes"} {* 'no' is default defined in config *}
-   	{include file="inc_jsTree.tpl"}
-	{/if}
-
+	
 	{if $editorType == 'tinymce'}
     <script type="text/javascript" language="javascript"
     	src="{$basehref}third_party/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
@@ -56,9 +57,11 @@ rev :
 	{/if}
 
 	<script type="text/javascript" language="javascript">
+	<!--
 	var fRoot = '{$basehref}';
 	var menuUrl = '{$menuUrl}';
 	var args  = '{$args}';
+	var additionalArgs  = '{$additionalArgs}';
 	
 	// To solve problem diplaying help
 	var SP_html_help_file  = '{$SP_html_help_file}';
@@ -70,8 +73,12 @@ rev :
 	
 	// bug management (using logic similar to attachment)
 	var bug_dialog = new bug_dialog();
-	</script> 
+
+	// for ext js
+	var extjsLocation = '{$smarty.const.TL_EXTJS_RELATIVE_PATH}';
 	
+	//-->
+	</script> 
 {if $openHead == "no"} {* 'no' is default defined in config *}
 </head>
 {/if}

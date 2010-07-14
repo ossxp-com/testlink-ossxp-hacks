@@ -1,8 +1,8 @@
 /* 
-$Revision: 1.2.8.1 $
-$Date: 2009/05/25 18:39:04 $
-$Author: schlundus $
-$Name: testlink_1_8_5b $
+$Revision: 1.2 $
+$Date: 2005/10/14 06:44:46 $
+$Author: franciscom $
+$Name:  $
 
 20051013 - fm - added Test Plan info in build name
 Migration from 1.5.x to 1.6 POST RC1 - 20050925 - fm
