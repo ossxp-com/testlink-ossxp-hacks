@@ -5,41 +5,45 @@
  *
  * Filename $RCSfile: tcExport.php,v $
  *
- * @version $Revision: 1.4 $
- * @modified $Date: 2009/01/06 15:34:06 $ by $Author: franciscom $
+ * @version $Revision: 1.14 $
+ * @modified $Date: 2010/03/15 22:21:20 $ by $Author: franciscom $
  *
  * Scope: test case and test suites export
  * 
  * Revisions:
- * 20081027 - martin - cleanup
- * 20070113 - franciscom - added logic to create messagexportDataToXMLexportDataToXMLe when there is 
- *                         nothing to export.
  *
- * 20061118 - franciscom - using different file name, depending the
- *                         type of exported elements.
+ * 20100315 - franciscom - improvements on goback management
+ * 20100315 - amitkhullar - Added checkboxes options for Requirements and CFields for Export.
+ * 20081027 - martin - cleanup
+ * 20070113 - franciscom - added logic to create message when there is nothing to export.
+ *
+ * 20061118 - franciscom - using different file name, depending type of exported elements.
  *
  * ----------------------------------------------------------------------------------- */
 /** @TODO martin: csv export is not available now - get it back */
 
 require_once("../../config.inc.php");
 require_once("../functions/common.php");
+require_once("../functions/xml.inc.php");
 testlinkInitPage($db);
 $templateCfg = templateConfiguration();
 
 $tree_mgr = new tree($db);
 $args = init_args();
+
 $gui = new stdClass();
 $gui->do_it = 1;
 $gui->nothing_todo_msg = '';
 $gui->export_filename = '';
 $gui->page_title = '';
 $gui->object_name='';
+$gui->goback_url = !is_null($args->goback_url) ? $args->goback_url : ''; 
 
 $exporting_just_one_tc = 0;
 $node_id = $args->container_id;
 $check_children = 0;
 
-if($args->bRecursive)
+if($args->useRecursion)
 {
 	// Exporting situations:
 	// All test suites in test project
@@ -85,29 +89,32 @@ if( $check_children )
 	                                  array("testplan" => "exclude_me",
 	                                        "requirement_spec" => "exclude_me",
 	                                        "requirement" => "exclude_me"));	
+	
+	$gui->nothing_todo_msg='';
 	if(count($children)==0)
+	{
 		$gui->do_it = 0 ;
-	else
-		$gui->nothing_todo_msg='';
+	}
 }
-$node = $tree_mgr->get_node_hierachy_info($node_id);
+$node = $tree_mgr->get_node_hierarchy_info($node_id);
 
 
-if ($args->bExport)
+if ($args->doExport)
 {
 	$tcase_mgr = new testcase($db);
 	$tsuite_mgr = new testsuite($db);
 	
-	$optExport = array('KEYWORDS' => $args->bKeywords,'RECURSIVE' => $args->bRecursive);
-	
+	$optExport = array('REQS' => $args->exportReqs, 'CFIELDS' => $args->exportCFields,
+	                   'KEYWORDS' => $args->exportKeywords, 'RECURSIVE' => $args->useRecursion);
 	$pfn = null;
 	switch($args->exportType)
 	{
 		case 'XML':
+		    $pfn = 'exportTestSuiteDataToXML';
 			if ($exporting_just_one_tc)
+			{
 				$pfn = 'exportTestCaseDataToXML';
-			else
-				$pfn = 'exportTestSuiteDataToXML';				
+			}
 			break;
 	}
 	if ($pfn)
@@ -128,7 +135,7 @@ if ($args->bExport)
 	}
 }
 
-if( $args->bRecursive )
+if( $args->useRecursion )
 {
   // we are working on a testsuite
   $obj_mgr = new testsuite($db);
@@ -143,7 +150,7 @@ $gui->exportTypes=$obj_mgr->get_export_file_types();
 $gui->tproject_name=$args->tproject_name;
 $gui->tproject_id=$args->tproject_id;
 $gui->tcID=$args->tcase_id; 
-$gui->bRecursive=$args->bRecursive ? 1 : 0;
+$gui->useRecursion=$args->useRecursion ? 1 : 0;
 $gui->tcVersionID=$args->tcversion_id;
 $gui->containerID=$args->container_id;
 
@@ -165,16 +172,21 @@ function init_args()
     $_REQUEST = strings_stripSlashes($_REQUEST);
     
     $args = new stdClass();
-    $args->bExport = isset($_REQUEST['export']) ? $_REQUEST['export'] : null;
-    $args->bKeywords = isset($_REQUEST['bKeywords']) ? 1 : 0;
+    $args->doExport = isset($_REQUEST['export']) ? $_REQUEST['export'] : null;
+    $args->exportReqs = isset($_REQUEST['exportReqs']) ? 1 : 0;
+    $args->exportCFields = isset($_REQUEST['exportCFields']) ? 1 : 0;
+    $args->exportKeywords = isset($_REQUEST['exportKeywords']) ? 1 : 0;
     $args->exportType = isset($_REQUEST['exportType']) ? $_REQUEST['exportType'] : null;
     $args->tcase_id = isset($_REQUEST['testcase_id']) ? intval($_REQUEST['testcase_id']) : 0;
     $args->tcversion_id = isset($_REQUEST['tcversion_id']) ? intval($_REQUEST['tcversion_id']) : 0;
     $args->container_id = isset($_REQUEST['containerID']) ? intval($_REQUEST['containerID']) : 0;
-    $args->bRecursive = isset($_REQUEST['bRecursive']) ? $_REQUEST['bRecursive'] : false;
+    $args->useRecursion = isset($_REQUEST['useRecursion']) ? $_REQUEST['useRecursion'] : false;
     $args->tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
     $args->tproject_name = $_SESSION['testprojectName'];
     $args->export_filename=isset($_REQUEST['export_filename']) ? $_REQUEST['export_filename'] : null;
+
+	// 20100315 - franciscom
+    $args->goback_url=isset($_REQUEST['goback_url']) ? $_REQUEST['goback_url'] : null;
 
     return $args;
 }

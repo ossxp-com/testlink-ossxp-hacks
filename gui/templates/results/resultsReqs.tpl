@@ -1,19 +1,20 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/
-$Id: resultsReqs.tpl,v 1.13.2.5 2009/09/05 18:23:29 schlundus Exp $
+$Id: resultsReqs.tpl,v 1.18 2010/05/02 09:38:10 franciscom Exp $
 Purpose: report REQ coverage 
 Author : Martin Havlat 
 
-    20090702 - amitkhullar - BUGID 2687
-rev: 20090402 - amitkhullar - added TC version while displaying the Req -> TC Mapping 
-rev: 20090305 - franciscom - added test case path on displayy
-     20090114 - franciscom - BUGID 1977
-     20090111 - franciscom - BUGID 1967 + Refactoring
+rev: 
+    20100311 - franciscom - BUGID 3267
+    20090402 - amitkhullar - added TC version while displaying the Req -> TC Mapping 
+    20090305 - franciscom - added test case path on displayy
+    20090114 - franciscom - BUGID 1977
+    20090111 - franciscom - BUGID 1967 + Refactoring
 *}
 {lang_get var='labels'
           s='title_result_req_testplan,no_srs_defined,req_spec,req_total_count,req_title_in_tl,testcase,th_version,
              req_without_tcase,
-             req_title_covered,req_title_uncovered,req,req_title_not_in_tl,req_title_nottestable,none'}
+             req_title_covered,req_title_uncovered,req,req_title_not_in_tl,req_title_nottestable,none,req_doc_id'}
 
 {* Configure Actions *}
 {assign var="reqViewAction" value="lib/requirements/reqView.php?item=requirement&requirement_id="}
@@ -32,28 +33,30 @@ rev: 20090305 - franciscom - added test case path on displayy
 {include file="inc_result_tproject_tplan.tpl" 
          arg_tproject_name=$gui->tproject_name arg_tplan_name=$gui->tplan_name}	
 
-{if $gui->reqSpecSet == '' }
+{if $gui->reqSpecSet == ''}
 <br />
   <div class="user_feedback">{$labels.no_srs_defined}</div>
 {/if}
 
 
-{if $gui->reqSpecSet != '' }
+{if $gui->reqSpecSet != ''}
   <form method="get">
   <table class="invisible">
-    <tr><td>{$labels.req_spec}
-      	<select name="req_spec_id" onchange="form.submit()">
-  		{html_options options=$gui->reqSpecSet selected=$gui->req_spec_id}
-  	</select></td></tr>
-	<input type="hidden" id="tplan_id" name="tplan_id" value="{$gui->tplan_id}" />
+    <tr>
+    	<td>{$labels.req_spec}
+      		<select name="req_spec_id" onchange="form.submit()">
+  				{html_options options=$gui->reqSpecSet selected=$gui->req_spec_id}
+  			</select>
+  		</td>
+  	</tr>
     <tr><td>&nbsp;</td></tr>
-    <tr><td>{$labels.req_total_count}</td><td>{$gui->metrics.expectedTotal}</td></tr>
-    <tr><td>{$labels.req_title_in_tl}</td><td>{$gui->metrics.total}</td></tr>
-    <tr><td>{$labels.req_title_covered}</td><td>{$gui->metrics.covered}</td></tr>
-    <tr><td>{$labels.req_title_uncovered}</td><td>{$metrics.total-$metrics.notTestable-$metrics.covered}</td></tr>
-    <tr><td>{$labels.req_title_not_in_tl}</td><td>{$gui->metrics.uncovered}</td></tr>
-    <tr><td>{$labels.req_title_nottestable}</td><td>{$gui->metrics.notTestable}</td></tr>
-    </table>
+    <tr><td>{$labels.req_total_count}</td><td align="right">{$gui->metrics.expectedTotal}</td></tr>
+    <tr><td>{$labels.req_title_in_tl}</td><td align="right">{$gui->metrics.total}</td></tr>
+    <tr><td>{$labels.req_title_covered}</td><td align="right">{$gui->metrics.covered}</td></tr>
+    <tr><td>{$labels.req_title_uncovered}</td><td align="right">{$gui->metrics.total-$gui->metrics.notTestable-$gui->metrics.covered}</td></tr>
+    <tr><td>{$labels.req_title_not_in_tl}</td><td align="right">{$gui->metrics.uncovered}</td></tr>
+    <tr><td>{$labels.req_title_nottestable}</td><td align="right">{$gui->metrics.notTestable}</td></tr>
+  </table>
   </form>  
 </div>
 {* --------------------------------------------------------------------------------------------------- *}  
@@ -68,11 +71,13 @@ rev: 20090305 - franciscom - added test case path on displayy
     {if $smarty.section.row.first}
     <table class="simple">
     	<tr>
+    		<th>{$labels.req_doc_id}</th>
     		<th>{$labels.req}</th>
     		<th>{$labels.testcase}</th>
     	</tr>
     {/if}
     	<tr>
+    		<td>{$gui->coverage.$key[row].req_doc_id|escape}</td>
     		<td><span class="bold"><a href="{$reqViewAction}{$gui->coverage.$key[row].id}">
     			  {$gui->coverage.$key[row].title|escape}</a></span></td>
     		<td>{assign var=tcList value=$gui->coverage.$key[row].tcList}
@@ -98,10 +103,12 @@ rev: 20090305 - franciscom - added test case path on displayy
     {if $gui->withoutTestCase != ''}
        <table class="simple">
        	<tr>
+       		<th>{$labels.req_doc_id}</th>
        		<th>{$labels.req}</th>
        	</tr>
          {foreach item=reqnotest from=$gui->withoutTestCase}
          	<tr>
+         		<td>{$reqnotest.req_doc_id|escape}</td>
          		<td><span class="bold"><a href="{$reqViewAction}{$reqnotest.id}">
          			  {$reqnotest.title|escape}</a></span></td>
          	</tr>
