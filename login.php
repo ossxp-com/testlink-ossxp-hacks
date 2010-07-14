@@ -229,6 +229,7 @@ function init_args()
 		             "req" => array(tlInputParameter::STRING_N,0,4000),
 		             "reqURI" => array(tlInputParameter::STRING_N,0,4000),
 		             "action" => array(tlInputParameter::STRING_N,0, 10),
+		             "sso" => array(tlInputParameter::STRING_N,0, 10),
 		             "demo" => array(tlInputParameter::STRING_N,0, 32),
 	);
 	$pParams = R_PARAMS($iParams);
@@ -240,6 +241,7 @@ function init_args()
     $args->reqURI = urlencode($pParams['req']);
     $args->preqURI = urlencode($pParams['reqURI']);
     $args->demo = urlencode($pParams['demo']);
+    $args->sso = urlencode($pParams['sso']);
 
 	if ($pParams['action'] == 'ajaxcheck' || $pParams['action'] == 'ajaxlogin') {
 		$args->action = $pParams['action'];
