@@ -62,6 +62,7 @@ $TLS_error = "Error";
 $TLS_export = "Export";
 $TLS_file_type = '文件类型';
 $TLS_filter_mode_and = 'Attention: Filter fields works in AND mode';
+$TLS_goto_testspec = 'Open test case specification';
 $TLS_help = "帮助";
 $TLS_hour = "小时";
 $TLS_importance	= "重要";
@@ -2572,6 +2573,9 @@ $TLS_API_NO_TESTPROJECTID = "未提供测试项目id。";
 $TLS_API_NO_TESTSUITEID = "未提供测试套件id。";
 $TLS_API_NO_TPID = "未提供测试计划 ID (testplanid).";
 $TLS_API_NO_TCID = "未提供测试用例 ID (testcaseid).";
+$TLS_API_NO_PLATFORMID = "No Platform ID (platformid) provided.";
+
+
 $TLS_API_INVALID_TCASEID= "提供的测试用例 ID (testcaseid) 不存在!";
 $TLS_API_INVALID_BUILDID = "提供的构建 ID (buildid) 不存在!";
 $TLS_API_INVALID_TPLANID = "提供的测试计划 ID (%s) 不存在!";
@@ -2643,6 +2647,17 @@ $TLS_API_TESTPLAN_HAS_NO_PLATFORMS = "Test plan (name:%s) has no platforms linke
 $TLS_API_TCASEID_NOT_IN_TPLANID_FOR_PLATFORM = "Test Case (name=%s/id=%s) is not associated with " .
                                                "Test Plan (name=%s/id=%s) for Platform (name=%s/id=%s).";
 
+
+$TLS_API_MISSING_PLATFORMID_BUT_NEEDED = 'Because Test Plan (name=%s/id=%s) has linked Platforms, operation requested ' .
+                                         'needs platformid';
+
+$TLS_API_PLATFORM_ID_NOT_LINKED_TO_TESTPLAN = "Platform ID %s is not linked to test plan (name:%s).";
+
+$TLS_API_LINKED_FEATURE_ALREADY_EXISTS = "Test Case version is already linked to " .
+                                         "Test Plan (name=%s/id=%s) for Platform (name=%s/id=%s).";
+
+$TLS_API_OTHER_VERSION_IS_ALREADY_LINKED = " Test Case version number %s <> %s (requested version) , " .
+                                           " is already linked to Test Plan (name=%s/id=%s).";
 
 // ----- audit log entries -----
 $TLS_audit_login_succeeded = "从 '{%2}' 登录 '{%1}' from '{%2}' 成功";
@@ -2867,5 +2882,6 @@ $TLS_import_done = 'Import done';
 $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
 $TLS_import_req_exists_here = 'Doc ID exists';
 
+$TLS_invalid_release_date = 'Release date is not a valid date';
 // ----- END ------------------------------------------------------------------
 ?>
