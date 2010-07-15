@@ -1,1 +1,2 @@
 t/php5_deprecated
+t/htmlentities_on_utf8
