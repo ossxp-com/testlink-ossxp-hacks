@@ -654,7 +654,7 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
       foreach($value['name'] as $jdx => $elem)
       {
       	$str .= "<a href=\"javascript:openTestSuiteWindow(" . $value['node_id'][$jdx] . ")\"> ";
-      	$str .= htmlentities($elem) . '</a>/';
+      	$str .= string_html_entities($elem) . '</a>/';
       }
       $tsuite_info[$key]['tsuite_name']=$str;  
   }
