@@ -145,7 +145,7 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_publi
 	                     $serOptions . "','" .
 		                 $this->db->prepare_string($notes) . "'," .
 		                 $active . "," . $is_public . ",'" .
-		                 $this->db->prepare_string($tcprefix) . "','";
+		                 $this->db->prepare_string($tcprefix) . "','" .
 		                 $this->db->prepare_string($btsProjectId) . "')";
 	$result = $this->db->exec_query($sql);
 
