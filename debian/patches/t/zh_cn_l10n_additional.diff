@@ -6,18 +6,21 @@ Subject: [PATCH] t/zh_cn_l10n_additional
 Signed-off-by: Jiang <jiangxin@ossxp.com>
 
 ---
- locale/en_GB/strings.txt |    5 +++++
- locale/zh_CN/strings.txt |    5 +++++
- 2 files changed, 10 insertions(+), 0 deletions(-)
+ locale/en_GB/strings.txt |    8 ++++++++
+ locale/zh_CN/strings.txt |    8 ++++++++
+ 2 files changed, 16 insertions(+), 0 deletions(-)
 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 8482ab0..7c2022b 100644
+index 8482ab0..34a5484 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
-@@ -2907,5 +2907,10 @@ $TLS_import_done = 'Import done';
+@@ -2907,5 +2907,13 @@ $TLS_import_done = 'Import done';
  $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
  $TLS_import_req_exists_here = 'Doc ID exists';
  
++// ----- OSSXP add the following locale strings -----
++$TLS_bts_project_id = "BTS Project ID";
++
 +// ----- login.php -----
 +$TLS_sso_login_url_text = "Click to login...";
 +$TLS_demo_login_title = "TestLink demo";
@@ -26,13 +29,16 @@ index 8482ab0..7c2022b 100644
  // ----- END ------------------------------------------------------------------
  ?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index 2a8d617..5ddc977 100644
+index 2a8d617..843f77d 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -2867,5 +2867,10 @@ $TLS_import_done = 'Import done';
+@@ -2867,5 +2867,13 @@ $TLS_import_done = 'Import done';
  $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
  $TLS_import_req_exists_here = 'Doc ID exists';
  
++// ----- 群英汇添加下列国际化字符串。 by ossxp.com -----
++$TLS_bts_project_id = "缺陷跟踪项目ID";
++
 +// ----- login.php -----
 +$TLS_sso_login_url_text = "点击这里，使用已有帐号登录";
 +$TLS_demo_login_title = "TestLink 演示";

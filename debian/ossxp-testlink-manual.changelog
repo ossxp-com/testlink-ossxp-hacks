@@ -1,3 +1,9 @@
+ossxp-testlink (1:1.9~beta5-1) unstable; urgency=low
+
+  * Upstream upgrade to 1.9 beta5.
+
+ -- Wang Sheng <wangsheng@bj.ossxp.com>  Thu, 15 Jul 2010 14:16:32 +0800
+
 ossxp-testlink (1:1.8.5b-1) unstable; urgency=low
 
   * modify some Chinese translation in texts.php file.

@@ -1,3 +1,10 @@
+ossxp-testlink (1.9~beta5-22) unstable; urgency=low
+
+  * Show bts_project_id in testlink project list.
+  * Update css, change font size from 11px to 12px.
+
+ -- Jiang Xin <jiangxin@ossxp.com>  Thu, 15 Jul 2010 14:13:41 +0800
+
 ossxp-testlink (1.9~beta5-21) unstable; urgency=low
 
   * Upstream upgrade to 1.9 beta5.

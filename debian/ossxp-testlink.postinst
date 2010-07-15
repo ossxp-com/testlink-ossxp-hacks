@@ -25,6 +25,14 @@ if [ -z "$2" ]; then
     fi
 fi
 
+# if package is newly installed, or below xxx
+if dpkg --compare-versions "$2" lt "1.9~beta5-22"; then
+    FONTDIR=/opt/testlink/web/third_party/pchart/Fonts
+    for font in simsun.ttc SIMLI.TTF simhei.ttf STSONG.TTF; do
+        [ -f $FONTDIR/$font ] || ln -s /opt/ossxp/fonts/truetype/$font $FONTDIR
+    done
+fi
+
 #DEBHELPER#
 
 exit 0

@@ -12,7 +12,7 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  2 files changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
-index 1e2bc0a..5ae099d 100644
+index e2f8d48..25ede8e 100644
 --- a/gui/templates/login.tpl
 +++ b/gui/templates/login.tpl
 @@ -28,6 +28,11 @@ window.onload=function()
@@ -82,7 +82,7 @@ index 1e2bc0a..5ae099d 100644
  		<div>{$tlCfg->login_info}</div>
  	{/if}
 diff --git a/login.php b/login.php
-index 0c0bad8..9bad53b 100644
+index 87eb228..22a8065 100644
 --- a/login.php
 +++ b/login.php
 @@ -180,6 +180,8 @@ if( $doRender )
@@ -95,4 +95,4 @@ index 0c0bad8..9bad53b 100644
  }
  
 -- 
-tg: (148a11d..) t/login_page_msg (depends on: t/demo_login)
+tg: (c676535..) t/login_page_msg (depends on: t/demo_login)

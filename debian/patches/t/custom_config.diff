@@ -8,9 +8,9 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  cfg/const.inc.php                                  |    2 +-
  config.inc.php                                     |    2 +-
- custom_config.inc.php.example                      |  123 ++++++++++++--------
+ custom_config.inc.php.example                      |  143 +++++++++++++-------
  install/sql/mysql/testlink_create_default_data.sql |    4 +-
- 4 files changed, 78 insertions(+), 53 deletions(-)
+ 4 files changed, 98 insertions(+), 53 deletions(-)
 
 diff --git a/cfg/const.inc.php b/cfg/const.inc.php
 index 9a6b5a9..f11a18b 100644
@@ -37,7 +37,7 @@ index d93cc11..a64a70a 100644
  /**
   * @var string Charset 'UTF-8' is only officially supported charset (Require
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index 2abaac4..b4b1a23 100644
+index 2abaac4..536e580 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
 @@ -52,55 +52,6 @@
@@ -96,7 +96,7 @@ index 2abaac4..b4b1a23 100644
  
  // TRUE  -> the whole execution history for the choosen build will be showed
  // FALSE -> just last execution for the choosen build will be showed [STANDARD BEHAVIOUR]
-@@ -168,5 +119,79 @@
+@@ -168,5 +119,99 @@
  // $tlCfg->req_spec_template->scope->type = 'file';
  // $tlCfg->req_spec_template->scope->value = 'c:\usr\local\xampp-1.7.2\xampp\htdocs\head-20090909\item_templates\req_spec.txt';
  
@@ -114,6 +114,7 @@ index 2abaac4..b4b1a23 100644
 +//$tlCfg->authentication['method'] = 'MD5';  # Default
 +//$tlCfg->authentication['method'] = 'LDAP';
 +//$tlCfg->authentication['method'] = 'COSIGN3';
++$tlCfg->authentication['sso_service_name'] = 'testlink';
 +$tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 +$tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 +
@@ -174,6 +175,25 @@ index 2abaac4..b4b1a23 100644
 + * 'SILENT': same that FILE, but user will not receive message on screen.
 + */
 +//$tlCfg->config_check_warning_mode = "SILENT";
++
++/*
++
++// Before enable demo_login, muse create the demo user, such as guest and leader.
++$tlCfg->authentication['demo_users'] = array(
++                          "guest" => "访客",
++                          "leader" => "测试经理");
++
++// Notes in the login page.
++$tlCfg->login_page_msg_title = "说明";
++$tlCfg->login_page_msg = "<div align='left'>" .
++                "<ul>" .
++                "<li>对该产品的意见和建议可以登录北京群英汇的 <a href='http://redmine.ossxp.com/redmine/projects/show/testlink'>Testlink 项目管理首页</a> 进
++行提问。" .
++                "<li>查看源代码，可选择 <a href='http://redmine.ossxp.com/redmine/repositories/show/testlink'>Web浏览</a>, ".
++                "或者从 GitHub 上 <a href='http://github.com/ossxp-com/testlink-ossxp-hacks'>克隆代码库</a>。" .
++                "<li>对该产品以及其他相关管理软件的技术支持请访问 <a href='http://www.ossxp.com/'>北京群英汇信息技术有限公司</a>。".
++                "</ul></div>";
++*/
  
  ?>
 diff --git a/install/sql/mysql/testlink_create_default_data.sql b/install/sql/mysql/testlink_create_default_data.sql

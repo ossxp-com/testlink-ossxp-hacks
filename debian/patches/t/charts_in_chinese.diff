@@ -10,10 +10,10 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
  1 files changed, 10 insertions(+), 0 deletions(-)
 
 diff --git a/custom_config.inc.php.example b/custom_config.inc.php.example
-index b4b1a23..ba4177e 100644
+index 536e580..706937a 100644
 --- a/custom_config.inc.php.example
 +++ b/custom_config.inc.php.example
-@@ -184,6 +184,16 @@ $g_smtp_password    = '';  # password
+@@ -185,6 +185,16 @@ $g_smtp_password    = '';  # password
  /** [LOCALIZATION] */
  $tlCfg->default_language = 'zh_CN'; 
  
@@ -31,4 +31,4 @@ index b4b1a23..ba4177e 100644
   *  How to warning user when security weak points exists.
   *
 -- 
-tg: (558da70..) t/charts_in_chinese (depends on: t/custom_config)
+tg: (86cf360..) t/charts_in_chinese (depends on: t/custom_config)

@@ -12,7 +12,7 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  3 files changed, 175 insertions(+), 32 deletions(-)
 
 diff --git a/gui/templates/login.tpl b/gui/templates/login.tpl
-index 4d64db4..1e2bc0a 100644
+index 4d64db4..e2f8d48 100644
 --- a/gui/templates/login.tpl
 +++ b/gui/templates/login.tpl
 @@ -7,6 +7,8 @@ Purpose: smarty template - login page
@@ -128,7 +128,7 @@ index 4d64db4..1e2bc0a 100644
 +		{rdelim}
 +	</script>
 +
-+	<div class="vertical_menu" style="float: left; width: 80%; margin:10px">
++	<div class="vertical_menu" style="float: left; width: 80%; margin:10px; font-size:1em;">
 +		<br />
 +		<div id="menu_login_block"></div><br />
 +		<div id="menu_demo_users_block"></div><br />
@@ -185,21 +185,21 @@ index 4d64db4..1e2bc0a 100644
 \ No newline at end of file
 +</html>
 diff --git a/gui/themes/default/css/testlink.css b/gui/themes/default/css/testlink.css
-index fd3ce1f..4db0959 100644
+index a042251..4d0ebf3 100644
 --- a/gui/themes/default/css/testlink.css
 +++ b/gui/themes/default/css/testlink.css
 @@ -834,4 +834,9 @@ th.testlink, td.testlink, tr.testlink td {
  .x-tl-panel-body{overflow:hidden;}
  .x-tl-panel-collapsed .x-resizable-handle{display:none;}
  
-+.urlbtn{text-decoration:none;font-size:14px!important;line-height:16px;padding:6px 12px;cursor:pointer;border:1px solid #bbb;color:#464646;-moz-border-radius:15px;-khtml-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;-khtml-box-sizing:content-box;box-sizing:content-box;}
++.urlbtn{text-decoration:none;font-size:14px!important;line-height:2.5em;padding:6px 12px;cursor:pointer;border:1px solid #bbb;color:#464646;-moz-border-radius:15px;-khtml-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;-khtml-box-sizing:content-box;box-sizing:content-box;}
 +.urlbtn:hover{color:#000;border-color:#666;}
 +.urlbtn{background:#f2f2f2 url(../images/white-grad.png) repeat-x scroll left top;}
 +.urlbtn:active{background:#eee url(../images/white-grad-active.png) repeat-x scroll left top;}
 +
  /* ----- END ------------------------------------------------------------------------- */
 diff --git a/login.php b/login.php
-index b8879cb..0c0bad8 100644
+index b8879cb..87eb228 100644
 --- a/login.php
 +++ b/login.php
 @@ -53,6 +53,19 @@ if (strtolower($tlCfg->authentication['method']) == 'cosign' ||
@@ -301,7 +301,7 @@ index b8879cb..0c0bad8 100644
      $args->reqURI = urlencode($pParams['req']);
      $args->preqURI = urlencode($pParams['reqURI']);
 +    $args->demo = urlencode($pParams['demo']);
-+    $args->sso = urlencode($pParams['sso']);
++    $args->sso = isset($pParams['sso']);
  
  	if ($pParams['action'] == 'ajaxcheck' || $pParams['action'] == 'ajaxlogin') {
  		$args->action = $pParams['action'];
@@ -315,4 +315,4 @@ index b8879cb..0c0bad8 100644
      }
  	$gui->reqURI = $args->reqURI ? $args->reqURI : $args->preqURI;
 -- 
-tg: (142dba4..) t/demo_login (depends on: t/single_signon)
+tg: (d53c2c6..) t/demo_login (depends on: t/single_signon t/gui_stylesheet)

@@ -8,15 +8,17 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
 ---
  cfg/redmine.cfg.php                             |   14 ++---
  config.inc.php                                  |    1 +
- gui/templates/project/projectEdit.tpl           |   14 +++++-
+ gui/templates/project/projectEdit.tpl           |   12 ++++-
+ gui/templates/project/projectView.tpl           |   12 ++++-
  install/sql/mssql/testlink_create_tables.sql    |    1 +
  install/sql/mysql/testlink_create_tables.sql    |    1 +
  install/sql/postgres/testlink_create_tables.sql |    1 +
  lib/bugtracking/int_bugtracking.php             |   60 ++++++++++++++++++++++-
  lib/execute/bugAdd.php                          |    6 ++-
- lib/functions/testproject.class.php             |   20 ++++++--
- lib/project/projectEdit.php                     |   18 +++++--
- 10 files changed, 116 insertions(+), 20 deletions(-)
+ lib/functions/testproject.class.php             |   18 +++++--
+ lib/project/projectEdit.php                     |   23 +++++++--
+ lib/project/projectView.php                     |    9 +++-
+ 12 files changed, 134 insertions(+), 24 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
 index a87ea2f..3dbdd21 100755
@@ -70,7 +72,7 @@ index d93cc11..c73aca4 100644
   * 'FOGBUGZ'   : edit configuration in TL_ABS_PATH/cfg/fogbugz.cfg.php
   * ]
 diff --git a/gui/templates/project/projectEdit.tpl b/gui/templates/project/projectEdit.tpl
-index 093e45b..b4f5953 100644
+index 093e45b..204aa42 100644
 --- a/gui/templates/project/projectEdit.tpl
 +++ b/gui/templates/project/projectEdit.tpl
 @@ -33,7 +33,7 @@
@@ -82,11 +84,10 @@ index 093e45b..b4f5953 100644
  
  {include file="inc_head.tpl" openHead="yes" jsValidate="yes" editorType=$editorType}
  {include file="inc_del_onclick.tpl"}
-@@ -149,6 +149,18 @@
- 					{$labels.testproject_enable_requirements}
+@@ -121,6 +121,16 @@
+ 				  	{include file="error_icon.tpl" field="tcasePrefix"}
  				</td>
  			</tr>
-+
 +			{if $bts_project_name_wanted}
 +			<tr>
 +				<th style="background:none;">{$labels.bts_project_id}</th>
@@ -97,10 +98,51 @@ index 093e45b..b4f5953 100644
 +				</td>
 +			</tr>
 +			{/if}
-+
  			<tr>
- 				<td></td><td>
- 					<input type="checkbox" name="optPriority" 
+ 				<td>{$labels.testproject_description}</td>
+ 				<td style="width:80%">{$notes}</td>
+diff --git a/gui/templates/project/projectView.tpl b/gui/templates/project/projectView.tpl
+index 0bbfcd3..90c675c 100644
+--- a/gui/templates/project/projectView.tpl
++++ b/gui/templates/project/projectView.tpl
+@@ -28,7 +28,7 @@ Rev :
+ 		s='title_testproject_management,testproject_txt_empty_list,tcase_id_prefix,
+ 		th_name,th_notes,testproject_alt_edit,testproject_alt_active,
+ 		th_requirement_feature,testproject_alt_delete,btn_create,public,
+-		testproject_alt_requirement_feature,th_active,th_delete,th_id'}
++		testproject_alt_requirement_feature,th_active,th_delete,th_id,bts_project_id'}
+ 
+ 
+ {include file="inc_head.tpl" openHead="yes" enableTableSorting="yes"}
+@@ -62,6 +62,9 @@ var del_action=fRoot+'{$deleteAction}';
+ 			<th>{$toggle_api_info_img}{$sortHintIcon}{$labels.th_name}</th>
+ 			<th class="{$noSortableColumnClass}">{$labels.th_notes}</th>
+ 			<th>{$sortHintIcon}{$labels.tcase_id_prefix}</th>
++			{if $bts_project_name_wanted}
++			<th>{$labels.bts_project_id}</th>
++			{/if}
+ 			<th class="{$noSortableColumnClass}">{$labels.th_requirement_feature}</th>
+ 			<th class="icon_cell">{$labels.th_active}</th>
+ {* havlatm: the feature is not ready for using - must be disabled (developed by Francisco)
+@@ -89,6 +92,11 @@ var del_action=fRoot+'{$deleteAction}';
+ 			<td width="10%">
+ 				{$testproject.prefix|escape}
+ 			</td>
++			{if $bts_project_name_wanted}
++			<td width="10%">
++				{$testproject.bts_project_id|escape}
++			</td>
++			{/if}
+ 			<td class="clickable_icon">
+ 				{if $testproject.opt->requirementsEnabled}
+   					<img style="border:none"
+@@ -156,4 +164,4 @@ var del_action=fRoot+'{$deleteAction}';
+ {/if}
+ 
+ </body>
+-</html>
+\ No newline at end of file
++</html>
 diff --git a/install/sql/mssql/testlink_create_tables.sql b/install/sql/mssql/testlink_create_tables.sql
 index 1178826..4f28ecf 100644
 --- a/install/sql/mssql/testlink_create_tables.sql
@@ -252,7 +294,7 @@ index 71dea2c..d8ddd2c 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/functions/testproject.class.php b/lib/functions/testproject.class.php
-index e007736..22f7dab 100644
+index e007736..3597525 100644
 --- a/lib/functions/testproject.class.php
 +++ b/lib/functions/testproject.class.php
 @@ -129,21 +129,24 @@ class testproject extends tlObjectWithAttachments
@@ -278,25 +320,21 @@ index e007736..22f7dab 100644
  		                 $this->db->prepare_string($notes) . "'," .
  		                 $active . "," . $is_public . ",'" .
 -		                 $this->db->prepare_string($tcprefix) . "')";
-+		                 $this->db->prepare_string($tcprefix) . "','";
++		                 $this->db->prepare_string($tcprefix) . "','" .
 +		                 $this->db->prepare_string($btsProjectId) . "')";
  	$result = $this->db->exec_query($sql);
  
  	if ($result)
-@@ -183,8 +186,12 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_publi
-  *	20060312 - franciscom - name is setted on nodes_hierarchy table
+@@ -184,7 +187,7 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_publi
   *
   **/
-+<<<<<<< HEAD
-+function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null,$btsProjectId=null)
-+=======
  function projectUpdate($id, $name, $color, $notes,$options,$active=null,
- 						$tcasePrefix=null,$is_public=null)
-+>>>>>>> refs/top-bases/t/bugtrac_integration
+-						$tcasePrefix=null,$is_public=null)
++						$tcasePrefix=null,$is_public=null,$btsProjectId=null)
  {
      $status_ok=1;
  	$status_msg = 'ok';
-@@ -209,6 +216,11 @@ function projectUpdate($id, $name, $color, $notes,$options,$active=null,
+@@ -209,6 +212,11 @@ function projectUpdate($id, $name, $color, $notes,$options,$active=null,
  	}
  	$serOptions = serialize($options);
  
@@ -308,7 +346,7 @@ index e007736..22f7dab 100644
  	$sql = " UPDATE {$this->object_table} SET color='" . $this->db->prepare_string($color) . "', ".
  			" options='" .  $serOptions . "', " .
  			" notes='" . $this->db->prepare_string($notes) . "' {$add_upd} " .
-@@ -2403,4 +2415,4 @@ private function copy_requirements($source_id,$target_id,$user_id)
+@@ -2403,4 +2411,4 @@ private function copy_requirements($source_id,$target_id,$user_id)
  }
  
  } // end class
@@ -316,10 +354,20 @@ index e007736..22f7dab 100644
 \ No newline at end of file
 +?>
 diff --git a/lib/project/projectEdit.php b/lib/project/projectEdit.php
-index 96daf3c..d23f424 100644
+index 96daf3c..12c7a5d 100644
 --- a/lib/project/projectEdit.php
 +++ b/lib/project/projectEdit.php
-@@ -33,6 +33,7 @@ testlinkInitPage($db,true,false,"checkRights");
+@@ -28,11 +28,17 @@ require_once('common.php');
+ require_once("web_editor.php");
+ $editorCfg = getWebEditorCfg('testproject');
+ require_once(require_web_editor($editorCfg['type']));
++if (config_get('interface_bugs') != 'NO')
++{
++    require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' .
++                   DIRECTORY_SEPARATOR . 'int_bugtracking.php');
++}
+ 
+ testlinkInitPage($db,true,false,"checkRights");
  
  $gui_cfg = config_get('gui');
  $templateCfg = templateConfiguration();
@@ -327,7 +375,7 @@ index 96daf3c..d23f424 100644
  
  $session_tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
  $template = null;
-@@ -102,6 +103,7 @@ $smarty = new TLSmarty();
+@@ -102,6 +108,7 @@ $smarty = new TLSmarty();
  $smarty->assign('gui_cfg',$gui_cfg);
  $smarty->assign('editorType',$editorCfg['type']);
  $smarty->assign('mgt_view_events',$_SESSION['currentUser']->hasRight($db,"mgt_view_events"));
@@ -335,7 +383,7 @@ index 96daf3c..d23f424 100644
  
  
  if(!$status_ok)
-@@ -142,6 +144,8 @@ switch($args->doAction)
+@@ -142,6 +149,8 @@ switch($args->doAction)
          $smarty->assign('notes', $of->CreateHTML());
          $smarty->assign('user_feedback', $user_feedback);
          $smarty->assign('feedback_type', 'ultrasoft');
@@ -344,7 +392,7 @@ index 96daf3c..d23f424 100644
          $smarty->display($templateCfg->template_dir . $template);
      break;
  
-@@ -165,7 +169,7 @@ function init_args($tprojectMgr,$request_hash, $session_tproject_id)
+@@ -165,7 +174,7 @@ function init_args($tprojectMgr,$request_hash, $session_tproject_id)
  {
      $args = new stdClass();
  	$request_hash = strings_stripSlashes($request_hash);
@@ -353,7 +401,7 @@ index 96daf3c..d23f424 100644
  	foreach ($nullable_keys as $value)
  	{
  		$args->$value = isset($request_hash[$value]) ? trim($request_hash[$value]) : null;
-@@ -252,7 +256,7 @@ function doCreate($argsObj,&$tprojectMgr)
+@@ -252,7 +261,7 @@ function doCreate($argsObj,&$tprojectMgr)
  	  	    
  		$new_id = $tprojectMgr->create($argsObj->tprojectName, $argsObj->color,
  					$options, $argsObj->notes, $argsObj->active, $argsObj->tcasePrefix,
@@ -362,7 +410,7 @@ index 96daf3c..d23f424 100644
  									                 
  		if (!$new_id)
  		{
-@@ -322,7 +326,7 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
+@@ -322,7 +331,7 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
  	  	$options = prepareOptions($argsObj);
          if( $tprojectMgr->projectUpdate($argsObj->tprojectID,trim($argsObj->tprojectName),
          			$argsObj->color, $argsObj->notes, $options, $argsObj->active,
@@ -371,7 +419,7 @@ index 96daf3c..d23f424 100644
          {
          	$op->msg = '';
          	$tprojectMgr->activateTestProject($argsObj->tprojectID,$argsObj->active);
-@@ -363,6 +367,8 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
+@@ -363,6 +372,8 @@ function doUpdate($argsObj,&$tprojectMgr,$sessionTprojectID)
  */
  function edit(&$argsObj,&$tprojectMgr)
  {
@@ -380,7 +428,7 @@ index 96daf3c..d23f424 100644
  	$tprojectInfo = $tprojectMgr->get_by_id($argsObj->tprojectID);
     
  	$argsObj->tprojectName = $tprojectInfo['name'];
-@@ -372,6 +378,10 @@ function edit(&$argsObj,&$tprojectMgr)
+@@ -372,6 +383,10 @@ function edit(&$argsObj,&$tprojectMgr)
  	$argsObj->active = $tprojectInfo['active'];
  	$argsObj->tcasePrefix = $tprojectInfo['prefix'];
  	$argsObj->is_public = $tprojectInfo['is_public'];
@@ -391,7 +439,41 @@ index 96daf3c..d23f424 100644
  
  
  	$ui = new stdClass();
-@@ -492,4 +502,4 @@ function checkRights(&$db,&$user)
+@@ -492,4 +507,4 @@ function checkRights(&$db,&$user)
+ {
+ 	return $user->hasRight($db,'mgt_modify_product');
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/lib/project/projectView.php b/lib/project/projectView.php
+index fbc2937..bde967f 100644
+--- a/lib/project/projectView.php
++++ b/lib/project/projectView.php
+@@ -16,6 +16,11 @@
+ 
+ require_once('../../config.inc.php');
+ require_once("common.php");
++if (config_get('interface_bugs') != 'NO')
++{
++    require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' .
++                   DIRECTORY_SEPARATOR . 'int_bugtracking.php');
++}
+ testlinkInitPage($db,false,false,"checkRights");
+ 
+ $templateCfg = templateConfiguration();
+@@ -35,8 +40,10 @@ if(count($gui->tprojects) == 0)
+     $template2launch = "projectEdit.tpl"; 
+     $gui->doAction = "create";
+ }
++$bts_project_name_wanted = $g_bugInterface ? $g_bugInterface->project_name_wanted(): false;
+ $smarty = new TLSmarty();
+ $smarty->assign('gui',$gui);
++$smarty->assign('bts_project_name_wanted', $bts_project_name_wanted);
+ $smarty->display($templateCfg->template_dir . $template2launch);
+ 
+ 
+@@ -60,4 +67,4 @@ function checkRights(&$db,&$user)
  {
  	return $user->hasRight($db,'mgt_modify_product');
  }

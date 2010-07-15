@@ -67,7 +67,7 @@ index 9590480..7e634a3 100644
  }
  $smarty = new TLSmarty();
 diff --git a/lib/functions/doAuthorize.php b/lib/functions/doAuthorize.php
-index a555c6b..5112ed8 100644
+index a555c6b..3ef9719 100644
 --- a/lib/functions/doAuthorize.php
 +++ b/lib/functions/doAuthorize.php
 @@ -22,29 +22,57 @@
@@ -103,7 +103,7 @@ index a555c6b..5112ed8 100644
 +				{
 +					$user->globalRoleID = config_get('default_roleid');
 +					$user->locale = config_get('default_language');
-+					$user->bActive = 1;
++					$user->isActive = 1;
 +					$login_exists = 1;
 +				}
 +				$user->writeToDB($db);
