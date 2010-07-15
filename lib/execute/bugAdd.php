@@ -47,7 +47,7 @@ if($args->bug_id != "")
 $smarty = new TLSmarty();
 if($g_bugInterface)
 {
-	$g_bugInterface->init_pid_from_execute($db, $exec_id);
+	$g_bugInterface->init_pid_from_execute($db, $args->exec_id);
 }
 $smarty->assign('bugIDMaxLength',$g_bugInterface->getBugIDMaxLength());
 $smarty->assign('bts_url', $g_bugInterface->getEnterBugURL());
