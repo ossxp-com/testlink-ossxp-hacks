@@ -115,7 +115,7 @@ window.onload=function()
 		{rdelim}
 	</script>
 
-	<div class="vertical_menu" style="float: left; width: 80%; margin:10px">
+	<div class="vertical_menu" style="float: left; width: 80%; margin:10px; font-size:1em;">
 		<br />
 		<div id="menu_login_block"></div><br />
 		<div id="menu_demo_users_block"></div><br />

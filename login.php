@@ -243,7 +243,7 @@ function init_args()
     $args->reqURI = urlencode($pParams['req']);
     $args->preqURI = urlencode($pParams['reqURI']);
     $args->demo = urlencode($pParams['demo']);
-    $args->sso = urlencode($pParams['sso']);
+    $args->sso = isset($pParams['sso']);
 
 	if ($pParams['action'] == 'ajaxcheck' || $pParams['action'] == 'ajaxlogin') {
 		$args->action = $pParams['action'];

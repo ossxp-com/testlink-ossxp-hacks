@@ -49,7 +49,7 @@ function doAuthorize(&$db,$login,$pwd,$sso=0)
 				{
 					$user->globalRoleID = config_get('default_roleid');
 					$user->locale = config_get('default_language');
-					$user->bActive = 1;
+					$user->isActive = 1;
 					$login_exists = 1;
 				}
 				$user->writeToDB($db);

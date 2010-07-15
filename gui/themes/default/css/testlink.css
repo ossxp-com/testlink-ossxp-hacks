@@ -38,7 +38,7 @@ assigned using name (example: white) instead of code (example: #FFF)
 body, body.testlink {
 	background:  	#EEE; 
 	font-family: 	'Trebuchet MS', Verdana, Arial, sans-serif;
-	font-size: 		small;
+	font-size:    12px;
 	margin:			0px;
 	padding:		0px;
 }
@@ -374,7 +374,7 @@ table.common {
 table.common th, table.simple th{
   	overflow:		hidden;
   	color:			#15428b;
-  	font:			bold 11px tahoma,arial,verdana,sans-serif;
+  	font:			bold 12px tahoma,arial,verdana,sans-serif;
   	padding:		5px 3px 4px 5px;
   	border:			1px solid #99bbe8;
   	line-height:	15px;
@@ -773,7 +773,7 @@ input.tl-input{
 table.mainTable-x th {
   overflow:hidden;
   color:#15428b;
-  font:bold 11px tahoma,arial,verdana,sans-serif;
+  font:bold 12px tahoma,arial,verdana,sans-serif;
   padding:5px 3px 4px 5px;
   border:1px solid #99bbe8;
   line-height:15px;
@@ -796,7 +796,7 @@ th.testlink, td.testlink, tr.testlink td {
 /* Taken from ext js 2.0, and adapted */
 
 .x-tl-panel{border-style:solid;border-color:#99bbe8;border-width:0;}
-.x-tl-panel-header{overflow:hidden;color:#15428b;font:bold 11px tahoma,arial,verdana,sans-serif;
+.x-tl-panel-header{overflow:hidden;color:#15428b;font:bold 12px tahoma,arial,verdana,sans-serif;
                    padding:2px 1px 1px 2px;border:1px solid #99bbe8;line-height:15px;
                    background:transparent url(../images/white-top-bottom.gif) repeat-x 0 -1px;}
 .x-tl-panel-body{border:1px solid #99bbe8;border-top:0 none;overflow:hidden;background:white;}
@@ -806,7 +806,7 @@ th.testlink, td.testlink, tr.testlink td {
                                                                           border-bottom:0 none;}
 .x-tl-panel-body-noheader,.x-tl-panel-mc .x-tl-panel-body{border-top:1px solid #99bbe8;}
 .x-tl-panel-header{overflow:hidden;}
-.x-tl-panel-tl .x-tl-panel-header{color:#15428b;font:bold 11px tahoma,arial,verdana,sans-serif;
+.x-tl-panel-tl .x-tl-panel-header{color:#15428b;font:bold 12px tahoma,arial,verdana,sans-serif;
                                padding:5px 0 4px 0;border:0 none;background:transparent;}
 .x-tl-panel-tl .x-tl-panel-icon,.x-window-tl .x-tl-panel-icon{padding-left:20px!important;background-repeat:no-repeat;
                                                         background-position:0 4px;}
@@ -822,7 +822,7 @@ th.testlink, td.testlink, tr.testlink td {
                padding-left:6px;}
 .x-tl-panel-br{background:transparent url(../images/corners-sprite.gif) no-repeat right bottom;
                padding-right:6px;}
-.x-tl-panel-mc{border:0 none;padding:0;margin:0;font:normal 11px tahoma,arial,helvetica,sans-serif;
+.x-tl-panel-mc{border:0 none;padding:0;margin:0;font:normal 12px tahoma,arial,helvetica,sans-serif;
                padding-top:6px;background:#dfe8f6;}
 .x-tl-panel-mc .x-tl-panel-body{background:transparent;border:0 none;}
 .x-tl-panel-ml{background:#fff url(../images/left-right.gif) repeat-y 0 0;padding-left:6px;}
@@ -834,7 +834,7 @@ th.testlink, td.testlink, tr.testlink td {
 .x-tl-panel-body{overflow:hidden;}
 .x-tl-panel-collapsed .x-resizable-handle{display:none;}
 
-.urlbtn{text-decoration:none;font-size:14px!important;line-height:16px;padding:6px 12px;cursor:pointer;border:1px solid #bbb;color:#464646;-moz-border-radius:15px;-khtml-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;-khtml-box-sizing:content-box;box-sizing:content-box;}
+.urlbtn{text-decoration:none;font-size:14px!important;line-height:2.5em;padding:6px 12px;cursor:pointer;border:1px solid #bbb;color:#464646;-moz-border-radius:15px;-khtml-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;-khtml-box-sizing:content-box;box-sizing:content-box;}
 .urlbtn:hover{color:#000;border-color:#666;}
 .urlbtn{background:#f2f2f2 url(../images/white-grad.png) repeat-x scroll left top;}
 .urlbtn:active{background:#eee url(../images/white-grad-active.png) repeat-x scroll left top;}
