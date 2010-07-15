@@ -11,4 +11,3 @@
 /opt/testlink/web/cfg/fogbugz.cfg.php
 /opt/testlink/web/cfg/jirasoap.cfg.php
 /opt/testlink/web/cfg/bugzilla.cfg.php
-#/opt/testlink/web/cfg/const.inc.php
