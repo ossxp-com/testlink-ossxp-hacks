@@ -3,4 +3,6 @@ Subject: [PATCH] t/fckeditor
 
 For issue #53: testlink中需求规格说明书编辑器不能使用
 
+Has been fixed in testlink 1.9 upstream.
+
 Signed-off-by: leiww <leiww@bj.ossxp.com>
