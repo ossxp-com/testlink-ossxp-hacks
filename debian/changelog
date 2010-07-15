@@ -1,3 +1,9 @@
+ossxp-testlink (1.9~beta5-24) unstable; urgency=low
+
+  * Bugfix: htmlentities may destroy chinese characters.
+
+ -- Jiang Xin <jiangxin@ossxp.com>  Thu, 15 Jul 2010 19:04:24 +0800
+
 ossxp-testlink (1.9~beta5-23) unstable; urgency=low
 
   * Show bts_project_id in testlink project list.

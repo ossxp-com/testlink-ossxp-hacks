@@ -1038,7 +1038,7 @@ index 078dda9..e757a5d 100644
  
  DESCRIPTION: A php library for building xmlrpc clients and servers
 diff --git a/third_party/phpxmlrpc/lib/xmlrpc.inc b/third_party/phpxmlrpc/lib/xmlrpc.inc
-index 3e89007..93f8842 100644
+index 28c1d6d..080ddf6 100644
 --- a/third_party/phpxmlrpc/lib/xmlrpc.inc
 +++ b/third_party/phpxmlrpc/lib/xmlrpc.inc
 @@ -1,7 +1,7 @@
@@ -1680,7 +1680,7 @@ index 3e89007..93f8842 100644
 +			{
 +				print "<PRE>\n---CURL INFO---\n";
 +				foreach(curl_getinfo($curl) as $name => $val)
-+					 print $name . ': ' . htmlentities($val). "\n";
++					 print $name . ': ' . htmlentities($val, ENT_COMPAT, 'UTF-8'). "\n";
 +				print "---END---\n</PRE>";
 +			}
 +
@@ -3154,4 +3154,4 @@ index 8a965c2..441dc3d 100644
  		}
  	}
 -- 
-tg: (fda2456..) t/php5_thirdparty_xmlrpc (depends on: t/php5_deprecated)
+tg: (048cfdb..) t/php5_thirdparty_xmlrpc (depends on: t/php5_deprecated t/htmlentities_on_utf8)

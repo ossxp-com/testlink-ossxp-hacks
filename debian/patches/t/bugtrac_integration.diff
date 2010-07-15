@@ -272,7 +272,7 @@ index d528c19..a94d41e 100644
  
  	$g_bugInterfaceName = BUG_INTERFACE_CLASSNAME;
 diff --git a/lib/execute/bugAdd.php b/lib/execute/bugAdd.php
-index 71dea2c..d8ddd2c 100644
+index 71dea2c..b43b0bf 100644
 --- a/lib/execute/bugAdd.php
 +++ b/lib/execute/bugAdd.php
 @@ -45,6 +45,10 @@ if($args->bug_id != "")
@@ -281,7 +281,7 @@ index 71dea2c..d8ddd2c 100644
  $smarty = new TLSmarty();
 +if($g_bugInterface)
 +{
-+	$g_bugInterface->init_pid_from_execute($db, $exec_id);
++	$g_bugInterface->init_pid_from_execute($db, $args->exec_id);
 +}
  $smarty->assign('bugIDMaxLength',$g_bugInterface->getBugIDMaxLength());
  $smarty->assign('bts_url', $g_bugInterface->getEnterBugURL());

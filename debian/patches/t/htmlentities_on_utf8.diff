@@ -1,0 +1,305 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/htmlentities_on_utf8
+
+htmlentities 如果不提供 UTF-8 作为字符集，在进行转换时会破坏中文字符，导致中文在网页显示异常。
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
+
+---
+ install/migration/migrate_16_to_17_functions.php |    8 ++++----
+ lib/execute/execSetResults.php                   |    2 +-
+ lib/functions/print.inc.php                      |    2 +-
+ third_party/adodb/adodb-xmlschema.inc.php        |    8 ++++----
+ third_party/adodb/adodb-xmlschema03.inc.php      |   16 ++++++++--------
+ third_party/diff/diff.php                        |    2 +-
+ third_party/pchart/pChart/pChart.class           |    4 ++--
+ third_party/phpxmlrpc/lib/xmlrpc.inc             |   16 ++++++++--------
+ 8 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/install/migration/migrate_16_to_17_functions.php b/install/migration/migrate_16_to_17_functions.php
+index 6d11d78..2914b97 100644
+--- a/install/migration/migrate_16_to_17_functions.php
++++ b/install/migration/migrate_16_to_17_functions.php
+@@ -310,7 +310,7 @@ function migrate_tc_specs(&$source_db,&$target_db,&$tmp_table_name,&$users,&$mig
+ 	     // 20061208 - franciscom - 
+ 	     // added abs()
+ 	     // added htmlentities()
+-	     print_msg("TCID:{$item_id} - " . htmlentities($idata['title']) ."<br>");
++	     print_msg("TCID:{$item_id} - " . htmlentities($idata['title'], ENT_COMPAT, 'UTF-8') ."<br>");
+ 	     
+ 	     $status = $tc_mgr->create_tcase_only(0,$idata['title'],abs($idata['TCorder']),$item_id);	     
+ 	     	       	
+@@ -361,7 +361,7 @@ function migrate_tc_specs(&$source_db,&$target_db,&$tmp_table_name,&$users,&$mig
+ 	     $map_tc_tcversion[$item_id]= $x['id'];
+ 	     
+ 	     // 20061208 - franciscom
+-		 print_msg("TCID:{$item_id} - " . htmlentities($idata['title']) . " - TCVERSION_ID:{$x['id']}<br>", "FULL_FEEDBACK");
++		 print_msg("TCID:{$item_id} - " . htmlentities($idata['title'], ENT_COMPAT, 'UTF-8') . " - TCVERSION_ID:{$x['id']}<br>", "FULL_FEEDBACK");
+ 	    
+ 	     ++$items_processed; 
+ 	     if( ($items_processed % FEEDBACK_STEP)== 0 )
+@@ -447,7 +447,7 @@ foreach($items as $prod_id => $pd)
+       $ret=$ts_mgr->create($tproject_id,$cod['name'],$details);
+       if( $ret['status_ok'] )
+       {
+-        echo "<pre>Component " . htmlentities($cod['name']) . " Migrated<br></pre>";
++        echo "<pre>Component " . htmlentities($cod['name'], ENT_COMPAT, 'UTF-8') . " Migrated<br></pre>";
+         flush();
+           
+         $mgtcomp_id=$ret['id'];
+@@ -473,7 +473,7 @@ foreach($items as $prod_id => $pd)
+           $ret=$ts_mgr->create($mgtcomp_id,$cad['name'],$details);
+           if( $ret['status_ok'] )
+           {
+-            echo "<pre>    Category " . htmlentities($cad['name']) . " Migrated<br></pre>";  
++            echo "<pre>    Category " . htmlentities($cad['name'], ENT_COMPAT, 'UTF-8') . " Migrated<br></pre>";  
+             flush();
+             
+             $mgtcat_id=$ret['id'];
+diff --git a/lib/execute/execSetResults.php b/lib/execute/execSetResults.php
+index 18afa94..264a7f3 100644
+--- a/lib/execute/execSetResults.php
++++ b/lib/execute/execSetResults.php
+@@ -654,7 +654,7 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
+       foreach($value['name'] as $jdx => $elem)
+       {
+       	$str .= "<a href=\"javascript:openTestSuiteWindow(" . $value['node_id'][$jdx] . ")\"> ";
+-      	$str .= htmlentities($elem) . '</a>/';
++      	$str .= string_html_entities($elem) . '</a>/';
+       }
+       $tsuite_info[$key]['tsuite_name']=$str;  
+   }
+diff --git a/lib/functions/print.inc.php b/lib/functions/print.inc.php
+index eda8e3c..af7a25f 100644
+--- a/lib/functions/print.inc.php
++++ b/lib/functions/print.inc.php
+@@ -211,7 +211,7 @@ function renderRequirementNodeForPrinting(&$db,$node, &$printingOptions, $tocPre
+ 			           "<td>";
+ 			           
+ 			foreach ($req_coverage as $tc) {
+-				$output .= htmlentities($tc['tc_external_id'] . $title_separator .
++				$output .= string_html_entities($tc['tc_external_id'] . $title_separator .
+ 				                        $tc['name']) . "<br/>";
+ 			}
+ 			           
+diff --git a/third_party/adodb/adodb-xmlschema.inc.php b/third_party/adodb/adodb-xmlschema.inc.php
+index 1792bd5..3d280d1 100644
+--- a/third_party/adodb/adodb-xmlschema.inc.php
++++ b/third_party/adodb/adodb-xmlschema.inc.php
+@@ -1870,7 +1870,7 @@ class adoSchema {
+ 					   . '<table>' . "\n";
+ 		
+ 		foreach( $msg as $label => $details ) {
+-			$error_details .= '<tr><td><b>' . $label . ': </b></td><td>' . htmlentities( $details ) . '</td></tr>' . "\n";
++			$error_details .= '<tr><td><b>' . $label . ': </b></td><td>' . htmlentities( $details, ENT_COMPAT, 'UTF-8' ) . '</td></tr>' . "\n";
+ 		}
+ 		
+ 		$error_details .= '</table>';
+@@ -2012,7 +2012,7 @@ class adoSchema {
+ 						
+ 						while( $row = $rs->FetchRow() ) {
+ 							foreach( $row as $key => $val ) {
+-								$row[$key] = htmlentities($val);
++								$row[$key] = htmlentities($val, ENT_COMPAT, 'UTF-8');
+ 							}
+ 							
+ 							$schema .= '			<row><f>' . implode( '</f><f>', $row ) . '</f></row>' . "\n";
+@@ -2180,7 +2180,7 @@ class adoSchema {
+ 			case 'text':
+ 				return !empty( $sqlArray ) ? implode( ";\n\n", $sqlArray ) . ';' : '';
+ 			case'html':
+-				return !empty( $sqlArray ) ? nl2br( htmlentities( implode( ";\n\n", $sqlArray ) . ';' ) ) : '';
++				return !empty( $sqlArray ) ? nl2br( htmlentities( implode( ";\n\n", $sqlArray ) . ';', ENT_COMPAT, 'UTF-8' ) ) : '';
+ 		}
+ 		
+ 		return $this->sqlArray;
+@@ -2208,7 +2208,7 @@ function logMsg( $msg, $title = NULL, $force = FALSE ) {
+ 		echo '<pre>';
+ 		
+ 		if( isset( $title ) ) {
+-			echo '<h3>' . htmlentities( $title ) . '</h3>';
++			echo '<h3>' . htmlentities( $title, ENT_COMPAT, 'UTF-8' ) . '</h3>';
+ 		}
+ 		
+ 		if( is_object( $this ) ) {
+diff --git a/third_party/adodb/adodb-xmlschema03.inc.php b/third_party/adodb/adodb-xmlschema03.inc.php
+index d850ead..5c5907c 100644
+--- a/third_party/adodb/adodb-xmlschema03.inc.php
++++ b/third_party/adodb/adodb-xmlschema03.inc.php
+@@ -2030,7 +2030,7 @@ class adoSchema {
+ 					   . '<table>' . "\n";
+ 		
+ 		foreach( $msg as $label => $details ) {
+-			$error_details .= '<tr><td><b>' . $label . ': </b></td><td>' . htmlentities( $details ) . '</td></tr>' . "\n";
++			$error_details .= '<tr><td><b>' . $label . ': </b></td><td>' . htmlentities( $details, ENT_COMPAT, 'UTF-8' ) . '</td></tr>' . "\n";
+ 		}
+ 		
+ 		$error_details .= '</table>';
+@@ -2107,7 +2107,7 @@ class adoSchema {
+ 		if( is_array( $tables = $this->db->MetaTables( 'TABLES' , ($prefix) ? $prefix.'%' : '') ) ) {
+ 			foreach( $tables as $table ) {
+ 				if ($stripprefix) $table = str_replace(str_replace('\\_', '_', $pfx ), '', $table);
+-				$schema .= $indent . '<table name="' . htmlentities( $table ) . '">' . "\n";
++				$schema .= $indent . '<table name="' . htmlentities( $table, ENT_COMPAT, 'UTF-8' ) . '">' . "\n";
+ 				
+ 				// grab details from database
+ 				$rs = $this->db->Execute( 'SELECT * FROM ' . $table . ' WHERE -1' );
+@@ -2130,7 +2130,7 @@ class adoSchema {
+ 						}
+ 						
+ 						if( isset($details->has_default) && $details->has_default ) {
+-							$content[] = '<DEFAULT value="' . htmlentities( $details->default_value ) . '"/>';
++							$content[] = '<DEFAULT value="' . htmlentities( $details->default_value, ENT_COMPAT, 'UTF-8' ) . '"/>';
+ 						}
+ 						
+ 						if( isset($details->auto_increment) && $details->auto_increment ) {
+@@ -2146,7 +2146,7 @@ class adoSchema {
+ 						$details->primary_key = 0;
+ 						$type = $rs->MetaType( $details );
+ 						
+-						$schema .= str_repeat( $indent, 2 ) . '<field name="' . htmlentities( $details->name ) . '" type="' . $type . '"' . $extra;
++						$schema .= str_repeat( $indent, 2 ) . '<field name="' . htmlentities( $details->name, ENT_COMPAT, 'UTF-8' ) . '" type="' . $type . '"' . $extra;
+ 						
+ 						if( !empty( $content ) ) {
+ 							$schema .= ">\n" . str_repeat( $indent, 3 )
+@@ -2167,7 +2167,7 @@ class adoSchema {
+ 						}
+ 						
+ 						foreach( $details['columns'] as $column ) {
+-							$schema .= str_repeat( $indent, 3 ) . '<col>' . htmlentities( $column ) . '</col>' . "\n";
++							$schema .= str_repeat( $indent, 3 ) . '<col>' . htmlentities( $column, ENT_COMPAT, 'UTF-8' ) . '</col>' . "\n";
+ 						}
+ 						
+ 						$schema .= str_repeat( $indent, 2 ) . '</index>' . "\n";
+@@ -2182,7 +2182,7 @@ class adoSchema {
+ 						
+ 						while( $row = $rs->FetchRow() ) {
+ 							foreach( $row as $key => $val ) {
+-								if ( $val != htmlentities( $val ) ) {
++								if ( $val != htmlentities( $val, ENT_COMPAT, 'UTF-8' ) ) {
+ 									$row[$key] = '<![CDATA[' . $val . ']]>';
+ 								}
+ 							}
+@@ -2361,7 +2361,7 @@ class adoSchema {
+ 			case 'text':
+ 				return !empty( $sqlArray ) ? implode( ";\n\n", $sqlArray ) . ';' : '';
+ 			case'html':
+-				return !empty( $sqlArray ) ? nl2br( htmlentities( implode( ";\n\n", $sqlArray ) . ';' ) ) : '';
++				return !empty( $sqlArray ) ? nl2br( htmlentities( implode( ";\n\n", $sqlArray ) . ';', ENT_COMPAT, 'UTF-8' ) ) : '';
+ 		}
+ 		
+ 		return $this->sqlArray;
+@@ -2389,7 +2389,7 @@ function logMsg( $msg, $title = NULL, $force = FALSE ) {
+ 		echo '<pre>';
+ 		
+ 		if( isset( $title ) ) {
+-			echo '<h3>' . htmlentities( $title ) . '</h3>';
++			echo '<h3>' . htmlentities( $title, ENT_COMPAT, 'UTF-8' ) . '</h3>';
+ 		}
+ 		
+ 		if( @is_object( $this ) ) {
+diff --git a/third_party/diff/diff.php b/third_party/diff/diff.php
+index 417f582..f1054d5 100644
+--- a/third_party/diff/diff.php
++++ b/third_party/diff/diff.php
+@@ -60,7 +60,7 @@ class diff {
+ 	}
+ 	
+ 	function formatcode($code){
+-		$code = htmlentities($code);
++		$code = htmlentities($code, ENT_COMPAT, 'UTF-8');
+ 		$code = str_replace(" ",'&nbsp;',$code);
+ 		$code = str_replace("\t",'&nbsp;&nbsp;&nbsp;&nbsp;',$code);
+ 		return $code;
+diff --git a/third_party/pchart/pChart/pChart.class b/third_party/pchart/pChart/pChart.class
+index 2b3303e..e127679 100644
+--- a/third_party/pchart/pChart/pChart.class
++++ b/third_party/pchart/pChart/pChart.class
+@@ -3407,7 +3407,7 @@
+      else
+       {
+        foreach($this->ImageMap as $Key => $Value)
+-        fwrite($Handle, htmlentities($Value)."\r");
++        fwrite($Handle, htmlentities($Value, ENT_COMPAT, 'UTF-8')."\r");
+       }
+      fclose ($Handle);
+     }
+@@ -3486,4 +3486,4 @@
+    echo "[FATAL] ".$Message."\r\n";
+    exit();
+   }
+-?>
+\ No newline at end of file
++?>
+diff --git a/third_party/phpxmlrpc/lib/xmlrpc.inc b/third_party/phpxmlrpc/lib/xmlrpc.inc
+index 0d9c2a3..2ddd3bf 100644
+--- a/third_party/phpxmlrpc/lib/xmlrpc.inc
++++ b/third_party/phpxmlrpc/lib/xmlrpc.inc
+@@ -1317,7 +1317,7 @@ $cp1252_to_xmlent =
+ 
+ 			if($this->debug > 1)
+ 			{
+-				print "<PRE>\n---SENDING---\n" . htmlentities($op) . "\n---END---\n</PRE>";
++				print "<PRE>\n---SENDING---\n" . htmlentities($op, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
+ 				// let the client see this now in case http times out...
+ 				flush();
+ 			}
+@@ -1460,7 +1460,7 @@ $cp1252_to_xmlent =
+ 
+ 			if($this->debug > 1)
+ 			{
+-				print "<PRE>\n---SENDING---\n" . htmlentities($payload) . "\n---END---\n</PRE>";
++				print "<PRE>\n---SENDING---\n" . htmlentities($payload, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
+ 				// let the client see this now in case http times out...
+ 				flush();
+ 			}
+@@ -2342,11 +2342,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
+ 					print '<PRE>';
+ 					foreach($GLOBALS['_xh']['headers'] as $header => $value)
+ 					{
+-						print htmlentities("HEADER: $header: $value\n");
++						print htmlentities("HEADER: $header: $value\n", ENT_COMPAT, 'UTF-8');
+ 					}
+ 					foreach($GLOBALS['_xh']['cookies'] as $header => $value)
+ 					{
+-						print htmlentities("COOKIE: $header={$value['value']}\n");
++						print htmlentities("COOKIE: $header={$value['value']}\n", ENT_COMPAT, 'UTF-8');
+ 					}
+ 					print "</PRE>\n";
+ 				}
+@@ -2380,13 +2380,13 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
+ 								{
+ 									$data = $degzdata;
+ 									if($this->debug)
+-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
++									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---</PRE>";
+ 								}
+ 								elseif($GLOBALS['_xh']['headers']['content-encoding'] == 'gzip' && $degzdata = @gzinflate(substr($data, 10)))
+ 								{
+ 									$data = $degzdata;
+ 									if($this->debug)
+-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
++									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---</PRE>";
+ 								}
+ 								else
+ 								{
+@@ -2424,7 +2424,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
+ 			if($this->debug)
+ 			{
+ 				//by maHo, replaced htmlspecialchars with htmlentities
+-				print "<PRE>---GOT---\n" . htmlentities($data) . "\n---END---\n</PRE>";
++				print "<PRE>---GOT---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
+ 			}
+ 
+ 			if($data == '')
+@@ -2463,7 +2463,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
+ 					$start += strlen('<!-- SERVER DEBUG INFO (BASE64 ENCODED):');
+ 					$end = strpos($data, '-->', $start);
+ 					$comments = substr($data, $start, $end-$start);
+-					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".htmlentities(str_replace("\n", "\n\t", base64_decode($comments)))."\n---END---\n</PRE>";
++					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".htmlentities(str_replace("\n", "\n\t", base64_decode($comments)), ENT_COMPAT, 'UTF-8')."\n---END---\n</PRE>";
+ 				}
+ 			}
+ 
+-- 
+tg: (d05c095..) t/htmlentities_on_utf8 (depends on: master)
