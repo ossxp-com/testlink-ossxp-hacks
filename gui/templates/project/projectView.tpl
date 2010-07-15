@@ -28,7 +28,7 @@ Rev :
 		s='title_testproject_management,testproject_txt_empty_list,tcase_id_prefix,
 		th_name,th_notes,testproject_alt_edit,testproject_alt_active,
 		th_requirement_feature,testproject_alt_delete,btn_create,public,
-		testproject_alt_requirement_feature,th_active,th_delete,th_id'}
+		testproject_alt_requirement_feature,th_active,th_delete,th_id,bts_project_id'}
 
 
 {include file="inc_head.tpl" openHead="yes" enableTableSorting="yes"}
@@ -62,6 +62,9 @@ var del_action=fRoot+'{$deleteAction}';
 			<th>{$toggle_api_info_img}{$sortHintIcon}{$labels.th_name}</th>
 			<th class="{$noSortableColumnClass}">{$labels.th_notes}</th>
 			<th>{$sortHintIcon}{$labels.tcase_id_prefix}</th>
+			{if $bts_project_name_wanted}
+			<th>{$labels.bts_project_id}</th>
+			{/if}
 			<th class="{$noSortableColumnClass}">{$labels.th_requirement_feature}</th>
 			<th class="icon_cell">{$labels.th_active}</th>
 {* havlatm: the feature is not ready for using - must be disabled (developed by Francisco)
@@ -89,6 +92,11 @@ var del_action=fRoot+'{$deleteAction}';
 			<td width="10%">
 				{$testproject.prefix|escape}
 			</td>
+			{if $bts_project_name_wanted}
+			<td width="10%">
+				{$testproject.bts_project_id|escape}
+			</td>
+			{/if}
 			<td class="clickable_icon">
 				{if $testproject.opt->requirementsEnabled}
   					<img style="border:none"

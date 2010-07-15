@@ -16,6 +16,11 @@
 
 require_once('../../config.inc.php');
 require_once("common.php");
+if (config_get('interface_bugs') != 'NO')
+{
+    require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' .
+                   DIRECTORY_SEPARATOR . 'int_bugtracking.php');
+}
 testlinkInitPage($db,false,false,"checkRights");
 
 $templateCfg = templateConfiguration();
@@ -35,8 +40,10 @@ if(count($gui->tprojects) == 0)
     $template2launch = "projectEdit.tpl"; 
     $gui->doAction = "create";
 }
+$bts_project_name_wanted = $g_bugInterface ? $g_bugInterface->project_name_wanted(): false;
 $smarty = new TLSmarty();
 $smarty->assign('gui',$gui);
+$smarty->assign('bts_project_name_wanted', $bts_project_name_wanted);
 $smarty->display($templateCfg->template_dir . $template2launch);
 
 
