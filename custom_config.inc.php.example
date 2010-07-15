@@ -133,6 +133,7 @@
 //$tlCfg->authentication['method'] = 'MD5';  # Default
 //$tlCfg->authentication['method'] = 'LDAP';
 //$tlCfg->authentication['method'] = 'COSIGN3';
+$tlCfg->authentication['sso_service_name'] = 'testlink';
 $tlCfg->authentication['login_url'] = 'https://weblogin.foo.bar/cgi-bin/login';
 $tlCfg->authentication['logout_url'] = 'https://weblogin.foo.bar/cgi-bin/logout';
 
@@ -193,5 +194,24 @@ $tlCfg->default_language = 'zh_CN';
  * 'SILENT': same that FILE, but user will not receive message on screen.
  */
 //$tlCfg->config_check_warning_mode = "SILENT";
+
+/*
+
+// Before enable demo_login, muse create the demo user, such as guest and leader.
+$tlCfg->authentication['demo_users'] = array(
+                          "guest" => "访客",
+                          "leader" => "测试经理");
+
+// Notes in the login page.
+$tlCfg->login_page_msg_title = "说明";
+$tlCfg->login_page_msg = "<div align='left'>" .
+                "<ul>" .
+                "<li>对该产品的意见和建议可以登录北京群英汇的 <a href='http://redmine.ossxp.com/redmine/projects/show/testlink'>Testlink 项目管理首页</a> 进
+行提问。" .
+                "<li>查看源代码，可选择 <a href='http://redmine.ossxp.com/redmine/repositories/show/testlink'>Web浏览</a>, ".
+                "或者从 GitHub 上 <a href='http://github.com/ossxp-com/testlink-ossxp-hacks'>克隆代码库</a>。" .
+                "<li>对该产品以及其他相关管理软件的技术支持请访问 <a href='http://www.ossxp.com/'>北京群英汇信息技术有限公司</a>。".
+                "</ul></div>";
+*/
 
 ?>
