@@ -1,0 +1,6 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/htmlentities_on_utf8
+
+htmlentities 如果不提供 UTF-8 作为字符集，在进行转换时会破坏中文字符，导致中文在网页显示异常。
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
