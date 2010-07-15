@@ -13,12 +13,12 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  install/sql/mssql/testlink_create_tables.sql    |    1 +
  install/sql/mysql/testlink_create_tables.sql    |    1 +
  install/sql/postgres/testlink_create_tables.sql |    1 +
- lib/bugtracking/int_bugtracking.php             |   60 ++++++++++++++++++++++-
+ lib/bugtracking/int_bugtracking.php             |   62 +++++++++++++++++++++-
  lib/execute/bugAdd.php                          |    6 ++-
  lib/functions/testproject.class.php             |   18 +++++--
  lib/project/projectEdit.php                     |   23 +++++++--
  lib/project/projectView.php                     |    9 +++-
- 12 files changed, 134 insertions(+), 24 deletions(-)
+ 12 files changed, 135 insertions(+), 25 deletions(-)
 
 diff --git a/cfg/redmine.cfg.php b/cfg/redmine.cfg.php
 index a87ea2f..3dbdd21 100755
@@ -180,7 +180,7 @@ index f91a30d..4029138 100644
    PRIMARY KEY ("id")
  ); 
 diff --git a/lib/bugtracking/int_bugtracking.php b/lib/bugtracking/int_bugtracking.php
-index d528c19..a94d41e 100644
+index d528c19..519f650 100644
 --- a/lib/bugtracking/int_bugtracking.php
 +++ b/lib/bugtracking/int_bugtracking.php
 @@ -63,6 +63,9 @@ class bugtrackingInterface
@@ -255,7 +255,12 @@ index d528c19..a94d41e 100644
  	}
  
  	/**
-@@ -364,7 +413,14 @@ if (isset($bts[$bts_type]))
+@@ -360,11 +409,18 @@ $g_bugInterface = null;
+ $bts_type = config_get('interface_bugs');
+ if (isset($bts[$bts_type]))
+ {
+-	$btsname = strtolower($g_interface_bugs);
++	$btsname = strtolower($bts_type);
  	$configPHP = $btsname . '.cfg.php';
  	$interfacePHP = 'int_' . $btsname . '.php';
  

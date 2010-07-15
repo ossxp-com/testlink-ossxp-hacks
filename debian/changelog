@@ -1,6 +1,8 @@
-ossxp-testlink (1.9~beta6~cvs+24) unstable; urgency=low
+ossxp-testlink (1.9~beta6~cvs+25) unstable; urgency=low
 
   * Sync with upstream 1.9 beta6-cvs.
+  * bugfix: in chart report view, raise a error for 
+    $g_interface_bugs not defined.
 
  -- Jiang Xin <jiangxin@ossxp.com>  Thu, 15 Jul 2010 19:04:24 +0800
 
