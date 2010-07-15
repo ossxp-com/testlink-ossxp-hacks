@@ -1,0 +1,14 @@
+/opt/testlink/web/cfg/reports.cfg.php
+/opt/testlink/web/cfg/redmine.cfg.php
+/opt/testlink/web/cfg/userRightMatrix.php
+/opt/testlink/web/cfg/trackplus.cfg.php
+/opt/testlink/web/cfg/jira.cfg.php
+/opt/testlink/web/cfg/gforge.cfg.php
+/opt/testlink/web/cfg/seapine.cfg.php
+/opt/testlink/web/cfg/eventum.cfg.php
+/opt/testlink/web/cfg/trac.cfg.php
+/opt/testlink/web/cfg/mantis.cfg.php
+/opt/testlink/web/cfg/fogbugz.cfg.php
+/opt/testlink/web/cfg/jirasoap.cfg.php
+/opt/testlink/web/cfg/bugzilla.cfg.php
+#/opt/testlink/web/cfg/const.inc.php
