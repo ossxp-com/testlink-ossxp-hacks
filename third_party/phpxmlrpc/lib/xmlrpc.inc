@@ -1357,7 +1357,7 @@
 
 			if($this->debug > 1)
 			{
-				print "<PRE>\n---SENDING---\n" . htmlentities($op) . "\n---END---\n</PRE>";
+				print "<PRE>\n---SENDING---\n" . htmlentities($op, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
 				flush();
 			}
@@ -1501,7 +1501,7 @@
 
 			if($this->debug > 1)
 			{
-				print "<PRE>\n---SENDING---\n" . htmlentities($payload) . "\n---END---\n</PRE>";
+				print "<PRE>\n---SENDING---\n" . htmlentities($payload, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
 				flush();
 			}
@@ -2406,11 +2406,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					print '<PRE>';
 					foreach($GLOBALS['_xh']['headers'] as $header => $value)
 					{
-						print htmlentities("HEADER: $header: $value\n");
+						print htmlentities("HEADER: $header: $value\n", ENT_COMPAT, 'UTF-8');
 					}
 					foreach($GLOBALS['_xh']['cookies'] as $header => $value)
 					{
-						print htmlentities("COOKIE: $header={$value['value']}\n");
+						print htmlentities("COOKIE: $header={$value['value']}\n", ENT_COMPAT, 'UTF-8');
 					}
 					print "</PRE>\n";
 				}
@@ -2444,13 +2444,13 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 								{
 									$data = $degzdata;
 									if($this->debug)
-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
+									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---</PRE>";
 								}
 								elseif($GLOBALS['_xh']['headers']['content-encoding'] == 'gzip' && $degzdata = @gzinflate(substr($data, 10)))
 								{
 									$data = $degzdata;
 									if($this->debug)
-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
+									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---</PRE>";
 								}
 								else
 								{
@@ -2488,7 +2488,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			if($this->debug)
 			{
 				//by maHo, replaced htmlspecialchars with htmlentities
-				print "<PRE>---GOT---\n" . htmlentities($data) . "\n---END---\n</PRE>";
+				print "<PRE>---GOT---\n" . htmlentities($data, ENT_COMPAT, 'UTF-8') . "\n---END---\n</PRE>";
 			}
 
 			if($data == '')
@@ -2527,7 +2527,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					$start += strlen('<!-- SERVER DEBUG INFO (BASE64 ENCODED):');
 					$end = strpos($data, '-->', $start);
 					$comments = substr($data, $start, $end-$start);
-					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".htmlentities(str_replace("\n", "\n\t", base64_decode($comments)))."\n---END---\n</PRE>";
+					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".htmlentities(str_replace("\n", "\n\t", base64_decode($comments)), ENT_COMPAT, 'UTF-8')."\n---END---\n</PRE>";
 				}
 			}
 

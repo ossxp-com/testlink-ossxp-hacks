@@ -310,7 +310,7 @@ function migrate_tc_specs(&$source_db,&$target_db,&$tmp_table_name,&$users,&$mig
 	     // 20061208 - franciscom - 
 	     // added abs()
 	     // added htmlentities()
-	     print_msg("TCID:{$item_id} - " . htmlentities($idata['title']) ."<br>");
+	     print_msg("TCID:{$item_id} - " . htmlentities($idata['title'], ENT_COMPAT, 'UTF-8') ."<br>");
 	     
 	     $status = $tc_mgr->create_tcase_only(0,$idata['title'],abs($idata['TCorder']),$item_id);	     
 	     	       	
@@ -361,7 +361,7 @@ function migrate_tc_specs(&$source_db,&$target_db,&$tmp_table_name,&$users,&$mig
 	     $map_tc_tcversion[$item_id]= $x['id'];
 	     
 	     // 20061208 - franciscom
-		 print_msg("TCID:{$item_id} - " . htmlentities($idata['title']) . " - TCVERSION_ID:{$x['id']}<br>", "FULL_FEEDBACK");
+		 print_msg("TCID:{$item_id} - " . htmlentities($idata['title'], ENT_COMPAT, 'UTF-8') . " - TCVERSION_ID:{$x['id']}<br>", "FULL_FEEDBACK");
 	    
 	     ++$items_processed; 
 	     if( ($items_processed % FEEDBACK_STEP)== 0 )
@@ -447,7 +447,7 @@ foreach($items as $prod_id => $pd)
       $ret=$ts_mgr->create($tproject_id,$cod['name'],$details);
       if( $ret['status_ok'] )
       {
-        echo "<pre>Component " . htmlentities($cod['name']) . " Migrated<br></pre>";
+        echo "<pre>Component " . htmlentities($cod['name'], ENT_COMPAT, 'UTF-8') . " Migrated<br></pre>";
         flush();
           
         $mgtcomp_id=$ret['id'];
@@ -473,7 +473,7 @@ foreach($items as $prod_id => $pd)
           $ret=$ts_mgr->create($mgtcomp_id,$cad['name'],$details);
           if( $ret['status_ok'] )
           {
-            echo "<pre>    Category " . htmlentities($cad['name']) . " Migrated<br></pre>";  
+            echo "<pre>    Category " . htmlentities($cad['name'], ENT_COMPAT, 'UTF-8') . " Migrated<br></pre>";  
             flush();
             
             $mgtcat_id=$ret['id'];
