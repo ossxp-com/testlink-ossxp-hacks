@@ -1,0 +1,6 @@
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/gui_stylesheet
+
+Change font-size from 11px to 12 px.
+
+Signed-off-by: Jiang <jiangxin@ossxp.com>
