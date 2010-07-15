@@ -60,7 +60,7 @@ class diff {
 	}
 	
 	function formatcode($code){
-		$code = htmlentities($code);
+		$code = htmlentities($code, ENT_COMPAT, 'UTF-8');
 		$code = str_replace(" ",'&nbsp;',$code);
 		$code = str_replace("\t",'&nbsp;&nbsp;&nbsp;&nbsp;',$code);
 		return $code;

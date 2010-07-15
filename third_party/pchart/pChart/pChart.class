@@ -3407,7 +3407,7 @@
      else
       {
        foreach($this->ImageMap as $Key => $Value)
-        fwrite($Handle, htmlentities($Value)."\r");
+        fwrite($Handle, htmlentities($Value, ENT_COMPAT, 'UTF-8')."\r");
       }
      fclose ($Handle);
     }

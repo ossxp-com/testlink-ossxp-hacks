@@ -211,7 +211,7 @@ function renderRequirementNodeForPrinting(&$db,$node, &$printingOptions, $tocPre
 			           "<td>";
 			           
 			foreach ($req_coverage as $tc) {
-				$output .= htmlentities($tc['tc_external_id'] . $title_separator .
+				$output .= string_html_entities($tc['tc_external_id'] . $title_separator .
 				                        $tc['name']) . "<br/>";
 			}
 			           
