@@ -186,12 +186,8 @@ function create($name,$color,$options,$notes,$active=1,$tcasePrefix='',$is_publi
  *	20060312 - franciscom - name is setted on nodes_hierarchy table
  *
  **/
-<<<<<<< HEAD
-function update($id, $name, $color, $opt_req, $optPriority, $optAutomation, $notes,$active=null,$tcasePrefix=null,$btsProjectId=null)
-=======
 function projectUpdate($id, $name, $color, $notes,$options,$active=null,
-						$tcasePrefix=null,$is_public=null)
->>>>>>> refs/top-bases/t/bugtrac_integration
+						$tcasePrefix=null,$is_public=null,$btsProjectId=null)
 {
     $status_ok=1;
 	$status_msg = 'ok';
