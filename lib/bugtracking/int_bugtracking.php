@@ -409,7 +409,7 @@ $g_bugInterface = null;
 $bts_type = config_get('interface_bugs');
 if (isset($bts[$bts_type]))
 {
-	$btsname = strtolower($g_interface_bugs);
+	$btsname = strtolower($bts_type);
 	$configPHP = $btsname . '.cfg.php';
 	$interfacePHP = 'int_' . $btsname . '.php';
 
