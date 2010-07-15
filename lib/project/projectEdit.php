@@ -28,6 +28,11 @@ require_once('common.php');
 require_once("web_editor.php");
 $editorCfg = getWebEditorCfg('testproject');
 require_once(require_web_editor($editorCfg['type']));
+if (config_get('interface_bugs') != 'NO')
+{
+    require_once(TL_ABS_PATH. 'lib' . DIRECTORY_SEPARATOR . 'bugtracking' .
+                   DIRECTORY_SEPARATOR . 'int_bugtracking.php');
+}
 
 testlinkInitPage($db,true,false,"checkRights");
 

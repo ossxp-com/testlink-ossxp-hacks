@@ -121,6 +121,16 @@
 				  	{include file="error_icon.tpl" field="tcasePrefix"}
 				</td>
 			</tr>
+			{if $bts_project_name_wanted}
+			<tr>
+				<th style="background:none;">{$labels.bts_project_id}</th>
+				<td><input type="text" name="btsProjectId"
+  			           size="{#BTS_PROJECT_ID_SIZE#}"
+	  		           maxlength="{#BTS_PROJECT_ID_MAXLEN#}"
+				           value="{$btsProjectId|escape}"/>
+				</td>
+			</tr>
+			{/if}
 			<tr>
 				<td>{$labels.testproject_description}</td>
 				<td style="width:80%">{$notes}</td>
@@ -149,18 +159,6 @@
 					{$labels.testproject_enable_requirements}
 				</td>
 			</tr>
-
-			{if $bts_project_name_wanted}
-			<tr>
-				<th style="background:none;">{$labels.bts_project_id}</th>
-				<td><input type="text" name="btsProjectId"
-  			           size="{#BTS_PROJECT_ID_SIZE#}"
-	  		           maxlength="{#BTS_PROJECT_ID_MAXLEN#}"
-				           value="{$btsProjectId|escape}"/>
-				</td>
-			</tr>
-			{/if}
-
 			<tr>
 				<td></td><td>
 					<input type="checkbox" name="optPriority" 
