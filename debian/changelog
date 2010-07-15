@@ -1,3 +1,9 @@
+ossxp-testlink (1.9~beta6~cvs+24) unstable; urgency=low
+
+  * Sync with upstream 1.9 beta6-cvs.
+
+ -- Jiang Xin <jiangxin@ossxp.com>  Thu, 15 Jul 2010 19:04:24 +0800
+
 ossxp-testlink (1.9~beta5-24) unstable; urgency=low
 
   * Bugfix: htmlentities may destroy chinese characters.

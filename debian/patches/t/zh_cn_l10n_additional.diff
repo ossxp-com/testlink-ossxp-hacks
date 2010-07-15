@@ -6,18 +6,19 @@ Subject: [PATCH] t/zh_cn_l10n_additional
 Signed-off-by: Jiang <jiangxin@ossxp.com>
 
 ---
- locale/en_GB/strings.txt |    8 ++++++++
- locale/zh_CN/strings.txt |    8 ++++++++
- 2 files changed, 16 insertions(+), 0 deletions(-)
+ locale/en_GB/strings.txt |    9 +++++++++
+ locale/zh_CN/strings.txt |    9 +++++++++
+ 2 files changed, 18 insertions(+), 0 deletions(-)
 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 8482ab0..34a5484 100644
+index 4dfddeb..5df911d 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
-@@ -2907,5 +2907,13 @@ $TLS_import_done = 'Import done';
- $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
- $TLS_import_req_exists_here = 'Doc ID exists';
+@@ -2924,4 +2924,13 @@ $TLS_import_req_exists_here = 'Doc ID exists';
  
+ $TLS_invalid_release_date = 'Release date is not a valid date';
+ // ----- END ------------------------------------------------------------------
++
 +// ----- OSSXP add the following locale strings -----
 +$TLS_bts_project_id = "BTS Project ID";
 +
@@ -26,16 +27,16 @@ index 8482ab0..34a5484 100644
 +$TLS_demo_login_title = "TestLink demo";
 +$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
 +
- // ----- END ------------------------------------------------------------------
  ?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index 2a8d617..843f77d 100644
+index 8a2214d..8080ea0 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -2867,5 +2867,13 @@ $TLS_import_done = 'Import done';
- $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
- $TLS_import_req_exists_here = 'Doc ID exists';
+@@ -2884,4 +2884,13 @@ $TLS_import_req_exists_here = 'Doc ID exists';
  
+ $TLS_invalid_release_date = 'Release date is not a valid date';
+ // ----- END ------------------------------------------------------------------
++
 +// ----- 群英汇添加下列国际化字符串。 by ossxp.com -----
 +$TLS_bts_project_id = "缺陷跟踪项目ID";
 +
@@ -44,7 +45,6 @@ index 2a8d617..843f77d 100644
 +$TLS_demo_login_title = "TestLink 演示";
 +$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
 +
- // ----- END ------------------------------------------------------------------
  ?>
 -- 
-tg: (69e5105..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)
+tg: (857ae89..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)

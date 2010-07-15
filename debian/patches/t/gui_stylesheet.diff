@@ -68,4 +68,4 @@ index fd3ce1f..a042251 100644
  .x-tl-panel-mc .x-tl-panel-body{background:transparent;border:0 none;}
  .x-tl-panel-ml{background:#fff url(../images/left-right.gif) repeat-y 0 0;padding-left:6px;}
 -- 
-tg: (d05c095..) t/gui_stylesheet (depends on: master)
+tg: (6dce09c..) t/gui_stylesheet (depends on: master)
