@@ -1667,7 +1667,7 @@
 			{
 				print "<PRE>\n---CURL INFO---\n";
 				foreach(curl_getinfo($curl) as $name => $val)
-					 print $name . ': ' . htmlentities($val). "\n";
+					 print $name . ': ' . htmlentities($val, ENT_COMPAT, 'UTF-8'). "\n";
 				print "---END---\n</PRE>";
 			}
 
