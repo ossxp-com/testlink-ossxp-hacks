@@ -6,13 +6,11 @@
  * @package     TestLink
  * @author      Erik Eloff
  * @copyright   2006-2009, TestLink community
- * @version     CVS: $Id: tlPlatform.class.php,v 1.20 2010/07/11 17:05:24 franciscom Exp $
+ * @version     CVS: $Id: tlPlatform.class.php,v 1.18 2010/03/01 20:39:18 franciscom Exp $
  * @link        http://www.teamst.org/index.php
  *
  * @internal Revision:
  *
- *	20100711 - franciscom - BUGID 3564: TestCases added via tl.addTestCaseToTestPlan won't show up for execution
- *	20100705 - franciscom - getLinkedToTestplan() - interface changes
  *	20100225 - eloff - rename platformVisibleForTestplan() to platformsActiveForTestplan()
  *	20100202 - franciscom - create() - changed return type
  *	20100201 - franciscom - linkToTestplan(), unlinkFromTestplan() - refactoring to manage null	as $id
@@ -293,45 +291,18 @@ class tlPlatform extends tlObjectWithDB
 	}
 
 	/**
-	 * @param map $options
+	 * @param string $orderBy
 	 * @return array Returns all platforms associated to a given testplan
-	 *
-	 * @internal revision
-	 * 20100705 - franciscom - interface - BUGID 3564
-	 *
 	 */
-	public function getLinkedToTestplan($testplanID, $options = null)
+	public function getLinkedToTestplan($testplanID,$orderBy=' ORDER BY name ')
 	{
-		// output:
-		// array => indexed array
-		// mapAccessByID => map access key: id
-		// mapAccessByName => map access key: name
-		$my['options'] = array('outputFormat' => 'array', 'orderBy' => ' ORDER BY name ');
-	    $my['options'] = array_merge($my['options'], (array)$options);
-		
 		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
-		$rs = null;
 		$sql = "/* $debugMsg */ SELECT P.id, P.name, P.notes " .
 			   " FROM {$this->tables['platforms']} P " .
 			   " JOIN {$this->tables['testplan_platforms']} TP " .
 			   " ON P.id = TP.platform_id " .
-			   " WHERE  TP.testplan_id = {$testplanID} {$my['options']['orderBy']}";
-		
-		switch($my['options']['outputFormat'])
-		{
-			case 'array':
-				$rs = $this->db->get_recordset($sql);
-			break;
-			
-			case 'mapAccessByID':
-				$rs = $this->db->fetchRowsIntoMap($sql,'id');
-			break;
-			
-			case 'mapAccessByName':
-				$rs = $this->db->fetchRowsIntoMap($sql,'name');
-			break;
-		}	   
-		return $rs;
+			   " WHERE  TP.testplan_id = {$testplanID} {$orderBy}";
+		return $this->db->get_recordset($sql);
 	}
 
 

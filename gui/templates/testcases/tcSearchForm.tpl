@@ -1,10 +1,9 @@
 {* 
 TestLink Open Source Project - http://testlink.sourceforge.net/ 
-$Id: tcSearchForm.tpl,v 1.17 2010/07/07 08:46:24 mx-julian Exp $
+$Id: tcSearchForm.tpl,v 1.16 2010/06/24 17:25:53 asimon83 Exp $
 Purpose: show form for search through test cases in test specification
 
 rev :
-  20100707 - Julian - BUGID 3584: replaced cf names by cf labels
   20100609 - franciscom - BUGID 1627: Search Test Case by Date of Creation
   20100409 - franciscom - BUGID 3371 Search Test Cases based on Test Importance
   20100124 - franciscom - BUGID 3077 - search on preconditions
@@ -127,7 +126,7 @@ rev :
 		    	<td><select name="custom_field_id">
 		    			<option value="0">&nbsp;</option>
 		    			{foreach from=$gui->design_cf key=cf_id item=cf}
-		    				<option value="{$cf_id}">{$cf.label|escape}</option>
+		    				<option value="{$cf_id}">{$cf.name}</option>
 		    			{/foreach}
 		    		</select>
 		    	</td>
