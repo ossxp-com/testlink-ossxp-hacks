@@ -1,7 +1,7 @@
 <?php
 /*
  * TestLink Open Source Project - http://testlink.sourceforge.net/
- * $Id: APIErrors.php,v 1.33 2010/07/11 17:08:02 franciscom Exp $
+ * $Id: APIErrors.php,v 1.30 2010/06/24 17:25:56 asimon83 Exp $
  */
 
 /** 
@@ -96,10 +96,6 @@ define('NODEID_DOESNOT_EXIST_STR',lang_get('API_NODEID_DOESNOT_EXIST',null,1));
 define('CFG_DELETE_EXEC_DISABLED',232);
 define('CFG_DELETE_EXEC_DISABLED_STR',lang_get('API_CFG_DELETE_EXEC_DISABLED',null,1));
 
-define('NO_PLATFORMID', 233);
-define('NO_PLATFORMID_STR', lang_get('API_NO_PLATFORMID',null,1));
-
-
 
 /**
  * 2000 level - authentication errors
@@ -143,19 +139,6 @@ define('TESTPLAN_HAS_NO_PLATFORMS_STR',lang_get('API_TESTPLAN_HAS_NO_PLATFORMS',
 
 define('TCASEID_NOT_IN_TPLANID_FOR_PLATFORM', 3042);
 define('TCASEID_NOT_IN_TPLANID_FOR_PLATFORM_STR', lang_get('API_TCASEID_NOT_IN_TPLANID_FOR_PLATFORM',null,1));
-
-define('MISSING_PLATFORMID_BUT_NEEDED', 3043);
-define('MISSING_PLATFORMID_BUT_NEEDED_STR', lang_get('API_MISSING_PLATFORMID_BUT_NEEDED',null,1));
-
-define('PLATFORM_ID_NOT_LINKED_TO_TESTPLAN', 3044);
-define('PLATFORM_ID_NOT_LINKED_TO_TESTPLAN_STR', lang_get('API_PLATFORM_ID_NOT_LINKED_TO_TESTPLAN',null,1));
-
-define('LINKED_FEATURE_ALREADY_EXISTS', 3045);
-define('LINKED_FEATURE_ALREADY_EXISTS_STR', lang_get('API_LINKED_FEATURE_ALREADY_EXISTS',null,1));
-
-define('OTHER_VERSION_IS_ALREADY_LINKED', 3046);
-define('OTHER_VERSION_IS_ALREADY_LINKED_STR', lang_get('API_OTHER_VERSION_IS_ALREADY_LINKED',null,1));
-
 
 
 /**
