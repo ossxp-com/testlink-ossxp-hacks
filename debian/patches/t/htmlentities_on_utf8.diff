@@ -57,10 +57,10 @@ index 6d11d78..2914b97 100644
              
              $mgtcat_id=$ret['id'];
 diff --git a/lib/execute/execSetResults.php b/lib/execute/execSetResults.php
-index 1a346f3..640b242 100644
+index 18afa94..264a7f3 100644
 --- a/lib/execute/execSetResults.php
 +++ b/lib/execute/execSetResults.php
-@@ -669,7 +669,7 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
+@@ -654,7 +654,7 @@ function smarty_assign_tsuite_info(&$smarty,&$request_hash, &$db,&$tree_mgr,$tca
        foreach($value['name'] as $jdx => $elem)
        {
        	$str .= "<a href=\"javascript:openTestSuiteWindow(" . $value['node_id'][$jdx] . ")\"> ";
@@ -70,7 +70,7 @@ index 1a346f3..640b242 100644
        $tsuite_info[$key]['tsuite_name']=$str;  
    }
 diff --git a/lib/functions/print.inc.php b/lib/functions/print.inc.php
-index 3d21a6a..a9ab3aa 100644
+index eda8e3c..af7a25f 100644
 --- a/lib/functions/print.inc.php
 +++ b/lib/functions/print.inc.php
 @@ -211,7 +211,7 @@ function renderRequirementNodeForPrinting(&$db,$node, &$printingOptions, $tocPre
@@ -302,4 +302,4 @@ index 0d9c2a3..2ddd3bf 100644
  			}
  
 -- 
-tg: (6dce09c..) t/htmlentities_on_utf8 (depends on: master)
+tg: (9ef00e4..) t/htmlentities_on_utf8 (depends on: master)

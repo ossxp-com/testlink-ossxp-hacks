@@ -16,7 +16,7 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  7 files changed, 205 insertions(+), 12 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index 59015fd..ebbebda 100644
+index d93cc11..2bd6c7a 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -318,8 +318,12 @@ $g_smtp_password    = '';  # password
@@ -188,10 +188,10 @@ index a653f3b..7a4a75d 100644
 +
  ?>
 diff --git a/lib/functions/tlUser.class.php b/lib/functions/tlUser.class.php
-index bb64e0f..ec62afc 100644
+index 800496e..1613755 100644
 --- a/lib/functions/tlUser.class.php
 +++ b/lib/functions/tlUser.class.php
-@@ -30,6 +30,9 @@
+@@ -29,6 +29,9 @@
   * @uses 	config.inc.php
   * @since 	1.7
   */ 
@@ -201,7 +201,7 @@ index bb64e0f..ec62afc 100644
  class tlUser extends tlDBObject
  {
  	/**
-@@ -98,6 +101,8 @@ class tlUser extends tlDBObject
+@@ -97,6 +100,8 @@ class tlUser extends tlDBObject
  	 */
  	public $userApiKey;
  
@@ -210,7 +210,7 @@ index bb64e0f..ec62afc 100644
  	/**
  	 * @var string the password of the user
  	 * @access protected
-@@ -156,6 +161,7 @@ class tlUser extends tlDBObject
+@@ -155,6 +160,7 @@ class tlUser extends tlDBObject
  		$this->isActive = 1;
  		$this->tprojectRoles = null;
  		$this->tplanRoles = null;
@@ -218,7 +218,7 @@ index bb64e0f..ec62afc 100644
  	}
  	
  	/** 
-@@ -229,7 +235,24 @@ class tlUser extends tlDBObject
+@@ -228,7 +234,24 @@ class tlUser extends tlDBObject
  	function create()
  	{
  	}
@@ -244,7 +244,7 @@ index bb64e0f..ec62afc 100644
  	//----- BEGIN interface iDBSerialization -----
  	/** 
  	 * Reads an user object identified by its database id from the given database
-@@ -984,4 +1007,4 @@ class tlUser extends tlDBObject
+@@ -965,4 +988,4 @@ class tlUser extends tlDBObject
  	}	
  
  }
@@ -392,4 +392,4 @@ index 4c38572..941d4c6 100644
  exit();
  
 -- 
-tg: (fa3a5ab..) t/single_signon (depends on: t/typos_no_last_eol)
+tg: (f806f14..) t/single_signon (depends on: t/typos_no_last_eol)

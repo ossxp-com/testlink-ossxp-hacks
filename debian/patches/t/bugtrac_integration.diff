@@ -60,7 +60,7 @@ index a87ea2f..3dbdd21 100755
 +define('BUG_TRACK_ENTER_BUG_HREF',"http://localhost/redmine/projects/%s/issues/new");
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index 59015fd..a6989c0 100644
+index d93cc11..c73aca4 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -270,6 +270,7 @@ $g_removeEventsOlderThan = 30;
@@ -486,4 +486,4 @@ index fbc2937..bde967f 100644
 \ No newline at end of file
 +?>
 -- 
-tg: (5744030..) t/bugtrac_integration (depends on: t/typos_no_last_eol)
+tg: (130f25e..) t/bugtrac_integration (depends on: t/typos_no_last_eol)

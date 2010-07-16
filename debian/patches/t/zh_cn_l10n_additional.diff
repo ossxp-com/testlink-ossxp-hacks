@@ -11,12 +11,12 @@ Signed-off-by: Jiang <jiangxin@ossxp.com>
  2 files changed, 18 insertions(+), 0 deletions(-)
 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 4dfddeb..5df911d 100644
+index 8482ab0..70ee1bd 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
-@@ -2924,4 +2924,13 @@ $TLS_import_req_exists_here = 'Doc ID exists';
+@@ -2908,4 +2908,13 @@ $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe bran
+ $TLS_import_req_exists_here = 'Doc ID exists';
  
- $TLS_invalid_release_date = 'Release date is not a valid date';
  // ----- END ------------------------------------------------------------------
 +
 +// ----- OSSXP add the following locale strings -----
@@ -47,4 +47,4 @@ index 8a2214d..8080ea0 100644
 +
  ?>
 -- 
-tg: (857ae89..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)
+tg: (caee7da..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)
