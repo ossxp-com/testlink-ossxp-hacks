@@ -6,16 +6,11 @@
  * @package 	TestLink
  * @author 		Francisco Mancardi (francisco.mancardi@gmail.com)
  * @copyright 	2005-2009, TestLink community 
- * @version    	CVS: $Id: testcase.class.php,v 1.283 2010/07/14 14:21:21 mx-julian Exp $
+ * @version    	CVS: $Id: testcase.class.php,v 1.277 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  *
  * @internal Revisions:
  *
- * 20100714 - Julian - BUGID 3575 -  get_assigned_to_user() added priority in output set
- * 20100712 - asimon - inserted missing semicolon after break in get_assigned_to_user()
- * 20100711 - franciscom - BUGID 3575 -  get_assigned_to_user() added $filters as optional arg
- * 20100708 - franciscom - BUGID 3575 -  get_assigned_to_user() add plaftorm in output set
- * 20100706 - franciscom - BUGID 3573 - _blind_delete() with alias has problems with MySQL
  * 20100521 - franciscom - BUGID 3481 - copy_tcversion() - preconditions are not copied
  * 20100516 - franciscom - BUGID 3465: Delete Test Project - User Execution Assignment is not deleted
  * 20100514 - franciscom - get_by_id() interface changes and improvements
@@ -1236,9 +1231,8 @@ class testcase extends tlObjectWithAttachments
 	    }
 
 		// BUGID 3465: Delete Test Project - User Execution Assignment is not deleted
-		// BUGID 3573: MySQL does not like ALIAS
-		$sql[]="/* $debugMsg */ DELETE FROM {$this->tables['user_assignments']} " .
-			   " WHERE feature_id in (" .
+		$sql[]="/* $debugMsg */ DELETE FROM {$this->tables['user_assignments']} UA " .
+			   " WHERE UA.feature_id in (" .
 			   " SELECT id FROM {$this->tables['testplan_tcversions']}  " .
 		       " WHERE tcversion_id IN ({$tcversion_list}))";
 		
@@ -3189,9 +3183,6 @@ class testcase extends tlObjectWithAttachments
 	 *                         possible values: 'testplan_testcase','testcase_testplan'
 	 *                         changes access key in result map of maps.
 	 *                         if not defined or null -> 'testplan_testcase' 
-	 *						   
-	 * @param object [filters] 'tplan_status' => 'active','inactive','all'
-	 *                     	
 	 *
 	 * @return map key: (test plan id or test case id depending on options->access_keys,
 	 *                   default is test plan).
@@ -3202,58 +3193,33 @@ class testcase extends tlObjectWithAttachments
 	 *                         
 	 * @since 20090131 - franciscom
 	 *
-	 * @internal revision
-	 *  20100712 - asimon - inserted missing semicolon
-	 *	20100708 - franciscom - BUGID 3575 - add plaftorm in output set
 	 */
-	function get_assigned_to_user($user_id,$tproject_id,$tplan_id=null,$options=null, $filters=null)
+	function get_assigned_to_user($user_id,$tproject_id,$tplan_id=null,$options=null)
 	{
-		$debugMsg = 'Class:' . __CLASS__ . ' - Method: ' . __FUNCTION__;
-	    
-   	    $my['filters'] = array( 'tplan_status' => 'all');
-	    $my['filters'] = array_merge($my['filters'], (array)$filters);
-
-	    $filters = null;
-	    
+	    $filters=null;
 	    $has_options=!is_null($options);
 	    $access_key=array('testplan_id','testcase_id');
-
-	    $sql="/* $debugMsg */ SELECT TPROJ.id as testproject_id,TPTCV.testplan_id,TPTCV.tcversion_id, " .
-	         " TCV.version,TCV.tc_external_id, NHTC.id AS testcase_id, NHTC.name, TPROJ.prefix, " .
-	         " UA.creation_ts ,UA.deadline_ts, COALESCE(PLAT.name,'') AS platform_name, " .
-	         " (TPTCV.urgency * TCV.importance) AS priority " .
-	         " FROM {$this->tables['user_assignments']} UA " . 
-	         " JOIN {$this->tables['testplan_tcversions']} TPTCV ON TPTCV.id = UA.feature_id " .
-	         " JOIN {$this->tables['tcversions']} TCV ON TCV.id=TPTCV.tcversion_id " .
-	         " JOIN {$this->tables['nodes_hierarchy']} NHTCV ON NHTCV.id = TCV.id " .
-	         " JOIN {$this->tables['nodes_hierarchy']} NHTC ON NHTC.id = NHTCV.parent_id " .
-	         " JOIN {$this->tables['nodes_hierarchy']} NHTPLAN ON  NHTPLAN.id=TPTCV.testplan_id " .
-	         " JOIN {$this->tables['testprojects']} TPROJ ON  TPROJ.id = NHTPLAN.parent_id " .
-	         " JOIN {$this->tables['testplans']} TPLAN ON  TPLAN.id = TPTCV.testplan_id " .
-	         " LEFT OUTER JOIN {$this->tables['platforms']} PLAT ON  PLAT.id = TPTCV.platform_id " .
-	         " WHERE UA.type={$this->assignment_types['testcase_execution']['id']} " .
-	         " AND UA.user_id = {$user_id} " .
-	         " AND TPROJ.id IN (" . implode(',', array($tproject_id)) .") " ;
+	    
+	    
+	    $sql="SELECT testprojects.id as testproject_id,TPTCV.testplan_id,TPTCV.tcversion_id, " .
+	         "TCV.version,TCV.tc_external_id, NHB.id AS testcase_id, NHB.name, testprojects.prefix, " .
+	         "UA.creation_ts ,UA.deadline_ts " .
+	         "FROM {$this->tables['user_assignments']}  UA, {$this->tables['testplan_tcversions']}  TPTCV, " .
+	         "{$this->tables['tcversions']}  TCV, {$this->tables['nodes_hierarchy']} NHA," .
+	         " {$this->tables['nodes_hierarchy']} NHB, " .
+	         "{$this->tables['nodes_hierarchy']} NHC, {$this->tables['testprojects']} testprojects " .
+	         "WHERE UA.type={$this->assignment_types['testcase_execution']['id']} " .
+	         "AND UA.user_id = {$user_id} " .
+	         "AND testprojects.id IN (" . implode(',', array($tproject_id)) .") " .
+	         "AND UA.feature_id=TPTCV.id AND TPTCV.tcversion_id=TCV.id  " .
+	         "AND NHC.id=TPTCV.testplan_id AND NHC.parent_id=testprojects.id " .
+	         "AND NHB.id=NHA.parent_id AND NHA.id=TCV.id " ;
+	         
 	         
 	    if( !is_null($tplan_id) )
 	    {
 	        $filters=" AND TPTCV.testplan_id IN (" . implode(',',$tplan_id) . ") "; 
 	    }     
-	    
-	    switch($my['filters']['tplan_status'])
-	    {
-	    	case 'all':
-	    	break;
-	    	
-	    	case 'active':
-	        	$filters .= " AND TPLAN.active = 1 ";
-	    	break;
-	    	
-	    	case 'inactive':
-	        	$filters .= " AND TPLAN.active = 0 ";
-	    	break;
-	    }
-
 	    $sql .= $filters;
 	    
 	    if( $has_options && isset($options->access_keys) )
@@ -3269,7 +3235,8 @@ class testcase extends tlObjectWithAttachments
 	        }
 	    }
 	    
-	    $rs=$this->db->fetchMapRowsIntoMap($sql,$access_key[0],$access_key[1],database::CUMULATIVE);
+	    $rs=$this->db->fetchMapRowsIntoMap($sql,$access_key[0],$access_key[1]);
+	
 	    if( $has_options && !is_null($rs))
 	    {
 	        if( isset($options->mode) )
@@ -3281,23 +3248,17 @@ class testcase extends tlObjectWithAttachments
 	                        (is_null($options->access_keys) || $options->access_keys='testplan_testcase') )
 	                    { 
 	                        $tcaseSet=null;
-	                        $main_keys = array_keys($rs);
-	       					foreach($main_keys as $maccess_key)
-	       					{
-	       						$sec_keys = array_keys($rs[$maccess_key]);
-	       						foreach($sec_keys as $saccess_key)
-	       						{
-	       							// is enough I process first element
-	       							$item = $rs[$maccess_key][$saccess_key][0];
+	                        foreach($rs as $container)
+	                        {
+	                            foreach($container as $item)
+	                            {
 	                                if(!isset($tcaseSet[$item['testcase_id']]))
 	                                {
 	                                    $tcaseSet[$item['testcase_id']]=$item['testcase_id'];  
 	                                }  
-	       						}
-	       					}
-
+	                            }    
+	                        }
 	                        $path_info = $this->tree_manager->get_full_path_verbose($tcaseSet);
-
 	                        // Remove test project piece and convert to string
 	                        $flat_path=null;
 	                        foreach($path_info as $tcase_id => $pieces)
@@ -3305,21 +3266,15 @@ class testcase extends tlObjectWithAttachments
 	                            unset($pieces[0]);
 	                            $flat_path[$tcase_id]=implode('/',$pieces) . '/';  
 	                        }
-	                        $main_keys = array_keys($rs);
-
-	       					foreach($main_keys as $idx)
-	       					{
-	       						$sec_keys = array_keys($rs[$idx]);
-	       						foreach($sec_keys as $jdx)
-	       						{
-									$third_keys = array_keys($rs[$idx][$jdx]);
-	       							foreach($third_keys as $tdx)
-	       							{
-	       								$fdx = $rs[$idx][$jdx][$tdx]['testcase_id'];
-	                                	$rs[$idx][$jdx][$tdx]['tcase_full_path']=$flat_path[$fdx];
-									}
-	       						}
-	       					}
+	
+	                        $container_keys=array_keys($rs);
+	                        foreach($container_keys as $idx)
+	                        {
+	                            foreach($rs[$idx] as $jdx => $item)
+	                            {
+	                                $rs[$idx][$jdx]['tcase_full_path']=$flat_path[$item['testcase_id']];
+	                            }    
+	                        }
 	                    }
 	                break;  
 	            }  

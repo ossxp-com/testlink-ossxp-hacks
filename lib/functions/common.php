@@ -13,12 +13,11 @@
  * @package 	TestLink
  * @author 		Martin Havlat, Chad Rosen
  * @copyright 	2005, TestLink community 
- * @version    	CVS: $Id: common.php,v 1.194 2010/07/14 14:40:33 asimon83 Exp $
+ * @version    	CVS: $Id: common.php,v 1.192 2010/06/24 17:25:53 asimon83 Exp $
  * @link 		http://www.teamst.org/index.php
  * @since 		TestLink 1.5
  *
  * @internal Revisions:
- *  20100714 - asimon - BUGID 3601: show req spec link only when req mgmt is enabled
  *	20100616 - eloff - config_get: log warning when requested option does not exist
  * 	20100310 - franciscom - changes to make code compatible with smarty 3
  * 	20100207 - havlatm - cleanup
@@ -253,14 +252,14 @@ function doSessionStart()
  * @since 1.9
  *
  * @internal Revisions
- *  20100714 - asimon - BUGID 3601: show req spec link only when req mgmt is enabled
  *	20091119 - franciscom - removed global coupling 
+ *
  */
 function initTopMenu(&$db)
 {
 	$_SESSION['testprojectTopMenu'] = '';
 	$guiTopMenu = config_get('guiTopMenu');
-
+    
 	// check if Project is available
 	if (isset($_SESSION['testprojectID']) && $_SESSION['testprojectID'] > 0)
 	{
@@ -268,13 +267,9 @@ function initTopMenu(&$db)
     	foreach ($guiTopMenu as $element)
 		{
 			// check if Test Plan is available
-			// BUGID 3601: check also if req mgmt is enabled
 			if ((!isset($element['condition'])) || ($element['condition'] == '') ||
 				(($element['condition'] == 'TestPlanAvailable') && 
-				  isset($_SESSION['testplanID']) && $_SESSION['testplanID'] > 0) ||
-				(($element['condition'] == 'ReqMgmtEnabled') && 
-				  isset($_SESSION['testprojectOptions']->requirementsEnabled) && 
-				    $_SESSION['testprojectOptions']->requirementsEnabled))
+				  isset($_SESSION['testplanID']) && $_SESSION['testplanID'] > 0))
 			{
 				// (is_null($element['right']) => no right needed => display always
 				if (is_null($element['right']) || has_rights($db,$element['right']) == "yes")
@@ -335,14 +330,9 @@ function initProject(&$db,$hash_user_sel)
 	$tproject_id = isset($_SESSION['testprojectID']) ? $_SESSION['testprojectID'] : 0;
 	$tplan_id = isset($_SESSION['testplanID']) ? $_SESSION['testplanID'] : null;
 	// Now we need to validate the TestPlan
-	// dolezalz, havlatm: added remember the last selection by cookie
-	$cookieName = "TL_user${_SESSION['userID']}_proj${tproject_id}_testPlanId";
 	if($user_sel["tplan_id"] != 0)
 	{
 		$tplan_id = $user_sel["tplan_id"];
-		setcookie($cookieName, $tplan_id, time()+60*60*24*90, '/');
-	} elseif (isset($_COOKIE[$cookieName])) {
-		$tplan_id = intval($_COOKIE[$cookieName]);
 	}
   
 	// check if the specific combination of testprojectid and testplanid is valid
