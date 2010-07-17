@@ -1,7 +1,8 @@
-ossxp-testlink (1.9~beta5+25) unstable; urgency=low
+ossxp-testlink (1.9~beta5+26) unstable; urgency=low
 
   * bugfix: in chart report view, raise a error for 
     $g_interface_bugs not defined.
+  * Install script is in /opt/testlink/web/.install dir.
 
  -- Jiang Xin <jiangxin@ossxp.com>  Thu, 15 Jul 2010 19:04:24 +0800
 

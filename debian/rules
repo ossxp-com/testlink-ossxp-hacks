@@ -11,6 +11,10 @@ $(patsubst %,binary-fixup/%,$(DEB_ALL_PACKAGES)) ::
 		find debian/$$pkg/ \( -name .svn -o -name "*~" \) -exec rm -rf {} + 
 
 binary-fixup/ossxp-testlink::
+	## copy install scripts to .install
+	rm -rf debian/ossxp-testlink/opt/testlink/web/.install
+	cp -a install debian/ossxp-testlink/opt/testlink/web/.install
+
 	# Remove runtime files used for development, or runtime files in development.
 	# Dynamic generated templates files.
 	-rm -rf debian/ossxp-testlink/opt/testlink/web/gui/templates_c

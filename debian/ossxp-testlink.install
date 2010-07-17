@@ -8,7 +8,6 @@ gui             /opt/testlink/web
 lib             /opt/testlink/web
 locale          /opt/testlink/web
 third_party     /opt/testlink/web
-install         /opt/testlink/
 CHANGELOG       /opt/testlink/doc
 SCHEMA_CHANGES  /opt/testlink/doc
 README          /opt/testlink/doc
