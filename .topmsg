@@ -1,6 +1,6 @@
-From: Jiang Xin <worldhello.net@gmail.com>
-Subject: [PATCH] t/single_signon
+From: Jiang <jiangxin@ossxp.com>
+Subject: [PATCH] t/ldap_account_sync
 
-TestLink 单点登录支持
+从 LDAP 中同步用户帐号。
 
-Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
+Signed-off-by: Jiang <jiangxin@ossxp.com>
