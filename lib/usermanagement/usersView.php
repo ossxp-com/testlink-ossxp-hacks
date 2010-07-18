@@ -128,6 +128,7 @@ $smarty->assign('base_href', $args->basehref);
 $smarty->assign('grants',$grants);
 $smarty->assign('body_onload',$args->body_onload);
 $smarty->assign('checked_hide_inactive_users',$args->checked_hide_inactive_users);
+$smarty->assign('ldap_user_sync_capability',ldap_user_sync_capability());
 
 $smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 
@@ -260,4 +261,12 @@ function checkRights(&$db,&$user)
 {
 	return $user->hasRight($db,'mgt_users');
 }
+
+function ldap_user_sync_capability()
+{
+	$authCfg = config_get('authentication');
+	return strtolower($authCfg['method']) != 'md5';
+}
+
+// vim: noet ts=4 sw=4
 ?>

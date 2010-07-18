@@ -22,7 +22,7 @@ include to generate menu when managing users and roles
 
 {lang_get var="tabsMenuLabels"
           s="menu_new_user,menu_view_users,menu_edit_user,menu_define_roles,
-             menu_edit_role,menu_view_roles,menu_assign_testproject_roles,menu_assign_testplan_roles"}
+             menu_edit_role,menu_view_roles,menu_assign_testproject_roles,menu_assign_testplan_roles,menu_ldap_sync_users"}
 
 <div class="tabMenu">
 {if $grants->user_mgmt == "yes"}
@@ -31,6 +31,10 @@ include to generate menu when managing users and roles
 	{else}
 	   {if $highlight->create_user}
 	       <span class="selected">{$tabsMenuLabels.menu_new_user}</span>
+	   {else}
+	      {if $highlight->ldap_sync_users}
+	          <span class="selected">{$tabsMenuLabels.menu_ldap_sync_users}</span>
+	      {/if}
 	   {/if}
 	{/if}
 

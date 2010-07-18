@@ -14,6 +14,7 @@ Purpose: smarty template - users overview
 {assign var="userActionMgr" value="lib/usermanagement/usersEdit.php"}
 {assign var="createUserAction" value="$userActionMgr?doAction=create"}
 {assign var="editUserAction" value="$userActionMgr?doAction=edit&amp;user_id="}
+{assign var="ldapSyncAction" value="lib/usermanagement/ldapSync.php"}
 
 {lang_get s='warning_disable_user' var="warning_msg"}
 {lang_get s='disable' var="del_msgbox_title"}
@@ -163,9 +164,16 @@ function toggleRowByClass(oid,className,displayValue)
 
 	<div class="groupBtn">
 	<form method="post" action="{$createUserAction}" name="launch_create">
+	{if $ldap_user_sync_capability}
+	<input type="button" name="doSync"  value="Sync account with LDAP" onClick="javascript:location.href='{$ldapSyncAction}';return false;" />
+	{/if}
 	<input type="submit" name="doCreate"  value="{$labels.btn_create}" />
   </form>
 	</div>
+	{if $ldap_user_sync_capability}
+		<p><a href="{$ldapSyncAction}"><b>Sync account with LDAP</b></a>:
+       User accounts are management by external auth sources, sync account with it.</p>
+	{/if}
 
 	{*  BUGID 0000103: Localization is changed but not strings *}
 	{if $update_title_bar == 1}

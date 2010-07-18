@@ -141,6 +141,64 @@
 	}
 
 // ----------------------------------------------------------------------------
+	// Read all users from the LDAP directory
+	function ldap_fetch_all_accounts( $ldap_filter="", $max=0 ) 
+	{
+		$users = array();
+
+		$authCfg 			= config_get('authentication');
+		$t_ldap_organization = $authCfg['ldap_organization'];
+		$t_ldap_root_dn		= $authCfg['ldap_root_dn'];
+		$t_ldap_uid_field	= strtolower( $authCfg['ldap_uid_field'] );	// 'uid' by default
+		$t_ldap_firstname_field = strtolower( $authCfg['ldap_firstname_field'] );	// 'givenName' by default
+		$t_ldap_lastname_field  = strtolower( $authCfg['ldap_lastname_field'] );	// 'sn' by default
+		$t_ldap_fullname_field  = strtolower( $authCfg['ldap_fullname_field'] );	// 'cn' by default
+		$t_ldap_email_field     = strtolower( $authCfg['ldap_email_field'] );	// 'mail' by default
+
+    if (empty($ldap_filter))
+		    $t_search_filter 	= "$t_ldap_organization";
+    else if ($ldap_filter[0] == "(")
+		    $t_search_filter 	= "(&${t_ldap_organization}$ldap_filter)";
+    else
+		    $t_search_filter 	= "(&$t_ldap_organization($ldap_filter))";
+		$t_search_attrs  	= array( 'dn',
+                  'uid',
+									$t_ldap_firstname_field,
+									$t_ldap_lastname_field,
+									$t_ldap_fullname_field,
+									$t_ldap_email_field );
+		$t_connect          = ldap_connect_bind();
+
+		if( !is_null($t_connect->handler) )
+		{
+			$t_ds = $t_connect->handler;
+
+			# Search for the user id
+			$t_sr = ldap_search( $t_ds, $t_ldap_root_dn, $t_search_filter, $t_search_attrs );
+			$t_info = ldap_get_entries( $t_ds, $t_sr );
+
+			if ( $t_info ) {
+        $max = $max <= $t_info['count'] && $max > 0 ? $max : $t_info['count'];
+        for ($i = 0; $i < $max; $i++) {
+            $uid = $t_info[$i]['uid'][0];
+            $sn = $t_info[$i][$t_ldap_lastname_field][0];
+            $givenname = $t_info[$i][$t_ldap_firstname_field][0];
+            $mail = $t_info[$i][$t_ldap_email_field][0];
+            $users[$uid] = array();
+            $users[$uid]['lastName'] = $sn;
+            $users[$uid]['firstName'] = $givenname;
+            $users[$uid]['emailAddress'] = $mail;
+        }
+			}
+
+			ldap_free_result( $t_sr );
+			ldap_unbind( $t_ds );
+		}
+
+		return $users;
+	}
+
+// ----------------------------------------------------------------------------
 	// Read user attributes from the LDAP directory
 	function ldap_fetch_account( $login_name ) 
 	{
