@@ -6,6 +6,7 @@ t/single_signon.diff -p1
 t/gui_stylesheet.diff -p1
 t/demo_login.diff -p1
 t/htmlentities_on_utf8.diff -p1
+t/ldap_account_sync.diff -p1
 t/login_page_msg.diff -p1
 t/php5_deprecated.diff -p1
 t/php5_thirdparty_xmlrpc.diff -p1

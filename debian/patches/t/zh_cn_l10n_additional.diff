@@ -6,15 +6,15 @@ Subject: [PATCH] t/zh_cn_l10n_additional
 Signed-off-by: Jiang <jiangxin@ossxp.com>
 
 ---
- locale/en_GB/strings.txt |    9 +++++++++
- locale/zh_CN/strings.txt |    9 +++++++++
- 2 files changed, 18 insertions(+), 0 deletions(-)
+ locale/en_GB/strings.txt |   16 ++++++++++++++++
+ locale/zh_CN/strings.txt |   16 ++++++++++++++++
+ 2 files changed, 32 insertions(+), 0 deletions(-)
 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 8482ab0..70ee1bd 100644
+index 8482ab0..c5399a0 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
-@@ -2908,4 +2908,13 @@ $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe bran
+@@ -2908,4 +2908,20 @@ $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe bran
  $TLS_import_req_exists_here = 'Doc ID exists';
  
  // ----- END ------------------------------------------------------------------
@@ -27,12 +27,19 @@ index 8482ab0..70ee1bd 100644
 +$TLS_demo_login_title = "TestLink demo";
 +$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
 +
++$TLS_menu_ldap_sync_users = "Sync users";
++$TLS_title_ldap_sync_users = "Sync users";
++$TLS_title_ldap_sync_users = "Sync users";
++$TLS_title_ldap_filter = "LDAP filter";
++$TLS_btn_ldap_sync_users = "Sync users";
++$TLS_th_toggle_all = "Toggle all";
++
  ?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index 8a2214d..8080ea0 100644
+index 8a2214d..6c0f3c9 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -2884,4 +2884,13 @@ $TLS_import_req_exists_here = 'Doc ID exists';
+@@ -2884,4 +2884,20 @@ $TLS_import_req_exists_here = 'Doc ID exists';
  
  $TLS_invalid_release_date = 'Release date is not a valid date';
  // ----- END ------------------------------------------------------------------
@@ -44,6 +51,13 @@ index 8a2214d..8080ea0 100644
 +$TLS_sso_login_url_text = "点击这里，使用已有帐号登录";
 +$TLS_demo_login_title = "TestLink 演示";
 +$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
++
++$TLS_menu_ldap_sync_users = "同步帐号";
++$TLS_title_ldap_sync_users = "同步帐号";
++$TLS_title_ldap_sync_users = "同步帐号";
++$TLS_title_ldap_filter = "LDAP 过滤器";
++$TLS_btn_ldap_sync_users = "同步帐号";
++$TLS_th_toggle_all = "全选";
 +
  ?>
 -- 
