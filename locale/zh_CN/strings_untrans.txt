@@ -11,6 +11,7 @@ $TLS_destination_bottom = "Destination position bottom";
 $TLS_error = "Error";
 $TLS_export = "Export";
 $TLS_filter_mode_and = 'Attention: Filter fields works in AND mode';
+$TLS_goto_testspec = 'Open test case specification';
 $TLS_important_notice = "Important Notice";
 $TLS_mandatory = "Mandatory fields";
 $TLS_needed = "Needed";
@@ -366,6 +367,7 @@ $TLS_edit_platform = "Edit platform";
 $TLS_platform_name_already_exists = "Platform name %s already exists!";
 $TLS_platform_update_failed = "Platform update failed";
 $TLS_warning_empty_platform = "Platform can not be empty!";
+$TLS_API_NO_PLATFORMID = "No Platform ID (platformid) provided.";
 $TLS_API_BUILDNAME_DOES_NOT_EXIST = "Build Name (buildname: %s) provided does not exist!";
 $TLS_API_NO_TESTCASE_FOUND = "No Test Case found for search criteria.";
 $TLS_API_TESTPLANNAME_ALREADY_EXISTS="Test Plan (name:%s) Already EXITS on Test Project (name:%s).";
@@ -376,6 +378,13 @@ $TLS_API_PLATFORM_NOT_LINKED_TO_TESTPLAN = "Platform (name=%s/id=%s) is not link
 $TLS_API_TESTPLAN_HAS_NO_PLATFORMS = "Test plan (name:%s) has no platforms linked";
 $TLS_API_TCASEID_NOT_IN_TPLANID_FOR_PLATFORM = "Test Case (name=%s/id=%s) is not associated with " .
                                                "Test Plan (name=%s/id=%s) for Platform (name=%s/id=%s).";
+$TLS_API_MISSING_PLATFORMID_BUT_NEEDED = 'Because Test Plan (name=%s/id=%s) has linked Platforms, operation requested ' .
+                                         'needs platformid';
+$TLS_API_PLATFORM_ID_NOT_LINKED_TO_TESTPLAN = "Platform ID %s is not linked to test plan (name:%s).";
+$TLS_API_LINKED_FEATURE_ALREADY_EXISTS = "Test Case version is already linked to " .
+                                         "Test Plan (name=%s/id=%s) for Platform (name=%s/id=%s).";
+$TLS_API_OTHER_VERSION_IS_ALREADY_LINKED = " Test Case version number %s <> %s (requested version) , " .
+                                           " is already linked to Test Plan (name=%s/id=%s).";
 $TLS_audit_user_disabled = "User '{%1}' was disabled";
 $TLS_audit_requirement_copy = "Req 'DOCID:{%1}' was created as a copy of Req 'DOCID:{%2}'";
 $TLS_audit_req_version_deleted = " Version {%1} of Req 'DOCID:{%2}' - {%3} was deleted.";
@@ -445,3 +454,4 @@ $TLS_import_req_updated = 'Updated - Requirement - Doc ID:%s';
 $TLS_import_done = 'Import done';
 $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
 $TLS_import_req_exists_here = 'Doc ID exists';
+$TLS_invalid_release_date = 'Release date is not a valid date';

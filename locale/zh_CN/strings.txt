@@ -1619,6 +1619,10 @@ $TLS_tp_status_for_build = "构建的测试计划状态";
 
 // ----- gui/templates/resultsTC.tpl -----
 $TLS_generated_by_TestLink_on = "由TestLink 生成 ";
+$TLS_show_all_builds = "Show all builds";
+$TLS_show_all_builds_tooltip = "Show all builds (if hidden)";
+$TLS_expand_groups='Expand';
+$TLS_collapse_groups='Collapse';
 
 // ----- gui/templates/resultsImport.tpl -----
 $TLS_results_import_format = "XML 文件必须按下面格式：";
