@@ -14,7 +14,7 @@ Signed-off-by: leiww <leiww@bj.ossxp.com>
  5 files changed, 1256 insertions(+), 69 deletions(-)
 
 diff --git a/config.inc.php b/config.inc.php
-index d93cc11..d12d289 100644
+index 7c00da7..1246ec7 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -898,10 +898,10 @@ $g_attachments->order_by = " ORDER BY date_added DESC ";
@@ -2151,4 +2151,4 @@ index 0000000..38a814c
 +$TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe branch';
 +$TLS_import_req_exists_here = 'Doc ID exists';
 -- 
-tg: (9ef00e4..) t/zh_cn_l10n (depends on: master)
+tg: (f7c79dd..) t/zh_cn_l10n (depends on: master)

@@ -13,7 +13,7 @@ Signed-off-by: Jiang Xin <worldhello.net@gmail.com>
  4 files changed, 98 insertions(+), 53 deletions(-)
 
 diff --git a/cfg/const.inc.php b/cfg/const.inc.php
-index 9a6b5a9..f11a18b 100644
+index 3a9eb74..67af4cf 100644
 --- a/cfg/const.inc.php
 +++ b/cfg/const.inc.php
 @@ -918,4 +918,4 @@ $tlCfg->guiTopMenu[7] = array(
@@ -24,7 +24,7 @@ index 9a6b5a9..f11a18b 100644
 \ No newline at end of file
 +?>
 diff --git a/config.inc.php b/config.inc.php
-index d93cc11..a64a70a 100644
+index 7c00da7..a301cfd 100644
 --- a/config.inc.php
 +++ b/config.inc.php
 @@ -149,7 +149,7 @@ require_once(TL_ABS_PATH . 'cfg' . DIRECTORY_SEPARATOR . 'const.inc.php');
@@ -217,4 +217,4 @@ index a0da420..52038ac 100644
 \ No newline at end of file
 +INSERT INTO /*prefix*/assignment_status (id,description) VALUES(5,'todo');
 -- 
-tg: (7813fc5..) t/custom_config (depends on: t/typos_no_last_eol)
+tg: (de53abf..) t/custom_config (depends on: t/typos_no_last_eol)
