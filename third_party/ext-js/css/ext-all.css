@@ -4,7 +4,11 @@
  * licensing@extjs.com
  * http://www.extjs.com/license
  */
-html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;}q:before,q:after{content:'';}.ext-el-mask {
+/** 
+ * removed - damage TC format
+ * html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;}q:before,q:after{content:'';}
+ */
+.ext-el-mask {
     z-index: 100;
     position: absolute;
     top:0;
@@ -5918,11 +5922,11 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 }
 
 .x-group-by-icon {
-    background-image:url(../images/default/grid/group-by.gif);
+    background-image:url(../images/default/grid/group-by.gif) !important;
 }
 
 .x-cols-icon {
-    background-image:url(../images/default/grid/columns.gif);
+    background-image:url(../images/default/grid/columns.gif) !important;
 }
 
 .x-show-groups-icon {
