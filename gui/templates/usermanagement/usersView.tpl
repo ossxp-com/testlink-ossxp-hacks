@@ -63,7 +63,8 @@ function toggleRowByClass(oid,className,displayValue)
           s="title_user_mgmt,th_login,title_user_mgmt,th_login,th_first_name,th_last_name,th_email,
              th_role,order_by_role_descr,order_by_role_dir,th_locale,th_active,th_api,th_delete,
              disable,alt_edit_user,Yes,No,alt_delete_user,no_permissions_for_action,btn_create,
-             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user"}
+             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user,
+             menu_ldap_sync_users,ldap_sync_users_desc"}
 
 <body {$body_onload}>
 
@@ -165,15 +166,13 @@ function toggleRowByClass(oid,className,displayValue)
 	<div class="groupBtn">
 	<form method="post" action="{$createUserAction}" name="launch_create">
 	{if $ldap_user_sync_capability}
-	<input type="button" name="doSync"  value="Sync account with LDAP" onClick="javascript:location.href='{$ldapSyncAction}';return false;" />
-	{/if}
+	<input type="button" name="doSync"  value="{$labels.menu_ldap_sync_users}" onClick="javascript:location.href='{$ldapSyncAction}';return false;" />
+	<a href="{$ldapSyncAction}">{$labels.ldap_sync_users_desc}</a>
+  {else}
 	<input type="submit" name="doCreate"  value="{$labels.btn_create}" />
+	{/if}
   </form>
 	</div>
-	{if $ldap_user_sync_capability}
-		<p><a href="{$ldapSyncAction}"><b>Sync account with LDAP</b></a>:
-       User accounts are management by external auth sources, sync account with it.</p>
-	{/if}
 
 	{*  BUGID 0000103: Localization is changed but not strings *}
 	{if $update_title_bar == 1}

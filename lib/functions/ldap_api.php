@@ -156,7 +156,7 @@
 		$t_ldap_email_field     = strtolower( $authCfg['ldap_email_field'] );	// 'mail' by default
 
     if (empty($ldap_filter))
-		    $t_search_filter 	= "$t_ldap_organization";
+		    $t_search_filter 	= $t_ldap_organization ? $t_ldap_organization : "(&(uid=*)(mail=*))";
     else if ($ldap_filter[0] == "(")
 		    $t_search_filter 	= "(&${t_ldap_organization}$ldap_filter)";
     else
