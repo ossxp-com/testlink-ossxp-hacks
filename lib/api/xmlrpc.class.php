@@ -5,8 +5,8 @@
  *  
  * Filename $RCSfile: xmlrpc.class.php,v $
  *
- * @version $Revision: 1.10 $
- * @modified $Date: 2010/06/24 17:25:56 $ by $Author: asimon83 $
+ * @version $Revision: 1.18 $
+ * @modified $Date: 2010/07/16 18:35:22 $ by $Author: franciscom $
  * @author 		Asiel Brumfield <asielb@users.sourceforge.net>
  * @package 	TestlinkAPI
  * 
@@ -22,6 +22,12 @@
  * 
  *
  * rev : 
+ *	20100715 - franciscom - BUGID 3604 - getTestCasesForTestPlan()
+ *	20100711 - franciscom - BUGID 3564 - addTestCaseToTestPlan()
+ *                          BUGID 2607 - UTF8 settings for MySQL
+ *							BUGID 3544: deleteExecution doesn't handle missing execution id - checkExecutionID()
+ *	20100705 - franciscom - BUGID  - getTestPlanPlatforms() typo error
+ * 	20100704 - franciscom - BUGID 3565 - createTestPlan() typo and logic error
  *	20100618 - franciscom - contribution refactored doesUserExist(), checkDevKey()
  *  20100613 - franciscom - BUGID 2845: buildname option in reportTCResult will never be used
  *	20100610 - eloff - added getTotalsForTestPlan() method
@@ -217,6 +223,7 @@ class TestlinkXMLRPCServer extends IXR_Server
 	public static $overwriteParamName = "overwrite";
 	public static $testCasePathNameParamName = "testcasepathname";
     public static $userParamName = "user";
+    public static $getStepsInfoParamName = "getstepsinfo";
 
 
 	// public static $executionRunTypeParamName		= "executionruntype";
@@ -367,17 +374,24 @@ class TestlinkXMLRPCServer extends IXR_Server
 	 * connect to the db and set up the db object 
 	 *
 	 * @access protected
+	 *
+	 * 20100711 - franciscom - BUGID 2607 - UTF8 settings for MySQL
 	 */		
 	protected function _connectToDB()
 	{
 		if(true == $this->testMode)
 		{
-			return $this->dbObj->connect(TEST_DSN, TEST_DB_HOST, TEST_DB_USER, TEST_DB_PASS, TEST_DB_NAME);
+		    $this->dbObj->connect(TEST_DSN, TEST_DB_HOST, TEST_DB_USER, TEST_DB_PASS, TEST_DB_NAME);
 		}
 		else
 		{
-			return $this->dbObj->connect(DSN, DB_HOST, DB_USER, DB_PASS, DB_NAME);
-		}					
+		    $this->dbObj->connect(DSN, DB_HOST, DB_USER, DB_PASS, DB_NAME);
+		}
+		if((DB_TYPE == 'mysql') && ($charSet == 'UTF-8'))
+		{
+		    $this->dbObj->exec_query("SET CHARACTER SET utf8");
+		    $this->dbObj->exec_query("SET collation_connection = 'utf8_general_ci'");
+		}
 	}
 
 	/**
@@ -2188,6 +2202,7 @@ class TestlinkXMLRPCServer extends IXR_Server
 	 * @param int $args["$assignedto"] - optional
 	 * @param string $args["executestatus"] - optional
 	 * @param array $args["executiontype"] - optional
+	 * @param array $args["getstepinfo"] - optional - default false
 	 *
 	 * @return mixed $resultInfo
 	 */
@@ -2204,7 +2219,8 @@ class TestlinkXMLRPCServer extends IXR_Server
                    self::$executedParamName => null,
                    self::$assignedToParamName => null,
                    self::$executeStatusParamName => null,
-                   self::$executionTypeParamName => null);
+                   self::$executionTypeParamName => null,
+                   self::$getStepsInfoParamName => false);
          	
         $optMutualExclusive=array(self::$keywordIDParamName => null,
                                   self::$keywordNameParamName => null); 	
@@ -2234,7 +2250,11 @@ class TestlinkXMLRPCServer extends IXR_Server
         	$keywordSet = explode(",",$keywordList);
         }
 		
-        $options = array('executed_only' => $opt[self::$executedParamName], 'details' => 'full');
+		// BUGID 3604
+        $options = array('executed_only' => $opt[self::$executedParamName], 
+        				 'steps_info' => $opt[self::$getStepsInfoParamName],
+        				 'details' => 'full');
+        				 
 		$filters = array('tcase_id' => $opt[self::$testCaseIDParamName],
 			             'keyword_id' => $opt[self::$keywordIDParamName],
 			             'assigned_to' => $opt[self::$assignedToParamName],
@@ -2611,44 +2631,50 @@ class TestlinkXMLRPCServer extends IXR_Server
 	  * @param args['testplanid']
 	  * @param args['testcaseexternalid']
 	  * @param args['version']
+	  * @param args['platformid'] - OPTIONAL Only if  test plan has no platforms
 	  * @param args['executionorder'] - OPTIONAL
 	  * @param args['urgency'] - OPTIONAL
 	  *
 	  */
-	 public function addTestCaseToTestPlan($args)
-	 {
-	    $operation=__FUNCTION__;
-	    $messagePrefix="({$operation}) - ";
-	    $this->_setArgs($args);
-	    $op_result=null;
-	    $additional_fields='';
-        $checkFunctions = array('authenticate','checkTestProjectID','checkTestCaseVersionNumber',
-                                'checkTestCaseIdentity','checkTestPlanID');
-        
-        $status_ok=$this->_runChecks($checkFunctions,$messagePrefix) && $this->userHasRight("testplan_planning");       
-       
-        // Test Plan belongs to test project ?
-        if( $status_ok )
-        {
-           $tproject_id=$this->args[self::$testProjectIDParamName];
-           $tplan_id=$this->args[self::$testPlanIDParamName];
-           
-           $sql=" SELECT id FROM {$this->tables['testplans']}" .
-                " WHERE testproject_id={$tproject_id} AND id = {$tplan_id}";         
-            
-           $rs=$this->dbObj->get_recordset($sql);
-        
-           if( count($rs) != 1 )
-           {
-              $status_ok=false;
-              $tplan_info = $this->tplanMgr->get_by_id($tplan_id);
-              $tproject_info = $this->tprojectMgr->get_by_id($tproject_id);
-              $msg = sprintf(TPLAN_TPROJECT_KO_STR,$tplan_info['name'],$tplan_id,
-                                                   $tproject_info['name'],$tproject_id);  
-              $this->errors[] = new IXR_Error(TPLAN_TPROJECT_KO,$msg_prefix . $msg); 
-           }
-                      
-        } 
+	public function addTestCaseToTestPlan($args)
+	{
+		$operation=__FUNCTION__;
+		$messagePrefix="({$operation}) - ";
+		$this->_setArgs($args);
+		$op_result=null;
+		$additional_fields='';
+		$doDeleteLinks = false;
+		$doLink = false;
+      	$hasPlatforms = false;
+		$hasPlatformIDArgs = false;
+		$platform_id = 0;
+		$checkFunctions = array('authenticate','checkTestProjectID','checkTestCaseVersionNumber',
+		                        'checkTestCaseIdentity','checkTestPlanID');
+		
+		$status_ok=$this->_runChecks($checkFunctions,$messagePrefix) && $this->userHasRight("testplan_planning");       
+		
+		// Test Plan belongs to test project ?
+		if( $status_ok )
+		{
+		   $tproject_id=$this->args[self::$testProjectIDParamName];
+		   $tplan_id=$this->args[self::$testPlanIDParamName];
+		   $tplan_info = $this->tplanMgr->get_by_id($tplan_id);
+		   
+		   $sql=" SELECT id FROM {$this->tables['testplans']}" .
+		        " WHERE testproject_id={$tproject_id} AND id = {$tplan_id}";         
+		    
+		   $rs=$this->dbObj->get_recordset($sql);
+		
+		   if( count($rs) != 1 )
+		   {
+		      $status_ok=false;
+		      $tproject_info = $this->tprojectMgr->get_by_id($tproject_id);
+		      $msg = sprintf(TPLAN_TPROJECT_KO_STR,$tplan_info['name'],$tplan_id,
+		                                           $tproject_info['name'],$tproject_id);  
+		      $this->errors[] = new IXR_Error(TPLAN_TPROJECT_KO,$msg_prefix . $msg); 
+		   }
+		              
+		} 
        
         // Test Case belongs to test project ?
         if( $status_ok )
@@ -2682,33 +2708,74 @@ class TestlinkXMLRPCServer extends IXR_Server
                    
         }     
 
+		if( $status_ok )
+		{
+		    // Optional parameters
+		    $additional_fields=null;
+		    $additional_values=null;
+		    $opt_fields=array(self::$urgencyParamName => 'urgency', self::$executionOrderParamName => 'node_order');
+		    $opt_values=array(self::$urgencyParamName => null, self::$executionOrderParamName => 1);
+			foreach($opt_fields as $key => $field_name)
+			{
+			    if($this->_isParamPresent($key))
+			    {
+			            $additional_values[]=$this->args[$key];
+			            $additional_fields[]=$field_name;              
+			    }   
+			    else
+			    {
+					if( !is_null($opt_values[$key]) )
+			     	{
+			            $additional_values[]=$opt_values[$key];
+			            $additional_fields[]=$field_name;              
+			        }
+			 	}
+			}
+		}
+
+		if( $status_ok )
+		{
+			// 20100705 - work in progress - BUGID 3564
+			// if test plan has platforms, platformid argument is MANDATORY
+        	$opt = array('outputFormat' => 'mapAccessByID');
+        	$platformSet = $this->tplanMgr->getPlatforms($tplan_id,$opt);  
+      		$hasPlatforms = !is_null($platformSet);
+			$hasPlatformIDArgs = $this->_isParamPresent(self::$platformIDParamName);
+			
+			if( $hasPlatforms )
+			{
+				if( $hasPlatformIDArgs )
+				{
+					// Check if platform id belongs to test plan
+					$platform_id = $this->args[self::$platformIDParamName];
+					$status_ok = isset($platformSet[$platform_id]);
+					if( !$status_ok )
+					{
+   			    		$msg = sprintf( PLATFORM_ID_NOT_LINKED_TO_TESTPLAN_STR,
+                               			$platform_id,$tplan_info['name']);
+   						$this->errors[] = new IXR_Error(PLATFORM_ID_NOT_LINKED_TO_TESTPLAN, $msg);
+					}
+				}
+				else
+				{
+              		$msg = sprintf(MISSING_PLATFORMID_BUT_NEEDED_STR,$tplan_info['name'],$tplan_id);  
+              		$this->errors[] = new IXR_Error(MISSING_PLATFORMID_BUT_NEEDED,$msg_prefix . $msg); 
+					$status_ok = false;
+				}
+			}
+		}       
        if( $status_ok )
        {
-           // Optional parameters
-           $additional_fields=null;
-           $additional_values=null;
-           $opt_fields=array(self::$urgencyParamName => 'urgency', self::$executionOrderParamName => 'node_order');
-           $opt_values=array(self::$urgencyParamName => null, self::$executionOrderParamName => 1);
-		       foreach($opt_fields as $key => $field_name)
-		       {
-		           if($this->_isParamPresent($key))
-		           {
-		                   $additional_values[]=$this->args[$key];
-		                   $additional_fields[]=$field_name;              
-		           }   
-		           else
-		           {
-                   if( !is_null($opt_values[$key]) )
-                   {
-		                   $additional_values[]=$opt_values[$key];
-		                   $additional_fields[]=$field_name;              
-		               }
-               }
-		       }
-       }
-       
-       if( $status_ok )
-       {
+       	  // 20100711 - franciscom
+       	  // Because for TL 1.9 link is done to test plan + platform, logic used 
+       	  // to understand what to unlink has to be changed.
+       	  // If same version exists on other platforms
+       	  //	just add this new record
+       	  // If other version exists on other platforms
+       	  //	error -> give message to user
+       	  //
+       	  // 
+       	  
           // Other versions must be unlinked, because we can only link ONE VERSION at a time
           // 20090411 - franciscom
           // As implemented today I'm going to unlink ALL linked versions, then if version
@@ -2721,9 +2788,58 @@ class TestlinkXMLRPCServer extends IXR_Server
                  " WHERE NH.parent_id = {$tcase_id} " .
                  " AND TCV.id = NH.id ";
                  
-          $all_tcversions=$this->dbObj->fetchRowsIntoMap($sql,'id');
+          $all_tcversions = $this->dbObj->fetchRowsIntoMap($sql,'id');
           $id_set = array_keys($all_tcversions);
-          if( count($id_set) > 0 )
+
+		  // get records regarding all test case versions linked to test plan	
+          $in_clause=implode(",",$id_set);
+          $sql = " SELECT tcversion_id, platform_id, PLAT.name FROM {$this->tables['testplan_tcversions']} TPTCV " .
+                 " LEFT OUTER JOIN {$this->tables['platforms']} PLAT ON PLAT.id = platform_id " . 
+                 " WHERE TPTCV.testplan_id={$tplan_id} AND TPTCV.tcversion_id IN({$in_clause}) ";
+
+		  $rs = $this->dbObj->fetchMapRowsIntoMap($sql,'tcversion_id','platform_id');
+		  
+		  $doLink = is_null($rs);
+		  if( !$doLink )
+		  {
+		  	if( isset($rs[$target_tcversion[$version_number]['id']]) )
+		  	{
+		  		$plat_keys = array_flip(array_keys($rs[$target_tcversion[$version_number]['id']]));
+		  		// need to understand what where the linked platforms.
+		  		$platform_id = $this->args[self::$platformIDParamName];
+		  		$linkExists = isset($plat_keys[$platform_id]);
+ 				$doLink = !$linkExists;
+		  		if( $linkExists )
+		  		{
+		  			$platform_name = $rs[$target_tcversion[$version_number]['id']][$platform_id]['name'];
+          	  		$msg = sprintf(LINKED_FEATURE_ALREADY_EXISTS_STR,$tplan_info['name'],$tplan_id,
+          	  				       $platform_name, $platform_id);  
+          	  		$this->errors[] = new IXR_Error(LINKED_FEATURE_ALREADY_EXISTS,$msg_prefix . $msg); 
+					$status_ok = false;
+		  		}
+		  	}	
+		  	else 
+		  	{
+		  		// Other version than requested done is already linked
+				$doLink = false;
+				reset($rs);
+				$linked_tcversion = key($rs);		  		
+		  		$other_version = $all_tcversions[$linked_tcversion]['version'];
+          	  	$msg = sprintf(OTHER_VERSION_IS_ALREADY_LINKED_STR,$other_version,$version_number,
+          	  				   $tplan_info['name'],$tplan_id);
+          	  	$this->errors[] = new IXR_Error(OTHER_VERSION_IS_ALREADY_LINKED,$msg_prefix . $msg); 
+				$status_ok = false;
+		  	}
+		  	
+          }
+		  if( $doLink && $hasPlatforms )
+		  {
+		 	$additional_values[] = $platform_id;
+		 	$additional_fields[] = 'platform_id';              
+		  }
+
+
+          if( $doDeleteLinks && count($id_set) > 0 )
           {
               $in_clause=implode(",",$id_set);
               $sql=" DELETE FROM {$this->tables['testplan_tcversions']} " .
@@ -2731,26 +2847,30 @@ class TestlinkXMLRPCServer extends IXR_Server
            		$this->dbObj->exec_query($sql);
           }
           
-          $fields="testplan_id,tcversion_id,author_id,creation_ts";
-          if( !is_null($additional_fields) )
-          {
-             $dummy = implode(",",$additional_fields);
-             $fields .= ',' . $dummy; 
-          }
-          
-          $sql_values="{$tplan_id},{$target_tcversion[$version_number]['id']}," .
-                      "{$this->userID},{$this->dbObj->db_now()}";
-          if( !is_null($additional_values) )
-          {
-             $dummy = implode(",",$additional_values);
-             $sql_values .= ',' . $dummy; 
-          }
+		  if( $doLink)
+		  {	
+          	$fields="testplan_id,tcversion_id,author_id,creation_ts";
+          	if( !is_null($additional_fields) )
+          	{
+          	   $dummy = implode(",",$additional_fields);
+          	   $fields .= ',' . $dummy; 
+          	}
+          	
+          	$sql_values="{$tplan_id},{$target_tcversion[$version_number]['id']}," .
+          	            "{$this->userID},{$this->dbObj->db_now()}";
+          	if( !is_null($additional_values) )
+          	{
+          	   $dummy = implode(",",$additional_values);
+          	   $sql_values .= ',' . $dummy; 
+          	}
+          	
+          	$sql=" INSERT INTO {$this->tables['testplan_tcversions']} ({$fields}) VALUES({$sql_values})"; 
+          	$this->dbObj->exec_query($sql);
 
-          $sql=" INSERT INTO {$this->tables['testplan_tcversions']} ({$fields}) VALUES({$sql_values})"; 
-          $this->dbObj->exec_query($sql);
-          
+          	$op_result['feature_id']=$this->dbObj->insert_id($this->tables['testplan_tcversions']);
+
+          }
           $op_result['operation']=$operation;
-          $op_result['feature_id']=$this->dbObj->insert_id($this->tables['testplan_tcversions']);
           $op_result['status']=true;
           $op_result['message']='';
        }
@@ -3404,24 +3524,28 @@ public function getTestCase($args)
 	 * @param string $args["public"], optional default value 1
      *	 
 	 * @return mixed $resultInfo
+	 * @internal revision
+	 *	20100704 - franciscom - BUGID 3565
 	 */
 	public function createTestPlan($args)
 	{
 	    $this->_setArgs($args);
-	    $status_ok=true;    
+	    $status_ok = false;    
         $msg_prefix="(" . __FUNCTION__ . ") - ";
 
     	if($this->authenticate() && $this->userHasRight("mgt_modify_product"))
     	{
             $keys2check = array(self::$testPlanNameParamName,
                                 self::$testProjectNameParamName);
+        
+        	$status_ok = true;
             foreach($keys2check as $key)
             {
                 $names[$key]=$this->_isParamPresent($key,$msg_prefix,self::SET_ERROR) ? trim($this->args[$key]) : '';
                 if($names[$key]=='')
                 {
                     $status_ok=false;    
-                    breack;
+                    break;
                 }
             }
         }
@@ -3584,7 +3708,7 @@ public function getTestCase($args)
 		$resultInfo[0]["status"] = false;
 		
         $checkFunctions = array('authenticate','checkExecutionID');       
-        $status_ok=$this->_runChecks($checkFunctions,$msg_prefix);       
+        $status_ok = $this->_runChecks($checkFunctions,$msg_prefix);       
 	
 	    // Important userHasRight sets error object
 	    //
@@ -3619,11 +3743,30 @@ public function getTestCase($args)
 	 * @return boolean
 	 * @access protected
 	 */        
-    protected function checkExecutionID()
+    protected function checkExecutionID($messagePrefix='',$setError=false)
     {
         // need to be implemented - franciscom
-        $status=true;
-    	return $status;
+		$pname = self::$executionIDParamName;
+		$status_ok = $this->_isParamPresent($pname,$messagePrefix,$setError);
+		if(!$status_ok)
+		{		
+	        $msg = $messagePrefix . sprintf(MISSING_REQUIRED_PARAMETER_STR, $pname);
+	        $this->errors[] = new IXR_Error(MISSING_REQUIRED_PARAMETER, $msg);				      
+		}
+		else
+		{
+			$status_ok = is_int($this->args[$pname]) && $this->args[$pname] > 0;
+			if( !$status_ok )
+			{
+            	$msg = $messagePrefix . sprintf(PARAMETER_NOT_INT_STR,$pname,$this->args[$pname]);
+            	$this->errors[] = new IXR_Error(PARAMETER_NOT_INT, $msg);
+			}
+			else
+			{
+				
+			}
+		}
+		return $status_ok;
     }
 
 
@@ -3839,6 +3982,7 @@ public function getTestCase($args)
 	{
 	    $operation=__FUNCTION__;
 	    $msg_prefix="({$operation}) - ";
+	    $items = null;
 	
 	    $this->_setArgs($args);
 	    $status_ok = $this->_runChecks(array('authenticate','checkTestSuiteID'),$msg_prefix) && 
@@ -3886,8 +4030,6 @@ public function getTestCase($args)
         	// get test plan name is useful for error messages
 			$tplanInfo = $this->tplanMgr->get_by_id($tplanID);
         	$items = $this->tplanMgr->getPlatforms($tplanID);  
-      		$status_ok = !is_null($platformInfo);
-      		
             if(! ($status_ok = !is_null($items)) )
             {
    				$msg = sprintf($messagePrefix . TESTPLAN_HAS_NO_PLATFORMS_STR,$tplanInfo['name']);
