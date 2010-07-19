@@ -9,7 +9,7 @@
  * @package 	TestLink
  * @author 		Martin Havlat
  * @copyright 	2007-2009, TestLink community 
- * @version    	CVS: $Id: const.inc.php,v 1.148 2010/07/02 06:27:11 mx-julian Exp $
+ * @version    	CVS: $Id: const.inc.php,v 1.152 2010/07/14 14:40:33 asimon83 Exp $
  * @see 		config.inc.php
  *
  * @internal 
@@ -21,7 +21,7 @@
 /* [GLOBAL SETTINGS] */
 
 /** TestLink Release version (MUST BE changed before the release day) */
-define('TL_VERSION', '1.9 (Beta 5 - Development)'); 
+define('TL_VERSION', '1.9 (Beta 6 - Development)'); 
 
 // needed to avoid problems in install scripts that do not include config.inc.php
 // want to point to root install dir, need to remove fixed part
@@ -850,7 +850,7 @@ $tlCfg->review_types = array(1 => 'undefined',
  * - url: resource to access when users click on menu item
  * - right: user right need to display menu item.
  *        null => no right check needed
- * - condition: specific condition = ['','TestPlanAvailable']
+ * - condition: specific condition = ['','TestPlanAvailable','ReqMgmtEnabled']
  * - shortcut: keyboard HTML shortcut
  * - target: window/frame name (mainframe in the most of cases)
  * 
@@ -868,7 +868,7 @@ $tlCfg->guiTopMenu[2] = array(
 		'label' => 'title_requirements',
 		'url' => 'lib/general/frmWorkArea.php?feature=reqSpecMgmt',
 		'right' => 'mgt_view_req',
-		'condition'=>'',
+		'condition'=>'ReqMgmtEnabled',
 		'shortcut'=>'r',
 		'target'=>'mainframe'
 ); 
