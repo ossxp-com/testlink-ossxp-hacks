@@ -1,8 +1,14 @@
-ossxp-testlink (1:1.8.5b-5) unstable; urgency=low
+ossxp-testlink (1:1.8.5b-6) unstable; urgency=low
 
   * Add description of ldap users sync.
 
  -- Jiang Xin <jiangxin@ossxp.com>  Mon, 19 Jul 2010 19:09:35 +0800
+
+ossxp-testlink (1:1.8.5b-5) unstable; urgency=low
+
+  * perfect Creative Common logo
+
+ -- Wang Sheng <wangsheng@ossxp.com>  Mon, 12 Jul 2010 12:47:39 +0800
 
 ossxp-testlink (1:1.8.5b-4) unstable; urgency=low
 
