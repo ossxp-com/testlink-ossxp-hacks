@@ -18,7 +18,7 @@
  *
  * @package 	TestLink
  * @copyright 	2005-2009, TestLink community
- * @version    	CVS: $Id: config.inc.php,v 1.309 2010/07/01 13:50:20 mx-julian Exp $
+ * @version    	CVS: $Id: config.inc.php,v 1.311 2010/07/16 11:58:48 mx-julian Exp $
  * @link 		http://www.teamst.org/index.php
  *
  * @internal Revisions:
@@ -417,7 +417,7 @@ $tlCfg->gui->round_corners->tc_spec = ENABLED;
  * Display name definition (used to build a human readable display name for users)
  * Example of values:
  * 		'%first% %last%'          -> John Cook
- * 		'%last%, %first%'          -> John Cook
+ * 		'%last%, %first%'          -> Cook John
  * 		'%first% %last% %login%'    -> John Cook [ux555]
  **/
 $tlCfg->username_format = '%login%';
@@ -976,7 +976,12 @@ $tlCfg->internal_links =  new stdClass();
 // link to requirements: [req]req_doc_id[/req]
 // link to requirement specifications: [req_spec]req_spec_doc_id[/req_spec]
 //
-// FALSE: no links are automatically created.
+// The test project of the requirement / requirement specification and an anchor
+// to jump to can also be specified:
+// [req tproj=<tproj_prefix> anchor=<anchor_name>]req_doc_id[/req]
+// This syntax also works for requirement specifications.
+//
+// FALSE: no links are automatically created. 
 //
 $tlCfg->internal_links->enable =  TRUE;
 
