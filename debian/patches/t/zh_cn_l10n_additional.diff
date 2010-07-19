@@ -36,12 +36,12 @@ index c2814d1..bf301cd 100644
 +
  ?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index 8a2214d..cf1c434 100644
+index 9bc4f37..cbbf367 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
-@@ -2884,4 +2884,20 @@ $TLS_import_req_exists_here = 'Doc ID exists';
+@@ -2884,4 +2884,20 @@ $TLS_import_req_exists_here = '文档 ID 已存在';
  
- $TLS_invalid_release_date = 'Release date is not a valid date';
+ $TLS_invalid_release_date = '发布日期不是一个有效日期';
  // ----- END ------------------------------------------------------------------
 +
 +// ----- 群英汇添加下列国际化字符串。 by ossxp.com -----
@@ -61,4 +61,4 @@ index 8a2214d..cf1c434 100644
 +
  ?>
 -- 
-tg: (a594626..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)
+tg: (f8e6799..) t/zh_cn_l10n_additional (depends on: t/zh_cn_l10n)
