@@ -1,8 +1,8 @@
-ossxp-testlink (1.9~beta5+27) unstable; urgency=low
+ossxp-testlink (1.9~beta5+28) unstable; urgency=low
 
   * New feature: sync ldap user accounts.
 
- -- Jiang Xin <jiangxin@ossxp.com>  Sun, 18 Jul 2010 17:04:04 +0800
+ -- Jiang Xin <jiangxin@ossxp.com>  Mon, 19 Jul 2010 11:17:25 +0800
 
 ossxp-testlink (1.9~beta5+26) unstable; urgency=low
 

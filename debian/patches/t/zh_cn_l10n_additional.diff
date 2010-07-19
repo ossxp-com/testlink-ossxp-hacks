@@ -11,7 +11,7 @@ Signed-off-by: Jiang <jiangxin@ossxp.com>
  2 files changed, 32 insertions(+), 0 deletions(-)
 
 diff --git a/locale/en_GB/strings.txt b/locale/en_GB/strings.txt
-index 8482ab0..c5399a0 100644
+index 8482ab0..b73f490 100644
 --- a/locale/en_GB/strings.txt
 +++ b/locale/en_GB/strings.txt
 @@ -2908,4 +2908,20 @@ $TLS_import_req_conflicts_other_branch = 'Doc ID conflicts with req in othe bran
@@ -28,15 +28,15 @@ index 8482ab0..c5399a0 100644
 +$TLS_demo_login_text = "If you don't have a login yet, before signup an account, you can click the following link for demo.<br>Demo as:";
 +
 +$TLS_menu_ldap_sync_users = "Sync users";
-+$TLS_title_ldap_sync_users = "Sync users";
-+$TLS_title_ldap_sync_users = "Sync users";
-+$TLS_title_ldap_filter = "LDAP filter";
 +$TLS_btn_ldap_sync_users = "Sync users";
++$TLS_ldap_sync_users_desc = "User accounts are managed by external auth sources, sync account with it.";
 +$TLS_th_toggle_all = "Toggle all";
++$TLS_ldap_sync_result = "Add %d accounts successfully from LDAP, %d failed.";
++$TLS_ldap_user_summary = "%s users of %s total. Show %s.";
 +
  ?>
 diff --git a/locale/zh_CN/strings.txt b/locale/zh_CN/strings.txt
-index 8a2214d..6c0f3c9 100644
+index 8a2214d..cf1c434 100644
 --- a/locale/zh_CN/strings.txt
 +++ b/locale/zh_CN/strings.txt
 @@ -2884,4 +2884,20 @@ $TLS_import_req_exists_here = 'Doc ID exists';
@@ -53,11 +53,11 @@ index 8a2214d..6c0f3c9 100644
 +$TLS_demo_login_text = "如果您尚没有可用帐号，在注册帐号之前，可以点击下面的链接，以相应的演示角色登录。<br>登录为:";
 +
 +$TLS_menu_ldap_sync_users = "同步帐号";
-+$TLS_title_ldap_sync_users = "同步帐号";
-+$TLS_title_ldap_sync_users = "同步帐号";
-+$TLS_title_ldap_filter = "LDAP 过滤器";
 +$TLS_btn_ldap_sync_users = "同步帐号";
-+$TLS_th_toggle_all = "全选";
++$TLS_ldap_sync_users_desc = "用户帐号由外部认证源(LDAP)管理，从LDAP同步用户帐号。";
++$TLS_th_toggle_all = "选择";
++$TLS_ldap_sync_result = "成功添加 %d 个账户自LDAP（%d 个失败）。";
++$TLS_ldap_user_summary = "显示 %s 个用户 / 共%s 个。一次显示 %s 。";
 +
  ?>
 -- 

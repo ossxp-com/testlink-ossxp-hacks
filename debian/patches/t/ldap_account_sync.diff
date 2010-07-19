@@ -6,74 +6,42 @@ Subject: [PATCH] t/ldap_account_sync
 Signed-off-by: Jiang <jiangxin@ossxp.com>
 
 ---
- gui/templates/usermanagement/ldapSync.tpl  |  143 +++++++++++++++++++++++
+ gui/templates/usermanagement/ldapSync.tpl  |   97 +++++++++++++++
  gui/templates/usermanagement/tabsmenu.tpl  |    8 +-
- gui/templates/usermanagement/usersView.tpl |   10 ++-
- lib/functions/ldap_api.php                 |   58 ++++++++++
- lib/usermanagement/ldapSync.php            |  168 ++++++++++++++++++++++++++++
+ gui/templates/usermanagement/usersView.tpl |   11 ++-
+ lib/functions/ldap_api.php                 |   58 +++++++++
+ lib/usermanagement/ldapSync.php            |  180 ++++++++++++++++++++++++++++
  lib/usermanagement/usersView.php           |    9 ++
- 6 files changed, 393 insertions(+), 3 deletions(-)
+ 6 files changed, 359 insertions(+), 4 deletions(-)
 
 diff --git a/gui/templates/usermanagement/ldapSync.tpl b/gui/templates/usermanagement/ldapSync.tpl
 new file mode 100644
-index 0000000..5e47fa7
+index 0000000..6cf1a93
 --- /dev/null
 +++ b/gui/templates/usermanagement/ldapSync.tpl
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,97 @@
 +{*
 +Testlink Open Source Project - http://testlink.sourceforge.net/
-+$Id: usersView.tpl,v 1.23 2010/05/02 15:26:59 franciscom Exp $
 +
-+Purpose: smarty template - users overview
++Purpose: smarty template - sync users from ldap
 +
-+20100426 - asimon - removed forgotten comment end sign (template syntax error)
-+20100419 - franciscom - BUGID 3355: A user can not be deleted from the list
-+20100326 - franciscom - BUGID 3324
++20100719 - jiangxin - initialized.
 +*}
 +{include file="inc_head.tpl" openHead="yes"}
-+{include file="inc_del_onclick.tpl"}
-+
-+{assign var="userActionMgr" value="lib/usermanagement/usersEdit.php"}
-+{assign var="createUserAction" value="$userActionMgr?doAction=create"}
-+{assign var="editUserAction" value="$userActionMgr?doAction=edit&amp;user_id="}
-+{assign var="ldapSyncAction" value="lib/usermanagement/ldapSync.php"}
-+
-+{lang_get s='warning_disable_user' var="warning_msg"}
-+{lang_get s='disable' var="del_msgbox_title"}
-+
-+<script type="text/javascript">
-+	var del_action=fRoot+"lib/usermanagement/usersView.php?operation=disable&user=";
-+</script>
 +
 +{literal}
 +<script type="text/javascript">
-+function toggleRowByClass(oid,className,displayValue)
-+{
-+  var trTags = document.getElementsByTagName("tr");
-+  var cbox = document.getElementById(oid);
-+  
-+  for( idx=0; idx < trTags.length; idx++ ) 
-+  {
-+    if( trTags[idx].className == className ) 
-+    {
-+      if( displayValue == undefined )
-+      {
-+        if( cbox.checked )
-+        {
-+          trTags[idx].style.display = 'none';
-+        }
-+        else
-+        {
-+          trTags[idx].style.display = 'table-row';
-+        }
-+      } 
-+      else
-+      {
-+        trTags[idx].style.display = displayValue;
-+      }
++function toggleAllSelection(el) {
++  var boxes = el.getElementsBySelector('input[type=checkbox]');
++  var all_checked = true;
++  for (i = 0; i < boxes.length; i++) { if (boxes[i].checked == false) { all_checked = false; } }
++  for (i = 0; i < boxes.length; i++) {
++    if (all_checked) {
++      boxes[i].checked = false;
++    } else if (boxes[i].checked == false) {
++      boxes[i].checked = true;
 +    }
 +  }
-+
 +}
 +</script>
 +{/literal}
@@ -82,47 +50,32 @@ index 0000000..5e47fa7
 +
 +
 +{lang_get var="labels"
-+          s="title_user_mgmt,th_login,title_user_mgmt,th_login,th_first_name,th_last_name,th_email,
-+             order_by_role_descr,order_by_role_dir,
-+             disable,alt_edit_user,Yes,No,alt_delete_user,no_permissions_for_action,btn_create,
-+             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user,
-+             title_ldap_sync_users,btn_ldap_sync_users,title_ldap_filter,btn_apply_filter,th_toggle_all"}
++          s="title_user_mgmt,th_login,th_first_name,th_last_name,th_email,no_permissions_for_action,
++             menu_ldap_sync_users,btn_ldap_sync_users,btn_apply_filter,th_toggle_all"}
 +
 +<body>
 +
 +{if $grants->user_mgmt == "yes"}
 +
-+	<h1 class="title">{$labels.title_user_mgmt} - {$labels.title_ldap_sync_users}</h1>
++	<h1 class="title">{$labels.title_user_mgmt} - {$labels.menu_ldap_sync_users}</h1>
 +	{***** TABS *****}
 +  {include file="usermanagement/tabsmenu.tpl"}
 +
 +	{***** existing users form *****}
 +	<div class="workBack">
 +		<form method="post" action="lib/usermanagement/ldapSync.php" name="ldapsync" id="ldapsync">
-+		<input type="hidden" id="operation" name="operation" value="" />
-+		<input type="hidden" id="order_by_login_dir" name="order_by_login_dir" value="{$order_by_login_dir}" />
-+		<input type="hidden" id="user_order_by" name="user_order_by" value="{$user_order_by}" />
-+
++    <input type="hidden" name="show" value="{$show|escape}">
 +	  {include file="inc_update.tpl" result=$result item="user" action="$action" user_feedback=$user_feedback}
 +		<div>
-+			{$labels.title_ldap_filter}: 
-+			<input name="ldap_filter" id="ldap_filter" type="text" value="{$ldap_filter}">
-+			<input name="doFilterApply" id="ldap_filter_apply" type="submit" value="{$labels.btn_apply_filter}">
++			<input name="doFilterApply" id="ldap_filter_apply" type="submit" value="{$labels.btn_apply_filter}:">
++			<input name="ldap_filter" id="ldap_filter" type="text" size="50" value="{$ldap_filter}">
 +		</div>
++    <br>
 +		<input name="doLdapSync" id="do_ldap_sync" type="submit" value="{$labels.btn_ldap_sync_users}">
 +		<table class="simple" width="95%">
 +			<tr>
-+				<th style="width:3em;">{$labels.th_toggle_all}</th>
-+				<th {if $user_order_by == 'order_by_login'}style="background-color: #c8dce8;color: black;"{/if}>
-+				    {$labels.th_login}
-+				    <img src="{$smarty.const.TL_THEME_IMG_DIR}/order_{$order_by_login_dir}.gif"
-+				         title="{$labels.order_by_login} {lang_get s=$order_by_login_dir}"
-+						     alt="{$labels.order_by_role_descr} {lang_get s=$order_by_role_dir}"
-+				         onclick="usersview.operation.value='order_by_login';
-+				                  usersview.user_order_by.value='order_by_login';
-+				                  usersview.submit();" />
-+				</th>
-+
++				<th style="width:3em;"><a href="#" onclick="toggleAllSelection(Element.up(this, &quot;form&quot;)); return false;" title="{$labels.th_toggle_all}">{$labels.th_toggle_all}</a></th>
++				<th>{$labels.th_login}</th>
 +				<th>{$labels.th_first_name}</th>
 +				<th>{$labels.th_last_name}</th>
 +				<th>{$labels.th_email}</th>
@@ -138,6 +91,7 @@ index 0000000..5e47fa7
 +			</tr>
 +			{/foreach}
 +		</table>
++    <div>{$summary}</div>
 +		<input name="doLdapSync" id="do_ldap_sync" type="submit" value="{$labels.btn_ldap_sync_users}">
 +		</form>
 +	</div>
@@ -195,7 +149,7 @@ index 05a60bf..d58f2f1 100644
 \ No newline at end of file
 +</div>
 diff --git a/gui/templates/usermanagement/usersView.tpl b/gui/templates/usermanagement/usersView.tpl
-index ce486e8..2466c79 100644
+index ce486e8..d5ceea1 100644
 --- a/gui/templates/usermanagement/usersView.tpl
 +++ b/gui/templates/usermanagement/usersView.tpl
 @@ -14,6 +14,7 @@ Purpose: smarty template - users overview
@@ -206,24 +160,30 @@ index ce486e8..2466c79 100644
  
  {lang_get s='warning_disable_user' var="warning_msg"}
  {lang_get s='disable' var="del_msgbox_title"}
-@@ -163,9 +164,16 @@ function toggleRowByClass(oid,className,displayValue)
+@@ -62,7 +63,8 @@ function toggleRowByClass(oid,className,displayValue)
+           s="title_user_mgmt,th_login,title_user_mgmt,th_login,th_first_name,th_last_name,th_email,
+              th_role,order_by_role_descr,order_by_role_dir,th_locale,th_active,th_api,th_delete,
+              disable,alt_edit_user,Yes,No,alt_delete_user,no_permissions_for_action,btn_create,
+-             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user"}
++             show_inactive_users,hide_inactive_users,alt_disable_user,order_by_login,order_by_login_dir,alt_active_user,
++             menu_ldap_sync_users,ldap_sync_users_desc"}
+ 
+ <body {$body_onload}>
+ 
+@@ -163,7 +165,12 @@ function toggleRowByClass(oid,className,displayValue)
  
  	<div class="groupBtn">
  	<form method="post" action="{$createUserAction}" name="launch_create">
 +	{if $ldap_user_sync_capability}
-+	<input type="button" name="doSync"  value="Sync account with LDAP" onClick="javascript:location.href='{$ldapSyncAction}';return false;" />
-+	{/if}
++	<input type="button" name="doSync"  value="{$labels.menu_ldap_sync_users}" onClick="javascript:location.href='{$ldapSyncAction}';return false;" />
++	<a href="{$ldapSyncAction}">{$labels.ldap_sync_users_desc}</a>
++  {else}
  	<input type="submit" name="doCreate"  value="{$labels.btn_create}" />
++	{/if}
    </form>
  	</div>
-+	{if $ldap_user_sync_capability}
-+		<p><a href="{$ldapSyncAction}"><b>Sync account with LDAP</b></a>:
-+       User accounts are management by external auth sources, sync account with it.</p>
-+	{/if}
  
- 	{*  BUGID 0000103: Localization is changed but not strings *}
- 	{if $update_title_bar == 1}
-@@ -187,4 +195,4 @@ function toggleRowByClass(oid,className,displayValue)
+@@ -187,4 +194,4 @@ function toggleRowByClass(oid,className,displayValue)
  	<a href="{$base_href}" alt="Home">Home</a>
  {/if}
  </body>
@@ -231,7 +191,7 @@ index ce486e8..2466c79 100644
 \ No newline at end of file
 +</html>
 diff --git a/lib/functions/ldap_api.php b/lib/functions/ldap_api.php
-index 7a4a75d..03416ca 100644
+index 7a4a75d..62e582a 100644
 --- a/lib/functions/ldap_api.php
 +++ b/lib/functions/ldap_api.php
 @@ -141,6 +141,64 @@
@@ -253,7 +213,7 @@ index 7a4a75d..03416ca 100644
 +		$t_ldap_email_field     = strtolower( $authCfg['ldap_email_field'] );	// 'mail' by default
 +
 +    if (empty($ldap_filter))
-+		    $t_search_filter 	= "$t_ldap_organization";
++		    $t_search_filter 	= $t_ldap_organization ? $t_ldap_organization : "(&(uid=*)(mail=*))";
 +    else if ($ldap_filter[0] == "(")
 +		    $t_search_filter 	= "(&${t_ldap_organization}$ldap_filter)";
 +    else
@@ -301,10 +261,10 @@ index 7a4a75d..03416ca 100644
  	{
 diff --git a/lib/usermanagement/ldapSync.php b/lib/usermanagement/ldapSync.php
 new file mode 100644
-index 0000000..fe12c80
+index 0000000..59c660b
 --- /dev/null
 +++ b/lib/usermanagement/ldapSync.php
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,180 @@
 +<?php
 +/**
 + * TestLink Open Source Project - http://testlink.sourceforge.net/
@@ -363,14 +323,23 @@ index 0000000..fe12c80
 +			$count_success++;
 +		}
 +	}
-+	$user_feedback = sprintf( "%d accounts added, while %d failed to sync from LDAP.", $count_success, $count_failed );
++	$user_feedback = sprintf( lang_get('ldap_sync_result'), $count_success, $count_failed );
 +}
 +
 +// Get all testlink users include new sync users from ldap.
 +$tl_users = get_tl_users();
 +
 +// Users still in LDAP, but not in testlink.
-+$ldap_new_users = get_new_ldap_users( $tl_users, $ldap_users, 20 );
++$ldap_new_users = get_new_ldap_users( $tl_users, $ldap_users);
++
++$count_total = count($ldap_new_users);
++$count_show = $args->show && $args->show < $count_total ? $args->show : $count_total;
++$ldap_new_users = array_slice( $ldap_new_users, 0, $count_show );
++$summary = sprintf( lang_get(ldap_user_summary), $count_show, $count_total,
++			"<a href='" . $_SERVER['PHP_SELF'] . "?show=20&ldap_filter="  . urlencode($args->ldap_filter) . "'>20</a>, ".
++			"<a href='" . $_SERVER['PHP_SELF'] . "?show=50&ldap_filter="  . urlencode($args->ldap_filter) . "'>50</a>, ".
++			"<a href='" . $_SERVER['PHP_SELF'] . "?show=100&ldap_filter=" . urlencode($args->ldap_filter) . "'>100</a>"
++			);
 +
 +$highlight = initialize_tabsmenu();
 +$highlight->ldap_sync_users = 1;
@@ -382,7 +351,9 @@ index 0000000..fe12c80
 +$smarty->assign('user_feedback',$user_feedback);
 +$smarty->assign('result',$sqlResult);
 +$smarty->assign('grants',$grants);
++$smarty->assign('show',$args->show);
 +$smarty->assign('ldap_user_sync_capability',ldap_user_sync_capability());
++$smarty->assign('summary', $summary);
 +
 +$smarty->display($templateCfg->template_dir . $templateCfg->default_template);
 +
@@ -442,21 +413,22 @@ index 0000000..fe12c80
 +	// "HelloString3" => array("GET",tlInputParameter::STRING_N,1,15,'checkFooOrBar','normFunction'),
 +	$iParams = array("ldap_filter" => array(tlInputParameter::STRING_N,0,90),
 +			         "ids" => array(tlInputParameter::ARRAY_STRING_N),
++			         "show" => array(tlInputParameter::STRING_N),
 +			         "doLdapSync" => array(tlInputParameter::STRING_N),
 +			         "doFilterApply" => array(tlInputParameter::STRING_N));
 +
 +	$pParams = R_PARAMS($iParams);
 +
 +	$args = new stdClass();
-+	$args->ldap_filter = empty($pParams["ldap_filter"]) ? "&(uid=*)(mail=*)(!(objectClass=gosaUserTemplate))" : $pParams["ldap_filter"];
++	$args->ldap_filter = isset($pParams["ldap_filter"]) ? $pParams["ldap_filter"] : "&(uid=*)(mail=*)(!(objectClass=gosaUserTemplate))";
 +    $args->ids = $pParams["ids"];
 +    $args->doLdapSync = empty($pParams["doLdapSync"]) ? false : true;
 +    $args->doFilterApply = empty($pParams["doFilterApply"]) ? false : true;
-+	
++    $args->show = isset($pParams["show"]) ? $pParams["show"] : 20;
 +    $args->currentUser = $_SESSION['currentUser'];
 +    $args->currentUserID = $_SESSION['currentUser']->dbID;
 +    $args->basehref =  $_SESSION['basehref'];
-+    
++   
 +    return $args;
 +}
 +
