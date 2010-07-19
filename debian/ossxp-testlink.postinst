@@ -25,6 +25,11 @@ if [ -z "$2" ]; then
     fi
 fi
 
+# Clear smarty run-time templates, or web page abnormal.
+rm -rf /opt/testlink/web/gui/templates_c
+mkdir /opt/testlink/web/gui/templates_c
+chown www-data.www-data /opt/testlink/web/gui/templates_c
+
 # if package is newly installed, or below xxx
 if dpkg --compare-versions "$2" lt "1.9~beta5-22"; then
     FONTDIR=/opt/testlink/web/third_party/pchart/Fonts

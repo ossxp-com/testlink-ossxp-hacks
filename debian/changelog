@@ -1,6 +1,7 @@
-ossxp-testlink (1.9~beta5+28) unstable; urgency=low
+ossxp-testlink (1.9~beta5+29) unstable; urgency=low
 
   * New feature: sync ldap user accounts.
+  * Clear smarty run-time templates directory.
 
  -- Jiang Xin <jiangxin@ossxp.com>  Mon, 19 Jul 2010 11:17:25 +0800
 
