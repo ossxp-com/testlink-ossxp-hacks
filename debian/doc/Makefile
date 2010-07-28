@@ -15,6 +15,7 @@ $(STAMP_FILE):
 	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
 	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake html)
 	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
+	touch $(STAMP_FILE)
 
 clean:
 	rm -f $(STAMP_FILE)
