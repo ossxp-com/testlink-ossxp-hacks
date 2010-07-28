@@ -7,17 +7,24 @@ DOC_DATE=$(shell date -d "$(DOC_DATESTRING)" +"%Y-%m-%d %H:%M:%S")
 
 all: build
 
-STAMP_FILE=doc-build-stamp
+STAMP_USER_DOC=stamp-user-doc-build
+STAMP_ADMIN_DOC=stamp-admin-doc-build
 
-build: $(STAMP_FILE)
-$(STAMP_FILE):
+build: user admin
+user: $(STAMP_USER_DOC)
+admin: $(STAMP_ADMIN_DOC)
+
+$(STAMP_USER_DOC):
 	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake html)
 	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
+	touch $@
+
+$(STAMP_ADMIN_DOC):
 	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake html)
 	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
-	touch $(STAMP_FILE)
+	touch $@
 
 clean:
-	rm -f $(STAMP_FILE)
+	rm -f stamp-*
 
 # vim: noet ts=4 sw=4

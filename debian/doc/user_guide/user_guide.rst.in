@@ -51,7 +51,7 @@ TestLink 是一个基于Web的测试管理工具。
 TestLink系统共有三大基石：测试项目，测试计划和用户。其它的所有数据都与这三大基石相关或者是它们的属性。
 
 .. figure:: images/testproject_component.png
-   :scale: 70
+   :scale: 90
 
    TestLink里测试项目的基本组件
 
@@ -78,7 +78,7 @@ TestLink系统共有三大基石：测试项目，测试计划和用户。其它
   每一个TestLink用户都有一个角色。
 
   .. figure:: images/usecase.png
-     :scale: 70
+     :scale: 90
 
      TestLink用例图
 
@@ -202,7 +202,7 @@ TestLink将测试规约拆分为测试套件和测试用例，他们将会在整
   可以在 *指派关键字* 页面或者在 *测试用例管理* 页面指派关键字。
 
 .. image:: images/assign_keyword.png
-   :scale: 70
+   :scale: 90
 
 * 关键字过滤器
 
@@ -329,7 +329,7 @@ TestLink提供项目级别的需求规约可见性管理。管理员可在测试
   可以根据具体情况，复制适当的内容到新建的测试计划中。
 
 .. figure:: images/create_testplan.png
-   :scale: 70
+   :scale: 80
 
    创建测试计划
 
@@ -356,7 +356,7 @@ TestLink提供项目级别的需求规约可见性管理。管理员可在测试
   只有打开的构建才允许修改测试结果。
 
 .. figure:: images/create_build.png
-   :scale: 70
+   :scale: 80
 
    创建构建
 
@@ -370,7 +370,7 @@ TestLink提供项目级别的需求规约可见性管理。管理员可在测试
 ------------
 
 .. image:: images/assign_testcase.png
-   :scale: 70
+   :scale: 80
 
 管理者通过该页面来对测试人员分配具体测试任务。
 
@@ -392,7 +392,7 @@ TestLink允许设置测试套件的紧急程度来影响测试用例执行的优
 共有3个优先级：高、中、低
 
 .. figure:: images/set_priority.png
-   :scale: 70
+   :scale: 80
    
    设置测试用例的紧急程度
 
@@ -402,7 +402,7 @@ TestLink允许设置测试套件的紧急程度来影响测试用例执行的优
 测试负责人(leader)可以定义一个里程碑，用于指定截至某一日期，测试执行需要达到的预期进度。
 
 .. figure:: images/create_milestone.png
-   :scale: 70
+   :scale: 80
 
    创建里程碑
 
@@ -426,7 +426,7 @@ TestLink允许设置测试套件的紧急程度来影响测试用例执行的优
 在测试用例特别多的情况下，可以通过过滤器设置，进行筛选。
 
 .. figure:: images/testcase_filter.png
-   :scale: 70
+   :scale: 100
 
    测试用例过滤器截图
 
@@ -437,7 +437,7 @@ TestLink允许设置测试套件的紧急程度来影响测试用例执行的优
 在主页上点击 "结果"或者"测试报告和度量"链接，进入测试报告和度量页面。
 
 .. image:: images/report.png
-   :scale: 70
+   :scale: 80
 
 左侧列出了可供选择的报告形式，右侧将会对应列出详细的信息。
 
@@ -505,17 +505,17 @@ TestLink允许设置测试套件的紧急程度来影响测试用例执行的优
 图表中的方块都有颜色标记, 方便用户识别出通过,失败, 受阻, 未执行的测使用例的大概数目。
 
 .. figure:: images/graph1.png
-   :scale: 70
+   :scale: 100
 
    全面度量图表
 
 .. figure:: images/graph2.png
-   :scale: 70
+   :scale: 90
 
    按关键字显示图表
 
 .. figure:: images/graph3.png
-   :scale: 70
+   :scale: 90
 
    按测试者显示图表
 

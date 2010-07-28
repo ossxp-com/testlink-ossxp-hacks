@@ -1,6 +1,7 @@
-ossxp-testlink (1:1.9.0-6) unstable; urgency=low
+ossxp-testlink (1:1.9.0-7) unstable; urgency=low
 
   * Add PDF footer and header.
+  * Resize images.
 
  -- Jiang Xin <jiangxin@ossxp.com>  Mon, 19 Jul 2010 19:09:35 +0800
 
