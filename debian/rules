@@ -45,5 +45,8 @@ debian/patches:
 	tg export --all --quilt debian/patches
 	cd debian && git status
 
+clean::
+	rm -f debian/doc/doc-build-stamp
+
 .PHONY: debian/patches debian/control
 # vim: noet

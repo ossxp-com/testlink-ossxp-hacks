@@ -7,8 +7,16 @@ DOC_DATE=$(shell date -d "$(DOC_DATESTRING)" +"%Y-%m-%d %H:%M:%S")
 
 all: build
 
-build:
-	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake all)
-	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake all)
+STAMP_FILE=doc-build-stamp
+
+build: $(STAMP_FILE)
+$(STAMP_FILE):
+	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake html)
+	(cd user_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
+	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake html)
+	(cd admin_guide && DOC_REV="$(DOC_REV)" DOC_DATE="$(DOC_DATE)" RUBYOPT=rubygems rake pdf)
+
+clean:
+	rm -f $(STAMP_FILE)
 
 # vim: noet ts=4 sw=4

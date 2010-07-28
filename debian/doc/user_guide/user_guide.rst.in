@@ -1,27 +1,35 @@
-=================
-TestLink 用户手册
-=================
+==================
+|ArticleTitle|
+==================
 
----------------------
-基于TestLink 1.8 版本
----------------------
-
-:作者: 北京群英汇信息技术有限公司_
+:作者: |AuthorOSSXP|_
 :网址: http://www.ossxp.com/
 :版本: |doc_rev|
 :日期: |doc_date|
 :版权信息: |Creative Commons|_
 
+.. |date| date::        %Y-%m-%d %H:%M
+.. |doc_rev| replace::  @ENV(DOC_REV)@
+.. |doc_date| replace:: @ENV(DOC_DATE)@
+.. |Creative Commons|   image:: images/cc-icon.png
+.. _Creative Commons:   http://creativecommons.org/licenses/by-sa/3.0/
+.. |AuthorOSSXP|        replace:: 北京群英汇信息技术有限公司
+.. _AuthorOSSXP:        http://www.ossxp.coom/
+.. |ArticleTitle|       replace:: TestLink 用户手册
+.. _ArticleTitle:       http://www.ossxp.com/doc/testlink/user_guide/user_guide.html
+
 .. contents:: 目录
 .. sectnum::
-.. header:: TestLink 用户手册
-.. footer:: 北京群英汇信息技术有限公司
-.. |doc_rev| replace:: ENV(DOC_REV)
-.. |doc_date| replace:: ENV(DOC_DATE)
-.. |Creative Commons| image:: images/cc-icon.png
-                              :scale: 100
-.. _Creative Commons: http://creativecommons.org/licenses/by-sa/3.0/
-.. _北京群英汇信息技术有限公司: http://www.ossxp.com/
+
+.. include:: DEFINES.txt
+   :start-after: START_@ENV(DOC_BACKEND)@_HEADER_FOOTER
+   :end-before: END_@ENV(DOC_BACKEND)@_HEADER_FOOTER
+
+.. raw:: pdf
+
+   Transition Dissolve 1
+   PageBreak contentsPage
+
 
 系统介绍
 =========
